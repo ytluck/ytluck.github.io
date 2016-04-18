@@ -26,7 +26,173 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-super-post-04.html">数据存储</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-data-01.html">MySQL文件系统</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-04-17T13:20:00+08:00">
+                Published: 2016-04-17 13:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/mysql.html">MySQL</a> </p>
+</footer><!-- /.post-info --><h3>芯片架构以及指令集</h3>
+<div class="highlight"><pre><span></span>* 计算机指令系统
+  * 计算机中央处理器的设计模式：复杂指令集（CISC）和精简指令集（RISC）两部分
+  * 微电子技术、微电子机械系统
+  * 处理器：32bit 和64bit
+</pre></div>
+
+
+<h3>安装的操作系统平台，以及安装平台下的限制</h3>
+<div class="highlight"><pre><span></span>* windows下：目录和文件名、文件名大小写、目录的分隔符、管道操作隐患、最大可用内存、端口限制、文件系统
+* Linux下：源码安装和使用编译好的二进制文件安装
+* Unix
+* 操作系统：32bit 和64bit
+</pre></div>
+
+
+<h3>MySQL中数据库是个操作系统层的目录</h3>
+<h3>安装文件：</h3>
+<p>bin文件夹下是：可执行文件 mysql.exe、 mysqld<br />
+   data文件夹下是：数据库文件<br />
+   include文件夹下是：头文件 ，mysql.h errmsg.h<br />
+   lib文件夹下是：库文件，又有两个子文件夹 Plugin 和debug<br />
+   share文件夹下是：字符集与语言等信息<br />
+   support-files文件夹下是支持文件，包含Solaris文件<br />
+   my.ini文件：参数配置文件</p>
+<p>data文件夹下是：数据库文件</p>
+<h3>系统默认创建的数据库</h3>
+<div class="highlight"><pre><span></span> mysql：记录用户权限、帮助、日志等信息  
+ performance——schema：服务性能指标库  
+ information_schema：记录用户、表、视图的元数据信息，是虚拟出来的视图，所以在文件夹下没有
+</pre></div>
+
+
+<h3>用户创建的数据库：</h3>
+<div class="highlight"><pre><span></span> 表对象数据文件：frm:表对象的结构定义文件，所有存储引擎都会有的文件，frm文件是用来保存每个数据表的元数据(meta)信息，包括表结构的定义等
+         db.opt文件 ,该文件主要用来存储当前数据库的默认字符集和字符校验规则。collation&lt;校验&gt;
+         .ibd 文件,InnoDB引擎专用文件,是单表表空间文件，每个表使用一个表空间文件（file per table），存放用户数据库表数据和索引,
+         .myd文件：MyISAM 引擎专用的数据文件
+         .myi文件：MyISAM 引擎专用的索引文件
+         .scv文件：CSV引擎专用的数据文件
+         .arz
+         .pid 文件：进程ID文件
+</pre></div>
+
+
+<h3>日志文件</h3>
+<ul>
+<li>记录错误信息的日志<br />
+ 服务进程运行时发生的关键错误&lt;可以指定路径和文件名，默认的lenovo-01.err&gt;<br />
+    错误日志文件
+     Note 、Warning、 Error三类信息</li>
+<li>记录查询信息的日志 <br />
+    查询日志文件&lt;文本格式&gt;：用于审计<br />
+    slow query log<br />
+    general query log ：记录mysqld进程几乎所有的操作，通常不被启用，记录内容太详细，安全性和效率就要考虑了
+    配置查询日志         </li>
+<li>记录数据库中的修改事件<br />
+      二进制日志<binary log>，用于复制和恢复<br />
+    二进制日志文件<binary log file><br />
+     使用专用的工具查询mysqlbinlog.exe ,记录的格式有所不同，有基于行格式记录<row-based logging>、<br />
+     基于语句记录<statement-based logging>、 以及基于混合模式记录的<mixed-based logging>  </li>
+<li>记录当前复制环境、进度的
+    中继日志文件
+    中继日志信息文件
+    Master信息日志文件</li>
+<li>mysql 配置文件<Option Files>
+  Windows平台下配置文件的扩展名既可以是 .ini 也可以使 .cnf <br />
+默认会扫描以下路径中的文件，并使用找到的第一个匹配的文件，不同平台的默认路径是不一样的，也可以自己设定路径，只要告诉MySQL命令行文件路径，主要是通过defaults-file 和default-extra-file 这两个参数确定<br />
+my.ini         真正的配置信息
+my-default.ini 存放一些默认配置信息<br />
+配置选项的语法，以及指定配置的选项<br />
+注释符<br />
+[] :用于定义对应命令行的选项
+    [mysqld] 服务器端的配置<br />
+    [client] 客户端的配置作用于所有命令行程序<br />
+    [mysql] [mysqladmin]、[mysqldump] [mysqlhotcopy]   [myisamchk]<br />
+    Option_name = Option_value  </li>
+</ul>
+<h3>附录：</h3>
+<div class="highlight"><pre><span></span>mysqld.exe 是MySQL后台程序(即MySQL服务器)。要想使用客户端程序，该程序必须运行，因为客户端通过连接服务器来访问数据库。  
+mysql.exe  是MySQL自带的命令行客户端工具，是交互式输入SQL语句或从文件以批处理模式执行它们的命令行工具。
+简单来说：mysqld是用来启动mysql数据库的命令，mysql则是打开并执行sql语句的命令。
+</pre></div>
+
+
+<h3>mysqld端的配置</h3>
+<p>Option_name
+[mysqld]
+  port      #：MySQL数据库的端口<br />
+  basedir   #：MySQL的安装路径<br />
+  datadir   #：MySQL数据文件的存储位置<br />
+  character-set-server=utf8 #：服务器端默认的字符集<br />
+  collation-server=utf8_general_ci  #：服务器端默认的校对规则<br />
+  default-storage-engine=INNODB #：默认的存储引擎<br />
+  sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"     #：表示SQL模式的参数，设置检验SQL语句的严格程度<br />
+  max_connections=512   #：表示允许同时访问MySQL最大连接数&lt;其中一个预留给管理员登陆&gt;  </p>
+<p>query_cache_size=0    #：表示查询时缓存的大小
+  table_cache=256
+  tmp_table_size=18M    #：内存中临时表的最大值</p>
+<p>thread_cache_size=8   #：保留客户端线程的缓存
+  myisam_max_sort_file_size=64G
+  myisam_sort_buffer_size=35M
+  key_buffer_size=25M
+  read_buffer_size=64K
+  read_rnd_buffer_size=256K
+  sort_buffer_size=256K</p>
+<p>innodb_additional_mem_pool_size=2M    #：表示附加的内存池，用来存储InnoDB表的内容<br />
+  innodb_flush_log_at_trx_commit=1  #：表示 设置提交日志的时机<br />
+  innodb_log_buffer_size=1M #：表示用来存储日志数据缓冲区的大小<br />
+  innodb_buffer_pool_size=47M   #：表示缓存大小，InnoDB用缓存池来保存索引和原始数据<br />
+  innodb_log_file_size=24M  #:日志文件大小<br />
+  innodb_thread_concurrency=8   #：表示InnoDB存储引擎允许的线程最大数<br />
+  innodb_lock_wait_timeout = 288000000  #：设置锁等待时间<br />
+  max_allowed_packet = 1024M    #：服务器接受的数据包大 eg:sql文件过大,会出现"MySQL server has gone away"问题
+  wait_timeout=288000000
+   (1)interactive_timeout:
+   参数含义：服务器关闭交互式连接前等待活动的秒数<br />
+   (2)wait_timeout:参数含义：服务器关闭非交互连接之前等待活动的秒数。</p>
+<h2>表对象数据文件</h2>
+<div class="highlight"><pre><span></span>db.opt文件 ,该文件主要用来存储当前数据库的默认字符集和字符校验规则。collation&lt;校验&gt;  
+.frm       ,frm文件是用来保存每个数据表的元数据(meta)信息，包括表结构的定义等    
+.ibd       ,是单表表空间文件，每个表使用一个表空间文件（file per table），存放用户数据库表数据和索引,InnoDB引擎专用文件  
+.myd       ,MYD文件用来保存MyISAM表的数据&lt;表的数据记录&gt;,专属于MyISAM存储引擎的
+.myi       ,MYI文件用来存放MyISAM表的索引信息,专属于MyISAM存储引擎的
+.csm
+.csv       ，CSV引擎专用的数据文件
+.arz       ，archive引擎专用数据文件
+MyISAM表结构
+InnoDB表结构
+</pre></div>
+
+
+<h3>当配置好MySQL数据库服务后，系统会默认的创建4个库；具体</h3>
+<p>information_schema<br />
+perfoemance_schema<br />
+mysql<br />
+test<br />
+schema [ˈski:mə] 在MySQL中和database是可以等效的
+information_schema，数据字典信息库，只读视图，mysql启动的时候所加载的系统参数信息。所以没有实际的物理存储
+                    对于该库，用户拥有查询功能<br />
+perfoemance_schema，服务性能指标库<br />
+mysql             ，记录用户权限、帮助、日志等信息<br />
+test              ,测试库</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-super-post-04.html" rel="bookmark"
+                           title="Permalink to 数据存储">数据存储</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-14T13:04:00+08:00">
                 Published: 2016-04-14 13:04:00
@@ -37,26 +203,10 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/mysql.html">MySQL</a> </p>
-</footer><!-- /.post-info --><h3>数据库中文乱码的原因</h3>
-<ul>
-<li>
-<p>数据文件的编码方式：txt多ASCII码编码，另存为之后变为utf8</p>
-</li>
-<li>
-<p>数据文件的数据格式：列的间隔，分行的标识windows下或者Linux下</p>
-</li>
-<li>
-<p>数据库的原因：数据库的存储和连接方式</p>
-</li>
-<li>
-<p>程序的原因：</p>
-</li>
-</ul>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>MySQL数据库乱码</p>
+                <a class="readmore" href="/data-mining/my-super-post-04.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
