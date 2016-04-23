@@ -26,7 +26,92 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-data-post-01.html">R语言函数作用空间</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-data-post-02.html">R语言排序与统计频数</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-04-23T16:08:00+08:00">
+                Published: 2016-04-23 16:08:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info --><table><tr><td bgcolor=#DED5B6>
+##R 语言排序
+###数据示意
+    FL <- c(1,5,4,4)
+    FF <- c(3,7,4,2)
+    FA <- c("A","C","D","B")
+    ora  <- data.frame(FL,FF,FA)
+###排序
+    ##只排一行
+    sort(ora$FL)
+    sort(ora$FL,decreasing=TRUE)
+###获得排序的位置，多列排序,升序以及降序
+     order(ora$FL)
+     ora[order(ora$FL),]
+     ora[order(-ora$FL),]
+     ora[order(ora$FL,ora$FA),]
+     ora[order(ora$FL,ora$FA,decreasing=T),]
+     ora[order(-ora$FL,ora$FA),]
+###还原排序
+    ora2 <-ora[order(ora$FL),]  
+    ora3 <- ora2[order(order(ora$FL)),]
+###利用行名还原排序
+    ora2 <-ora[order(ora$FL),]  
+    N <- nrow(ora)
+    DealData <- data.frame(FL=numeric(N),FF=numeric(N),FA=numeric(N))       
+    DealData[as.integer(row.names(ora2)),] <- ora2
+
+###按照自定义列排序
+    ora
+    ora4 <- cbind(ora2,ora2$FA)
+    rownames(ora4) <- NULL
+    merge(ora,ora4,all=TRUE,sort=FALSE)
+    merge(ora4,ora,all=TRUE,sort=FALSE)
+##R语言统计频率
+###数据
+    score    <- c(1,2,1,3,3,4)
+    grade <- c("A","A","A","B","B","C")
+    LA <- data.frame(score ,grade ,stringsAsFactors=F)
+###统计一列的数据
+    sp <- table(LA$score)
+    sp <- as.data.frame(sp,stringsAsFactors=F)
+    str(sp)
+###统计两列的或者多列的组合
+  * 方法一  
+    `install.packages("plyr")，没有这个包的话要下载 `  
+    `library(plyr)`  
+    `Freq_table  <- count(LA,vars=c("score","grade")) `   
+    `colnames(Freq_table) <- c("scor","gra","Frequency")`   
+  * 方法二  
+    `library(dplyr)  `      
+    `rename(count(LA,score ,grade), Freq = n)`  
+  * 方法三      
+    `library(reshape2)`  
+    `df_counts <- melt(table(LA))`   
+    `names(df_counts) <- names(LA)`   
+    `colnames(df_counts)[ncol(df_counts)] <- "count" `  
+ * 方法四  
+    `library(data.table) ` 
+    /##数据框转为列连表  
+    `setDT(LA)`  
+      ## 转化   
+      `df[,.N,by=c('score','grade')]`                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-data-post-01.html" rel="bookmark"
+                           title="Permalink to R语言函数作用空间">R语言函数作用空间</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-20T19:20:00+08:00">
                 Published: 2016-04-20 19:20:00
@@ -37,30 +122,12 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><h2>R语言中函数环境的运作机制</h2>
-<ul>
-<li>在R语言中函数称之为（closure），即闭包。函数不仅包含参数以及函数体，还包括环境 &lt;命名孔家&gt;</li>
-<li>函数的输入：函数的输入有位置参数以及 原则：惰性求值(Lazy evaluation)</li>
-<li>函数体：  循环结构，选择结构，顺序结构等</li>
-<li>函数的输出：返回值可以显性调用return()函数，或者不显性调用</li>
-<li>函数的调用</li>
-<li>函数种类：匿名函数等，自定义函数</li>
-<li>
-<p>自定义函数： function(){} </p>
-</li>
-<li>
-<p>变量的作用区域：scope具有层次结构， 多重嵌套的函数，对层次进行擦操作涉及 &lt;&lt;-  或者是assign(),对上层变量进行操作。</p>
-</li>
-<li>环境的创建一般依靠继承</li>
-<li>R语言中没有指针，依靠赋值来改变</li>
-</ul>
-<h2>R语言自定义类</h2>
-<ul>
-<li>数据结构满足条件，可以直接用，但当数据结构不满足的情况下就需要自定义类了。主要方面有 定义类，创建对象，引用成员变量，声明泛型，实现泛型。</li>
-<li>S3类：通过构建列表的方式，然后手动添加类属性，再实现各种泛型</li>
-<li>S4类</li>
-</ul>                </article>
-            </aside><!-- /#featured -->
+</footer><!-- /.post-info -->                <p>R语言函数以及类</p>
+                <a class="readmore" href="/data-mining/my-data-post-01.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>
