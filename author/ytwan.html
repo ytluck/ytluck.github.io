@@ -37,68 +37,92 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><table><tr><td bgcolor=#DED5B6>
-##R 语言排序
-###数据示意
-    FL <- c(1,5,4,4)
-    FF <- c(3,7,4,2)
-    FA <- c("A","C","D","B")
-    ora  <- data.frame(FL,FF,FA)
-###排序
-    ##只排一行
-    sort(ora$FL)
-    sort(ora$FL,decreasing=TRUE)
-###获得排序的位置，多列排序,升序以及降序
-     order(ora$FL)
-     ora[order(ora$FL),]
-     ora[order(-ora$FL),]
-     ora[order(ora$FL,ora$FA),]
-     ora[order(ora$FL,ora$FA,decreasing=T),]
-     ora[order(-ora$FL,ora$FA),]
-###还原排序
-    ora2 <-ora[order(ora$FL),]  
-    ora3 <- ora2[order(order(ora$FL)),]
-###利用行名还原排序
-    ora2 <-ora[order(ora$FL),]  
-    N <- nrow(ora)
-    DealData <- data.frame(FL=numeric(N),FF=numeric(N),FA=numeric(N))       
-    DealData[as.integer(row.names(ora2)),] <- ora2
+</footer><!-- /.post-info --><h2>R 语言排序</h2>
+<h3>数据示意</h3>
+<div class="highlight"><pre><span></span>FL <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
+FF <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
+FA <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;C&quot;</span><span class="p">,</span><span class="s">&quot;D&quot;</span><span class="p">,</span><span class="s">&quot;B&quot;</span><span class="p">)</span>
+ora  <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>FL<span class="p">,</span>FF<span class="p">,</span>FA<span class="p">)</span>
+</pre></div>
 
-###按照自定义列排序
-    ora
-    ora4 <- cbind(ora2,ora2$FA)
-    rownames(ora4) <- NULL
-    merge(ora,ora4,all=TRUE,sort=FALSE)
-    merge(ora4,ora,all=TRUE,sort=FALSE)
-##R语言统计频率
-###数据
-    score    <- c(1,2,1,3,3,4)
-    grade <- c("A","A","A","B","B","C")
-    LA <- data.frame(score ,grade ,stringsAsFactors=F)
-###统计一列的数据
-    sp <- table(LA$score)
-    sp <- as.data.frame(sp,stringsAsFactors=F)
-    str(sp)
-###统计两列的或者多列的组合
-  * 方法一  
-    `install.packages("plyr")，没有这个包的话要下载 `  
-    `library(plyr)`  
-    `Freq_table  <- count(LA,vars=c("score","grade")) `   
-    `colnames(Freq_table) <- c("scor","gra","Frequency")`   
-  * 方法二  
-    `library(dplyr)  `      
-    `rename(count(LA,score ,grade), Freq = n)`  
-  * 方法三      
-    `library(reshape2)`  
-    `df_counts <- melt(table(LA))`   
-    `names(df_counts) <- names(LA)`   
-    `colnames(df_counts)[ncol(df_counts)] <- "count" `  
- * 方法四  
-    `library(data.table) ` 
-    /##数据框转为列连表  
-    `setDT(LA)`  
-      ## 转化   
-      `df[,.N,by=c('score','grade')]`                </article>
+
+<h3>排序</h3>
+<div class="highlight"><pre><span></span><span class="cp">##</span><span class="c">只排一行</span><span class="x"></span>
+<span class="x">sort(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">)</span>
+<span class="x">sort(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,decreasing=TRUE)</span>
+</pre></div>
+
+
+<h3>获得排序的位置，多列排序,升序以及降序</h3>
+<div class="highlight"><pre><span></span><span class="x"> order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">)</span>
+<span class="x"> ora[order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">),]</span>
+<span class="x"> ora[order(-ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">),]</span>
+<span class="x"> ora[order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,ora</span><span class="p">$</span><span class="nv">FA</span><span class="x">),]</span>
+<span class="x"> ora[order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,ora</span><span class="p">$</span><span class="nv">FA</span><span class="x">,decreasing=T),]</span>
+<span class="x"> ora[order(-ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,ora</span><span class="p">$</span><span class="nv">FA</span><span class="x">),]</span>
+</pre></div>
+
+
+<h3>还原排序</h3>
+<div class="highlight"><pre><span></span>ora2 <span class="o">&lt;-</span>ora<span class="p">[</span><span class="kp">order</span><span class="p">(</span>ora<span class="o">$</span>FL<span class="p">),]</span>  
+ora3 <span class="o">&lt;-</span> ora2<span class="p">[</span><span class="kp">order</span><span class="p">(</span><span class="kp">order</span><span class="p">(</span>ora<span class="o">$</span>FL<span class="p">)),]</span>
+</pre></div>
+
+
+<h3>利用行名还原排序</h3>
+<div class="highlight"><pre><span></span>ora2 <span class="o">&lt;-</span>ora<span class="p">[</span><span class="kp">order</span><span class="p">(</span>ora<span class="o">$</span>FL<span class="p">),]</span>  
+N <span class="o">&lt;-</span> <span class="kp">nrow</span><span class="p">(</span>ora<span class="p">)</span>
+DealData <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>FL<span class="o">=</span><span class="kt">numeric</span><span class="p">(</span>N<span class="p">),</span>FF<span class="o">=</span><span class="kt">numeric</span><span class="p">(</span>N<span class="p">),</span>FA<span class="o">=</span><span class="kt">numeric</span><span class="p">(</span>N<span class="p">))</span>       
+DealData<span class="p">[</span><span class="kp">as.integer</span><span class="p">(</span><span class="kp">row.names</span><span class="p">(</span>ora2<span class="p">)),]</span> <span class="o">&lt;-</span> ora2
+</pre></div>
+
+
+<h3>按照自定义列排序</h3>
+<div class="highlight"><pre><span></span>ora
+ora4 <span class="o">&lt;-</span> <span class="kp">cbind</span><span class="p">(</span>ora2<span class="p">,</span>ora2<span class="o">$</span>FA<span class="p">)</span>
+<span class="kp">rownames</span><span class="p">(</span>ora4<span class="p">)</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+<span class="kp">merge</span><span class="p">(</span>ora<span class="p">,</span>ora4<span class="p">,</span>all<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>sort<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+<span class="kp">merge</span><span class="p">(</span>ora4<span class="p">,</span>ora<span class="p">,</span>all<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>sort<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>R语言统计频率</h2>
+<h3>数据</h3>
+<div class="highlight"><pre><span></span>score    <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
+grade <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
+LA <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>score <span class="p">,</span>grade <span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>统计一列的数据</h3>
+<div class="highlight"><pre><span></span>sp <span class="o">&lt;-</span> <span class="kp">table</span><span class="p">(</span>LA<span class="o">$</span>score<span class="p">)</span>
+sp <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>sp<span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+str<span class="p">(</span>sp<span class="p">)</span>
+</pre></div>
+
+
+<h3>统计两列的或者多列的组合</h3>
+<ul>
+<li>方法一<br />
+<code>install.packages("plyr")，没有这个包的话要下载</code><br />
+<code>library(plyr)</code><br />
+<code>Freq_table  &lt;- count(LA,vars=c("score","grade"))</code> <br />
+<code>colnames(Freq_table) &lt;- c("scor","gra","Frequency")</code>   </li>
+<li>方法二<br />
+<code>library(dplyr)</code>    <br />
+<code>rename(count(LA,score ,grade), Freq = n)</code>  </li>
+<li>方法三    <br />
+<code>library(reshape2)</code><br />
+<code>df_counts &lt;- melt(table(LA))</code> <br />
+<code>names(df_counts) &lt;- names(LA)</code> <br />
+<code>colnames(df_counts)[ncol(df_counts)] &lt;- "count"</code>  </li>
+<li>方法四<br />
+<code>library(data.table)</code> 
+    /##数据框转为列连表<br />
+<code>setDT(LA)</code><br />
+      ## 转化 <br />
+<code>df[,.N,by=c('score','grade')]</code></li>
+</ul>                </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
                     <h1>Other articles</h1>
