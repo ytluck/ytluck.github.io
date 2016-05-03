@@ -26,7 +26,119 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-data-post-02.html">R语言排序与统计频数</a></h1>
+                    <h1 class="entry-title"><a href="/operating-systems/my-os-01.html">操作系统之文件管理</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-05-03T22:20:00+08:00">
+                Published: 2016-05-03 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/operating-systems/index.html">Operating Systems</a>.</p>
+<p>tags: <a href="/tag/linux.html">Linux</a> </p>
+</footer><!-- /.post-info --><h2>操作系统之文件管理（一）</h2>
+<p>目录 路径 磁盘以及文件系统</p>
+<h3>Unix-like</h3>
+<p>简称：BSD （Berkeley Software Distribution） <br />
+多用户和多任务    </p>
+<h4>Linux内核版本编号</h4>
+<div class="highlight"><pre><span></span>主版本.次版本.释出版本-修改版本   
+    例如: 3.16.0-30-generic    
+Linux Distributions Linux发布商套件，两种安装软件的系统   
+一种是包括Red Hat以及CentOse的使用PRM方式安装   
+一种是包括Debian以及Ubuntu的使用DPKG安装
+</pre></div>
+
+
+<h4>使用环境：</h4>
+<div class="highlight"><pre><span></span>个人环境的使用：桌面计算机，手持设备，以及嵌入式系统   
+企业政府等环境
+</pre></div>
+
+
+<h4>文件系统</h4>
+<div class="highlight"><pre><span></span>EXt2/Ext3文件系统
+</pre></div>
+
+
+<h4>文件的三种身份</h4>
+<div class="highlight"><pre><span></span>所有者，用户组以及其他人（Owner Group Others），每种身份有三种权限（r,w,x）
+</pre></div>
+
+
+<h4>文件的权限属性：</h4>
+<div class="highlight"><pre><span></span>所有者，用户组以及其他人（Owner Group Others），每种身份有三种权限（r,w,x）   
+read:4
+write:2
+eXecute:1
+SUID 4 SGID：2  SBIT：1 系统账号权限有关
+t       进程有关
+</pre></div>
+
+
+<h4>文件类型属性</h4>
+<p>在Linux中每个设备都是一个被当成一个文件来对待，Linux中文件的种类以及扩展名 </p>
+<div class="highlight"><pre><span></span>一般文件 -
+目录文件 d
+连接文件 l
+设备文件 b 或者是c 即：block设备文件以及character设备文件
+套接字  s
+管道    p
+</pre></div>
+
+
+<h4>文件的隐藏属性</h4>
+<div class="highlight"><pre><span></span>lsattr  &lt;仅适用于EXt2/Ext3文件系统&gt;
+chattr
+</pre></div>
+
+
+<h4>文件默认权限和属性扩展名以及文件大小限制</h4>
+<div class="highlight"><pre><span></span>umask
+umask -S
+</pre></div>
+
+
+<h4>目录树</h4>
+<div class="highlight"><pre><span></span>根目录 /
+</pre></div>
+
+
+<h4>路径</h4>
+<div class="highlight"><pre><span></span>绝对路径
+相对路径： ./  ../
+</pre></div>
+
+
+<h4>相关的Linux命令</h4>
+<div class="highlight"><pre><span></span>chmod
+chown
+chgrp
+</pre></div>
+
+
+<h3>安装第三方软件</h3>
+<div class="highlight"><pre><span></span>pwd
+sudo  mkdir -p   /opt/soft
+sudo  chmod 1777 /opt/ /opt/soft/
+cd   /opt/soft
+ls   -al  &lt;列出文件的权限和属性包括隐藏文件&gt;
+head tail cat
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-data-post-02.html" rel="bookmark"
+                           title="Permalink to R语言排序与统计频数">R语言排序与统计频数</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-23T16:08:00+08:00">
                 Published: 2016-04-23 16:08:00
@@ -37,97 +149,10 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><h2>R 语言排序</h2>
-<h3>数据示意</h3>
-<div class="highlight"><pre><span></span>FL <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
-FF <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
-FA <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;C&quot;</span><span class="p">,</span><span class="s">&quot;D&quot;</span><span class="p">,</span><span class="s">&quot;B&quot;</span><span class="p">)</span>
-ora  <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>FL<span class="p">,</span>FF<span class="p">,</span>FA<span class="p">)</span>
-</pre></div>
-
-
-<h3>排序</h3>
-<div class="highlight"><pre><span></span><span class="cp">##</span><span class="c">只排一行</span><span class="x"></span>
-<span class="x">sort(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">)</span>
-<span class="x">sort(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,decreasing=TRUE)</span>
-</pre></div>
-
-
-<h3>获得排序的位置，多列排序,升序以及降序</h3>
-<div class="highlight"><pre><span></span><span class="x"> order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">)</span>
-<span class="x"> ora[order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">),]</span>
-<span class="x"> ora[order(-ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">),]</span>
-<span class="x"> ora[order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,ora</span><span class="p">$</span><span class="nv">FA</span><span class="x">),]</span>
-<span class="x"> ora[order(ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,ora</span><span class="p">$</span><span class="nv">FA</span><span class="x">,decreasing=T),]</span>
-<span class="x"> ora[order(-ora</span><span class="p">$</span><span class="nv">FL</span><span class="x">,ora</span><span class="p">$</span><span class="nv">FA</span><span class="x">),]</span>
-</pre></div>
-
-
-<h3>还原排序</h3>
-<div class="highlight"><pre><span></span>ora2 <span class="o">&lt;-</span>ora<span class="p">[</span><span class="kp">order</span><span class="p">(</span>ora<span class="o">$</span>FL<span class="p">),]</span>  
-ora3 <span class="o">&lt;-</span> ora2<span class="p">[</span><span class="kp">order</span><span class="p">(</span><span class="kp">order</span><span class="p">(</span>ora<span class="o">$</span>FL<span class="p">)),]</span>
-</pre></div>
-
-
-<h3>利用行名还原排序</h3>
-<div class="highlight"><pre><span></span>ora2 <span class="o">&lt;-</span>ora<span class="p">[</span><span class="kp">order</span><span class="p">(</span>ora<span class="o">$</span>FL<span class="p">),]</span>  
-N <span class="o">&lt;-</span> <span class="kp">nrow</span><span class="p">(</span>ora<span class="p">)</span>
-DealData <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>FL<span class="o">=</span><span class="kt">numeric</span><span class="p">(</span>N<span class="p">),</span>FF<span class="o">=</span><span class="kt">numeric</span><span class="p">(</span>N<span class="p">),</span>FA<span class="o">=</span><span class="kt">numeric</span><span class="p">(</span>N<span class="p">))</span>       
-DealData<span class="p">[</span><span class="kp">as.integer</span><span class="p">(</span><span class="kp">row.names</span><span class="p">(</span>ora2<span class="p">)),]</span> <span class="o">&lt;-</span> ora2
-</pre></div>
-
-
-<h3>按照自定义列排序</h3>
-<div class="highlight"><pre><span></span>ora
-ora4 <span class="o">&lt;-</span> <span class="kp">cbind</span><span class="p">(</span>ora2<span class="p">,</span>ora2<span class="o">$</span>FA<span class="p">)</span>
-<span class="kp">rownames</span><span class="p">(</span>ora4<span class="p">)</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
-<span class="kp">merge</span><span class="p">(</span>ora<span class="p">,</span>ora4<span class="p">,</span>all<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>sort<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
-<span class="kp">merge</span><span class="p">(</span>ora4<span class="p">,</span>ora<span class="p">,</span>all<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>sort<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
-</pre></div>
-
-
-<h2>R语言统计频率</h2>
-<h3>数据</h3>
-<div class="highlight"><pre><span></span>score    <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
-grade <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
-LA <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>score <span class="p">,</span>grade <span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
-</pre></div>
-
-
-<h3>统计一列的数据</h3>
-<div class="highlight"><pre><span></span>sp <span class="o">&lt;-</span> <span class="kp">table</span><span class="p">(</span>LA<span class="o">$</span>score<span class="p">)</span>
-sp <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>sp<span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
-str<span class="p">(</span>sp<span class="p">)</span>
-</pre></div>
-
-
-<h3>统计两列的或者多列的组合</h3>
-<ul>
-<li>方法一<br />
-<code>install.packages("plyr")，没有这个包的话要下载</code><br />
-<code>library(plyr)</code><br />
-<code>Freq_table  &lt;- count(LA,vars=c("score","grade"))</code> <br />
-<code>colnames(Freq_table) &lt;- c("scor","gra","Frequency")</code>   </li>
-<li>方法二<br />
-<code>library(dplyr)</code>    <br />
-<code>rename(count(LA,score ,grade), Freq = n)</code>  </li>
-<li>方法三    <br />
-<code>library(reshape2)</code><br />
-<code>df_counts &lt;- melt(table(LA))</code> <br />
-<code>names(df_counts) &lt;- names(LA)</code> <br />
-<code>colnames(df_counts)[ncol(df_counts)] &lt;- "count"</code>  </li>
-<li>方法四<br />
-<code>library(data.table)</code> 
-    /##数据框转为列连表<br />
-<code>setDT(LA)</code><br />
-      ## 转化 <br />
-<code>df[,.N,by=c('score','grade')]</code></li>
-</ul>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>R语言数据排序与R语言统计频率</p>
+                <a class="readmore" href="/data-mining/my-data-post-02.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
