@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>ytluck—For you - Itmes</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/itmes/index.html">Itmes</a></li>
+                    <li><a href="/operating-systems/index.html">Operating Systems</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/itmes/my-item-post-03.html">信息收集和爬虫</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-09-14T13:04:00+08:00">
+                Published: 2016-09-14 13:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/itmes/index.html">Itmes</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><ul>
+<li>数据搜集是对搜集者经验、毅力、知识全面的能力的考验。</li>
+</ul>
+<h2>数据收集方式</h2>
+<h3>人工录入</h3>
+<div class="highlight"><pre><span></span>数据通过人来产生。数据最开始的来源方式。
+</pre></div>
+
+
+<h3>网络实时爬取数据</h3>
+<div class="highlight"><pre><span></span>学会写爬虫，整个互联网就是你的数据库，爬虫可以自动化地，大批量地帮你将互联网上大量无规则数据爬取下来并归整。Python爬虫，基本上可以做到所见即所得。
+</pre></div>
+
+
+<h3>网络实时数据监控。</h3>
+<div class="highlight"><pre><span></span>很多网站的数据是具有时效性的，比如某招聘网站招聘数据，某二手房交易出租网站数据，这些数据每过一段时间会失去时效性，因此必须让爬虫每隔一段时间，甚至实时去监控网站数据的改变，自己建立一套面板数据。
+</pre></div>
+
+
+<h3>“特殊”漏洞渠道。</h3>
+<div class="highlight"><pre><span></span>经常关注乌云，会对有关数据的漏洞敏感一些，这些数据往往牵扯到对数据来源正当性的质疑，因此不要将其用于学术研究和非法用途.
+</pre></div>
+
+
+<h2>学术合作。</h2>
+<div class="highlight"><pre><span></span>有时候数据是靠“换”来的，我有你要的数据，你有我要的数据，那大家互通有无，或许可以推进学术合作，做出对你我都有意义的研究。这应该也是目前学术界普遍流行的模式。
+</pre></div>
+
+
+<h3>数据购买和数据交换。</h3>
+<div class="highlight"><pre><span></span>目前还是处于混沌期
+</pre></div>
+
+
+<h2>什么是爬虫？</h2>
+<p>爬虫，通俗的讲，也就是通过源码解析来获得想要的内容。
+传统爬虫从一个或若干初始网页的URL开始，获得初始网页上的URL，在抓取网页的过程中，不断从当前页面上抽取新的URL放入队列，直到满足系统的一定停止条件。 <br />
+聚焦爬虫的工作流程较为复杂，需要根据一定的网页分析算法过滤与主题无关的链接，保留有用的链接并将其放入等待抓取的URL队列。然后，它将根据一定的搜索策略从队列中选择下一步要抓取的网页URL，并重复上述过程，直到达到系统的某一条件时停止。<br />
+另外，所有被爬虫抓取的网页将会被系统存贮，进行一定的分析、过滤，并建立索引，以便之后的查询和检索；</p>
+<h2>网络爬虫的基本工作流程如下：</h2>
+<div class="highlight"><pre><span></span>    1.首先选取一部分精心挑选的种子URL；  
+    2.将这些URL放入待抓取URL队列；  
+    3.从待抓取URL队列中取出待抓取在URL，解析DNS，并且得到主机的ip，并将URL对应的网页下载下来，存储进已下载网页库中此外，将这些URL放进已抓取URL队列。
+    4.分析已抓取URL队列中的URL，分析其中的其他URL，并且将URL放入待抓取URL队列，从而进入下一个循环。
+</pre></div>
+
+
+<h2>爬虫构成</h2>
+<div class="highlight"><pre><span></span>下载器
+解析器
+ 存储
+ 调度
+解析器
+</pre></div>
+
+
+<h2>解决的问题:</h2>
+<h3>抓取目标描述</h3>
+<div class="highlight"><pre><span></span>对网站内容进行解析,内容来自哪呢?   
+    1.静态网页内容,解析方式是通过特定的HTML标签   
+    2.动态网页内容。JavaScript加载的内容,解析方式找到包含内容的js代码 Ajax异步请求  
+    3.APP数据。对App的数据抓取:先抓包,查看抓包所得的API链接和请求情况,然后模拟请求A
+</pre></div>
+
+
+<h3>抓取策略</h3>
+<div class="highlight"><pre><span></span>在爬虫系统中，待抓取URL队列是很重要的一部分。待抓取URL队列中的URL以什么样的顺序排列也是一个很重要的问题，  
+因为这涉及到先抓取那个页面，后抓取哪个页面。而决定这些URL排列顺序的方法，叫做抓取策略
+</pre></div>
+
+
+<h3>其他问题</h3>
+<div class="highlight"><pre><span></span>如何处理header以及cookie
+如何填写表单以及密码
+如何抓取动态页面的网站
+如何对抗反爬虫
+</pre></div>
+
+
+<p>注释：关于防爬虫：KS-WAF将爬虫行为分为搜索引擎爬虫及扫描程序爬虫，可屏蔽特定的搜索引擎爬虫节省带宽和性能，也可屏蔽扫描程序爬虫，避免网站被恶意抓取页面。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/itmes/my-super-post-03.html" rel="bookmark"
+                           title="Permalink to 搜索也是一种力量">搜索也是一种力量</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-14T13:04:00+08:00">
+                Published: 2016-04-14 13:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/itmes/index.html">Itmes</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>信息洪流中，找到目标，信息过载解决方式之一：搜索</p>
+                <a class="readmore" href="/itmes/my-super-post-03.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

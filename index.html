@@ -16,17 +16,175 @@
                 <nav><ul>
                     <li><a href="http://ytluck.github.io/">Home</a></li>
                     <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
                     <li><a href="/data-mining/index.html">Data Mining</a></li>
                     <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/itmes/index.html">Itmes</a></li>
                     <li><a href="/operating-systems/index.html">Operating Systems</a></li>
                     <li><a href="/program/index.html">Program</a></li>
-                    <li><a href="/tools/index.html">Tools</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/operating-systems/my-os-04.html">操作系统之登陆系统</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-01.html">大数据工具集合处理框架</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-09-23T13:04:00+08:00">
+                Published: 2016-09-23 13:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h2>&lt;一&gt;数据收集</h2>
+<h3>外部数据收集</h3>
+<div class="highlight"><pre><span></span>Apache Nutch主要组件有Crawler,Indexer以及Searcher.爬虫,索引以及查询.利用Lucene技术进行索引,  
+Heritrix更专注于网络信息的下载   
+Solr:Solr是一个基于Lucene的Java搜索引擎服务器
+</pre></div>
+
+
+<h3>内部收集收集</h3>
+<div class="highlight"><pre><span></span>数据源:Web日志是由Web服务器产生,生产环境的服务器可能是Apache Nginx Tomcat IIS等   
+    推送模式:实时性高,系统配置的容量需要超过峰值    
+    拉取模式:主动权在系统,可以缓冲高峰数据   
+    &lt;1&gt;Apache Flume是一个分布式 可靠以及高可用性的海量数据收集系统.采用推送以及拉取这两种采集模式.是cloudera开源的日志系统   
+    &lt;2&gt;Logstash是一款轻量级的日志搜集处理框架,   
+    &lt;3&gt;Scribe是Facebook开源的实时分布式数据收集系统.采用推送模式.    
+    &lt;4&gt;Apache Chukwa 是Apache/Yahoo 监控
+</pre></div>
+
+
+<h2>&lt;二&gt;数据存储</h2>
+<h3>持久化存储:将数据永久的记录在磁盘上</h3>
+<div class="highlight"><pre><span></span>     应用级的分布式文件存储服务:HDFS GFS TFS HayStack   
+     数据库存储系统:   
+        HBase列式存储      
+        MongoDB文档型存储  
+        Cassandra:是一套开源分布式NoSQL数据库系统。它最初由Facebook
+</pre></div>
+
+
+<h3>非持久化存储: 采用Hash的Key-Value存储,适合需要用到缓存Cache的场景</h3>
+<div class="highlight"><pre><span></span>   分布式缓存系统:Redis:远程字典服务器Remote Dictionary Server,支持两种持久化方式,RDB镜像以及AOF日志.   
+          Berkeley:    
+          Memcached:分布式内存对象缓存系统    
+    开源分布式内存文件系统:Alluxio
+</pre></div>
+
+
+<h2>&lt;三&gt;数据分析与数据挖掘</h2>
+<h3>数据分析方式</h3>
+<div class="highlight"><pre><span></span>离线处理  
+    离线批量处理:  
+        MapReduce  
+        Apache Spark  
+        Apache Flink  
+    类SQL查询,查询引擎:  
+        Hive   
+        Impala Impala是Dremel在Hadoop上的复制品，它由Cloudera开发  
+        Pig    
+        Spark SQL  
+        Apache Kylin是一个开源的分布式分析引擎，最初由eBay开发贡献至开源社区  
+    搜索引擎:   
+        查找数据  
+   全批量+消息机制:消息传递方式:点对点以及发布订阅模式  
+        消息服务机制:  
+                JMS&lt;Java Message Service&gt;:ActiveMQ  
+                Kafka消息机制  LinkedIn的      
+在线处理  
+    Apache Strom: Twitter公司开源的  
+    Apache Spark Streaming:微批量
+</pre></div>
+
+
+<h3>数据挖掘与机器学习</h3>
+<div class="highlight"><pre><span></span>Apache Spark MLi  
+Apache Mahout  
+TensorFlow  
+DMTK  
+Torch
+</pre></div>
+
+
+<h2>&lt;四&gt;分布式协同与管理</h2>
+<h3>集群资源管理</h3>
+<div class="highlight"><pre><span></span>Apache Spark自带的集群管理Standlone 并发的跑任务，就需要一个资源调度系统  
+YARN :YARN同时支持内存和CPU两种资源的调度,将Spark运行在Hadoop上，本质上是将Spark运行在Hadoop YARN上，因为Spark自身只提供了作业管理功能，资源调度要依托于第三方系统，比如YARN或Mesos等 
+Mesos
+</pre></div>
+
+
+<h3>协同器独立出来设计成通用的,可伸缩的协同系统</h3>
+<div class="highlight"><pre><span></span><span class="n">Chubby</span><span class="o">:</span><span class="n">Google</span><span class="err">提出中心化的组件</span><span class="n">Chubby</span><span class="err">—粗粒度锁服务，通过锁原语为其他系统实现更高级的服务</span>  
+<span class="n">Apache</span> <span class="n">Zookeeper</span><span class="o">:</span><span class="n">Yahoo</span><span class="err">！借鉴</span><span class="n">Chubby</span><span class="err">的设计思想开发了</span><span class="n">Zookeeper</span><span class="err">，并将其开源</span><span class="o">.</span><span class="err">提供生态系统的协同实现</span><span class="o">,</span><span class="n">paxos</span><span class="err">算法是</span><span class="n">Zookeeper</span><span class="err">的核心</span>  
+<span class="n">FourInOne</span><span class="o">:</span><span class="err">消息中枢模式</span>
+</pre></div>
+
+
+<h3>管理与配置</h3>
+<div class="highlight"><pre><span></span>Apache Ambari是一个基于web的工具，用于配置、管理和监视Apache Hadoop集群    
+Cloudera Hue: 是一个基于WEB的监控和管理系统
+</pre></div>
+
+
+<h2>&lt;五&gt;信息检索与数据可视化</h2>
+<h3>信息检索</h3>
+<div class="highlight"><pre><span></span> Apache Lucene是一个全文检索引擎程序库.
+ Elasticsearch
+ Solr
+</pre></div>
+
+
+<h3>数据可视化</h3>
+<div class="highlight"><pre><span></span>    R语言
+    D3.js
+    OpenRefine
+    Tableau Public
+
+    Datameer
+</pre></div>
+
+
+<h2>&lt;六&gt;相关技术</h2>
+<p>Apache Sqoop:提供了关系型数据库和HDFS之间的相互转换。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/itmes/my-item-post-03.html" rel="bookmark"
+                           title="Permalink to 信息收集和爬虫">信息收集和爬虫</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-09-14T13:04:00+08:00">
+                Published: 2016-09-14 13:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/itmes/index.html">Itmes</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>信息洪流中，收集数据。其中之一是搜索引擎，而搜索引擎又有通用的以及定向的使用。介绍数据收集以及爬虫基本内容。</p>
+                <a class="readmore" href="/itmes/my-item-post-03.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/operating-systems/my-os-04.html" rel="bookmark"
+                           title="Permalink to 操作系统之登陆系统">操作系统之登陆系统</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-07-24T14:23:00+08:00">
                 Published: 2016-07-24 14:23:00
@@ -37,58 +195,10 @@
         </address>
 <p>In <a href="/operating-systems/index.html">Operating Systems</a>.</p>
 <p>tags: <a href="/tag/linux.html">Linux</a> </p>
-</footer><!-- /.post-info --><h2>登陆模式</h2>
-<div class="highlight"><pre><span></span>终端界面：&lt;console&gt; ，也称命令行
-图形界面
-</pre></div>
-
-
-<h2>说明</h2>
-<div class="highlight"><pre><span></span>Linux操作系统为不同的账户登陆提供两种登陆模式，在这两种模式下可以本地登陆和远程登陆。提供7个运行等级 。
-登陆模式分为命令行登陆以及图形界面登陆。命令行中提供6个terminal操作界面tty1-tty6。而在图形界面中提供7个，其中第tty7是开机默认等待登陆的图形环境。
-</pre></div>
-
-
-<h2>图形界面登陆</h2>
-<div class="highlight"><pre><span></span>本地的图形界面登陆  
-远程的图形界面登陆：  
-    X-service：
-    VNC      ：
-</pre></div>
-
-
-<h2>命令行登陆</h2>
-<div class="highlight"><pre><span></span>本地的命令行登陆 ： 
-远程的图形界面登陆：客户端以及服务器端  
-    Telnet登陆：简单易用不安全  
-    SSH   登陆：
-        服务器端设置，服务端是一个守护进程,一般是sshd进程,在后台运行并响应来自客户端的请求。提供了对远程请求的处理，一般包括公共密钥认证、密钥交换、对称密钥加密和非安全连接。包括安装，启动，配置。    
-        客户端包括安装和登陆。在Ubuntu系统下，ssh客户端一般是自带的，如果没有可以执行sudo apt-get install openssh-client进行安装，之后执行ps -e|grep ssh如果有ssh-agent那么就表示ssh客户端安装成功了。在Windows操作系统下，有SSH&lt;secure shell client&gt;，Xshell等客户端。
-</pre></div>
-
-
-<h2>X-window</h2>
-<div class="highlight"><pre><span></span>linux本身没有图形界面,linux现在的图形界面的实现只是linux下的应用程序  
- 实现的  
-X Window System 简称X或X11.分为X-Service和X-client,是主从架构，可以跨网络和跨平台。 X Window从逻辑上分为三层：X Server、X Client和X协议。   
-X-Service：管理显示硬件，驱动等。管理客户端设备  
-X-Client ：负责一些事件的处理 ，其中X-Window Manager主要负责全部X-client的管理。常见的WM有GNOME、KDE、Xfce等。其中Display Manager 提供登陆的环境并加载用户选择的WM。
-</pre></div>
-
-
-<h2>显示引擎</h2>
-<div class="highlight"><pre><span></span>GNOME，Xfce 是以GTK图形界面库为基础。KDE是以Qt图形界面库为基础的。Qt是一个跨平台的C++图形用户界面库
-</pre></div>
-
-
-<h2>命令总结</h2>
-<div class="highlight"><pre><span></span>ssh startx
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>tty x-service ssh</p>
+                <a class="readmore" href="/operating-systems/my-os-04.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -246,7 +356,7 @@ X-Client ：负责一些事件的处理 ，其中X-Window Manager主要负责全
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/tools/my-super-post-03.html" rel="bookmark"
+                    <h1><a href="/itmes/my-super-post-03.html" rel="bookmark"
                            title="Permalink to 搜索也是一种力量">搜索也是一种力量</a></h1>
                 </header>
 
@@ -259,10 +369,10 @@ X-Client ：负责一些事件的处理 ，其中X-Window Manager主要负责全
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
         </address>
-<p>In <a href="/tools/index.html">Tools</a>.</p>
+<p>In <a href="/itmes/index.html">Itmes</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>信息洪流中，找到目标，信息过载解决方式之一：搜索</p>
-                <a class="readmore" href="/tools/my-super-post-03.html">read more</a>
+                <a class="readmore" href="/itmes/my-super-post-03.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
