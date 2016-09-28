@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R 语言绘制标注柱状图</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-06.html" rel="bookmark"
+           title="Permalink to R 语言绘制标注柱状图">R 语言绘制标注柱状图</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-09-28T23:15:00+08:00">
+                Published: 2016-09-28 23:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h2>数据示意</h2>
+<p>周天      0904    2011    <br />
+周一      0905    5623<br />
+周二      0906    2083<br />
+周三      0907    4844<br />
+周四      0908    3655<br />
+周五      0909    4586<br />
+周六      0910    5557<br />
+周天      0911    6658<br />
+周一      0912    6490<br />
+周二      0913    5003<br />
+周三      0914    4914 <br />
+周四      0915    3823<br />
+周五      0916    2632<br />
+周六      0917    1740  </p>
+<h2>input the data</h2>
+<div class="highlight"><pre><span></span>datafile <span class="o">&lt;-</span> <span class="s">&quot;E:/Data/trade_data.txt&quot;</span>  
+dat <span class="o">&lt;-</span> read.table<span class="p">(</span>file<span class="o">=</span>datafile<span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span> fileEncoding <span class="o">=</span> <span class="s">&quot;UTF-8&quot;</span><span class="p">)</span>
+<span class="kp">colnames</span><span class="p">(</span>dat<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;week&quot;</span><span class="p">,</span><span class="s">&quot;day&quot;</span><span class="p">,</span><span class="s">&quot;sales&quot;</span><span class="p">,</span><span class="s">&quot;IDs&quot;</span><span class="p">)</span>  
+dat<span class="o">$</span>IDs <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span>dat<span class="o">$</span>IDs<span class="p">)</span>  
+dat<span class="o">$</span>day <span class="o">&lt;-</span> <span class="kp">as.character</span><span class="p">(</span>dat<span class="o">$</span>day<span class="p">)</span>  
+str<span class="p">(</span>dat<span class="p">)</span>  
+weeksname <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;周一&quot;</span><span class="p">,</span><span class="s">&quot;周二&quot;</span><span class="p">,</span><span class="s">&quot;周三&quot;</span><span class="p">,</span><span class="s">&quot;周四&quot;</span><span class="p">,</span><span class="s">&quot;周五&quot;</span><span class="p">,</span><span class="s">&quot;周六&quot;</span><span class="p">,</span><span class="s">&quot;周天&quot;</span><span class="p">)</span>
+weeksname2 <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;月&quot;</span><span class="p">,</span><span class="s">&quot;火&quot;</span><span class="p">,</span><span class="s">&quot;水&quot;</span><span class="p">,</span><span class="s">&quot;木&quot;</span><span class="p">,</span><span class="s">&quot;金&quot;</span><span class="p">,</span><span class="s">&quot;土&quot;</span><span class="p">,</span><span class="s">&quot;日&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>data_explore</h2>
+<div class="highlight"><pre><span></span><span class="x">summary(dat</span><span class="p">$</span><span class="nv">sales</span><span class="x">)</span>
+<span class="x">sum(dat</span><span class="p">$</span><span class="nv">sales</span><span class="x">)</span>
+<span class="x">mean(dat</span><span class="p">$</span><span class="nv">sales</span><span class="x">)</span>
+<span class="x">median(dat</span><span class="p">$</span><span class="nv">sales</span><span class="x">)</span>
+<span class="x">var(dat</span><span class="p">$</span><span class="nv">sales</span><span class="x">)</span>
+<span class="x">mean(dat</span><span class="p">$</span><span class="nv">IDs</span><span class="x">,na.rm=TRUE)</span>
+<span class="x">mean(dat[,3]/dat[,4],na.rm=TRUE)*30</span>
+</pre></div>
+
+
+<h2>explore_data by graph</h2>
+<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>  
+ p2 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>dat<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">interaction</span><span class="p">(</span>week<span class="p">,</span>day<span class="p">),</span>y<span class="o">=</span>sales<span class="p">,</span>fill<span class="o">=</span>day<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+ p2<span class="o">+</span>theme<span class="p">(</span>axis.text.x<span class="o">=</span>element_text<span class="p">(</span>angle<span class="o">=</span><span class="m">45</span><span class="p">,</span>hjust<span class="o">=</span><span class="m">1</span><span class="p">,</span>vjust<span class="o">=</span><span class="m">1</span><span class="p">))</span><span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;Times&quot;</span><span class="p">)</span>  
+ p1 <span class="o">&lt;-</span> ggplot<span class="p">(</span>dat<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span>week<span class="p">,</span>y<span class="o">=</span>sales<span class="p">,</span>fill<span class="o">=</span>day<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>width<span class="o">=</span><span class="m">0.9</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span>  
+ scient <span class="o">&lt;-</span> <span class="p">(</span><span class="kp">format</span><span class="p">(</span><span class="kp">as.numeric</span><span class="p">(</span>dat<span class="o">$</span>sales<span class="p">),</span>scientific<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>digits<span class="o">=</span><span class="m">4</span><span class="p">))</span>  
+ p1 <span class="o">&lt;-</span> p1<span class="o">+</span>geom_text<span class="p">(</span>aes<span class="p">(</span>label<span class="o">=</span>scient<span class="p">),</span>vjust <span class="o">=</span> <span class="m">1.5</span><span class="p">,</span>size<span class="o">=</span><span class="m">4</span><span class="p">,</span>position<span class="o">=</span>position_dodge<span class="p">(</span><span class="m">0.9</span><span class="p">))</span>      
+p1 <span class="o">&lt;-</span> p1<span class="o">+</span>scale_x_discrete<span class="p">(</span>limits<span class="o">=</span>weeksname<span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+p1<span class="o">+</span> geom_text<span class="p">(</span>aes<span class="p">(</span>label<span class="o">=</span>dat<span class="o">$</span>day<span class="p">,</span>y<span class="o">=</span>sales<span class="m">-2000000</span><span class="p">),</span>vjust <span class="o">=</span> <span class="m">1.5</span><span class="p">,</span>size<span class="o">=</span><span class="m">3</span><span class="p">,</span>position<span class="o">=</span>position_dodge<span class="p">(</span><span class="m">0.9</span><span class="p">))</span>
+</pre></div>
+
+
+<h3>数值的大小以及位数</h3>
+<p>round(dat$sales,digits=-2)<br />
+signif(dat$sales,digits=3)</p>
+<h3>数值显示的位置，坐标的位置日期的显示</h3>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
