@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>操作系统之软件安装源码安装</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-os-02.html" rel="bookmark"
+           title="Permalink to 操作系统之软件安装源码安装">操作系统之软件安装<->源码安装</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-07-22T22:20:00+08:00">
+                Published: 2016-07-22 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/linux.html">Linux</a> </p>
+</footer><!-- /.post-info -->      <h3>软件在Linux下的安装</h3>
+<p>Linux发行版本有Redhat系列以及debian系列，对于redhat系列，linux私房菜中对CentOS操作系统中有过学习和使用。所以本文主要是学习debian系列中的Ubuntu操作系统。</p>
+<h2>安装方式</h2>
+<h3>源码安装、DPKG安装、apt安装，</h3>
+<div class="highlight"><pre><span></span>安装方法是&lt;1&gt;源码进行编译来进行安装和升级，&lt;2&gt;使用编译好的二进制文件进行安装，而在使用编译好的二进制文件进行安装又可以分为dpkg 安装和apt在线安装，。
+</pre></div>
+
+
+<h2>源码安装</h2>
+<div class="highlight"><pre><span></span>安装基本概念  
+对于源码安装，基本概念在鸟哥的私房菜中有介绍。具体的解释就不做详细的解释了，把有关的基本概念梳理出来就好。  
+源码，是我们编写的程序代码，在经过编译程序和链接程序的处理后，生成可执行文件。而在链接程序中则需要一些外部已经编写好的函数库。  
+静态链接库与动态链接库都是共享代码的方式，在这里函数库按照链接方式可以分为静态链接库和动态链接库。&lt;1&gt;函数库放在/lib /usr/lib 下，其中动态链接库采用.so，静态链接库采用.a来命名。  静态链接库占用内存多，但速度快。冬天链接库占用内存少，升级容易，灵活。判断一个二进制文件是否包含动态函数库，采用的命令是 **ldd  **   
+类比于windows操作系统中，区别&lt;1&gt;如果采用静态链接库，lib 中的指令都全部被直接包含在最终生成的 EXE 文件中了。但是若使用 DLL，该 DLL 不必被包含在最终 EXE 文件中，EXE 文件执行时可以“动态”地引用和卸载这个与 EXE 独立的 DLL 文件。静态链接库和动态链接库的区别&lt;2&gt;在在于静态链接库中不能再包含其他的动态链接库或者静态库，而在动态链接库中还可以再包含其他的动态或静态链接库。动态库就是在需要调用其中的函数时，根据函数映射表找到该函数然后调入堆栈执行。如果在当前工程中有多处对dll文件中同一个函数的调用，那么执行时，这个函数只会留下一份拷贝。但是如果有多处对lib文件中同一个函数的调用，那么执行时，该函数将在当前程序的执行空间里留下多份拷贝，而且是一处调用就产生一份拷贝。  
+源码安装过程    
+（./configure）–＞ 编译（sudo make） –＞ 安装（sudo make install）  
+    配置：这是编译源代码的第一步，通过 ./configure 命令完成。执行此步以便为编译源代码作准备。配置会检测环境，主要是检测操作系统平台，内核，内核的文件件，驱动，编译器，函数库以及其他相关的软件。荣国configure会创建一个MakeFile的文件，通常软件包会提供的。  
+    编译：一旦配置通过，可即刻使用 make 指令来执行源代码的编译过程。make是一个程序，会搜索MakeFile文件进行编译。MakeFile文件中记录了源码如何编译的信息。make程序包含了以gcc进行源码编译生成目标文件，目标文件通过gcc进行函数库，主程序和子程序的链接，最后生成二进制文件。
+    安装：如果编译没有问题，那么执行 sudo make install 就可以将程序安装到系统中了。  
+    注意：make和gcc 不一定会m默认安装，所以如果没有的话，请自行谷歌查看怎么安装这些，通常在联网的情况下，apt-get install gcc make 即可。   
+安装后的配置   
+    安装好程序后，我们调用程序的时候，需要到安装的程序的目录下运行程序，为了bash中可以调用程序，我们需要添加到环境变量中的路径中去
+安装后的文件放置位置  
+    配置/etc/man/config 才可以使用man来查询该软件的在线文件。更新源码diff patch。使用MD5的编码判断下载的文件是否是原厂商所发布的文件。
+</pre></div>
+
+
+<h2>命令总结</h2>
+<div class="highlight"><pre><span></span>    **./configure 、make 、make install、ldd、diff、patch、ldconfig**
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
