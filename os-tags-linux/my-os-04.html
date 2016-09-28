@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>操作系统之登陆系统</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os-tags-linux/index.html">OS  Tags: Linux</a></li>
+                    <li><a href="/os-tags-things/index.html">OS   Tags: things</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os-tags-linux/my-os-04.html" rel="bookmark"
+           title="Permalink to 操作系统之登陆系统">操作系统之登陆系统</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-07-24T14:23:00+08:00">
+                Published: 2016-07-24 14:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os-tags-linux/index.html">OS  Tags: Linux</a>.</p>
+
+</footer><!-- /.post-info -->      <h2>登陆模式</h2>
+<div class="highlight"><pre><span></span>终端界面：&lt;console&gt; ，也称命令行
+图形界面
+</pre></div>
+
+
+<h2>说明</h2>
+<div class="highlight"><pre><span></span>Linux操作系统为不同的账户登陆提供两种登陆模式，在这两种模式下可以本地登陆和远程登陆。提供7个运行等级 。
+登陆模式分为命令行登陆以及图形界面登陆。命令行中提供6个terminal操作界面tty1-tty6。而在图形界面中提供7个，其中第tty7是开机默认等待登陆的图形环境。
+</pre></div>
+
+
+<h2>图形界面登陆</h2>
+<div class="highlight"><pre><span></span>本地的图形界面登陆  
+远程的图形界面登陆：  
+    X-service：
+    VNC      ：
+</pre></div>
+
+
+<h2>命令行登陆</h2>
+<div class="highlight"><pre><span></span>本地的命令行登陆 ： 
+远程的图形界面登陆：客户端以及服务器端  
+    Telnet登陆：简单易用不安全  
+    SSH   登陆：
+        服务器端设置，服务端是一个守护进程,一般是sshd进程,在后台运行并响应来自客户端的请求。提供了对远程请求的处理，一般包括公共密钥认证、密钥交换、对称密钥加密和非安全连接。包括安装，启动，配置。    
+        客户端包括安装和登陆。在Ubuntu系统下，ssh客户端一般是自带的，如果没有可以执行sudo apt-get install openssh-client进行安装，之后执行ps -e|grep ssh如果有ssh-agent那么就表示ssh客户端安装成功了。在Windows操作系统下，有SSH&lt;secure shell client&gt;，Xshell等客户端。
+</pre></div>
+
+
+<h2>X-window</h2>
+<div class="highlight"><pre><span></span>linux本身没有图形界面,linux现在的图形界面的实现只是linux下的应用程序  
+ 实现的  
+X Window System 简称X或X11.分为X-Service和X-client,是主从架构，可以跨网络和跨平台。 X Window从逻辑上分为三层：X Server、X Client和X协议。   
+X-Service：管理显示硬件，驱动等。管理客户端设备  
+X-Client ：负责一些事件的处理 ，其中X-Window Manager主要负责全部X-client的管理。常见的WM有GNOME、KDE、Xfce等。其中Display Manager 提供登陆的环境并加载用户选择的WM。
+</pre></div>
+
+
+<h2>显示引擎</h2>
+<div class="highlight"><pre><span></span>GNOME，Xfce 是以GTK图形界面库为基础。KDE是以Qt图形界面库为基础的。Qt是一个跨平台的C++图形用户界面库
+</pre></div>
+
+
+<h2>命令总结</h2>
+<div class="highlight"><pre><span></span>ssh startx
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
