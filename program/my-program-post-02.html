@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>JAVA多线程</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-02.html" rel="bookmark"
+           title="Permalink to JAVA多线程">JAVA多线程</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-16T10:12:00+08:00">
+                Published: 2016-10-16 10:12:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <h2>硬件：</h2>
+<div class="highlight"><pre><span></span>单处理器
+   单任务阻塞、事件驱动程序
+多处理器
+</pre></div>
+
+
+<h2>软件：</h2>
+<div class="highlight"><pre><span></span>系统级的并发
+应用级的并发
+</pre></div>
+
+
+<h2>背景内容</h2>
+<div class="highlight"><pre><span></span>并发的开发语言
+将并发任务彼此隔离：函数型语言
+JAVA在顺序的基础上提供对线程的支持
+进程：  
+   程序的执行过程，持有资源&lt;共享内存，共享文件&gt;和线程
+   线程：进程的最小执行单元
+   线程交互：互斥  同步
+线程机制，底层机制是切分CPU时间
+    协作式
+    抢占式
+JAVA的线程机制：抢占式
+
+继承java.lang.Thread   类
+实现java.lang.Runnable 接口
+线程互斥：synchronize
+线程同步： wait  notifyAll
+Round_robin轮转法调度
+线程的生命周期：
+    new Thread  创建线程 new Thread()----start() 
+    Runnable    就绪
+    Blocked     堵塞
+    run     运行
+    Dead        消亡
+sleep()
+线程：用户线程
+  守护线程：例如：垃圾回收线程
+    设置守护线程 Thread.setDaemon
+        必须在start()之前
+        守护线程中的新线程是守护线程
+        不是所有的线程都可以设置为守护线程，读写、计算逻辑等
+</pre></div>
+
+
+<h2>扩展：</h2>
+<div class="highlight"><pre><span></span>Java Memory Model
+        线程共享变量
+            工作内存
+            主内存
+        线程对共享变量的所有操作都必须在自己的工作内存中进行，不能直接从主内存中读写
+        不同线程之间无法直接访问其他线程的工作内存的变量，线程间变量值的传递需要主内存来完成
+            可见性实现原理
+            工作内存1刷新到主内存，更新到工作内存2
+                synchronized:实现可见性，原子性&lt;同步&gt;
+                volatile:通过加入内存屏障和禁止重排序优化实现的
+        获取互斥锁，清空工作内存，从主内存拷贝变量到工作内存，执行代码，更改后的变量值刷新到主内存，释放互斥锁
+         不可见的原因：
+            线程的交叉执行                     解决-原子性
+            重排序结合线程交叉执行                 解决--原子性
+            共享变量更新后的值没在工作内存与主内存间及时更新    解决--可见性
+
+        指令重排序，代码书写顺序和实际执行的顺序不同
+    编译器         编译器优化
+    指令级并行       处理器优化
+    内存系统的重排序    内存的
+    as-if-serial 单线程下遵循as-if-serical
+
+ Locks &amp; Condition 类 锁机制和等待条件
+ JAVA的安全性  可见性编程
+ DeadLocks
+ 多线程编程常见的交互模式
+Producer-consumer
+Read-Write Lock
+Worker Thread
+Future
+ JAVA 中并发编程工具
+java.util.concurrent
+    线程池
+  《Java并发编程实践》Java concurrency in practice
+
+ Java自带的性能监测工具——jstack、jconsole、jinfo、jmap、jdb、jsta、jvisualvm
+</pre></div>
+
+
+<h2>线程竞争</h2>
+<h3>解决共享资源竞争</h3>
+<div class="highlight"><pre><span></span>序列化访问资源：
+序列化访问资源，在给定的时刻只允许一个任务访问共享资源。实现方式：在代码前添加一条锁语句。因为锁语句会
+ 产生相互排斥的效果。  mutex   互斥量
+ synchronized  各种互斥技术
+        java.util.coucurrent
+ 同步控制块
+  可视性
+    volatile
+根除对变量的共享
+  线程本地存储：一种自动化机制，可以为使用相同变量的每个不同的线程都创造不同的存储
+    java.lang.ThreadLocal
+</pre></div>
+
+
+<h2>线程之间的协作</h2>
+<div class="highlight"><pre><span></span> 握手：
+   wait() notify() notifyAll() 错失信号
+ 同步队列
+</pre></div>
+
+
+<h3>并发问题</h3>
+<div class="highlight"><pre><span></span> 死锁
+   产生原因：
+     互斥条件
+ 至少一任务必须持有资源且正在等待
+ 不被抢占
+ 循环等待
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

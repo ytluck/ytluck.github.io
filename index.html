@@ -26,7 +26,184 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/items/my-item-post-04.html">不同用户购买不同产品的聚类分析</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-02.html">Hbase的基本了解</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-10-22T21:52:00+08:00">
+                Published: 2016-10-22 21:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h2>1.Apache HBase的版本介绍</h2>
+<div class="highlight"><pre><span></span>0.98.x版本    2014-02-16
+1.0.x以及 2015-02
+1.1.0版本 1.1.2.2.4
+1.2.0等产品线将从 它们相应的分支中发布
+1.3.0
+2.0.0
+为什么要关注版本，因为在不同的版本中使用的API会有不同，对程序的编写会有影响。
+Apache HBase在1.0.0版本中引入新的API同时将hbase client侧的一些经常使用的API（包括HTableInterface, HTable and HBaseAdmin）设置为将不再支持deprecates。
+</pre></div>
+
+
+<h2>2.使用 hbase shell来管理Hbase</h2>
+<div class="highlight"><pre><span></span>刚开始接触，使用的命令行接口来操作Hbase，即使用Hbase shell访问Hbase对其进行初步了解。
+进入到开发环境中，如果hbase shell已经设置在环境变量中的话，可以直接输入以下命令进入
+ hbase shell
+</pre></div>
+
+
+<h2>0)查看基本信息</h2>
+<div class="highlight"><pre><span></span> version  
+ status  
+ whoami
+</pre></div>
+
+
+<h2>表的管理</h2>
+<div class="highlight"><pre><span></span>1）查看有哪些表  
+list  
+describe &#39;table&#39;  
+2）创建表  
+ 语法：create &lt;table&gt;, {NAME =&gt; &lt;family&gt;, VERSIONS =&gt; &lt;VERSIONS&gt;}  
+例如：创建表my_test，有两个family name：f1，f2
+create &#39;my_test&#39;, &#39;fy1&#39;,&#39;fy2&#39;
+3)增删改查
+    1）添加数据
+语法：put &lt;table&gt;,&lt;rowkey&gt;,&lt;family:column&gt;,&lt;value&gt;,&lt;timestamp&gt;
+例如：给表my_test的添加一行记录：rowkey是rowkey001，family name：f1，column name：col1，value：value01，timestamp：系统默认  
+ put &#39;my_test&#39;,&#39;rowkey001&#39;,&#39;f1:Channel&#39;,&#39;2&#39;,&#39;f1:Region&#39;,&#39;3&#39;,&#39;f2:Fresh&#39;,&#39;12669&#39;，&#39;f2:Milk&#39;,&#39;9656&#39;,&#39;f2:Grocery&#39;,&#39;12669&#39;，&#39;f2:Frozen&#39;,&#39;9656&#39;,&#39;f2:Detergents_Paper&#39;,&#39;12669&#39;，&#39;f2:Delicassen&#39;,&#39;9656&#39;
+直接的把多个参数给这个没通过，单个单个的给
+put &#39;my_test&#39;,&#39;rowkey001&#39;,&#39;f1:Channel&#39;
+查看帮助 help &quot;put&quot;中可知put的参数一般是5个，所以对于多个参数的时候就会报错；
+2)删
+删除表:首先要disable,然后drop
+删除行
+删除列族
+删除列
+
+3)改
+
+4)查
+查结构     describe &#39;my_test&#39;
+查数据内容：  scan &#39;my_test&#39;,{LIMIT =&gt; 5}
+            get  &#39;my_test&#39;,&#39;rowkey001&#39;
+</pre></div>
+
+
+<h2>退出</h2>
+<div class="highlight"><pre><span></span>exit
+</pre></div>
+
+
+<h2>附录</h2>
+<div class="highlight"><pre><span></span>少分号的情况下，命令会不朝下运行。
+在一些节点失效的情况下，可能会查不出表的内容
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-03.html" rel="bookmark"
+                           title="Permalink to JavaAPI开发Hbase">JavaAPI开发Hbase</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-22T21:52:00+08:00">
+                Published: 2016-10-22 21:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>JavaAPI 开发 HBase</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-03.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-03.html" rel="bookmark"
+                           title="Permalink to Java实现的http协议方式">Java实现的http协议方式</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-16T10:52:00+08:00">
+                Published: 2016-10-16 10:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>标准的Java接口</p>
+                <a class="readmore" href="/program/my-program-post-03.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-01.html" rel="bookmark"
+                           title="Permalink to JAVA内存以及线程">JAVA内存以及线程</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-16T10:22:00+08:00">
+                Published: 2016-10-16 10:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>Java Memory Model</p>
+                <a class="readmore" href="/program/my-program-post-01.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-02.html" rel="bookmark"
+                           title="Permalink to JAVA多线程">JAVA多线程</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-16T10:12:00+08:00">
+                Published: 2016-10-16 10:12:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>Java 多线程</p>
+                <a class="readmore" href="/program/my-program-post-02.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-04.html" rel="bookmark"
+                           title="Permalink to 不同用户购买不同产品的聚类分析">不同用户购买不同产品的聚类分析</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-09-29T21:27:00+08:00">
                 Published: 2016-09-29 21:27:00
@@ -37,175 +214,10 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><h2>目的</h2>
-<div class="highlight"><pre><span></span>从海量的数据中提取和挖掘出对企业有价值的规律和趋势，为企业的决策，营销，运维等提供支持
-支持包括，评估，预见，改进
-在这里做的是客户分群
-使用的工具是R语言
-时间是20160929
-</pre></div>
-
-
-<h2>特征工程</h2>
-<div class="highlight"><pre><span></span>将原始数据转化为特征数据
-</pre></div>
-
-
-<h2>数据示意</h2>
-<div class="highlight"><pre><span></span>Channel Region  Fresh   Milk    Grocery Frozen  Detergents_Paper    Delicassen
-2   3   12669   9656    7561    214 2674    1338
-2   3   7057    9810    9568    1762    3293    1776
-2   3   6353    8808    7684    2405    3516    7844
-1   3   13265   1196    4221    6404    507 1788
-2   3   22615   5410    7198    3915    1777    5185
-2   3   9413    8259    5126    666 1795    1451
-</pre></div>
-
-
-<h2>输入数据</h2>
-<p><code>filename &lt;- "C:/Data/Wholesale_customers_data.csv"</code>
-<code>dat &lt;- read.table(filename,sep=",",header=TRUE,stringsAsFactors=TRUE)</code></p>
-<h2>描述性统计</h2>
-<div class="highlight"><pre><span></span>数据剖析,离散数据与连续数据
-</pre></div>
-
-
-<h3>各个属性的集中趋势</h3>
-<div class="highlight"><pre><span></span>median(dat[,3])
-summary(dat[,3])
-summary(dat)
-</pre></div>
-
-
-<h3>各个属性离中趋势</h3>
-<div class="highlight"><pre><span></span>max(dat[,3])
-min(dat[,3])
-sd(dat[,3])
-var(dat[,3])
-</pre></div>
-
-
-<h3>离散数据的p频率</h3>
-<div class="highlight"><pre><span></span><span class="c1">##统计一列</span>
-datfreq <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span><span class="kp">table</span><span class="p">(</span>dat<span class="p">[,</span><span class="m">1</span><span class="p">]),</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
-统计两列或者多列
-<span class="c1">##install.packages(&quot;plyr&quot;)</span>
-<span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
-Freq_table <span class="o">&lt;-</span> count<span class="p">(</span>dat<span class="p">,</span>vars<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;Channel&quot;</span><span class="p">,</span> <span class="s">&quot;Region&quot;</span><span class="p">))</span>
-<span class="kp">colnames</span><span class="p">(</span>Freq_table <span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Chal&quot;</span><span class="p">,</span> <span class="s">&quot;Reg&quot;</span><span class="p">,</span><span class="s">&quot;Frequence&quot;</span><span class="p">)</span>
-</pre></div>
-
-
-<h3>各个属性的偏峰态</h3>
-<div class="highlight"><pre><span></span>install.packages(&quot;fBasics&quot;)
-library(fBasics)
-kurtosis(dat[,3])
-skewness(dat[,3])
-</pre></div>
-
-
-<h3>关联协方差</h3>
-<div class="highlight"><pre><span></span>cov(dat[,3],dat[,4]) 
-cov(dat[,3],dat[,4])
-cov(dat)
-var(dat)
-</pre></div>
-
-
-<h3>简单相关系数以及其显著性检验</h3>
-<div class="highlight"><pre><span></span>cor(dat$[,3],dat[4])  
-cor(dat)  
-cor.test(dat[,3],dat[,4])  
-cor.test(dat[,3],dat[,4],method=&quot;spearman&quot;)
-</pre></div>
-
-
-<h3>绘制图形</h3>
-<div class="highlight"><pre><span></span>plot(dat)
-barplot(dat[,3])
-hist(dat[,3])
-</pre></div>
-
-
-<h2>聚类分析</h2>
-<div class="highlight"><pre><span></span>    clusdata <span class="o">&lt;-</span> dat<span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
-<span class="c1">##距离矩阵</span>
-    kdat <span class="o">&lt;-</span> dist<span class="p">(</span>clusdata<span class="p">,</span>method<span class="o">=</span><span class="s">&quot;euclidean&quot;</span><span class="p">)</span>
-<span class="c1">##centers是分类个数，nstar取随机初始中心的次数</span>
-    km <span class="o">&lt;-</span> kmeans<span class="p">(</span>kdat<span class="p">,</span>center<span class="o">=</span><span class="m">3</span><span class="p">)</span>
-<span class="c1">##聚类的一些参数</span>
-    km<span class="o">$</span>centers      <span class="c1">#各类别中心坐标点</span>
-    km<span class="o">$</span>tot.withinss <span class="c1">#组内平方和</span>
-    km<span class="o">$</span>betweenss    <span class="c1">#组间平方和</span>
-    km<span class="o">$</span>totss        <span class="c1">#总平方和</span>
-<span class="c1">##聚类示意图</span>
-    plot<span class="p">(</span>kdat<span class="p">,</span>pch<span class="o">=</span><span class="p">(</span>km<span class="o">$</span>cluster<span class="m">-1</span><span class="p">))</span>
-    points<span class="p">(</span>km<span class="o">$</span>centers<span class="p">,</span>pch<span class="o">=</span><span class="m">8</span><span class="p">)</span>
-    legend<span class="p">(</span>km<span class="o">$</span>center<span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="m">1</span><span class="p">],</span>km<span class="o">$</span>center<span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">],</span><span class="s">&quot;center_1&quot;</span><span class="p">)</span>
-    legend<span class="p">(</span>km<span class="o">$</span>center<span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">],</span>km<span class="o">$</span>center<span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="m">2</span><span class="p">],</span><span class="s">&quot;center_2&quot;</span><span class="p">)</span>
-    legend<span class="p">(</span>km<span class="o">$</span>center<span class="p">[</span><span class="m">3</span><span class="p">,</span><span class="m">1</span><span class="p">],</span>km<span class="o">$</span>center<span class="p">[</span><span class="m">3</span><span class="p">,</span><span class="m">2</span><span class="p">],</span><span class="s">&quot;center_3&quot;</span><span class="p">)</span>
-<span class="c1">##聚类评价，聚类优度 取N/2中聚类个数，看哪个模型拟合效果会好一些</span>
-    N <span class="o">&lt;-</span> <span class="kp">length</span><span class="p">(</span> clusdata<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
-    result <span class="o">=</span> <span class="kp">rep</span><span class="p">(</span><span class="m">0</span><span class="p">,</span>N<span class="o">/</span><span class="m">2</span><span class="p">)</span>
-    <span class="kr">for</span><span class="p">(</span>k <span class="kr">in</span> <span class="m">1</span><span class="o">:</span><span class="p">(</span>N<span class="m">-1</span><span class="p">)){</span>
-      km <span class="o">=</span>kmeans<span class="p">(</span>kdat<span class="p">,</span>center<span class="o">=</span>k<span class="p">)</span>
-      result<span class="p">[</span>k<span class="p">]</span> <span class="o">=</span>km<span class="o">$</span>betweenss<span class="o">/</span>km<span class="o">$</span>totss
-      <span class="p">}</span>
-    <span class="c1">#取结果的两位小数，并画出聚类优度图</span>
-     <span class="kp">round</span><span class="p">(</span>result<span class="p">,</span><span class="m">2</span><span class="p">)</span>
-     plot<span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="p">(</span>N<span class="o">/</span><span class="m">2</span><span class="p">),</span>xlab<span class="o">=</span><span class="s">&quot;number of cluster&quot;</span><span class="p">,</span>ylab<span class="o">=</span><span class="s">&quot;betweenss/totss&quot;</span><span class="p">)</span>
-     points<span class="p">(</span><span class="m">5</span><span class="p">,</span>result<span class="p">[</span><span class="m">5</span><span class="p">],</span>pch<span class="o">=</span><span class="m">16</span><span class="p">)</span>
-     legend<span class="p">(</span><span class="m">5</span><span class="p">,</span>result<span class="p">[</span><span class="m">5</span><span class="p">],</span><span class="kp">paste</span><span class="p">(</span><span class="s">&quot;(5&quot;</span><span class="p">,</span><span class="kp">sprintf</span><span class="p">(</span><span class="s">&quot;%.1f%&quot;</span><span class="p">,</span>result<span class="p">[</span><span class="m">5</span><span class="p">]</span><span class="o">*</span><span class="m">100</span><span class="p">),</span><span class="s">&quot;)&quot;</span><span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">))</span>
-    <span class="c1">##结果展示   </span>
-    clustertag <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>km<span class="o">$</span>cluster<span class="p">)</span>
-    <span class="kp">colnames</span><span class="p">(</span>clustertag<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;tags&quot;</span><span class="p">)</span>
-    tyepdat <span class="o">&lt;-</span> <span class="kp">cbind</span><span class="p">(</span>dat<span class="p">,</span>clustertag<span class="p">)</span>
-    <span class="c1">##统计标签的数目  </span>
-    tagfreq <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span><span class="kp">table</span><span class="p">(</span>tyepdat<span class="o">$</span>tags<span class="p">)</span> <span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>  
-    <span class="c1">##筛选，选出特定标签的数据进行查看</span>
-    <span class="kp">subset</span><span class="p">(</span>tyepdat<span class="p">,</span>tags<span class="o">==</span><span class="s">&quot;3&quot;</span><span class="p">,</span>select<span class="o">=</span>Channel<span class="o">:</span>tags<span class="p">)</span>
-    <span class="c1">##按照聚类的标签进行排序</span>
-    heatdat <span class="o">&lt;-</span> tyepdat<span class="p">[</span><span class="kp">order</span><span class="p">(</span>tyepdat<span class="o">$</span>tags<span class="p">),]</span>
-    <span class="c1">##绘制K均值聚类热图</span>
-        <span class="c1">#install.packages(&quot;pheatmap&quot;)</span>
-        <span class="kn">library</span><span class="p">(</span>pheatmap<span class="p">)</span>
-        pheatmap<span class="p">(</span>heatdat<span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">8</span><span class="p">],</span> cluster_rows<span class="o">=</span><span class="bp">F</span><span class="p">,</span>cluster_cols<span class="o">=</span><span class="bp">F</span><span class="p">,</span>border_color<span class="o">=</span><span class="kc">NA</span><span class="p">)</span>
-        <span class="c1">#install.packages(&quot;RColorBrewer&quot;)</span>
-        <span class="kn">library</span><span class="p">(</span>RColorBrewer<span class="p">)</span><span class="c1">##颜色扩展包，扩展聚类热图</span>
-        pheatmap<span class="p">(</span>heatdat<span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">8</span><span class="p">],</span> cluster_rows<span class="o">=</span><span class="bp">F</span><span class="p">,</span>cluster_cols<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col<span class="o">=</span>brewer.pal<span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="s">&quot;Set3&quot;</span><span class="p">),</span>border_color<span class="o">=</span><span class="kc">NA</span><span class="p">)</span>
-        <span class="c1">#对热图的解释</span>
-            <span class="c1">##参考Heatmap里kmeans聚类 和 纯Heatmap  </span>
-            <span class="c1">##http://joseph.yy.blog.163.com/blog/static/50973959201285102114376/</span>
-        <span class="c1">##使用ggplot2绘制热图</span>
-            <span class="c1">#ggplot(heatdat,)+geom_tile()</span>
-            <span class="c1">#ggplot(heatdat,)+geom_raster()</span>
-    <span class="c1">#或者利用R语言heatmap.2函数进行聚类并画热图</span>
-    <span class="c1">#http://www.plob.org/article/10045.html</span>
-</pre></div>
-
-
-<h2>聚类结果解读与业务联系</h2>
-<div class="highlight"><pre><span></span>用户的消费行为的图像进行贴标签
-目标用户的群体分类
-不同产品的价值组合
-探测、发现 孤立点和异常点
-</pre></div>
-
-
-<h2>备注信息</h2>
-<div class="highlight"><pre><span></span>K<span class="o">-</span>modes采用相关性
-<span class="kn">library</span><span class="p">(</span>cluster<span class="p">)</span>    <span class="c1">##k-medoids</span>
-dist
-pm <span class="o">&lt;-</span> pam<span class="p">(</span>d<span class="p">,)</span>
-聚类本身就是一种模型技术，聚类得到的结果可以指导实践
-聚类在数据分析前期过程的一种工具，用来进行数据摸底，数据清洗以及数据整理
-不足是处，对初始值敏感
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>使用R语言进行产品组合以及客户分群的聚类，以及聚类热图</p>
+                <a class="readmore" href="/items/my-item-post-04.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

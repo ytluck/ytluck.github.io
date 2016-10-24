@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>JAVA内存以及线程</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-01.html" rel="bookmark"
+           title="Permalink to JAVA内存以及线程">JAVA内存以及线程</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-16T10:22:00+08:00">
+                Published: 2016-10-16 10:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <blockquote>
+<p>Java 虚拟机 （Java virtual machine，JVM）</p>
+</blockquote>
+<h3>JVM实现了Java语言最重要的特征：即平台无关性。</h3>
+<div class="highlight"><pre><span></span>原理：编译后的 Java 程序指令并不直接在硬件系统的 CPU 上执行，而是由 JVM 执行。
+JVM屏蔽了与具体平台相关的信息，使Java语言编译程序只需要生成在JVM上运行的目标字节码（.class）,
+就可以在多种平台上不加修改地运行。Java 虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。
+</pre></div>
+
+
+<h3>Java Memory Model</h3>
+<div class="highlight"><pre><span></span>JAVA的内存结构
+  程序计数器： 线程私有
+  方法区：存放装载的类数据信息
+  栈内存：以帧的形式存放本地方法的调用状态
+  局部变量区 操作栈 帧数据区
+  堆内存：JAVA虚拟机自动进行 垃圾回收
+    实例域、静态域和数组元素存储在堆内存
+  本地方法栈内存
+
+  线程共享变量
+            工作内存
+            主内存
+        线程对共享变量的所有操作都必须在自己的工作内存中进行，不能直接从主内存中读写
+        不同线程之间无法直接访问其他线程的工作内存的变量，线程间变量值的传递需要主内存来完成
+            可见性实现原理
+            工作内存1刷新到主内存，更新到工作内存2
+                synchronized:实现可见性，原子性&lt;同步&gt;
+                volatile:通过加入内存屏障和禁止重排序优化实现的
+        获取互斥锁，清空工作内存，从主内存拷贝变量到工作内存，执行代码，更改后的变量值刷新到主内存，释放互斥锁
+         不可见的原因：
+            线程的交叉执行                        解决-原子性
+            重排序结合线程交叉执行                  解决--原子性
+            共享变量更新后的值没在工作内存与主内存间及时更新    解决--可见性
+</pre></div>
+
+
+<h3>Method 方法区</h3>
+<h5>加载的类信息，常量，静态变量等</h5>
+<div class="highlight"><pre><span></span> 运行时常量池：存放编译器生成的各种字面量和符号引用：
+ 字面量就是字符串、final变量等。类名和方法名属于引用量。   
+ 引用量最常见的是在调用方法的时候，根据方法名找到方法的引用，并以此定为到函数体进行函数代码的执行。引用量包含：类和接口的权限定名、字段的名称和描述符，方法的名称和描述符
+</pre></div>
+
+
+<h3>Heap堆</h3>
+<h5>存放所有实例 和数组 的地方</h5>
+<div class="highlight"><pre><span></span>以Java堆还可以细分为：新生代和老年代；
+新生代再细致一点有Eden空间、From Survivor空间、To Survivor空间等
+</pre></div>
+
+
+<h3>VM Stack虚拟机栈：栈帧</h3>
+<h4>局部变量表，操作栈，方法返回地址，动态链接</h4>
+<h3>Native Method Stack   本地方法栈</h3>
+<div class="highlight"><pre><span></span>：本地方法栈和Java栈所发挥的作用非常相似，区别不过是Java栈为JVM执行Java方法服务，而本地方法栈为JVM执行Native方法服务
+</pre></div>
+
+
+<h3>Program Counter Register 程序计数器</h3>
+<h3>内存模型</h3>
+<div class="highlight"><pre><span></span>JAVA语言中，采用共享内存模型 来实现多线程之间的信息交换和数据同步   
+主内存，对应着Java内存区域划分的堆内存，
+工作内存对应着虚拟机栈和本地方法栈，所有线程共享主存储器，但是每个线程有各自的工作内存。
+</pre></div>
+
+
+<h3>内存回收</h3>
+<div class="highlight"><pre><span></span>从内存回收的角度来看，由于现在GC基本都采用分代收集算法所
+JMM规定了所有的变量都存储在主内存（Main Memory）中。每个线程还有自己的工作内存（Working Memory）,  
+线程的工作内存中保存了该线程使用到的变量的主内存的副本拷贝，线程对变量的所有操作（读取、赋值等）都必须在工作内存中进行，而不能直接读写主内存中的变量（volatile变量仍然有工作内存的拷贝，但是由于它特殊的操作顺序性规定，所以看起来如同直接在主内存中读写访问一般）。
+不同的线程之间也无法直接访问对方工作内存中的变量，线程之间值的传递都需要通过主内存来完成。
+</pre></div>
+
+
+<h2>Java程序启动与加载顺序，</h2>
+<h4>类加载器</h4>
+<div class="highlight"><pre><span></span>JAVA 程序启动顺序图
+加载
+隐式调用&lt;自动&gt;
+ 显示调用
+java.lang.ClassLoader
+    Bootstrap loader: 搜索系统参数&lt;sun.boot.class.path&gt;指定位置的类
+    Extended Loader ：搜索心痛参数&lt;java.ext.dirs&gt;指定位置的类
+    System Loader   ：搜索Classpath所指定的路径&lt;java.class.path&gt;
+    每个类加载器会先将加载任务交给其parent,如果parent找不到，则再由自己加载
+    java.net.URLClassLoader
+        ExtClassLoader
+        APPClassLoader
+    用户自定义加载器
+    动态加载类的方法
+        使用.class
+        使用实例的getClass()
+        使用Class.forName
+链接
+  是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程包括
+  验证、准备、解析、访问控制、方法覆盖
+在类或接口被链接之前，它必须是被成功地加载过。
+在类或接口初始化之前，它必须是被成功地验证及准备过.
+程序的直接或间接行为可能会导致链接发生，链接过程中检查到的错误应该在请求链接的程序处被抛出。
+    层次架构，动态加载类
+    在java中有三种类类加载器。
+1）Bootstrap ClassLoader 此加载器采用c++编写，一般开发中很少见。
+2）Extension ClassLoader 用来进行扩展类的加载，一般对应的是jre\lib\ext目录中的类
+3）AppClassLoader 加载classpath指定的类，是最常用的加载器。同时也是java中默认的加载器。
+在一个类编译完成之后，下一步就需要开始使用类，如果要使用一个类，肯定离不开JVM。在程序执行中JVM通过装载，链接，初始化这3个步骤完成。
+类的装载是通过类加载器完成的，加载器将.class文件的二进制文件装入JVM的方法区，并且在堆区创建描述这个类的java.lang.Class对象。用来封装数据。 但是同一个类只会被类装载器装载以前
+链接就是把二进制数据组装为可以运行的状态。
+</pre></div>
+
+
+<h4>链接</h4>
+<div class="highlight"><pre><span></span>链接分为校验，准备，解析这3个阶段
+校验一般用来确认此二进制文件是否适合当前的JVM（版本），
+准备就是为静态成员分配内存空间，。并设置默认值
+解析指的是转换常量池中的代码作为直接引用的过程，直到所有的符号引用都可以被运行程序使用（建立完整的对应关系完成之后，类型也就完成了初始化，初始化之后类的对象就可以正常使用了，直到一个对象不再使用之后，将被垃圾回收。释放空间。
+当没有任何引用指向Class对象时就会被卸载，结束类的生命周期
+</pre></div>
+
+
+<h3>1、多态机制</h3>
+<div class="highlight"><pre><span></span>一、使用父类类型的引用指向子类的对象；
+二、该引用只能调用父类中定义的方法和变量；
+三、如果子类中重写了父类中的一个方法，那么在调用这个方法的时候，将会调用子类中的这个方法；（动态连接、动态调用）
+四、变量不能被重写（覆盖），”重写“的概念只针对方法，如果在子类中”重写“了父类中的变量，那么在编译时会报错
+    父类的方法私有
+    父类的方法，子类重写
+    父类的方法，子类继承没重写
+    父类没有，子类中有
+</pre></div>
+
+
+<h3>2、前期绑定和后期绑定  ：</h3>
+<div class="highlight"><pre><span></span>绑定：将一个方法调用同一个方法主体关联起来被称作绑定。
+前期绑定：若程序在执行前进行绑定，由编译器和链接程序实现，叫做前期绑定。C语言中只有一种方法调用，就是前期绑定。
+后期绑定：在运行时根据对象的类型进行绑定，叫做后期绑定，也叫动态绑定或运行时绑定。
+Java中除了static方法和final方法（private方法被自动认为是final方法）之外，其他所有的方法都是后期绑定。
+</pre></div>
+
+
+<h3>3、运行时识别 对象和类的信息</h3>
+<div class="highlight"><pre><span></span> JAVA在需要时才被加载，加载时通过加载器实现的
+ Class对象由JVM自动产生，每当一个类被加载的时候，JVM就会自动为其生成一个Class对象
+   传统的RTTI机制&lt;(RTTI, Run-Time Type Identification&gt;
+   反射机制
+ 传统的RTTI机制&lt;(RTTI, Run-Time Type Identification&gt;
+ 类型信息：Class对象，类加载器，原生类加载器&lt;可信类&gt;
+    首先检查这个类的Class对象是否被加载 
+    Class.forName()实现动态加载类
+    getClass()获取每一个对象对应的Class对象，基本信息 
+     类字面常量
+</pre></div>
+
+
+<h3>反射机制</h3>
+<div class="highlight"><pre><span></span>java.lang.Class类以及java.lang.refect类库来对反射进行支持
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
