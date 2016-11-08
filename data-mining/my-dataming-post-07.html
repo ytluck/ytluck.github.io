@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>SQLite介绍</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-07.html" rel="bookmark"
+           title="Permalink to SQLite介绍">SQLite介绍</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-08T23:15:00+08:00">
+                Published: 2016-11-08 23:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->      <h2>SQLite介绍</h2>
+<div class="highlight"><pre><span></span>SQLite 是一个实现自我依赖、纯客户端、零配置且支持事务的数据库引擎。  
+在使用的过程中，也无需创建用户和划分权限，SQLite 没有用户以及账户概念，而是根据文件系统确定所有数据库的权限  
+弱类型：和大多数支持静态类型的数据库不同的是，SQLite中的数据类型被视为数值的一个属性。因此对于一个数据表列而言，即便在声明该表时给出了该列的类型，我们在插入数据时仍然可以插入任意类型，
+</pre></div>
+
+
+<h2>SQLite文件</h2>
+<div class="highlight"><pre><span></span>sqlite3.exe 是SQLite数据库引擎，命令行工具，可以实现SQLite 各项基本操作  
+sqlite3_analyzer.exe 是SQLite数据库分析器,命令行数据库分析器，该分析器允许显示关于任何 SQLite 数据库当前状态的详细信息。  
+sqlite3.dll : 动态连接库文件，提供了标准API函数，需要编程调用，经过编译的软件可以动态链接到SQLite，这意味着需要SQLite功能是，应用程序会加载DLL，而不是将SQLite代码嵌入到应用程序。
+</pre></div>
+
+
+<h2>数据库配置</h2>
+<div class="highlight"><pre><span></span>SQLite没有配置文件，所有的配置都是使用编译指令来实验&lt;pragma&gt;,包括了运行信息等
+控制字符串如何编码及存储在数据库文件中
+sqlite编码方式由pragma encoding设定，只有以下几种
+PRAGMA encoding;   --查询当前编码方式，默认utf8
+PRAGMA encoding = &quot;UTF-8&quot;; 
+PRAGMA encoding = &quot;UTF-16&quot;; 
+PRAGMA encoding = &quot;UTF-16le&quot;; 
+PRAGMA encoding = &quot;UTF-16be&quot;;
+如果文件路径出现中文，就会导致打开失败.sqlite数据库使用的是UTF-8编码方式，而传入的字符串是ASCII编码或Unicode编码，导致字符串格式错误。解决方案是在调用sqlite接口之前，先将字符串转换成UTF-8编码，各种字符串编码转换函数。
+</pre></div>
+
+
+<h2>常见命令</h2>
+<h3>创建命令</h3>
+<div class="highlight"><pre><span></span>创建数据库：
+ 1. D:\&gt;sqlite3 test.db 
+创建表
+ 2. sqlite&gt; CREATE TABLE person (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(20), age SMALLINT);
+</pre></div>
+
+
+<h3>查看命令</h3>
+<div class="highlight"><pre><span></span><span class="na">.databases</span> <span class="err">命令用来查看当前所有数据库</span>
+<span class="nf">sqlite</span><span class="err">&gt;</span> <span class="no">.databases</span>
+<span class="nf">seq</span> <span class="no">name</span> <span class="no">file</span> 
+<span class="p">---</span> <span class="p">---------------</span> <span class="p">----------------------------------------------------------</span>
+<span class="err">0</span> <span class="nf">main</span> <span class="err">/</span><span class="no">home</span><span class="err">/</span><span class="no">yu</span><span class="err">/</span><span class="no">sqlite</span><span class="err">/</span><span class="no">test.db</span> 
+<span class="mi">1</span> <span class="no">temp</span>
+
+ <span class="na">.tables</span> <span class="err">命令用来查看当前数据库的所有数据表</span>
+<span class="nf">sqlite</span><span class="err">&gt;</span> <span class="no">.tables</span>
+<span class="nf">data_txt_table</span>
+<span class="nf">sqlite</span><span class="err">&gt;</span>
+
+<span class="na">.schema</span> <span class="err">命令来查看指定的数据表的结构</span>
+<span class="nf">sqlite</span><span class="err">&gt;</span> <span class="no">.schema</span> <span class="no">data_txt_table</span>
+<span class="nf">CREATE</span> <span class="no">TABLE</span> <span class="no">data_txt_table</span><span class="p">(</span><span class="no">id</span> <span class="no">char</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="no">name</span> <span class="no">char</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="no">age</span> <span class="no">char</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="no">address</span> <span class="no">varchar</span><span class="p">(</span><span class="mi">15</span><span class="p">),</span><span class="no">hobby</span> <span class="no">varchar</span> <span class="p">(</span><span class="mi">15</span><span class="p">))</span><span class="err">;</span>
+<span class="nf">sqlite</span><span class="err">&gt;</span>
+
+<span class="nf">select</span><span class="err">查看具体的数据</span>
+<span class="nf">sqlite</span><span class="err">&gt;</span> <span class="no">select</span> <span class="p">*</span> <span class="no">from</span> <span class="no">data_txt_table</span> <span class="no">limit</span> <span class="mi">3</span><span class="err">;</span>
+</pre></div>
+
+
+<h2>数据的导入和导出</h2>
+<h3>数据的导入</h3>
+<div class="highlight"><pre><span></span>   <span class="mf">1.</span> <span class="err">首先，确定导入的数据源，这里是待导入的，按固定格式的文本文件。</span>
+   <span class="mf">2.</span> <span class="err">然后，依照导入的文件格式，确定想导入的目标数据表，这个数据表如果没有，可以依照待导入的文本文件格式，创建一个相对应的数据表。</span>
+   <span class="mf">3.</span> <span class="err">最后，执行</span><span class="o">.</span><span class="n">import</span><span class="err">命令，将文本文件中数据导入数据表中。</span>   
+   <span class="err">从</span><span class="o">.</span><span class="n">sql</span><span class="err">文件导入数据：</span>
+        <span class="mf">1.</span>  <span class="n">sqlite</span><span class="o">&gt;</span> <span class="o">.</span><span class="n">read</span> <span class="n">test</span><span class="o">.</span><span class="n">sql</span> 
+    <span class="err">从文本文件导入</span>
+    <span class="n">sqlite</span><span class="o">&gt;</span> <span class="o">.</span><span class="kn">import</span> <span class="nn">data.txt</span> <span class="nn">data_txt_table</span>
+</pre></div>
+
+
+<h3>数据导出</h3>
+<div class="highlight"><pre><span></span>导出数据
+    sqlite&gt; .output data.sql
+数据库导出
+    qlite$ sqlite3 test.db &quot;.dump&quot; | sqlite3 test2.db
+</pre></div>
+
+
+<h2>SQLite 数据类型</h2>
+<div class="highlight"><pre><span></span>SQLite 数据类型是一个用来指定任何对象的数据类型的属性
+存储类
+SQLite Affinity ：
+Boolean 数据类型：SQLite 没有单独的 Boolean 存储类。相反，布尔值被存储为整数 0（false）和 1（true）
+Date 与 Time 数据类型：无单独类型，QLite 能够把日期和时间存储为 TEXT、REAL 或 INTEGER 值。
+</pre></div>
+
+
+<h2>其他</h2>
+<div class="highlight"><pre><span></span> SQLite源代码
+ SQLite设计与概念：核心 C API以及扩展C API
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

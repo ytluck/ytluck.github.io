@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>MySQL介绍</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-08.html" rel="bookmark"
+           title="Permalink to MySQL介绍">MySQL介绍</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-08T22:15:00+08:00">
+                Published: 2016-11-08 22:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->      <h2>MySQL数据库权限体系</h2>
+<div class="highlight"><pre><span></span>能不能连接：用户名 用户密码以及来源主机
+能不能执行操作： 操作权限 
+权限级别：
+  全局 数据库 表 列 程序，授权主要通过GRANT
+</pre></div>
+
+
+<h2>MySQL的配置</h2>
+<div class="highlight"><pre><span></span>1、mysql 配置文件&lt;Option Files&gt;，在MYSQL文件系统中已经有所介绍了。
+Windows平台下配置文件的扩展名既可以是 .ini 也可以使 .cnf 
+默认会扫描以下路径中的文件，并使用找到的第一个匹配的文件，不同平台的默认路径是不一样的，也可以
+自己设定路径，只要告诉MySQL命令行文件路径，主要是通过defaults-file 和default-extra-file 这两个参数确定
+my.ini         真正的配置信息
+my-default.ini 存放一些默认配置信息
+配置选项的语法，以及指定配置的选项
+# ：注释符
+[] :用于定义对应命令行的选项
+    [mysqld] 服务器端的配置
+    [client] 客户端的配置作用于所有命令行程序
+    [mysql] [mysqladmin]、[mysqldump] [mysqlhotcopy] [myisamchk]
+Option_name = Option_
+
+2、字符和字符集
+    show character set
+
+3、对象的存储引擎
+    插件式 常见的 MyISAM  Innodb Federated
+
+4、用于数据分析的数据表，当&lt;1&gt;查询比删除和更新多,&lt;2&gt;数据量比较大的情况下，可以使用增加索引等进行多表查询
+</pre></div>
+
+
+<h2>MySQL常见命令</h2>
+<div class="highlight"><pre><span></span>打开数据库  mysql -u root -p
+</pre></div>
+
+
+<h3>查看命令  status</h3>
+<div class="highlight"><pre><span></span>        show databases;
+        use   your_database;
+        show tables;
+        DESC your_table;
+        select * from your_table limit 3;
+        select count(*) from your_table ;
+</pre></div>
+
+
+<h3>创建命令</h3>
+<div class="highlight"><pre><span></span>    创建用户
+    创建数据库 create  database  your_database;
+    创建表   use your_database; create table your_table(  
+                item bigint NOT　NULL);
+</pre></div>
+
+
+<h3>查询语句</h3>
+<div class="highlight"><pre><span></span>单表查询: from group  where order  in
+子查询
+多表查询--连接 内连接和外连接
+多表查询--集合操作 union
+</pre></div>
+
+
+<h2>数据的导入和导出</h2>
+<h3>导入数据</h3>
+<div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="err">一</span><span class="o">&gt;</span><span class="err">导入数据方式</span>
+   <span class="nt">mysqlimport</span><span class="err">命令行工具导入数据</span>
+   <span class="nt">SQL</span><span class="err">语句导入数据</span> <span class="err">：</span><span class="nt">load</span> <span class="nt">data</span> <span class="nt">infile</span>
+        <span class="nt">load</span>  <span class="nt">data</span> <span class="nt">local</span> <span class="nt">infile</span>  <span class="nt">__</span> <span class="nt">into</span> <span class="nt">table</span>  <span class="nt">your_table</span> <span class="nt">fields</span> <span class="nt">terminated</span> <span class="nt">by</span> <span class="o">,</span><span class="nt">lines</span> <span class="nt">terminated</span> <span class="nt">by</span><span class="o">;</span>
+   <span class="err">利用</span><span class="nt">CSV</span><span class="err">存储引擎加载数据</span><span class="o">&lt;</span><span class="err">所有列值不能为空</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="err">二</span><span class="o">&gt;</span> <span class="err">导入</span><span class="nt">sql</span><span class="err">文件</span>
+    <span class="nt">source</span>   <span class="nt">d</span><span class="o">:/</span><span class="nt">myprogram</span><span class="o">/</span><span class="nt">database</span><span class="o">/</span><span class="nt">db</span><span class="nc">.sql</span><span class="o">;</span>
+<span class="o">&lt;</span><span class="err">三</span><span class="o">&gt;</span> <span class="err">导入数据库</span>
+  <span class="err">进入</span><span class="nt">mysql</span><span class="err">数据库控制台</span><span class="o">,</span><span class="err">如</span>           <span class="nt">mysql</span> <span class="nt">-u</span> <span class="nt">root</span> <span class="nt">-p</span>
+  <span class="err">指定当前数据库</span>                     <span class="nt">mysql</span><span class="o">&gt;</span><span class="nt">use</span> <span class="err">数据库</span>
+  <span class="err">使用</span><span class="nt">source</span><span class="err">命令</span><span class="o">,</span><span class="err">后面参数为脚本文件</span> <span class="nt">source</span> <span class="nt">d</span><span class="nd">:wcnc_db</span><span class="nc">.sql</span>
+</pre></div>
+
+
+<h3>导出数据</h3>
+<div class="highlight"><pre><span></span>几个常用用例：
+1.导出整个数据库
+ mysqldump -u 用户名 -p 数据库名 &gt; 导出的文件名    
+ mysqldump -u wcnc -p smgp_apps_wcnc &gt; wcnc.sql
+2.导出一个表
+ mysqldump -u 用户名 -p 数据库名 表名&gt; 导出的文件名
+ mysqldump -u wcnc -p smgp_apps_wcnc users&gt; wcnc_users.sql
+3.导出一个数据库结构
+  mysqldump -u wcnc -p -d --add-drop-table smgp_apps_wcnc &gt;d:\wcnc_db.sql
+ -d 没有数据 --add-drop-table 在每个create语句之前增加一个drop table 
+mysqldump -u root -p adatabase &gt; d:\adatabase.sql
+ mysqldump -u root -p adatabase  t_arab_repn2 &gt;  d:\t_arab_repn2.sql
+mysqldump -u root -p relation  graduate &gt;  d:\graduate.sql
+mysqldump -u root -p relation  university &gt;  d:\university.sql
+导出的常用格式 .sql        .txt     .csv
+</pre></div>
+
+
+<h2>MySQL数据类型</h2>
+<div class="highlight"><pre><span></span>MySQL支持所有标准SQL数值数据类型。
+这些类型包括严格数值数据类型(INTEGER、SMALLINT、DECIMAL和NUMERIC)，以及近似数值数据类型(FLOAT、REAL和DOUBLE PRECISION)。关键字INT是INTEGER的同义词，关键字DEC是DECIMAL的同义词。
+BIT数据类型保存位字段值，并且支持MyISAM、MEMORY、InnoDB和BDB表。
+作为SQL标准的扩展，MySQL也支持整数类型TINYINT、MEDIUMINT和BIGINT，
+日期和时间类型：表示时间值的日期和时间类型为DATETIME、DATE、TIMESTAMP、TIME和YEAR。
+字符串类型指CHAR、VARCHAR、BINARY、VARBINARY、BLOB、TEXT、ENUM和SET。
+有4种TEXT类型：TINYTEXT、TEXT、MEDIUMTEXT和LONGTEXT。这些对应4种BLOB类型，有相同的最大长度和存储需求
+</pre></div>
+
+
+<h2>MySQL的存储对象</h2>
+<div class="highlight"><pre><span></span>索引
+视图
+触发器
+过程
+函数
+</pre></div>
+
+
+<h2>帮助系统</h2>
+<div class="highlight"><pre><span></span>help
+help content
+? contents
+</pre></div>
+
+
+<h2>性能调优</h2>
+<div class="highlight"><pre><span></span>关键性指标： IOPS QPS TPS
+数据库参数配置优化-连接相关参数，文件相关参数，缓存控制参数，引擎专用参数
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

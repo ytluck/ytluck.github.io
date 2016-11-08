@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Oracle介绍</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-09.html" rel="bookmark"
+           title="Permalink to Oracle介绍">Oracle介绍</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-08T22:15:00+08:00">
+                Published: 2016-11-08 22:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->      <h2>版本与配置</h2>
+<div class="highlight"><pre><span></span>企业版 标准版 个人版
+事务性数据表  分析型数据表
+PL/SQL
+</pre></div>
+
+
+<h3>配置</h3>
+<div class="highlight"><pre><span></span>控制文件--数据文件--重做日志文件--临时文件
+******\Oracle\app\oracle\product\11.2.0\server\network\ADMIN目录下有三个文件
+sqlnet.ora 用在oracle client端，用于配置连接服务端oracle的相关参数.  
+tnsnames.ora 用在oracle client端，用户配置连接数据库的别名参数,就像系统中的hosts文件一样。  
+listener.ora 用在oracle server端，配置oracle服务端程序的监听办法，比如限制某些ip等参数
+</pre></div>
+
+
+<h2>Orcale权限体系</h2>
+<div class="highlight"><pre><span></span>系统管理员 sys
+本地管理员 system
+普通用户
+</pre></div>
+
+
+<h2>进入系统</h2>
+<div class="highlight"><pre><span></span> 首先要从SYS或者SYSTEM账户开始。管理员账户登录认证有操作系统认证和口令文件认证。
+ 连接工具： sqlplus命令行
+1. 在Dos命令下输入 sqlplus 可以打开 Oracle 自带的 SQL Plus 并出现登录提示
+2. 输入 sqlplus/nolog则打开 SQL Plus 后不出现登陆提示显示用户为 &quot;&quot;；
+ 在系统的账号下创建用户--采用脚本的形式
+SQL&gt; @ ******\Oracle\app\oracle\product\11.2.0\server\rdbms\admin\scott.sql
+SQL&gt; alter user scott identified by tiger  account unlock
+SQL&gt; exit
+退出后即可以用Dos命令下sqlplus SCOTT/TIGER 
+3. 在 SQL Plus 中输入 conn 可以连接数据库，其中的一种格式为：SQL&gt; conn 用户名/密码 如： conn SCOTT/TIGER
+</pre></div>
+
+
+<h2>常见操作</h2>
+<h3>查看命令</h3>
+<div class="highlight"><pre><span></span>查看用户    show user
+查看用户表名  select * from user_tables where table_name=&#39;SCOTT&#39;;
+查看表结构   DESC your_table
+查看表内容   select * from your_table where rownum &lt;=3;
+            select count(*) from your_table;
+查看权限    select * from session_prios ;
+</pre></div>
+
+
+<h3>创建</h3>
+<div class="highlight"><pre><span></span>create table
+-建表空间  
+CREATE TABLESPACE sdt  
+DATAFILE &#39;C:\Data\Orcale_Data\Test&#39; size 800M  
+         EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;   
+--索引表空间  
+CREATE TABLESPACE sdt_Index  
+DATAFILE &#39;C:\Data\Orcale_Data\Test&#39; size 512M           
+         EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
+
+创建用户  
+create user yt_sql identified by Test   
+default Orcale_Data Test;
+
+赋权限 
+grant connect,resource to Test;  
+grant create any sequence to Test;  
+grant create any table to Test;  
+grant delete any table to Test;  
+grant insert any table to Test;  
+grant select any table to Test;  
+grant unlimited tablespace to Test;  
+grant execute any procedure to Test;  
+grant update any table to Test;  
+grant create any view to Test;
+</pre></div>
+
+
+<h3>查询</h3>
+<div class="highlight"><pre><span></span>单表查询: from group  where order  in and  or not  Like between
+子查询
+多表查询--连接 内连接和外连接
+多表查询--集合操作 union  intersect minus
+</pre></div>
+
+
+<h2>输入和输出数据</h2>
+<div class="highlight"><pre><span></span>data pump
+</pre></div>
+
+
+<h3>加载数据</h3>
+<div class="highlight"><pre><span></span>SQL*Loader  命令行下的操作工具  sqlldr
+</pre></div>
+
+
+<h3>输出数据</h3>
+<div class="highlight"><pre><span></span>export
+</pre></div>
+
+
+<h2>数据类型和存储对象</h2>
+<h3>数据类型</h3>
+<div class="highlight"><pre><span></span>varchar2
+number
+Boolean
+date
+</pre></div>
+
+
+<h3>存储对象</h3>
+<div class="highlight"><pre><span></span>视图 存储对象 函数 过程 包 索引 游标
+</pre></div>
+
+
+<h2>帮助体系</h2>
+<div class="highlight"><pre><span></span>help
+help index
+？index
+数据字典
+PL/SQL declare----begin--exception--end;
+    IF--end IF; case--end; loop--end loop;
+    变量赋值  :=
+</pre></div>
+
+
+<p>Oracle数据库开创性地提出了表空间的设计理念，表空间存放 表和索引，Orcale表空间是逻辑概念可以代表多个物理数据文件，和mySQL里的database差不多。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
