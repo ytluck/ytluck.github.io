@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python安装常用包</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-06.html" rel="bookmark"
+           title="Permalink to Python安装常用包">Python安装常用包</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-10T22:39:00+08:00">
+                Published: 2016-11-10 22:39:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <h2>使用Python的原因</h2>
+<div class="highlight"><pre><span></span> 其一语言特性：Python是解释性语言，入门比较简单，开发比较快，本身的易用。  
+其二 社区：  社区比较活跃，开发生态成熟，强大的工具库储备
+</pre></div>
+
+
+<h2>其使用目的涉及以下几个方面</h2>
+<div class="highlight"><pre><span></span>&lt;1&gt;数据收集之爬虫，收集数据                                 Scrapy、Beautiful Soup、lxml  
+&lt;2&gt;数据管理之文本处理：  
+&lt;3&gt;数据挖掘                                             pandas、NumPy、Scipy、matplotlib               
+&lt;4&gt;机器学习：一些常用的库，例如机器学习库                  scikit-learn  
+&lt;5&gt;数据展示                                             Flask
+&lt;6&gt;编程IDE使用：IPython Notebook
+</pre></div>
+
+
+<h2>0. 操作系统：</h2>
+<div class="highlight"><pre><span></span>Windows 
+Linux  自带 python
+</pre></div>
+
+
+<h2>1.成功安装Python&lt;安装方式自行百度&gt;</h2>
+<div class="highlight"><pre><span></span>设置了环境变量，把C:\Python27 和C:\Python27\Scripts 添加到环境变量中
+</pre></div>
+
+
+<h2>2.常用的包以及安装：</h2>
+<div class="highlight"><pre><span></span> jupyter IPython    了ipython notebook的功能和ipython shell下  
+ Numpy是一个用python实现的科学计算包  
+ pandas 是基于 Numpy 构建的含有更高级数据结构和工具的数据分析包  
+ SciPy是一个开源的Python算法库和数学工具包  
+ 绘图和可视化依赖于matplotlib模块，matplotlib的风格与matlab类似  
+ scikit-learn 是一个基于SciPy和Numpy的开源机器学习模块  
+ NLTK(Natural Language Toolkit)是Python  的自然语言处理模块，包括一系列的字符处理和语言统计模型
+ pip install--index https://pypi.mirrors.ustc.edu.cn/simple/  beautifulsoup4  
+ pip install --index https://pypi.mirrors.ustc.edu.cn/simple/ matplotlib
+</pre></div>
+
+
+<h2>3.出现问题以及解决方式：</h2>
+<div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nt">1</span><span class="o">&gt;</span>  <span class="nt">pip</span> <span class="nt">install</span> <span class="nt">jupyter</span>  
+<span class="err">出现问题：</span> <span class="err">出现如下错误，</span>  
+<span class="nt">Retrying</span> <span class="o">(</span><span class="nt">Retry</span><span class="o">(</span><span class="nt">total</span><span class="o">=</span><span class="nt">4</span><span class="o">,</span> <span class="nt">connect</span><span class="o">=</span><span class="nt">None</span><span class="o">,</span> <span class="nt">read</span><span class="o">=</span><span class="nt">None</span><span class="o">,</span> <span class="nt">redirect</span><span class="o">=</span><span class="nt">None</span><span class="o">))</span> 
+<span class="nt">after</span> <span class="nt">connection</span> <span class="nt">broken</span> <span class="nt">by</span> <span class="s1">&#39;ReadTimeoutError(&quot;HTTPSConnectionPool(host=&#39;</span><span class="nt">pypi</span><span class="nc">.python.org</span><span class="s1">&#39;, port=443): Read timed out. </span>
+<span class="s1">(read timeout=15)&quot;,)&#39;</span><span class="o">:</span> <span class="o">/</span><span class="nt">simple</span><span class="o">/</span><span class="nt">pip</span><span class="o">/</span>
+<span class="err">出错原因：网络问题，墙在，你懂</span><span class="o">~</span>  
+<span class="err">解决办法</span>  
+    <span class="err">使用国内镜像下载</span><span class="nt">python</span><span class="err">库的办法。</span>
+    <span class="err">以下载</span><span class="nt">pandas</span><span class="err">为例，终端输入命令（前提是</span><span class="nt">python</span><span class="err">正确安装）：</span>
+<span class="nt">pip</span> <span class="nt">install</span>  <span class="nt">--index</span> <span class="nt">https</span><span class="o">://</span><span class="nt">pypi</span><span class="nc">.mirrors.ustc.edu.cn</span><span class="o">/</span><span class="nt">simple</span><span class="o">/</span> <span class="nt">jupyter</span>
+<span class="nt">pip</span> <span class="nt">install</span>  <span class="nt">--index</span> <span class="nt">https</span><span class="o">://</span><span class="nt">pypi</span><span class="nc">.mirrors.ustc.edu.cn</span><span class="o">/</span><span class="nt">simple</span><span class="o">/</span> <span class="nt">pandas</span>       <span class="err">##依赖于</span><span class="nt">numpy</span><span class="err">，所以不需要安装</span>   
+<span class="err">注：</span><span class="nt">--index</span><span class="err">后面也可以换成别的镜像，比如</span><span class="nt">http</span><span class="o">://</span><span class="nt">mirrors</span><span class="nc">.sohu.com</span><span class="o">/</span><span class="nt">python</span><span class="o">/</span>
+ <span class="err">要配制成默认的话，</span>  
+<span class="err">需要创建或修改配置文件（</span><span class="nt">linux</span><span class="err">的文件在</span><span class="o">~/</span><span class="nc">.pip</span><span class="o">/</span><span class="nt">pip</span><span class="nc">.conf</span><span class="err">，</span>  <span class="nt">windows</span><span class="err">在</span><span class="o">%</span><span class="nt">HOMEPATH</span><span class="o">%</span><span class="err">\</span><span class="nt">pip</span><span class="err">\</span><span class="nt">pip</span><span class="nc">.ini</span><span class="err">），</span>  
+<span class="err">修改内容为：</span>
+<span class="nt">code</span><span class="o">:</span>  
+<span class="cp">[</span><span class="kd">global</span><span class="cp">]</span>  
+<span class="nt">index-url</span> <span class="o">=</span> <span class="nt">http</span><span class="o">://</span><span class="nt">pypi</span><span class="nc">.douban.com</span><span class="o">/</span><span class="nt">simple</span>  
+<span class="err">这样在使用</span><span class="nt">pip</span><span class="err">来安装时，会默认调用该镜像。</span><span class="o">&lt;</span><span class="err">注意，</span><span class="nt">python</span><span class="err">要顶格写</span><span class="o">&gt;</span>
+
+<span class="err">问题</span><span class="nc">.2</span> 
+<span class="nt">pip</span> <span class="nt">install</span>  <span class="nt">--index</span> <span class="nt">https</span><span class="o">://</span><span class="nt">pypi</span><span class="nc">.mirrors.ustc.edu.cn</span><span class="o">/</span><span class="nt">simple</span><span class="o">/</span> <span class="nt">scipy</span>  
+<span class="err">出现错误如下：</span>  
+<span class="nt">raise</span> <span class="nt">NotFoundError</span><span class="o">(</span><span class="s1">&#39;no lapack/blas resources found&#39;</span><span class="o">)</span>
+<span class="nt">numpy</span><span class="nc">.distutils.system_info.NotFoundError</span><span class="o">:</span> <span class="nt">no</span> <span class="nt">lapack</span><span class="o">/</span><span class="nt">blas</span> <span class="nt">resources</span> <span class="nt">found</span>   
+<span class="nt">Command</span> <span class="s2">&quot;c:\python27\python.exe -u -c &quot;</span><span class="nt">import</span> <span class="nt">setuptools</span><span class="o">,</span> <span class="nt">tokenize</span><span class="o">;</span><span class="nt">__file__</span><span class="o">=</span><span class="s1">&#39;c:\\users\\yt\\appdata\\local\\temp\\pip-build-xyyjlc\\SciPy\\setup.py&#39;</span><span class="o">;</span>
+<span class="nt">f</span><span class="o">=</span><span class="nt">getattr</span><span class="o">(</span><span class="nt">tokenize</span><span class="o">,</span> <span class="s1">&#39;open&#39;</span><span class="o">,</span> <span class="nt">open</span><span class="o">)(</span><span class="nt">__file__</span><span class="o">);</span><span class="nt">code</span><span class="o">=</span><span class="nt">f</span><span class="nc">.read</span><span class="o">()</span><span class="nc">.replace</span><span class="o">(</span><span class="s1">&#39;\r\n&#39;</span><span class="o">,</span> <span class="s1">&#39;\n&#39;</span><span class="o">);</span><span class="nt">f</span><span class="nc">.close</span><span class="o">();</span><span class="nt">exec</span><span class="o">(</span><span class="nt">compile</span><span class="o">(</span><span class="nt">code</span><span class="o">,</span> <span class="nt">__file__</span><span class="o">,</span> <span class="s1">&#39;exec&#39;</span><span class="o">))</span><span class="s2">&quot; </span>
+<span class="s2">install  --record c:\users\Test\appdata\local\temp\pip-zczpj_-record\install-record.txt </span>
+<span class="s2">--single-version-externally-managed </span>
+<span class="s2">--compile&quot;</span> <span class="nt">failed</span> <span class="nt">with</span> <span class="nt">error</span> <span class="nt">code</span> <span class="nt">1</span> <span class="nt">in</span> <span class="nt">c</span><span class="o">:</span><span class="err">\</span><span class="nt">users</span><span class="err">\</span><span class="nt">Test</span><span class="err">\</span><span class="nt">appdata</span><span class="err">\</span><span class="nt">local</span><span class="err">\</span><span class="nt">temp</span><span class="err">\</span><span class="nt">pip-build-xyyjlc</span><span class="err">\</span><span class="nt">SciPy</span><span class="err">\</span>
+</pre></div>
+
+
+<h2>安装爬虫命令</h2>
+<div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span>  <span class="o">--</span><span class="n">index</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">ustc</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="n">lxml</span>  
+ <span class="n">pip</span> <span class="n">install</span>  <span class="o">--</span><span class="n">index</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">ustc</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="n">Scrapy</span>  
+<span class="err">出现错误：</span>  
+<span class="n">error</span><span class="p">:</span> <span class="n">Microsoft</span> <span class="n">Visual</span> <span class="n">C</span><span class="o">++</span> <span class="mf">9.0</span> <span class="ow">is</span> <span class="n">required</span> <span class="p">(</span><span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">vcvarsall</span><span class="o">.</span><span class="n">bat</span><span class="p">)</span><span class="o">.</span> <span class="n">Get</span> <span class="n">it</span> <span class="kn">from</span> <span class="nn">http</span><span class="p">:</span><span class="o">//</span><span class="n">aka</span><span class="o">.</span><span class="n">ms</span><span class="o">/</span><span class="n">vcpython27</span>
+
+<span class="n">Command</span> <span class="s2">&quot;c:\python27\python.exe -u -c &quot;</span><span class="kn">import</span> <span class="nn">setuptools</span><span class="o">,</span> <span class="nn">tokenize</span><span class="p">;</span><span class="n">__file__</span><span class="o">=</span><span class="s1">&#39;c:</span><span class="se">\\</span><span class="s1">users</span><span class="se">\\</span><span class="s1">Test</span><span class="se">\\</span><span class="s1">appdata</span><span class="se">\\</span><span class="s1">local</span><span class="se">\\</span><span class="s1">temp</span><span class="se">\\</span><span class="s1">pip-build-xeeujn</span><span class="se">\\</span><span class="s1">lxml</span><span class="se">\\</span><span class="s1">setup.py&#39;</span><span class="p">;</span>
+<span class="n">f</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">tokenize</span><span class="p">,</span> <span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="nb">open</span><span class="p">)(</span><span class="n">__file__</span><span class="p">);</span><span class="n">code</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">);</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">();</span><span class="k">exec</span><span class="p">(</span><span class="nb">compile</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">__file__</span><span class="p">,</span> <span class="s1">&#39;exec&#39;</span><span class="p">))</span><span class="s2">&quot; </span>
+<span class="n">install</span> <span class="o">--</span><span class="n">record</span> <span class="n">c</span><span class="p">:</span>\<span class="n">users</span>\<span class="n">Test</span>\<span class="n">appdata</span>\<span class="n">local</span>\<span class="n">temp</span>\<span class="n">pip</span><span class="o">-</span><span class="n">dlfby2</span><span class="o">-</span><span class="n">record</span>\<span class="n">install</span><span class="o">-</span><span class="n">record</span><span class="o">.</span><span class="n">txt</span> 
+<span class="o">--</span><span class="n">single</span><span class="o">-</span><span class="n">version</span><span class="o">-</span><span class="n">externally</span><span class="o">-</span><span class="n">managed</span> 
+<span class="o">--</span><span class="nb">compile</span><span class="s2">&quot; failed with error code 1 in c:\users\Test</span><span class="se">\a</span><span class="s2">ppdata\local</span><span class="se">\t</span><span class="s2">emp\pip-build-xeeujn\lxml\  </span>
+<span class="err">原因：</span>  
+<span class="err">参考网址：</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">blogs</span><span class="o">.</span><span class="n">msdn</span><span class="o">.</span><span class="n">microsoft</span><span class="o">.</span><span class="n">com</span><span class="o">/</span>  <span class="n">pythonengineering</span><span class="o">/</span><span class="mi">2016</span><span class="o">/</span><span class="mo">04</span><span class="o">/</span><span class="mi">11</span><span class="o">/</span><span class="n">unable</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">find</span><span class="o">-</span><span class="n">vcvarsall</span><span class="o">-</span><span class="n">bat</span><span class="o">/</span>
+<span class="err">解决办法：</span>  
+    <span class="c1">###原因一：pip太旧，升级</span>
+    <span class="err">真实原因：没有编译文件</span>
+  <span class="err">方案一：安装</span><span class="n">Vs2008</span>
+  <span class="err">方案二：安装</span><span class="n">MinGW</span>
+  <span class="err">方案三：安装编译好的</span><span class="n">wheel</span><span class="err">文件：</span>
+    <span class="n">wheel</span> <span class="err">文件是</span><span class="n">Python</span><span class="err">的一种生成包格式文件，像一种特定的</span><span class="nb">zip</span><span class="err">文件，以‘</span> <span class="o">.</span><span class="n">whl</span> <span class="err">’后缀。</span>
+    <span class="err">对于</span><span class="n">wheel</span><span class="err">文件的安装，要使用</span><span class="n">pip</span><span class="err">工具来进行。安装</span><span class="n">whl</span><span class="err">文件</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">index</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">ustc</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="n">wheel</span>
+    <span class="err">下载</span><span class="n">lxml</span><span class="err">的</span><span class="n">whl</span><span class="err">文件，</span>
+    <span class="err">方案三：</span>
+     <span class="err">参考：</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">pythonwheels</span><span class="o">.</span><span class="n">com</span><span class="o">/</span>
+   <span class="err">方案二：</span>
+    <span class="err">参考：</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">my</span><span class="o">.</span><span class="n">oschina</span><span class="o">.</span><span class="n">net</span><span class="o">/</span><span class="n">zhangdapeng89</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="mi">54407</span>
+    <span class="err">参考：</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">cache</span><span class="o">.</span><span class="n">baiducontent</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">c</span><span class="err">?</span><span class="n">m</span><span class="o">=</span><span class="mi">9</span><span class="n">f65cb4a8c8507ed4fece76310579135480ddd276b97844b22918448e435061e5a25a4ec66644b598f8461670bac4c56eefb2b2577437df78cc8fe0d81e8c276789f274236419141648742f39d5125b764c11ebaef58b4e4ae2593d8828099401697135375d7b0cb074003cb1fe71447f4a7e90f490c40e4ba27648f4e775f882230f01aeee1427907f7e1dc2c189876867610e7b835c62913c557f55b486405b74dc15b0f7827e13f30ff322a05e2bb0ea1</span><span class="o">&amp;</span><span class="n">p</span><span class="o">=</span><span class="mi">897</span><span class="n">ed416d9c105ff57ee957d6142bb</span><span class="o">&amp;</span><span class="n">newp</span><span class="o">=</span><span class="n">c065de1c94904ead08e2977f0e0d9c231610db2151d7da1f6b82c825d7331b001c3bbfb42323160fd4c2776001ad4a59e1f7357931092ba3dda5c91d9fb4c57479</span><span class="o">&amp;</span><span class="n">user</span><span class="o">=</span><span class="n">baidu</span><span class="o">&amp;</span><span class="n">fm</span><span class="o">=</span><span class="n">sc</span><span class="o">&amp;</span><span class="n">query</span><span class="o">=</span><span class="n">error</span><span class="o">%</span><span class="mi">2</span><span class="n">Dunable</span><span class="o">%</span><span class="mi">2</span><span class="n">Dto</span><span class="o">%</span><span class="mi">2</span><span class="n">Dfind</span><span class="o">%</span><span class="mi">2</span><span class="n">Dvcvarsall</span><span class="o">%</span><span class="mi">2</span><span class="n">Dbat</span><span class="o">&amp;</span><span class="n">qid</span><span class="o">=</span><span class="n">eb2e002800040eed</span><span class="o">&amp;</span><span class="n">p1</span><span class="o">=</span><span class="mi">4</span>
+</pre></div>
+
+
+<h2>Ubuntu下安装scrapy</h2>
+<div class="highlight"><pre><span></span>需要的环境  
+sudo apt-get install python-lxml python-dev libffi-dev libssl-dev  
+ pip install scrapy  
+可以用下面的命令测试一下安装是否正 scrapy -v  
+ scrapy startproject weather
+进入主目录: cd weather  //主目录是有scrapy.cfg的文件夹 
+scrapy.cfg: 项目的配置文件
+weather/: 该项目的python模块。之后将在此加入代码。
+weather/items.py: 项目中的item文件.
+weather/pipelines.py: 项目中的pipelines文件.
+weather/settings.py: 项目的设置文件.
+weather/spiders/: 放置spider代码的目录.
+</pre></div>
+
+
+<h2>安装使用虚拟环境</h2>
+<div class="highlight"><pre><span></span>安装virtualenv：
+sudo apt install virtualenv
+创建虚拟环境
+virtualenv Spiders
+ Spiders是新创建的虚拟环境的名称。 同时会创建一个与虚拟环境名称相同的文件夹 Spiders, 里面存储了一个独立的Python执行环境。
+进入虚拟环境
+source Spiders/bin/activate
+进入虚拟环境后，命令行的提示符会加入虚拟环境的名称，例如：(venv)user@machine:~$
+退出虚拟环境$
+deactivate
+删除虚拟环境
+rm -r Spiders
+直接删除虚拟环境所在的文件夹venv就删除了我们创建的venv虚拟环境。
+</pre></div>
+
+
+<h2>参考书目</h2>
+<h3>基础</h3>
+<div class="highlight"><pre><span></span>《像计算机科学家一样思考Python 第2版》
+《Python入门经典:以解决计算问题为导向的Python编程实践》&lt;The Practice of Computing Using Python&gt; 建议读英文版的
+</pre></div>
+
+
+<h3>爬虫的一些内容：</h3>
+<div class="highlight"><pre><span></span>《Python网络数据采集》&lt;Web Scraping with Python Collecting Date From The Modern Web&gt;
+《用Python写网络爬虫》&lt;Web Scraping with Python&gt;
+《Python网络编程攻略》&lt;Python Network Programming Cookbook&gt;
+</pre></div>
+
+
+<h3>数据管理</h3>
+<div class="highlight"><pre><span></span>《干净的数据:数据清洗入门与实践》&lt;Clean Data&gt;
+</pre></div>
+
+
+<h3>数据挖掘与机器学习</h3>
+<div class="highlight"><pre><span></span>《利用Python进行数据分析》&lt;Python for Data Analysis&gt;
+《Python金融大数据分析》&lt;Python for Finance: Analyze Big Financial Data&gt;
+《Python数据挖掘入门与实践》&lt;Learning Data Mining with Python&gt;
+</pre></div>
+
+
+<h3>Web展示</h3>
+<div class="highlight"><pre><span></span>《Flask Web开发:基于Python的Web应用开发实战》
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
