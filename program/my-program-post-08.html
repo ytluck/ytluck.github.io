@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>各种语言与函数式编程小结</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-08.html" rel="bookmark"
+           title="Permalink to 各种语言与函数式编程小结">各种语言与函数式编程小结</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-20T14:59:00+08:00">
+                Published: 2016-11-20 14:59:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/fp.html">FP</a> </p>
+</footer><!-- /.post-info -->      <h2>Functional programming</h2>
+<div class="highlight"><pre><span></span>纯的函数式编程functional
+    lisp 、haskell、Erlang、Scheme
+有函数式编程思想，对函数式编程提供了部分支持的语言
+    Scala、Python、R
+原因：适合并行运算-多核计算-云计算-模式匹配
+</pre></div>
+
+
+<h2>函数式编程概念</h2>
+<div class="highlight"><pre><span></span>First-class Function
+所有运算都是表达式expression
+不需要变量，没有副作用
+纯函数---Pure Function   Side effects 副作用
+引用透明--Referential Transparency
+不变性--Immutability
+递归函数--Recursive Function    Tail recurisive 尾递归
+惰性求值--lazy evaluation
+Curried Function--      柯里化函数
+Anonymous functions     匿名函数
+Partial Function        偏函数
+Higher order function：  高阶函数：能够接受函数作为参数的函数
+Closures                闭包，内层函数引用了外层函数的变量（参数也算变量），
+                    然后返回内层函数的情况，称为闭包（Closure）。
+                闭包的特点是返回的函数还引用了外层函数的局部变量，
+                要正确使用闭包，就要确保引用的局部变量在函数返回后不能变
+</pre></div>
+
+
+<h2>Scala函数式编程</h2>
+<div class="highlight"><pre><span></span>不是纯函数式编程--  var  val  lazy val
+        会自动进行数据类型推导-- Any--AnyVal AnyRef 
+函数字面量&lt;function literal&gt;--值函数不能指定返回值类型
+匿名函数
+        (形参列表) =&gt; {函数体}
+闭包： 函数和上下文
+高阶函数：map() reduce() filter()    flatMap()  fold()
+</pre></div>
+
+
+<h2>Python与函数式编程</h2>
+<div class="highlight"><pre><span></span>不是纯函数式编程：允许有变量
+支持高阶函数：函数可以作为变量传入：map() reduce() filter()
+支持闭包：     返回函数
+有限度的支持匿名函数：例如lambda x: x * x，关键字lambda表示匿名函数，冒号前面的x表示函数参数。
+                        python匿名函数有个限制，就是只能有一个表达式
+装饰器：decorator----- 接收一个函数--包装--返回一个新的函数===通过高阶函数返回新函数 @ 语法
+    decorator 本质上就是一个高阶函数，
+    它接收一个函数作为参数，然后，返回一个新函数。
+    使用 decorator 用Python提供的 @ 语法，
+    这样可以避免手动编写 f = decorate(f) 这样的代码
+        decorator还改变了函数的__doc__等其它属性
+        不想改变，就需要把原函数的一些属性复制到新函数中functools：
+</pre></div>
+
+
+<h2>R 语言与函数式编程</h2>
+<div class="highlight"><pre><span></span>闭包：环境
+高阶函数:Reduce()、Filter()、Map() Postion()
+         apply  lapply sapply  tapply  mapply eapply rapply
+匿名函数  R 语言没有创建命名函数的特殊语法
+</pre></div>
+
+
+<h2>Java与函数式</h2>
+<div class="highlight"><pre><span></span>JDK8 
+匿名类---&gt; Lambda
+</pre></div>
+
+
+<h2>函数式编程-和-数据处理</h2>
+<div class="highlight"><pre><span></span>输入数据流
+
+迭代操作&lt;外部迭代和内部迭代&gt;----&gt;递归
+操作： 筛选 切片 映射
+      查找 匹配 规约  数据分组和分区 
+并行数据处理--顺序流转化为并行流
+模式匹配
+
+终端操作
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

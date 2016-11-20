@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>ytluck—For you - FP</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/program/my-program-post-09.html">Python安装常用包</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-11-20T15:39:00+08:00">
+                Published: 2016-11-20 15:39:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/fp.html">FP</a> </p>
+</footer><!-- /.post-info --><h2>遍历结构</h2>
+<div class="highlight"><pre><span></span>在 元素        上循环：    for (x in xs)
+在 数字索引 上循环：     for (i in seq_along(
+在 名字        上循环：    for (nm in names(xs))
+循环结构是 while 循环。 它会持续运行，直到满足某些条件时为止。
+while 循环比 for 循环更具有一般性
+</pre></div>
+
+
+<h2>C语言中的遍历</h2>
+<div class="highlight"><pre><span></span>      void foreachStringOne(char * str)  
+    {  
+        int len = strlen(str);  
+        for (int i = 0; i &lt; len; ++i)   
+        {  
+            printf(&quot;%c&quot;, str[i]);  
+        }  
+        printf(&quot;/n&quot;);  
+    }
+</pre></div>
+
+
+<h2>Java迭代list是通过下标完成的</h2>
+<div class="highlight"><pre><span></span>    for (i=0; i&lt;list.length; i++) {
+     n = list[i];
+       }
+</pre></div>
+
+
+<h2>Scala中如何筛选数据</h2>
+<div class="highlight"><pre><span></span>    使用迭代器
+    使用遍历
+    使用map 和filter函数 foreach
+<span class="m">1.</span>遍历
+<span class="kr">for</span><span class="p">(</span>value <span class="o">:</span> String <span class="o">&lt;-</span> myArray <span class="p">)</span> <span class="p">{</span>
+println<span class="p">(</span>value<span class="p">);</span>
+<span class="p">}</span>
+<span class="m">2.</span>筛选
+<span class="kr">for</span><span class="p">(</span>value <span class="o">:</span> String <span class="o">&lt;-</span> myArray <span class="kr">if</span> value.endsWith<span class="p">(</span><span class="s">&quot;5&quot;</span><span class="p">))</span> <span class="p">{</span>
+println<span class="p">(</span>value<span class="p">);</span>
+<span class="p">}</span>
+支持下标循环，也可以直接支持对数组集合元素的遍历，还支持在<span class="kr">for</span>循环中使用<span class="kr">if</span>条件
+<span class="m">3.</span>collection
+</pre></div>
+
+
+<h2>Python中如何筛选数据</h2>
+<h3>如何在列表、字典和集合中根据条件筛选数据</h3>
+<div class="highlight"><pre><span></span>数据类型：list dictionary set
+操作方式：过滤掉---or---筛选出
+做法：方法一：遍历，迭代---依次迭代列表中的元素，之后进行条件判断
+      方法二：函数：使用函数式编程 filter
+      方法三：使用解析，列表生成式。利用列表生成式，可以以非常简洁的代码生成 list。
+</pre></div>
+
+
+<h3>示例  迭代是通过 for ... in 来完成的</h3>
+<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="err">列表</span><span class="nb">list</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="k">for</span>  <span class="n">_</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span> <span class="n">data</span>
+<span class="err">通用的方法，迭代</span>
+<span class="n">res</span> <span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="err">使用列表函数</span>
+<span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+<span class="err">使用列表解析</span>
+<span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span><span class="mi">0</span> <span class="p">]</span>
+
+<span class="mf">2.</span><span class="n">set</span> <span class="err">集合</span>
+<span class="n">s</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">s</span>
+<span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">}</span>
+<span class="mf">3.</span><span class="n">dictionary</span> <span class="err">字典</span>
+<span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span> <span class="n">x</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">21</span><span class="p">)}</span>
+<span class="err">使用字典解析</span>
+<span class="p">{</span> <span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span>  <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span>  <span class="nb">dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span><span class="mi">30</span><span class="p">}</span>
+</pre></div>
+
+
+<h3>获取子集</h3>
+<div class="highlight"><pre><span></span>获取List中的子集&lt;使用位置索引&gt; 
+[a,b)
+添加和删除以及改变
+ +
+ del() 函数
+  这其中注意：=  copy 内容和引用，改变List元素注意，
+ 完全创建新的List，使用list() 函数
+</pre></div>
+
+
+<h3>使用模块方法</h3>
+<div class="highlight"><pre><span></span>传统List的计算要逐个计算以及与R语言的比较
+numpy 
+    numpy array 只是另外一种数据类型，数据类型要相同
+    使用布尔运算进行筛选数据
+    .shape()
+    使用行列np_2d[:,1:3]
+    了解数据--&gt;
+</pre></div>
+
+
+<h2>R语言中如何筛选数据</h2>
+<h3>一个数据类型</h3>
+<div class="highlight"><pre><span></span>根据位置索引，根据条件，根据名称&lt;标签&gt;
+筛选出下标，使用下标
+筛选出条件，使用条件&lt;逻辑运算 关系运算 which&gt;
+使用subset
+unique()
+dupicated()
+</pre></div>
+
+
+<h3>多个数据集合运算</h3>
+<div class="highlight"><pre><span></span>union()
+intersect()
+setdiff(x,y)
+x%%y
+is.element(x,y)
+merge()
+</pre></div>
+
+
+<h2>SQL中筛选数据</h2>
+<div class="highlight"><pre><span></span>使用条件 where
+join
+</pre></div>
+
+
+<h2>Excel中筛选数据</h2>
+<div class="highlight"><pre><span></span>菜单下的“排序和筛选
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-08.html" rel="bookmark"
+                           title="Permalink to 各种语言与函数式编程小结">各种语言与函数式编程小结</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-20T14:59:00+08:00">
+                Published: 2016-11-20 14:59:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/fp.html">FP</a> </p>
+</footer><!-- /.post-info -->                <p>函数式编程</p>
+                <a class="readmore" href="/program/my-program-post-08.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
