@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>HBase进一步说明</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-09.html" rel="bookmark"
+           title="Permalink to HBase进一步说明">HBase进一步说明</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-22T22:59:00+08:00">
+                Published: 2016-11-22 22:59:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <p>HBase进一步说明  </p>
+<h2>Hbase基本概念</h2>
+<div class="highlight"><pre><span></span>RowKey：是Byte array，是表中每条记录的“主键”，方便快速查找，Rowkey的设计非常重要。
+Column Family：列族，拥有一个名称(string)，包含一个或者多个相关列
+Column：属于某一个columnfamily，familyName:columnName，每条记录可动态添加
+Version Number：类型为Long，默认值是系统时间戳，可由用户自定义
+Value(Cell)：Byte array
+</pre></div>
+
+
+<h2>Hbase基本组件说明：</h2>
+<div class="highlight"><pre><span></span>Client
+    包含访问HBase的接口，并维护cache来加快对HBase的访问，比如region的位置信息
+Master
+    为Region server分配region
+    负责Region server的负载均衡
+    发现失效的Region server并重新分配其上的region
+    管理用户对table的增删改查操作
+Region Server
+    Regionserver维护region，处理对这些region的IO请求
+    Regionserver负责切分在运行过程中变得过大的region
+Zookeeper作用
+    通过选举，保证任何时候，集群中只有一个master，Master与RegionServers 启动时会向ZooKeeper注册
+    存贮所有Region的寻址入口
+    实时监控Region server的上线和下线信息。并实时通知给Master
+    存储HBase的schema和table元数据
+    默认情况下，HBase 管理ZooKeeper 实例，比如， 启动或者停止ZooKeeper
+    Zookeeper的引入使得Master不再是单点故障
+</pre></div>
+
+
+<h2>Region管理</h2>
+<div class="highlight"><pre><span></span> hbase(main)&gt; scan &#39;hbase:meta&#39;
+    Hbase中默认情况下单个Region是256MB
+    默认建表时有一个region，这个region的rowkey是没有边界的，即没有startkey和endkey，
+在数据写入时，所有数据都会写入这个默认的region，
+随着数据量的不断增加，此region已经不能承受不断增长的数据量，会进行split，分成2个region    
+控制在建表的时候，创建多个空region，并确定每个region的起始和终止rowky，
+这样只要我们的rowkey设计能均匀的命中各个region，这样预先创建hbase表分区的方式，称之为预分区
+    Hbase中有两张特殊的Table，-ROOT-和.META.维护着当前集群上所有区域的列表、状态和位置  
+        .META.：记录了用户表的Region信息，.META.可以有多个regoin
+        -ROOT-：记录了.META.表的Region信息，-ROOT-只有一个region
+    Zookeeper中记录了-ROOT-表的location
+Client访问用户数据之前需要首先访问zookeeper，然后访问-ROOT-表，接着访问.META.表，
+最后才能找到用户数据的位置去访问，中间需要多次网络操作，不过client端会做cache缓存。
+</pre></div>
+
+
+<h2>HBase的WebUI以及log：</h2>
+<div class="highlight"><pre><span></span>在Ambari中Dashboard面板中 有HBase Linkd ，在模块右下角有个More，点击，可以查看
+    HBase Master UI
+     HBase Logs
+         Zookeeper Info
+ 或者直接在web中输入： http://unix191:16010/master-status
+</pre></div>
+
+
+<h2>权限管理</h2>
+<div class="highlight"><pre><span></span><span class="err">查看权限：</span><span class="o">&gt;</span> <span class="n">user_permission</span>
+<span class="n">HBase</span><span class="err">提供的五个权限标识符：</span><span class="n">RWXCA</span><span class="p">,</span><span class="err">分别对应着</span><span class="n">READ</span><span class="p">(</span><span class="c">&#39;R&#39;), WRITE(&#39;W&#39;), EXEC(&#39;X&#39;), CREATE(&#39;C&#39;), ADMIN(&#39;A&#39;)</span>
+<span class="n">HBase</span><span class="err">提供的安全管控级别包括：</span>
+ <span class="n">Superuser</span><span class="err">：拥有所有权限的超级管理员用户。通过</span><span class="n">hbase</span><span class="p">.</span><span class="n">superuser</span><span class="err">参数配置</span>
+ <span class="k">Global</span><span class="err">：全局权限可以作用在集群所有的表上。</span>
+ <span class="k">Namespace</span> <span class="err">：命名空间级。</span>
+ <span class="n">Table</span><span class="err">：表级。</span>
+ <span class="n">ColumnFamily</span><span class="err">：列簇级权限。</span>
+ <span class="n">Cell</span><span class="err">：单元级。</span>
+    <span class="err">和关系数据库一样，权限的授予和回收都使用</span><span class="n">grant</span><span class="err">和</span><span class="n">revoke</span><span class="err">，但格式有所不同</span>
+</pre></div>
+
+
+<h2>容错处理</h2>
+<div class="highlight"><pre><span></span>Hbase采用客户端、从属机和协调主控机组成的模型
+定时向zookeeper汇报心跳
+</pre></div>
+
+
+<h2>物理模型</h2>
+<div class="highlight"><pre><span></span>每个column family存储在hdfs上的单个文件中，并且空值不会被保存；
+ rowKey和version number在每个column family中均有一份；
+  HBase为了每一个值维护了多级索引，即：&lt;rowkey, timestamp,column family,column name &gt;
+1、Table中所有行都会按照rowkey的字典排序列；
+2、Table在行的方向上分割为多个region；
+3、Region按大小分割的，每个表开始只有一个region，
+    随着数据增加，region不断增大，当增大到一个阀值的时候，region会等分分割为列个新的region，之后会越来越多；
+4、Region是HBase中分布式存储和负载均衡的最小单位，不同region分布到不同Regionserver上。
+5、Region虽然是分布式存储的最小单元，但并不是存储的最小单元。    
+    Region由一个或者多个store组成，每个store又由一个memStore和0至多个storefile组成，
+    storefile包含HFile；memstore存储在内存中，storefile存储在hdfs上。
+</pre></div>
+
+
+<h2>统计Hbase表的行数</h2>
+<div class="highlight"><pre><span></span><span class="x">方法一：在hbase shell中执行count的命令可以统计行数----&lt;适用于数据量较小的情况&gt;。</span>
+<span class="x">  hbase(main)&gt; count &#39;tablename&#39;, </span><span class="err">{</span><span class="x">INTERVAL =&gt; 100, CACHE =&gt; 500}</span>
+<span class="x">    语法：count &lt;table&gt;, </span><span class="err">{</span><span class="x">INTERVAL =&gt; intervalNum, CACHE =&gt; cacheNum}  </span>
+<span class="x">    </span><span class="err">#</span><span class="x"> INTERVAL设置多少行显示一次及对应的rowkey，默认1000；CACHE每次去取的缓存区大小，默认是10，调整该参数可提高查询速度</span>
+<span class="x">    </span><span class="err">#</span><span class="x"> 例如，查询表t1中的行数，每100条显示一次，缓存区为500</span>
+
+<span class="x">方法二：调用的hbase jar中自带的统计行数的类</span>
+<span class="x">  </span><span class="p">$</span><span class="nv">HBASE_HOME</span><span class="x">/bin/hbase   org.apache.hadoop.hbase.mapreduce.RowCounter &#39;tablename&#39;</span>
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span> Hbase原理、基本概念、基本架构 http://blog.csdn.net/woshiwanxin102213/article/details/17584043
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
