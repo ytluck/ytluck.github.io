@@ -2,7 +2,7 @@
 <html lang="zh_cn">
 <head>
         <meta charset="utf-8" />
-        <title>数据在各个工具中流通</title>
+        <title>Hbase数据通过Spark到MySQL</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -28,7 +28,7 @@
     <header>
       <h1 class="entry-title">
         <a href="/big-data/my-bigdata-post-13.html" rel="bookmark"
-           title="Permalink to 数据在各个工具中流通">数据在各个工具中流通</a></h1>
+           title="Permalink to Hbase数据通过Spark到MySQL">Hbase数据通过Spark到MySQL</a></h1>
     </header>
 
     <div class="entry-content">
@@ -42,9 +42,11 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info -->      <p>summary：Spark、HBase、MySQL、R、Python之间数据迁移
-HBase和关系型数据库之间转移大量数据
-    Spark、HBase、MySQL、R、Python</p>
+</footer><!-- /.post-info -->      <p>summary：通过Spark、对HBase、MySQL数据库，R和Python读取MySQL数据   </p>
+<div class="highlight"><pre><span></span>Spark、HBase、MySQL、R、Python
+</pre></div>
+
+
 <h2>处理流程：</h2>
 <div class="highlight"><pre><span></span>&lt;1&gt;MySQL 设置用户以及密码创建数据库以及待处理的数据表
 &lt;2&gt;Spark从HBase中读取数据，写到MySQL中
