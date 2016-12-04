@@ -26,7 +26,135 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-10.html">Python的各种包的使用</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-11.html">爬虫框架和数据库连接</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-12-03T15:59:00+08:00">
+                Published: 2016-12-03 15:59:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info --><h3>Scrapy的安装说明</h3>
+<div class="highlight"><pre><span></span>关于爬虫，Scrapy，在官网上资料很多，在这里
+主要记录一下流程，忽略的步骤等等
+以及爬出来的坑，也提醒一下自己
+还有就是一些自己接触的新概念的学习--是什么，怎么做，为什么，改进或者升级
+</pre></div>
+
+
+<h2>搭建语言环境</h2>
+<div class="highlight"><pre><span></span><span class="mf">0.</span><span class="err">操作系统，操作系统的位数</span>
+    <span class="n">Windows</span> <span class="mi">32</span><span class="n">bit</span>
+
+<span class="mf">1.</span><span class="n">Python</span><span class="err">的版本以及位数</span>
+    <span class="err">安装</span><span class="n">Python</span><span class="err">完成后，记得设置环境变量</span>
+    <span class="n">C</span><span class="p">:</span>\<span class="n">Python2</span><span class="o">.</span><span class="mi">7</span>\<span class="p">;</span>
+    <span class="n">C</span><span class="p">:</span>\<span class="n">Python2</span><span class="o">.</span><span class="mi">7</span>\<span class="n">Scripts</span>\<span class="p">;</span>
+    <span class="err">查看</span> <span class="n">python</span> <span class="o">-</span><span class="n">V</span>  <span class="n">Python</span><span class="err">的版本以及位数，打开命令提示符输入</span><span class="n">python</span> <span class="err">，看到以下内容，可见我安装的是</span><span class="mi">32</span><span class="err">位的</span>
+    <span class="n">Python</span> <span class="mf">2.7</span><span class="o">.</span><span class="mi">11</span> <span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="mf">7.11</span><span class="p">:</span><span class="mi">6</span><span class="n">d1b6a68f775</span><span class="p">,</span> <span class="n">Dec</span>  <span class="mi">5</span> <span class="mi">2015</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="mi">19</span><span class="p">)</span> <span class="p">[</span><span class="n">MSC</span> <span class="n">v</span><span class="o">.</span><span class="mi">1500</span> <span class="mi">32</span> <span class="n">bit</span> <span class="p">(</span><span class="n">Intel</span><span class="p">)]</span> <span class="n">on</span> <span class="n">win32</span>
+
+<span class="mf">2.</span><span class="err">从</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">sourceforge</span><span class="o">.</span><span class="n">net</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">pywin32</span><span class="o">/</span> <span class="err">安装</span> <span class="n">pywin32</span>  
+ <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">sourceforge</span><span class="o">.</span><span class="n">net</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">pywin32</span><span class="o">/</span><span class="n">files</span><span class="o">/</span><span class="n">pywin32</span><span class="o">/</span><span class="n">Build</span><span class="o">%</span><span class="mi">20220</span><span class="o">/</span>
+<span class="err">出现</span><span class="ne">ImportError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="n">win32api</span> <span class="err">或者出现</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="n">win32con</span><span class="err">，说明你的库没有安装好。</span>
+<span class="n">Pywin32</span><span class="err">像</span><span class="n">VC</span><span class="err">一样的形式来使用</span><span class="n">PYTHON</span><span class="err">开发</span><span class="n">win32</span><span class="err">应用</span>
+    <span class="err">库里面最重要的模块：</span><span class="n">win32api</span><span class="err">就是通过</span><span class="n">python</span><span class="err">对</span><span class="n">win32</span><span class="err">的本地</span><span class="n">api</span><span class="err">进行了封装</span>
+<span class="err">下载对应版本的</span><span class="n">pywin32</span><span class="err">，直接双击安装即可，安装完毕之后验证。验证方式</span> <span class="err">在</span><span class="n">python</span><span class="err">环境下</span> <span class="kn">import</span> <span class="nn">win32com</span>   <span class="err">没提示错即证明安装成功</span>
+
+<span class="mf">3.</span><span class="err">安装</span><span class="n">pip</span><span class="err">，对于版本小于</span><span class="mf">2.7</span><span class="o">.</span><span class="mi">9</span><span class="err">的需要安装，版本比较新的则不需要，查看</span>
+    <span class="n">pip</span> <span class="o">-</span><span class="n">version</span>
+
+<span class="mf">4.</span><span class="n">Win32OpenSSL</span><span class="err">这个很可能是在我之前安装其他的程序已经安装了，所以在这里是不需要了。具体在自己的电脑上再具体分析吧</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">slproweb</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="n">Win32OpenSSL</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+
+
+<h2>爬虫安装过程</h2>
+<div class="highlight"><pre><span></span>在Windows下安装，由于编译问题，很可能lxml安装不成功，对于这个问题，
+简单的解决办法是，安装编译包
+编译包的下载地址：windows版的各种Python库安装包下载地址：http://www.lfd.uci.edu/~gohlke/pythonlibs/
+注意版本库之间的相互依赖关系，以及自己操作系统的位数
+将cmd当前目录切换到下载的文件所在的位置 然后在命令行安装，例如我把lxml-3.6.4-cp36-cp36m-win32.whl下载到C:\downloads
+    cd  downloads
+    pip install lxml-3.6.4-cp36-cp36m-win32.whl
+在Linux下安装lmxl 可以参见：
+    http://lxml.de/installation.html
+
+安装openssl，网址：https://pypi.python.org/pypi/pyOpenSSL
+</pre></div>
+
+
+<h2>Scrapy的库依赖</h2>
+<div class="highlight"><pre><span></span>Scrapy 1.2.1的python介绍  https://pypi.python.org/pypi/Scrapy/1.2.1
+ Requires Distributions
+    w3lib (&gt;=1.15.0)
+    six (&gt;=1.5.2)
+    service-identity
+    queuelib
+    pyOpenSSL
+    parsel (&gt;=0.9.3)
+    lxml
+    cssselect (&gt;=0.9)
+    Twisted (&gt;=10.0.0)
+    PyDispatcher (&gt;=2.0.5)
+</pre></div>
+
+
+<h2>ubuntu安装数据库MySQL模块</h2>
+<div class="highlight"><pre><span></span>以mysql为例，一般先要安装mysqlclient模块
+1.ubuntu下python版本为2.x中的mysqlclient安装方式
+apt-get install python-dev libmysqlclient-dev
+pip install MySQL-python
+2.ubuntu下python版本为3.x中的mysqlclient安装方式
+apt-get install python3-dev libmysqlclient-dev
+pip install MySQL-python
+</pre></div>
+
+
+<h2>关于安装的编译问题</h2>
+<div class="highlight"><pre><span></span>关于Python的解释器
+        CPython即用C语言实现Python及其解释器（JIT编译器），Linux，OS X等自带的也是这个版本，第三方包Numpy等也是使用CPython。大多数第三方包仅兼容CPython。
+        Jython是用Java语言来实现，
+        Pypy是用Python来实现（准确说是个Python子集）
+        IronPython是用.NET实现的
+    Visual C++ |CPython
+    --------------------
+    14.0       |3.5
+    10.0       |3.3, 3.4
+    9.0        |2.6, 2.7, 3.0, 3.1, 3.2
+    对于Python的底层实现学习不学习，主要看时间投资是否值得以及自己的兴趣爱好的强烈程度。
+Python标准库与第三方库
+</pre></div>
+
+
+<h2>参考概念：</h2>
+<div class="highlight"><pre><span></span>OpenSSL整个软件包大概可以分成三个主要的功能部分：SSL协议库、应用程序以及密码算法库
+&lt;1&gt;MySQL-Python 1.2.5 does not support Python 3.0+ yet
+&lt;2&gt;Even if you havea 64bit computer, if you installed a 32bit version of Python you must install
+the 32bit version of pywin32.
+</pre></div>
+
+
+<h2>参考网址：</h2>
+<div class="highlight"><pre><span></span>Scrapy安装指南：http://scrapy-chs.readthedocs.io/zh_CN/1.0/intro/install.html
+ 安装出错中的一些参考网站：http://stackoverflow.com/questions/22388519/problems-with-pip-install-numpy-runtimeerror-broken-toolchain-cannot-link-a
+PyPI - the Python Package Index https://pypi.python.org/pypi2016/11/20
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-10.html" rel="bookmark"
+                           title="Permalink to Python的各种包的使用">Python的各种包的使用</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-11-20T15:59:00+08:00">
                 Published: 2016-11-20 15:59:00
@@ -37,91 +165,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/python.html">Python</a> </p>
-</footer><!-- /.post-info --><h2>Python的各种包的使用</h2>
-<div class="highlight"><pre><span></span>各种包的使用，首先是要安装使用的包，具体的安装方式在之前的文章中有所总结，以下的包都安装成功
-以下使用只需要要引用即可。
-</pre></div>
-
-
-<h2>Ipython使用介绍</h2>
-<div class="highlight"><pre><span></span><span class="n">jupyter</span><span class="o">==</span><span class="n">IPython</span><span class="o">+</span><span class="n">Notebook</span><span class="err">，如今更名为：</span><span class="n">jupyter</span><span class="err">，即为原来的</span><span class="n">notebook</span>
-<span class="n">ipython</span> <span class="err">自动补全和缩进的交互</span><span class="n">shell</span>
-<span class="n">notebook</span> <span class="err">基于</span><span class="n">web</span><span class="err">的</span><span class="n">ipython</span> <span class="n">shell</span><span class="err">！</span>
-<span class="n">notebook</span><span class="err">实际上会在本地的</span><span class="mi">8888</span><span class="err">端口开一个服务器</span><span class="p">(</span><span class="n">tornado</span><span class="p">)</span><span class="err">，</span>
-<span class="err">所见到的首页，通常叫做</span><span class="n">notebook</span> <span class="n">dashboard</span><span class="err">，它会列出所有的</span><span class="n">notebook</span><span class="err">。</span>
-
-<span class="n">IPython</span> <span class="n">shell</span>
-<span class="n">jupyter</span> <span class="err">运行：</span><span class="n">ipython</span> <span class="n">notebook</span>
-    <span class="err">出现</span><span class="n">jupyter</span><span class="p">,</span><span class="err">在其右侧，选择“</span><span class="k">new</span><span class="err">”</span>
-    <span class="err">代码片段有个专门的术语叫做</span><span class="n">cell</span>
-<span class="n">IPython</span><span class="err">具有</span><span class="n">Tab</span><span class="err">键自动补齐的功能，但是对于以下划线开头的属性和方法会隐藏，对于这些可以先输入下划线后</span><span class="n">_</span><span class="err">再</span><span class="n">Tab</span><span class="err">键。</span>
-<span class="err">中断执行</span> <span class="n">Ctr</span> <span class="o">+</span><span class="n">C</span>
-<span class="err">魔法命令</span> <span class="n">Magic</span> <span class="n">Command</span>
-<span class="nf">%paste</span> <span class="nf">%cpaste</span>
-</pre></div>
-
-
-<h2>numpy包的使用</h2>
-<div class="highlight"><pre><span></span>  <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-  <span class="n">np</span><span class="o">.</span><span class="kp">mean</span><span class="p">()</span>
-  <span class="n">np</span><span class="o">.</span><span class="kp">median</span><span class="p">()</span>
-  <span class="n">np</span><span class="o">.</span><span class="n">corrcodf</span><span class="p">()</span>
-  <span class="n">np</span><span class="o">.</span><span class="kp">std</span><span class="p">()</span>
-  <span class="n">np</span><span class="o">.</span><span class="kp">column_stack</span><span class="p">()</span>
-  <span class="err">和</span><span class="n">R</span><span class="err">语言中矩阵或者向量很相似</span>
-</pre></div>
-
-
-<h2>pandas包的使用</h2>
-<div class="highlight"><pre><span></span><span class="err">读取文件</span> <span class="n">read_csv</span><span class="p">()</span><span class="err">。</span><span class="n">read_table</span><span class="p">()</span><span class="o">--</span><span class="err">导入时数据框</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="n">brics</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;path/data.cvs&quot;</span><span class="p">,</span><span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
-<span class="err">选择列</span>
-<span class="err">选择行</span> <span class="n">loc</span>
-<span class="n">dataframe</span>
-</pre></div>
-
-
-<h2>matplotlib包的使用</h2>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np_hei</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-
-
-<h2>scikit-learn包的使用---机器学习</h2>
-<div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">lfd</span><span class="o">.</span><span class="n">uci</span><span class="o">.</span><span class="n">edu</span><span class="o">/~</span><span class="n">gohlke</span><span class="o">/</span><span class="n">pythonlibs</span><span class="o">/</span><span class="c1">#scikit-learn</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">svm</span>
-<span class="c1"># 进行训练</span>
-<span class="n">clf</span> <span class="o">=</span> <span class="n">svm</span><span class="o">.</span><span class="n">SVC</span><span class="p">()</span>
-<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
-<span class="c1"># 对新的数据进行预测</span>
-<span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_x</span><span class="p">)</span>
-</pre></div>
-
-
-<h2>深度学习--人工智能</h2>
-<div class="highlight"><pre><span></span>TensorFlow,是谷歌刚推出的深度学习框架，开源的TensorFlow是单机实现，其最有价值的分布式数据流实现，并没有开源
-1. cpp+cuda写核心代码2. python调用 。目前不支持Windows
-
-Caffe是应用最广的深度学习框架，作者伯克利PhD贾扬清。
-1. cpp核心代码2. python以及matlab调用来做一些prototype
-
-Theano，Theano大部分代码是使用Cython编写
-
-torch，编程语言Lua
-
-谷歌---TensorFlow；
-伯克利--Caffe
-Facebook---Torch
-微软----分布式机器学习工具（DMTK）---计算网络工具包CNTK的
-IBM-----SystemML，目前Apache旗下
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Python的各种包的使用</p>
+                <a class="readmore" href="/program/my-program-post-10.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -142,6 +189,50 @@ IBM-----SystemML，目前Apache旗下
 <p>tags: <a href="/tag/python.html">Python</a> </p>
 </footer><!-- /.post-info -->                <p>Python安装第三方包</p>
                 <a class="readmore" href="/program/my-program-post-06.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-05.html" rel="bookmark"
+                           title="Permalink to 使用Scrapy进行爬取数据">使用Scrapy进行爬取数据</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-09-14T13:27:00+08:00">
+                Published: 2016-09-14 13:27:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>爬取单个网页，了解过程</p>
+                <a class="readmore" href="/items/my-item-post-05.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-06.html" rel="bookmark"
+                           title="Permalink to Pelican and github 个人博客">Pelican and github 个人博客</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-13T10:22:00+08:00">
+                Published: 2016-04-13 10:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>搭建个人静态博客</p>
+                <a class="readmore" href="/items/my-item-post-06.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->

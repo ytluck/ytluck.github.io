@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark内部工作原理和版本API</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-10.html" rel="bookmark"
+           title="Permalink to Spark内部工作原理和版本API">Spark内部工作原理和版本API</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-03T22:10:00+08:00">
+                Published: 2016-12-03 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h2>Spark的内部原理</h2>
+<div class="highlight"><pre><span></span>Spark的主要模块，内部的运行机制，包括调度机制和执行机制
+    调度与任务分配
+    I/O模块
+    通信控制模块
+    容错模块
+    Shuffle模块
+</pre></div>
+
+
+<h3>Spark执行机制的总览：</h3>
+<div class="highlight"><pre><span></span>    Action---Job --&gt; RDD DAG ----&gt; Stage DAG  --Task---&gt;Executor执行
+</pre></div>
+
+
+<h3>Spark的调度：</h3>
+<div class="highlight"><pre><span></span>    application、job、stage、task几个层次，采用经典调度算法
+    Application运行方式分为 Cluster模式和 Client模式，Application的调度
+    JOb的调度：配置调度池，调度算法
+    Stage的调度是由DAGScheduler完成的
+</pre></div>
+
+
+<h3>Spark的I/O</h3>
+<div class="highlight"><pre><span></span>    采用数据块为单位进行管理
+        本地I/O开销和传输开销
+            通过序列化和反序列化---进行流式传输和块存储
+            压缩：Snappy 和LZF压缩
+        分层：通信层和存储层
+            CacheManager  BlockManager
+</pre></div>
+
+
+<h3>Spark的通信控制模块</h3>
+<div class="highlight"><pre><span></span>    通过akka框架进行集群消息通信
+     采取了异步通信和分布式架构，在本地和远程都有监控和恢复机制，采取无中心节点架构
+     Spark将其作为分布式中的RPC框架
+        分布式通信的几种方式：
+            RPC
+            RMI
+            JMS
+            EJB
+            Web service
+</pre></div>
+
+
+<h3>Spark的容错</h3>
+<div class="highlight"><pre><span></span>    通过Lineage 和 checkpoint 机制进行容错性保证
+        Lineage进行重算操作：记录粗颗粒度的特定数据Transformation操作的行为
+            Narrow Dependencies
+            Shuffle Dependencies---wide Dependencies
+        checkpoint  进行数据冗余备份
+            传统检查点：通过冗余数据和日志记录更新操作
+             SPARK通过冗余数据缓存数据
+</pre></div>
+
+
+<h3>Spark的shuffle机制</h3>
+<div class="highlight"><pre><span></span>在各种重新分区的算子下对数据进行重组合的过程
+</pre></div>
+
+
+<h2>主要有三个方面：</h2>
+<div class="highlight"><pre><span></span>安装和运维和测试
+开发和性能调优
+二次开发，打造专属框架
+</pre></div>
+
+
+<h2>API的更新与改进</h2>
+<h3>Spark 1.6.0</h3>
+<div class="highlight"><pre><span></span>Spark Core              SparkContext对象      RDD的入口
+模块中
+SparkStreaming          DStream
+Spark SQL               SQLContext              Dataframe .Dataset以及SQL的入口
+                        HiveContext
+Spark.mlib
+Spark Graphx
+</pre></div>
+
+
+<h3>Spark 2.0</h3>
+<div class="highlight"><pre><span></span>Spark Core              SparkContext            RDD的入口  
+模块
+SparkStreaming          Structured Streaming
+Spark SQL               SparkSession                Dataset 以及SQL和Hive
+
+Spark.ml
+Spark Graphx
+</pre></div>
+
+
+<h3>版本</h3>
+<div class="highlight"><pre><span></span>1.0     RDD     -           -           2014-03-30
+1.3     RDD     DataFrame   -           2015-03-13
+1.6     RDD     DataFrame   DataSet     2016-01-04
+2.0     RDD            DataSet          2016-07-26
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

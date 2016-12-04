@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>MLllib介绍和使用</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-11.html" rel="bookmark"
+           title="Permalink to MLllib介绍和使用">MLllib介绍和使用</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-03T22:14:00+08:00">
+                Published: 2016-12-03 22:14:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <p>算法库和数据源</p>
+<h2>MLllib目前分为两个代码包：</h2>
+<div class="highlight"><pre><span></span>spark.mllib 包含基于RDD的原始算法API。
+spark.ml 则提供了基于DataFrames 高层次的API，可以用来构建机器学习管道。
+
+
+受限制于JVM的先天不足，基于Java的矩阵运算速度远远比不上本地fortran和C代码实现的矩阵库，比如BLAS，Lapack这种，
+而MLlib则采用了Scala实现的Breeze去调用Netlib-java，而Netlb-java再去调用本地的BLAS和Lapack，以获得接近本地Native code运算矩阵的效果
+Netlib-java其Jar包编译时用的gfortran进行编译，如果在运行时环境中这些原生库不可用，你将会收到一条警告，而后spark会备用策略
+</pre></div>
+
+
+<h2>底层组件简要介绍：</h2>
+<div class="highlight"><pre><span></span>BLAS/LAPACK层：LAPACK是用Fortran编写的算法库，顾名思义，Linear Algebra PACKage，是为了解决通用的线性代数问题的。
+另外必须要提的算法包是BLAS（BasicLinearAlgebraSubprograms），其实LAPACK底层是使用了BLAS库的。
+不少计算机厂商都提供了针对不同处理器进行了优化的BLAS/LAPACK算法包。
+Netlib-java     是一个对底层BLAS,LAPACK封装的Java接口层。（官网为：https://github.com/fommil/netlib-java/）
+Breeze          是一个Scala写的数值处理库，提供向量、矩阵运算等API。（官网为：https://github.com/scalanlp/breeze）
+
+MLlib底层使用到了Scala书写的线性代数库Breeze，Breeze从Spark1.0开始就已近成为Spark的一部分了。
+Breeze底层依赖于netlib-java库 优化的数值处理。
+netlib-java底层依赖原生的Fortran routines
+</pre></div>
+
+
+<h3>库依赖：</h3>
+<div class="highlight"><pre><span></span>由于许可证（license）问题，Spark未将netlib-java相关调用本地库的代码放入到预编译的Spark jar包中。
+如果在运行时环境中这些原生库不可用，你将会收到一条警告，而后spark会使用纯JVM实现来替代之。
+MLlib底层使用了依赖Fortran routines的netlib-java。所以，当用户使用时需要在节点预安装gfortran runtime library
+gfortran runtime library（下载地址：https://github.com/mikiobraun/jblas/wiki/Missing-Libraries）
+
+如果程序中需要使用netlib-java的库，用户需要在项目中引入com.github.fommil.netlib:all:1.1.2的依赖或者参照指南
+（网址为：https://github.com/fommil/netlib-java/blob/master/README.md#machine-optimised-system-libraries）来建立用户自己的项目。
+
+如果用户需要使用python接口，则需要1.4或者更高版本的NumPy（注意：MLlib源码中注释有Experimental/DeveloperApi的API在未来的发布版本中可能会进行调整和改变，官方会在不同版本发布时提供迁移指南）。
+</pre></div>
+
+
+<h2>使用</h2>
+<div class="highlight"><pre><span></span><span class="n">Mlib</span><span class="err">的使用</span>
+    <span class="n">Maven</span>
+
+    <span class="kn">import</span> <span class="nn">org.apache.spark.mllib.stat.Statistics</span>
+</pre></div>
+
+
+<h2>开发：</h2>
+<div class="highlight"><pre><span></span><span class="n">Breeze</span><span class="err">库提供了</span><span class="n">Vector</span><span class="o">/</span><span class="n">Matrix</span><span class="err">的实现以及</span>
+<span class="err">相应计算的接口（</span><span class="n">Linalg</span><span class="err">）。</span>
+<span class="err">在</span><span class="n">MLlib</span><span class="err">里面同时也提供了</span><span class="n">Vector</span><span class="err">和</span><span class="n">Linalg</span><span class="err">等的实现</span>
+<span class="err">在使用</span><span class="n">Breeze</span> <span class="err">库时，需要导入相关包：</span>
+<span class="kn">import</span> <span class="nn">breeze.linalg._</span>
+<span class="kn">import</span> <span class="nn">breeze.numerics._</span>
+</pre></div>
+
+
+<h3>数据类型：</h3>
+<div class="highlight"><pre><span></span><span class="err">本地向量和矩阵存储、分布式的矩阵存储</span>
+    <span class="n">Local</span> <span class="n">vector</span>
+    <span class="n">Labeled</span> <span class="n">point</span>
+    <span class="n">Local</span> <span class="n">matrix</span>
+    <span class="n">Distributed</span> <span class="n">matrix</span>
+
+    <span class="err">本地向量</span> <span class="n">Local</span> <span class="n">vector</span>
+        <span class="n">DenseVector</span>  <span class="err">稠密向量</span> <span class="o">-</span> <span class="err">底层实现：一个</span><span class="n">double</span><span class="err">型的数组存储向量每个元素的值</span> 
+        <span class="n">SparseVector</span> <span class="err">稀疏向量</span> <span class="o">-</span> <span class="err">底层实现：连个并行的数组，一个数组存储向量的序号，一个存储向量元素值</span>
+    <span class="err">本地矩阵基本类</span><span class="n">local</span> <span class="n">Matrix</span> 
+        <span class="o">-</span> <span class="n">DenseMatrix</span> 
+        <span class="o">-</span> <span class="n">SparseMatrix</span>
+
+    <span class="err">标记向量</span><span class="p">(</span><span class="n">Labeled</span> <span class="n">point</span><span class="p">)</span>
+
+    <span class="err">分布式矩阵</span><span class="n">Distributed</span> <span class="n">matrix</span>
+        <span class="n">RowMatrix</span>           <span class="err">行矩阵</span>
+        <span class="n">IndexedRowMatrix</span>    <span class="err">行索引矩阵</span>
+        <span class="n">CoordinateMatrix</span>    <span class="err">坐标矩阵</span>
+        <span class="n">BlockMatrix</span>         <span class="err">块矩阵</span>
+
+<span class="err">向量与向量</span>
+<span class="kn">import</span> <span class="nn">breeze.linalg.DenseVector</span>
+
+<span class="err">矩阵与矩阵</span>
+<span class="kn">import</span> <span class="nn">breeze.linalg.DenseMatrix</span>
+
+<span class="err">矩阵或向量与数值</span>
+<span class="kn">import</span> <span class="nn">breeze.linalg.</span><span class="p">{</span><span class="n">DenseMatrix</span><span class="p">,</span> <span class="n">DenseVector</span><span class="p">}</span>
+
+<span class="err">函数</span>
+<span class="kn">import</span> <span class="nn">breeze.linalg.</span><span class="p">{</span><span class="n">Axis</span><span class="p">,</span> <span class="n">DenseMatrix</span><span class="p">,</span> <span class="nb">sum</span><span class="p">}</span>
+<span class="kn">import</span> <span class="nn">breeze.stats.mean</span>
+<span class="kn">import</span> <span class="nn">breeze.stats.</span><span class="p">{</span><span class="n">stddev</span><span class="p">,</span> <span class="n">variance</span><span class="p">}</span>
+<span class="kn">import</span> <span class="nn">breeze.numerics.</span><span class="p">{</span><span class="nb">pow</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">}</span>
+<span class="kn">import</span> <span class="nn">breeze.numerics.</span><span class="p">{</span><span class="n">exp</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">log10</span><span class="p">,</span> <span class="n">log1p</span><span class="p">}</span>
+</pre></div>
+
+
+<h2>下一步：</h2>
+<div class="highlight"><pre><span></span>使用轮子---基于应用场景，使用算法
+基于基础的矩阵运算（矩阵、向量的乘、加等），实现一些更高级的应用，进而打造针对特定场景的算法--改造轮子
+</pre></div>
+
+
+<h2>数据源</h2>
+<h4>政府&amp;机构数据</h4>
+<div class="highlight"><pre><span></span>北京市政务数据资源网  http://www.bjdata.gov.cn/
+上海市政府数据服务网  http://www.datashanghai.gov.cn/home!toHomePage.action
+广州市政府数据统一开放平台   http://www.datagz.gov.cn/
+深圳---正在建设中
+美国政府开源数据库：  http://www.data.gov/
+英国政府开源数据库：  http://data.gov.uk/
+世界银行数据库：        http://www.worldbank.org/
+美国气候数据库：        http://www.ncdc.noaa.gov/
+美国交通部数据库：       http://www.rita.dot.gov/bts/data_and_statistics/index.html
+</pre></div>
+
+
+<h4>开源社区数据集</h4>
+<div class="highlight"><pre><span></span>Machine Learning Data:  http://mldata.org/repository/data/
+UCI:                    http://archive.ics.uci.edu/ml/
+Co-Clustering:          https://coclustering.hds.utc.fr/doku.php?id=en:start
+R Dataset：              http://www.stats4stem.org/data-sets.html
+Google开源数据平台：   http://www.reddit.com/r/bigquery/wiki/datasets
+</pre></div>
+
+
+<h4>商业数据平台</h4>
+<div class="highlight"><pre><span></span>数据堂：              http://datatang.com/
+Wind:               http://114.80.154.45/University/ElitePlan.html
+</pre></div>
+
+
+<h4>竞赛&amp;会议数据</h4>
+<div class="highlight"><pre><span></span>Kaggle：             https://www.kaggle.com/
+DataCastle:         http://www.pkbigdata.com/
+KDD:                http://www.kdd.org/
+Statistical computing&amp;Statistical Graphics: http://stat-computing.org/dataexpo/
+天池大数据竞赛-        https://tianchi.shuju.aliyun.com/datalab/index.htm
+</pre></div>
+
+
+<h4>其他</h4>
+<div class="highlight"><pre><span></span>基因数据：               http://aws.amazon.com/cn/1000genomes/
+Cancer Program Dataset: http://www.broadinstitute.org/cgi-bin/cancer/datasets.cgi
+电影评分数据集：            http://grouplens.org/datasets/movielens/
+NCBI ：                  http://www.ncbi.nlm.nih.gov/
+Data Source on Web:     http://mran.revolutionanalytics.com/documents/data/#machinelearning
+Mahout数据集：          https://mahout.apache.org/users/basics/collections.html
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>Spark MLLib简介 http://blog.csdn.net/qq_33938256/article/details/52833105
+机器学习库（MLlib）指南 spark-1.6.1 http://ifeve.com/spark-mllib/
+Spark MLlib之矩阵      http://blog.csdn.net/qq_33938256/article/details/52584964
+并发编程网-Spark栏目   http://ifeve.com/category/spark/
+Spark上矩阵运算库（四）基本API搭建完毕 http://blog.csdn.net/u014252240/article/details/38354065 南京大学pasa大数据实验室
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

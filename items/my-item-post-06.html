@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Pelican and github 个人博客</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-06.html" rel="bookmark"
+           title="Permalink to Pelican and github 个人博客">Pelican and github 个人博客</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-13T10:22:00+08:00">
+                Published: 2016-04-13 10:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <h4>做个人网站的三个步骤</h4>
+<div class="highlight"><pre><span></span>决定使用pelican来发布个人的博客，使用的过程中逐渐摸索了一些关于网站的东西，先使用pelican静态网站生成器做一个静态的网站
+ 然后再使用Python中的flask框架来做一个相对复杂的网站。同时也关注Scrapy爬虫。Python中还有的就是作为数据预处理的一些小工具
+机器学习的一些算法Panas。对于python的学习和使用，在训练中逐渐练习吧！
+选择pelican的原因：语言，开发活跃，够轻量，有主题
+</pre></div>
+
+
+<h2>第一步：搭建环境</h2>
+<div class="highlight"><pre><span></span> <span class="err">在</span><span class="nt">Windows</span><span class="err">操作系统下可能出现的问题会很多，但是源于自己目前用于娱乐的还是</span><span class="nt">Windows</span><span class="err">系统，所以</span>
+ <span class="err">环境还是在这下面搭建的。首先要下载安装</span><span class="nt">Python</span><span class="err">，并将</span><span class="nt">Python</span><span class="err">加入到环境变量的路径中去，注意</span><span class="nt">pip</span><span class="err">也需要安装，</span><span class="nt">python</span>
+ <span class="err">环境的安装去谷歌就好。</span>
+    <span class="nt">0</span><span class="o">.</span><span class="err">操作系统，操作系统的位数</span>
+        <span class="nt">Windows</span> <span class="nt">32bit</span>
+
+    <span class="nt">1</span><span class="nc">.Python</span><span class="err">的版本以及位数</span>
+        <span class="err">安装</span><span class="nt">Python</span><span class="err">完成后，记得设置环境变量，设置环境变量自行百度</span>
+            <span class="nt">C</span><span class="o">:</span><span class="err">\</span><span class="nt">Python2</span><span class="nc">.7</span><span class="err">\</span><span class="o">;</span>
+            <span class="nt">C</span><span class="o">:</span><span class="err">\</span><span class="nt">Python2</span><span class="nc">.7</span><span class="err">\</span><span class="nt">Scripts</span><span class="err">\</span><span class="o">;</span>
+            <span class="err">查看是否设置成功，打开命令提示符输入</span>
+                        <span class="nt">python</span> <span class="err">，看到以下内容，可见我安装的是</span><span class="nt">32</span><span class="err">位的</span>
+            <span class="nt">Python</span> <span class="nt">2</span><span class="nc">.7.11</span> <span class="o">(</span><span class="nt">v2</span><span class="nc">.7.11</span><span class="nd">:6d1b6a68f775</span><span class="o">,</span> <span class="nt">Dec</span>  <span class="nt">5</span> <span class="nt">2015</span><span class="o">,</span> <span class="nt">20</span><span class="nd">:32:19</span><span class="o">)</span> <span class="cp">[</span><span class="nx">MSC</span> <span class="nx">v.1500</span> <span class="mi">32</span> <span class="nx">bit</span> <span class="p">(</span><span class="nx">Intel</span><span class="p">)</span><span class="cp">]</span> <span class="nt">on</span> <span class="nt">win32</span>
+            <span class="err">输入</span> <span class="nt">python</span> <span class="nt">-V</span>  <span class="err">可以查看</span><span class="nt">Python</span><span class="err">的版本</span>
+    <span class="nt">2</span><span class="nc">.git</span> <span class="nt">Github</span><span class="err">账户</span>
+        <span class="err">申请个</span><span class="nt">GitHub</span><span class="err">账户，并下载</span><span class="nt">GitHub</span><span class="err">软件</span>
+
+    <span class="nt">3</span><span class="o">.</span><span class="err">安装</span><span class="nt">pelican</span><span class="err">，现在</span><span class="nt">pelican</span><span class="err">是</span><span class="nt">3</span><span class="nc">.3.0</span><span class="err">版本的，同时安装</span> <span class="nt">markdown</span>
+    <span class="err">（</span><span class="nt">1</span><span class="err">）下载安装，</span><span class="nt">cmd</span><span class="err">运行下面的命令，安装</span><span class="nt">pelican</span>
+        <span class="nt">pip</span> <span class="nt">install</span> <span class="nt">pelican</span> <span class="nt">Markdown</span>
+
+    <span class="err">（</span><span class="nt">2</span><span class="err">）创建一个目录用来存放工程，转移到所在的目录</span>
+        <span class="err">然后运行</span>
+        <span class="nt">pelican-quickstart</span>
+
+    <span class="err">系统会给出一系列问题，比如你的博客网址啊，作者名字之类的，</span>
+    <span class="err">运行命令之后，在当前目录下有以下的文件</span>
+         <span class="nt">blog</span><span class="o">/</span>
+        <span class="err">├──</span> <span class="nt">content</span>              <span class="err">#</span> <span class="err">存放输入的源文件</span>
+        <span class="err">│</span>   <span class="err">└──</span> <span class="o">(</span><span class="nt">pages</span><span class="o">)</span>          <span class="err">#</span> <span class="err">存放手工创建的静态页面</span>
+        <span class="err">├──</span> <span class="nt">output</span>               <span class="err">#</span> <span class="err">生成的输出文件</span>
+        <span class="err">├──</span> <span class="nt">develop_server</span><span class="nc">.sh</span>    <span class="err">#</span> <span class="err">方便开启测试服务器</span>
+        <span class="err">├──</span> <span class="nt">Makefile</span>             <span class="err">#</span> <span class="err">方便管理博客的</span><span class="nt">Makefile</span>
+        <span class="err">├──</span> <span class="nt">pelicanconf</span><span class="nc">.py</span>       <span class="err">#</span> <span class="err">主配置文件</span>
+        <span class="err">└──</span> <span class="nt">publishconf</span><span class="nc">.py</span>       <span class="err">#</span> <span class="err">主发布文件，可删除</span>
+
+        <span class="err">如果在</span><span class="nt">content</span><span class="err">目录下创建了</span><span class="nt">pages</span><span class="err">目录，这个目录下的页面都是用来作为顶部导航栏的静态存在。一般用于</span><span class="nt">About</span><span class="err">，</span><span class="nt">Contact</span><span class="err">之类的页面</span>
+        <span class="err">涉及是否要自动生成并发布页面等相关问题。如果你回答“是”，</span> <span class="err">将会在您创建的项目根目录下生成</span> <span class="nt">fabfile</span><span class="nc">.py</span> <span class="err">和</span> <span class="nt">Makefile</span> <span class="err">文件。</span>
+        <span class="err">这些文件会记录安装过程中所做的相关设置，因此从一开始，就应该根据特定需求及其使用模式来设置相关信息。</span>
+</pre></div>
+
+
+<h2>第二步：生成静态的网页</h2>
+<div class="highlight"><pre><span></span>因为需要使用make函数，所以安装了MinGW
+MinGW - Minimalist GNU for Windows
+下载 MinGW installation manager。这是是i686，是32位的。如果机器是64位的，则需要安装64位的。
+        &lt;1&gt;下载之后，在下载的文件夹下会有C:\My_Files\MinGW\bin下会有mingw-get
+         cd  C:\My_Files\MinGW\bin
+        输入：mingw-get install gcc g++ mingw32-make 。安装完成后，并把mingw32备份后改名为make,并添加到环境变量路径中这样
+
+        &lt;2&gt;或者直接使用 MinGW installation manager点击鼠标进行安装，安装完成后，并把mingw32备份后改名为make,并添加到环境变量的路径中
+        在cmd中输入 make -version  。如果显示GNU Make 3.82.90  Built for i686-pc-mingw32 则表明安装成功。
+
+            安装64位的，查看mingw-w64-install.exe
+ 把写好的文章放到D:\Coding\Blogs\content\articles中去
+ D：
+ cd  D:\Coding\Blogs   注意在主目录即可，不需要到content内
+ 然后
+ make html
+
+在这里要说明的是在有些时候，我们要删除过去的内容，怎么办呢
+    在配置文件中有如下的内容，把命令前的注释符号去掉，make html，然后，在注释掉，在生成
+    ###生成文件时是否删除 output 目录
+    #DELETE_OUTPUT_DIRECTORY =True
+会报错，然后再注释掉保存后，在运行即可
+</pre></div>
+
+
+<h2>第三步：上线Github</h2>
+<div class="highlight"><pre><span></span> 流程如下，至于配置的可以参照下面的注释
+ 打开github,打开open in gitshell
+ ###流程代码
+    cd D:\Coding\Blogs\output
+git init
+git add .
+git commit  -m &quot;third com&quot; 
+git remote rm origin
+git remote add origin https://github.com/ytluck/ytluck.github.io.git    
+git push -u origin master 
+说明：
+网上搜索说GitHub Pages分两种，一种是项目页面，可创建多个；另一种是用户页面，每个用户ID只能创建一个。两种都可以用来托管Pelican博客，这里以用户页面为例。
+    首先要创建新建一个Repository，Repository名字是 ytluck.github.io
+    注意，其中&lt;ytluck.github.com&gt;竟然不能用，网上有资料说可以使用com。但是据传言在我国境内，由于一些原因，不能使用。没办法只能使用一个io作为网站。这点可耽误了我不少时间
+    其中 ytluck 是我的用户ID。创建完要public
+    打开github,打开open in gitshell
+    然后在
+    cd D:\Coding\Blogs\output                   
+        # 在本地仓库目录，创建裸仓库先本地库的创建，在一个本地一个目录把要创建仓库的目录创建好：
+            git init
+        #把本地仓库先提交到一个分支，一般开始是 master
+        ##更新所有 git add .
+                git add .
+            git commit  -m &quot;thid comm&quot; //提交更新，并注释信息“first commit”
+        #提交远程服务器,//连接远程github项目
+            git remote rm origin
+            git remote add origin https://github.com/ytluck/ytluck.github.io.git
+            git push -u origin master
+        ##如果出现错误，例如远程仓库比你的本地库更新，所以你得先 pull 下，再 push 就 ok 了。
+            git pull --rebase 
+            git pull origin master
+</pre></div>
+
+
+<h2>附录</h2>
+<div class="highlight"><pre><span></span>关于文章的书写
+    文章书写使用的软件时MarkdownPad2.
+如何给一篇文章指定一个特定模板
+给一篇文章指定一个特定的模板也很简单，只需要在文章中添加如下元数据，
+并且确保该模板文件在模板中存在即可
+    Template: template_name
+
+ 如何将一篇文章设置为主页
+根据上面的第5条很容易将一篇文章设置为网站的主页，如下代码即可实现将 content/pages/home.md设为主页
+    Title: [www.yulin]
+    Date: 2016-03-08
+    URL:
+    save_as: index.html
+    文章正文内容!
+http://www.yanyulin.info/pages/2014/01/pelican_question.html
+如何给一篇文章指定URL
+在需要指定URL的文章或者页面中包括两个元数据`url`与`save_as`,例如以下代码
+url: override/url/
+save_as: override/url/index.html
+这个代码指定了本篇文章的url为override/url/index.html
+</pre></div>
+
+
+<h3>关于板式的设定</h3>
+<div class="highlight"><pre><span></span>1.安装主题
+对应在在pelicanconf.py中添加主题选择条目：
+THEME = &#39;bootstrap2&#39;
+2.资源目录管理
+使用目录名作为文章的分类名
+USE_FOLDER_AS_CATEGORY = True
+使用文件名作为文章或页面的slug（url）
+FILENAME_METADATA = &#39;(?P&lt;slug&gt;.*)&#39;
+页面的显示路径和保存路径，推荐下面的方式
+ARTICLE_URL = &#39;{category}/{slug}.html&#39;
+ARTICLE_SAVE_AS = ARTICLE_URL
+PAGE_URL = &#39;{slug}.html&#39;
+PAGE_SAVE_AS = PAGE_URL
+CATEGORY_URL = &#39;{slug}/index.html&#39;
+CATEGORY_SAVE_AS = CATEGORY_URL
+TAG_URL = &#39;tag/{slug}.html&#39;
+TAG_SAVE_AS = TAG_URL
+TAGS_SAVE_AS = &#39;tag/index.html&#39;
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>pelican-quickstart https://github.com/getpelican/pelican-themes.git
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
