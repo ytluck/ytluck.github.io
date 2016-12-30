@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言中文分词和小说分析</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-09.html" rel="bookmark"
+           title="Permalink to R语言中文分词和小说分析">R语言中文分词和小说分析</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-25T23:20:00+08:00">
+                Published: 2016-04-25 23:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h2>用R来玩--分词和小说分析</h2>
+<div class="highlight"><pre><span></span>用于：使用R进行词语统计-段落分析-情节-人物-对话特点
+技术--中文分词---Rwordseg包&lt;已经不更新了3.0版后就没有了&gt;
+    或者使用结巴分词(jiebaR)，是一款高效的R语言中文分词包，底层使用的是C++，通过Rcpp进行调用很高效。在CRAN中已经有安装包了。
+    --英文分词---使用tm包, 里面的tm_map函数
+</pre></div>
+
+
+<h3>R语言中文分词</h3>
+<div class="highlight"><pre><span></span>采用源码安装
+ http://download.r-forge.r-project.org/src/contrib/Rwordseg_0.2-1.tar.gz
+ http://download.r-forge.r-project.org/bin/windows/contrib/3.0
+程序
+    library(rJava)
+    install.packages(&quot;C:\\My_Files\\Config\\Rwordseg_0.2-1.zip&quot;)##下载到本地，然后本地安装
+    library(&quot;Rwordseg&quot;)
+    segmentCN(&quot;待分析文件的完整路径&quot;,returnType=&quot;tm&quot;)
+    #install.packages(&quot;wordcloud&quot;)
+    library(wordcloud)
+</pre></div>
+
+
+<h3>一、从数据处理角度</h3>
+<div class="highlight"><pre><span></span>    1、导入数据---数据收集
+    2、筛选数据---数据清洗
+    3、多条件筛选对话--数据筛选
+</pre></div>
+
+
+<h3>二、从小说阅读角度</h3>
+<div class="highlight"><pre><span></span>    1、快速对文本分章节 
+    2、快速定位人物出场章节 
+    3、快速定位人物互动章节
+    4、人物的语言特点和变化
+</pre></div>
+
+
+<h3>：技术手段：</h3>
+<div class="highlight"><pre><span></span>1、导入数据技术点---&gt;&gt;--读取数据
+首先，我们要从R语言官方网站下载R语言程序本体。然后把小说全文储存在一个txt文档里。
+使用ReadLines读入所有文本。
+2、筛选数据---技术点---&gt;&gt;--R语言 grepl 正则表达式
+简单分析小说文本，我们会发现在小说里，对话基本都是用双引号“”括起来的。
+我们只需要用grep，就能很轻易把这些对话提取出来，代码示例如下
+在中文分词方面包Rwordseg包(中文分词)，依赖于Java环境
+ 3.分析
+快速对文本分章节
+快速定位人物出场章节：R里面的sapply函数
+快速定位人物互动章节 
+画一些人物图
+做热词分析
+文本挖掘
+写作习惯分析  
+4、导出数据
+但是摘选出来还不够，有时候我们会希望可以把它导出到本地盘，像txt或者html那样保存起来。
+R提供了write函数，可以导出字符串为txt文件，或者直接生成html。
+</pre></div>
+
+
+<h4>分词系统</h4>
+<div class="highlight"><pre><span></span>一个良好的分词系统，应当由词典和统计两套系统组成。
+后者是为前者构造可持续更新的词典，识别新词，同时消歧的部分可引入词典匹配。
+而真正上线主要还应当基于词典，
+    一个原因是性能，
+    另一个原因是一致性。基于统计的分词很容易因为上下文的不一致而产生一致性问题，从而导致查不到
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>R语言-用R眼看琅琊榜小说的正确姿势 http://www.cnblogs.com/weibaar/p/4925399.html
+用R进行文本挖掘与分析：分词、画词云 http://blog.sina.com.cn/s/blog_54f07aba0101slum.html
+R语言中文分词包jiebaR http://www.tuicool.com/articles/2miYVz6    http://blog.fens.me/r-word-jiebar/?utm_source=tuicool&amp;utm_medium=referral
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

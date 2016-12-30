@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言读取Excel以及和调用Java程序</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-12.html" rel="bookmark"
+           title="Permalink to R语言读取Excel以及和调用Java程序">R语言读取Excel以及和调用Java程序</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-24T22:35:00+08:00">
+                Published: 2016-12-24 22:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h2>R语言读取数据Excel数据</h2>
+<div class="highlight"><pre><span></span>应用背景：
+和数据分析师们打交道，很多数据在Excel中，通常呢，我的做法是打开，然后另存为csv格式，然后读取csv格式的文本。遇到读取不对的，也另存为。这种手动的方式简单粗暴但有效，也就没有采用其他的方式。可数据处理免不了要读取大量的Excel文件，怎么办，百度和Google？还是试了一些方法。总结如下
+</pre></div>
+
+
+<h3>解决方案</h3>
+<div class="highlight"><pre><span></span>读取
+</pre></div>
+
+
+<h4>方案一：手动</h4>
+<div class="highlight"><pre><span></span>    读取一个Excel文件的最好方式，就是在Excel中将其导出为一个逗号分隔文件（csv） ，并使读取CSV的方式将其导入R中。
+</pre></div>
+
+
+<h4>方案二：在Windows系统中，你也可以使用RODBC包来访问Excel文件。</h4>
+<div class="highlight"><pre><span></span>    <span class="c1">##第一步是针对你的系统和数据库类型安装和配置合适的ODBC驱动</span>
+    <span class="c1">#install.packages(&quot;RODBC&quot;)</span>
+    <span class="kn">library</span><span class="p">(</span>RODBC<span class="p">)</span>
+    channel <span class="o">&lt;-</span> odbcConnectExcel<span class="p">(</span><span class="s">&quot;my.xls&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>方案三：使用xlsx包中的read.xlsx()，这个需要安装JAVA软件</h4>
+<div class="highlight"><pre><span></span>    <span class="c1">#install.packages(&quot;xlsx&quot;)##只需要安装一次</span>
+    <span class="c1">#Sys.setenv(JAVA_HOME=&#39;C:\\Program Files\\Java\\jdk1.8.0_102&#39;)</span>
+    <span class="kn">library</span><span class="p">(</span>rJava<span class="p">)</span>
+    <span class="kn">library</span><span class="p">(</span>xlsx<span class="p">)</span>
+    read.xlsx<span class="p">()</span>
+        Dos和windows采用回车<span class="o">+</span>换行CR<span class="o">/</span>LF表示下一行<span class="p">,</span>
+        而UNIX<span class="o">/</span>Linux采用换行符LF表示下一行，
+        苹果机<span class="p">(</span>MAC OS系统<span class="p">)</span>则采用回车符CR表示下一行
+
+    gdata包读取<span class="m">.</span>xls包<span class="p">,</span>需要安装Perl，在Windows下就没采用这种方式。毕竟，我不怎么用Perl
+        read.xls<span class="p">()</span>
+
+  使用readxl包读xls
+    install.packages<span class="p">(</span><span class="s">&quot;readxl&quot;</span><span class="p">)</span><span class="c1">##只需要安装一次</span>
+    <span class="kn">library</span><span class="p">(</span>readxl<span class="p">)</span>
+     sales01 <span class="o">&lt;-</span> read_excel<span class="p">(</span><span class="s">&quot;C:/Items/Items/Data/sales01.xls&quot;</span><span class="p">)</span>
+        对包的使用<span class="o">--</span>了解方式之一
+            <span class="kn">library</span><span class="p">(</span>help<span class="o">=</span><span class="s">&quot;readxl&quot;</span><span class="p">)</span>
+            help<span class="p">(</span>package<span class="o">=</span><span class="s">&#39;readxl&#39;</span><span class="p">)</span>
+R本身与xlsx的融合并不好。
+首先尝试用R包解决。即xlsx包。
+xlsx包在加载时容易遇到问题。
+    原因：基本都是由于java环境未配置好，或者环境变量引用失败。
+    解决方案：
+     <span class="m">1</span>、如果没有java运行环境，则需安装对应版本的jre<span class="p">,</span>如R64就需要安装jre64位的，并且要注意在系统环境变量中指定java_home
+        win8的尤其小心不要安装为C<span class="o">:</span>\Program Files<span class="p">(</span>x86<span class="p">)</span>。可能是R在读取路径时，对x86这样的文件夹_R对中文和符号<span class="p">(</span>支持不是很好
+     <span class="m">2</span>、如果有java运行环境，则是jre版本对应的java_home设置有问题，需重新设置正确的JAVA_HOME，并设置环境变量
+     <span class="m">3</span>、用R命令直接设置java_home，命令如：<span class="kp">Sys.setenv</span><span class="p">(</span>JAVA_HOME<span class="o">=</span><span class="s">&#39;C:\\Program Files\\Java\jre7\\&#39;</span><span class="p">)</span>路径要依据你的java版本做出更改。
+</pre></div>
+
+
+<h4>方案四：用VBA把xlsx批量转化为csv格式</h4>
+<div class="highlight"><pre><span></span>和方案一的区别就是：这个是自动的。对大量的Excel处理很方便。而且有fread这个神器，读取csv比较方便
+参考网上的内容《R语言学习笔记之: 论如何正确把EXCEL文件喂给R处理》：
+写了一段VBA，可以选中需要的xlsx，然后在其目录下新建csv文件夹，把xlsx批量转化为csv格式。
+
+代码如下：
+   Sub getCSV()
+ &#39;这是网上看到的xlsx批量转化，而改写的一个xlsx批量转化csv格式
+ &#39;1)批量转化csv参考：http://club.excelhome.net/thread-1036776-2-1.html
+ &#39;2)创建文件夹参考：http://jingyan.baidu.com/article/f54ae2fcdc79bc1e92b8491f.html
+ &#39;这里设置屏幕不动，警告忽略
+ Application.DisplayAlerts = False
+ Application.ScreenUpdating = False
+ Dim data As Workbook
+ &#39;这里用GetOpenFilename弹出一个多选窗口，选中我们要转化成csv的xlsx文件，
+ file = Application.GetOpenFilename(MultiSelect:=True)
+ &#39;用LBound和UBound
+ For i = LBound(file) To UBound(file)
+     Workbooks.Open Filename:=file(i)
+     Set data = ActiveWorkbook
+     Path = data.Path
+     &#39;这里设置要保存在目录下面的csv文件夹里,之后可以自己调
+     &#39;参考了里面的第一种方法
+     On Error Resume Next
+     VBA.MkDir (Path &amp; &quot;\csv&quot;)
+     With data
+         .SaveAs Path &amp; &quot;\csv\&quot; &amp; Replace(data.Name, &quot;.xlsx&quot;, &quot;.csv&quot;), xlCSV
+         .Close True
+       End With
+ Next i
+ &#39;弹出对话框表示转化已完成，这时去相应地方的csv里查看即可
+ MsgBox &quot;已转换了&quot; &amp; (i-1) &amp; &quot;个文档&quot;
+ Application.ScreenUpdating = True
+ Application.DisplayAlerts = True
+   End Sub
+
+操作步骤：把代码复制进excel的vba编辑器里，然后运行getcsv这个宏，会跳出一个窗口，要求选择你要转化的xlsx文件。（可多选）
+选中以后，等一段时间，再回到xlsx文件下，会多一个csv文件夹，里面就是我们要导入R的文本文件了。
+
+1、操作简单，直接依托于excel的VBA操作，不用配置java环境，之后沟通成本/换电脑成本小 
+2、特别适用于有一定数据量，但是数据格式整齐的文件，譬如从某数据端读入的数据。用fread还可以控制读取的行(skip=NNN)，代码写入整洁方便。就算有一些异行数据，也可以事先用VBA进行操作，简单方便。
+</pre></div>
+
+
+<h4>方案五：采用Python将Excel变为csv</h4>
+<div class="highlight"><pre><span></span>    使用python将Excel变为csv，然后采用R读取。
+</pre></div>
+
+
+<h2>R中直接调用Java的对象和方法</h2>
+<div class="highlight"><pre><span></span>rJava是一个R语言和Java语言的通信接口，通过底层JNI实现调用，允许在R中直接调用Java的对象和方法。rJava还提供了Java调用R的功能，是通过JRI(Java/R Interface)实现的
+    在R语言中,如果和java 进行交互,需要调用rJava,
+在Linux中
+    然而在Linux的设置上是有一些需要注意的地方.那就是java的安装目录.checking Java support in R... present: 
+    在interpreter : &#39;/usr/lib/jvm/default-java/jre/bin/java&#39;
+    在实际安装中,把java安装在了/opt/Java/jdk1.7.0_79,所以要这是R的java环境
+    设置R的java最新环境   R CMD  javareconf JAVA_HOME=&quot;&quot; 
+                                 或者Sys.unsetenv()
+    在尝试修改以下中的jAVA_HOME      
+    sudo gedit /usr/lib/R/etc/javaconf
+    sudo gedit /usr/lib/R/etc/ldpaths           
+    source  /usr/lib/R/etc/javaconf
+    source   /usr/lib/R/etc/ldpaths
+    然后
+    设置R的程序从系统变量中会读取Java配置,R的java最新环境 R CMD javareconf       
+    sudo R CMD javareconf -e
+    当然,JAVA_HOME已经设置好的前提下:export JAVA_HOME=/opt/Java/jdk1.7.0_79
+
+在Windows中
+</pre></div>
+
+
+<h3>R从Access读取数据</h3>
+<div class="highlight"><pre><span></span>mdb格式的数据
+在R中通过RODBC包访问一个数据库
+#从Access导出到xlsx也不能超那个6万5，最大的导入行数就是你看到的那个，具体的说明请看RODBC包内的pdf文档,第15页的位置
+这个不知道是不是，没尝试，先放这里。知道Excel有最大行数的限制
+</pre></div>
+
+
+<h3>R从MySQL以及Orcale等关系型数据库中读取数据</h3>
+<div class="highlight"><pre><span></span>    <span class="c1">##本机需要安装和配置好MySQL的客户端，DBI包为访问数据库提供了一个通用且一致的客户端接口</span>
+    基于DBI的包有RMySQL、 ROracle、 RPostgreSQL和RSQLite。
+    流程：
+            安装并引入RMySQL
+            使用dbConnect函数打开数据库的连接
+            使用dbGetQuery函数发起一个select语句，并返回结果集
+            读取结束后，使用dbDisconnect函数终止与数据库的连接<span class="m">3</span>
+     <span class="c1">#install.packages(&quot;RMySQL&quot;)</span>
+    <span class="kn">library</span><span class="p">(</span>RMySQL<span class="p">)</span>
+    con <span class="o">&lt;-</span> dbConnect<span class="p">(</span>MySQL<span class="p">(),</span>user<span class="o">=</span><span class="s">&quot;root&quot;</span><span class="p">,</span>password<span class="o">=</span><span class="s">&quot;****&quot;</span><span class="p">,</span>host<span class="o">=</span><span class="s">&quot;172.15.10.***&quot;</span><span class="p">)</span>
+    sql <span class="o">&lt;-</span> <span class="s">&quot; select  userID,sex,dltcode from UNIX_DATEST.Lasy&quot;</span>
+    rows <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>con<span class="p">,</span>sql<span class="p">)</span>
+    str<span class="p">(</span>rows<span class="p">)</span>
+    <span class="kr">if</span><span class="p">(</span>dbMoreRessylts<span class="p">(</span>con<span class="p">))</span> dbNextResult<span class="p">(</span>con<span class="p">)</span>
+    dbDisconnect<span class="p">(</span>con<span class="p">)</span>
+</pre></div>
+
+
+<h3>读取xml文件和JSON文件</h3>
+<div class="highlight"><pre><span></span>#install.packages(&quot;XML&quot;) 
+#install.packages(&quot;rjson&quot;) 
+采用Python或者其他
+</pre></div>
+
+
+<h3>借助其他工具</h3>
+<div class="highlight"><pre><span></span>Stat/Transfer导入数据
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>解惑rJava R与Java的高速通道 http://blog.fens.me/r-rjava-java/   
+R语言学习笔记之: 论如何正确把EXCEL文件喂给R处理 http://www.cnblogs.com/weibaar/p/4506144.html
+学习R语言，一篇文章让你从懵圈到入门  http://www.xueqing.tv/cms/article/198
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

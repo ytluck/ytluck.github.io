@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Scala中基本语法和结构化数据</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-12.html" rel="bookmark"
+           title="Permalink to Scala中基本语法和结构化数据">Scala中基本语法和结构化数据</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-30T20:12:00+08:00">
+                Published: 2016-12-30 20:12:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->      <h3>Scala语言的语法框架</h3>
+<div class="highlight"><pre><span></span><span class="n">package</span>
+    <span class="err">目的：解决命名冲突</span>
+    <span class="err">使用和访问规则</span><span class="o">-</span><span class="err">外层包无法直接访问内层包</span>
+    <span class="n">package</span> <span class="nb">object</span> <span class="err">包对象</span><span class="o">--</span><span class="err">主要用于对常量和工具函数的封装</span>
+     <span class="kn">import</span> <span class="err">包引入</span>
+            <span class="err">重命名、类隐藏机制</span>
+
+<span class="k">class</span>
+    <span class="nc">class</span>
+    <span class="n">abstract</span> <span class="k">class</span>  <span class="err">抽象类</span>
+    <span class="n">Companion</span> <span class="n">Class</span> <span class="err">伴生类</span> 
+    <span class="err">内部类</span> <span class="err">匿名类</span>
+    <span class="n">case</span> <span class="k">class</span> <span class="err">样例类</span>
+    <span class="err">单例对象不带参数，而类可以</span>
+<span class="nb">object</span>
+    <span class="err">伴生对象首先是一个单例对象，单例对象用关键字</span><span class="nb">object</span><span class="err">定义。</span>
+    <span class="err">在</span><span class="n">Scala</span><span class="err">中，单例对象分为两种，一种是并未自动关联到特定类上的单例对象，称为独立对象</span> <span class="err">（</span><span class="n">Standalone</span> <span class="n">Object</span><span class="err">）；</span>
+    <span class="err">另一种是关联到一个类上的单例对象，该单例对象与该类共有相同名字，则这种单例对象称为伴生对象（</span><span class="n">Companion</span> <span class="n">Object</span><span class="err">），对应类称为伴生类。</span>
+    <span class="err">单例对象（</span><span class="n">singleton</span> <span class="nb">object</span><span class="err">）</span>
+    <span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="nb">object</span><span class="o">---</span><span class="err">单例对象使用</span><span class="nb">object</span><span class="err">关键字声明单例对象，使用时可以不创建对象，直接通过类名</span><span class="o">.</span><span class="err">类成员名称</span> <span class="err">的方式来访问</span><span class="o">.</span><span class="err">通过</span><span class="n">JAVA</span><span class="err">语言中的单例模式和静态类成员实现。</span>
+        <span class="n">main</span><span class="err">函数必须定义在单例模式中，作为程序的入口。也可以通过混入</span><span class="n">trait</span> <span class="n">App</span> <span class="err">实现。在</span><span class="n">App</span> <span class="err">已经定义了</span><span class="n">main</span><span class="err">函数</span>
+    <span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="n">Companion</span> <span class="nb">object</span><span class="o">----</span><span class="err">伴生对象</span>
+     <span class="err">内部对象</span>
+<span class="n">trait</span>
+    <span class="err">通过</span><span class="n">extends</span> <span class="err">或者</span><span class="k">with</span><span class="err">关键字</span><span class="n">mix</span>
+        <span class="err">抽象</span>
+        <span class="err">自身</span>
+<span class="err">伴生带来的特权就是：它们可以互相访问私有成员</span>
+    <span class="n">sealed</span> <span class="err">关键字主要有</span><span class="mi">2</span><span class="err">个作用：</span>
+        <span class="err">其修饰的</span><span class="n">trait</span><span class="err">，</span><span class="n">class</span><span class="err">只能在当前文件里面被继承</span>
+        <span class="err">用</span><span class="n">sealed</span><span class="err">修饰这样做的目的是告诉</span><span class="n">scala</span><span class="err">编译器在检查模式匹配的时候，让</span><span class="n">scala</span><span class="err">知道这些</span><span class="n">case</span><span class="err">的所有情况，</span>
+                <span class="n">scala</span><span class="err">就能够在编译的时候进行检查，看你写的代码是否有没有漏掉什么没</span><span class="n">case</span><span class="err">到，减少编程的错误。</span>   
+<span class="err">函数</span>
+    <span class="err">高阶函数</span>
+    <span class="err">匿名函数</span>
+    <span class="err">偏函数</span>
+
+<span class="err">关于类</span>
+    <span class="err">构造函数</span>
+        <span class="err">主构造函数</span>  <span class="o">---</span><span class="err">公有和私有，默认参数和自定义参数</span>
+        <span class="err">辅助构造函数</span>
+
+    <span class="err">成员变量</span>
+
+    <span class="err">局部变量</span>
+
+    <span class="err">方法</span>
+
+    <span class="err">成员访问控制</span>
+
+    <span class="err">复用类</span><span class="o">---</span><span class="err">组合和继承</span><span class="o">--</span><span class="err">父类和子类</span><span class="o">--</span><span class="err">继承，多态，重写等</span>
+    <span class="err">隐式转换</span>
+    <span class="err">泛型</span>
+        <span class="err">类型的上下界</span>          
+        <span class="k">class</span> <span class="nc">foo</span><span class="p">[</span><span class="n">T</span> <span class="o">&lt;%</span> <span class="n">A</span><span class="p">]{</span><span class="o">...</span><span class="p">}</span> <span class="o">//</span><span class="err">弱上界</span><span class="o">&lt;%</span><span class="err">。关系较弱：</span><span class="n">T</span><span class="err">能够隐式转换为</span><span class="n">Ordered</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> 
+        <span class="k">class</span> <span class="nc">foo</span><span class="p">[</span><span class="n">T</span> <span class="o">&lt;</span><span class="p">:</span> <span class="n">A</span><span class="p">]{</span><span class="o">...</span><span class="p">}</span> <span class="o">//</span><span class="err">上界</span> <span class="o">&lt;</span><span class="p">:</span><span class="err">。</span><span class="n">T</span><span class="err">必须是</span><span class="n">A</span><span class="err">的子类</span><span class="p">,</span><span class="n">A</span><span class="err">是</span><span class="n">T</span><span class="err">的类型上界。</span> 
+        <span class="k">class</span> <span class="nc">foo</span><span class="p">[</span><span class="n">T</span> <span class="o">&gt;</span><span class="p">:</span> <span class="n">A</span><span class="p">]{</span><span class="o">...</span><span class="p">}</span> <span class="o">//</span><span class="err">下界</span> <span class="o">&gt;</span><span class="p">:</span><span class="err">。</span><span class="n">T</span><span class="err">必须是</span><span class="n">A</span><span class="err">的父类，</span><span class="n">A</span><span class="err">是</span><span class="n">T</span><span class="err">类型的下界。</span>
+
+        <span class="err">协变和逆变</span> 
+        <span class="o">+</span><span class="n">T</span><span class="p">:</span> <span class="err">协变：</span><span class="k">class</span> <span class="nc">Queue</span><span class="p">[</span><span class="o">+</span><span class="n">T</span><span class="p">]</span> <span class="p">{}</span><span class="err">。如果</span><span class="n">C</span><span class="o">&lt;</span><span class="p">:</span><span class="n">A</span><span class="err">，则</span><span class="n">Queue</span><span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">A</span><span class="p">]</span>  
+        <span class="o">-</span><span class="n">T</span><span class="p">:</span> <span class="err">逆变</span> <span class="p">:</span> <span class="k">class</span> <span class="nc">Queue</span><span class="p">[</span><span class="o">-</span><span class="n">T</span><span class="p">]</span> <span class="p">{}</span><span class="err">。如果</span><span class="n">C</span><span class="o">&lt;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span><span class="err">则</span><span class="n">Queue</span><span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&gt;</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">A</span><span class="p">]</span> 
+    <span class="err">模式匹配</span>
+    <span class="err">并发</span><span class="o">---</span><span class="err">使用</span><span class="n">Actor</span><span class="err">模型为并发提供更高级的抽象</span><span class="o">--</span>
+            <span class="n">Actor</span><span class="err">构成</span><span class="o">--</span><span class="n">State</span> <span class="n">Behavior</span> <span class="n">Mailbox</span>
+<span class="err">关于</span><span class="n">case</span> <span class="k">class</span>
+    <span class="nc">case</span> <span class="n">class</span><span class="err">，它其实就是一个普通的</span><span class="n">class</span><span class="err">。但是它又和普通的</span><span class="n">class</span><span class="err">略有区别。不可变类中的一种简单类型，内置了所有</span><span class="n">JAVA</span><span class="err">类的基本方法，比如以下中的</span><span class="mf">2.3</span><span class="err">。</span>
+    <span class="err">提供</span><span class="n">factory</span> <span class="n">method</span><span class="err">来方便构造</span><span class="nb">object</span><span class="err">、</span><span class="k">class</span> <span class="nc">parameter</span><span class="err">隐含</span><span class="n">val</span> <span class="n">prefix</span>
+    <span class="o">&gt;</span><span class="mi">1</span><span class="err">、初始化的时候普通类一定需要加</span><span class="n">new</span><span class="err">，</span><span class="n">case</span> <span class="n">calss</span> <span class="err">可以不用</span><span class="n">new</span><span class="err">，当然你也可以加上。</span>
+    <span class="o">&gt;</span><span class="mi">2</span><span class="err">、</span><span class="n">toString</span><span class="err">的实现更漂亮</span>
+    <span class="o">&gt;</span><span class="mi">3</span><span class="err">、默认实现了</span><span class="n">equals</span> <span class="err">和</span><span class="n">hashCode</span>
+    <span class="o">&gt;</span><span class="mi">4</span><span class="err">、默认是可以序列化的，也就是实现了</span><span class="n">Serializable</span>
+    <span class="o">&gt;</span><span class="mi">5</span><span class="err">、自动从</span><span class="n">scala</span><span class="o">.</span><span class="n">Product</span><span class="err">中继承一些函数</span><span class="p">;</span>
+    <span class="o">&gt;</span><span class="mi">6</span><span class="err">、</span><span class="n">case</span> <span class="n">class</span><span class="err">构造函数的参数是</span><span class="n">public</span><span class="err">级别的，我们可以直接访问</span>
+    <span class="o">&gt;</span><span class="mi">7</span><span class="err">、支持模式匹配，</span><span class="n">case</span> <span class="n">class</span><span class="err">最重要的特性应该就是支持模式匹配。</span>
+<span class="err">集合元素的方法</span>
+<span class="err">用分隔符将集合元素连接成一个字符串</span><span class="o">---</span><span class="n">mkString</span>
+<span class="err">定义函数：</span>
+        <span class="o">/**</span>
+        <span class="o">*</span> <span class="err">产生计算维度，或者说是字段的名称</span>
+        <span class="o">*/</span>
+      <span class="k">def</span> <span class="nf">makeKey</span><span class="p">(</span><span class="nb">list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span> <span class="n">String</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">mkString</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+      <span class="p">}</span>
+<span class="err">使用</span>
+    <span class="n">makeKey</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">))</span>
+<span class="n">Scala</span><span class="err">的</span><span class="n">Seq</span><span class="err">类和</span><span class="n">Java</span><span class="err">的</span><span class="n">List</span><span class="err">接口类似，都是可迭代集合，即具有确定长度并且可以根据下标查找值，并且支持排序</span>
+<span class="n">Scala</span><span class="err">的</span><span class="n">Map</span><span class="err">类没有提供根据内容的键或者值排序的方法，可以将</span><span class="n">Map</span><span class="err">类型转换成</span><span class="n">Scala</span><span class="err">的</span><span class="n">Seq</span><span class="err">类型进行排序</span>
+</pre></div>
+
+
+<h3>Scala中对数据进行结构化处理</h3>
+<h5>使用元组Tuple对数据进行结构化</h5>
+<div class="highlight"><pre><span></span>    val codeRDD = HBase_DATARDD.map(
+        o =&gt; {
+            val age =   Bytes.toString(o._2.getValue(&quot;info&quot;.getBytes, &quot;age&quot;.getBytes)).toInt
+            val code =   Bytes.toString(o._2.getValue(&quot;info&quot;.getBytes, &quot;code&quot;.getBytes)).toInt
+            (age,code)      
+           }
+        ).map(o =&gt; o._1)
+
+
+        //关于Tuple1
+        package scala
+        case class Tuple1[ @scala.specialized +T1](val _1 : T1) extends scala.AnyRef with scala.Product1[T1] with scala.Product with scala.Serializable {
+          override def toString() : java.lang.String = { /* compiled code */ }
+        }
+        可以通过变量名._N 的方式进行访问元组的内容，其中N表示元组中元素的索引号。即通过下标访问记录元素。
+         //关于隐式类型转化
+         String类没有toInt方法，而然StringOps有，编译器悄悄的将将String类的实例转换成StringOps对象实例，然后调用toInt方法
+         Tuple2，表示一对--即两个，Tuple3，表示三个
+</pre></div>
+
+
+<h5>使用自定义case class对数据进行结构化</h5>
+<div class="highlight"><pre><span></span>    case class MatchData(lo: Int,sq: Int)
+    val codeRDD = HBase_DATARDD.map(
+        o =&gt; {
+            val age =   Bytes.toString(o._2.getValue(&quot;info&quot;.getBytes, &quot;age&quot;.getBytes)).toInt
+            val code =   Bytes.toString(o._2.getValue(&quot;info&quot;.getBytes, &quot;code&quot;.getBytes)).toInt
+            MatchData(lo,sq)        
+           }
+        )
+
+        功能：创建简单的记录类型，通过有意义的名称来访问记录的元素。
+</pre></div>
+
+
+<h5>使用系统提供的case class 对数据进行结构化</h5>
+<div class="highlight"><pre><span></span>    val codeRDD = HBase_DATARDD.map(
+        o =&gt; {
+            val age =   Bytes.toString(o._2.getValue(&quot;info&quot;.getBytes, &quot;age&quot;.getBytes)).toInt
+            val code =   Bytes.toString(o._2.getValue(&quot;info&quot;.getBytes, &quot;code&quot;.getBytes)).toInt
+            if (column1 != null &amp;&amp; column2 != null) {
+               Some(column1.toDouble, column2.toDouble)
+             }else{
+               None
+             }                          
+           }).filter( o =&gt; o != None).map(_.get._1),//过滤后，再使用.get提取其中的一列
+           //Scala中允许使用_表示匿名函数的参数map(_.get._1) 和map(o =&gt; o.get._1) 是一致的
+</pre></div>
+
+
+<h3>Some、None相关概念的扩展--源代码</h3>
+<div class="highlight"><pre><span></span>    //在Spark中的源代码
+   package scala
+    case object None extends scala.Option[scala.Nothing] with scala.Product with scala.Serializable {
+      def isEmpty : scala.Boolean = { /* compiled code */ }
+      def get : scala.Nothing = { /* compiled code */ }
+    }
+
+   package scala
+    final case class Some[+A](val x : A) extends scala.Option[A] with scala.Product with scala.Serializable {
+      def isEmpty : scala.Boolean = { /* compiled code */ }
+      def get : A = { /* compiled code */ }
+    }
+
+     package scala
+    sealed abstract class Option[+A]() extends scala.AnyRef with scala.Product with scala.Serializable {
+    object Option extends scala.AnyRef with scala.Serializable {
+
+    //对象序列化
+    //将实现了Serializable接口的对象转化成一个字节序列，并能够在以后将这个字节序列完全恢复为原来的对象--实现了轻量级持久性
+    package scala
+    trait Serializable extends scala.Any with java.io.Serializable {
+    }
+    Scala和Java互操作，Scala调用java接口。
+
+    package scala
+    trait Product extends scala.Any with scala.Equals {
+      def productElement(n : scala.Int) : scala.Any
+      def productArity : scala.Int
+      def productIterator : scala.Iterator[scala.Any] = { /* compiled code */ }
+      def productPrefix : java.lang.String = { /* compiled code */ }
+    }
+
+    package scala
+    trait Equals extends scala.Any {
+      def canEqual(that : scala.Any) : scala.Boolean
+      def equals(that : scala.Any) : scala.Boolean
+    }
+
+    //在Scala中的源代码
+    final case class Some[+A](x: A) extends Option[A] {
+      def isEmpty = false
+      def get = x
+    }
+    case object None extends Option[Nothing] {
+      def isEmpty = true
+      def get = throw new NoSuchElementException(&quot;None.get&quot;)
+    }    
+    Option类型代表任意的值，多用在集合操作中，它可以存储任意类型的值，
+        Option实例就是Some或者None对象实例，Some和None都是它的子类，他们都是final类，所以不能再有派生子类了
+        lastOption返回最后一个Option类型对象，lastOption方法中将通过last取到的最后一个元素转换为Some类型了
+        也就是Option类型只会返回Some或None类型对象
+
+ 关于 package scala //在Spark中
+   package object scala extends scala.AnyRef {
+       type Iterable[+A] = scala.collection.Iterable[A]
+       val Iterable : scala.collection.Iterable.type = { /* compiled code */ }
+       type Iterator[+A] = scala.collection.Iterator[A]
+       val Iterator : scala.collection.Iterator.type = { /* compiled code */ }
+       type Seq[+A] = scala.collection.Seq[A]
+       val Seq : scala.collection.Seq.type = { /* compiled code */ }
+       type List[+A] = scala.collection.immutable.List[A]
+       val List : scala.collection.immutable.List.type = { /* compiled code */ }
+       type Vector[+A] = scala.collection.immutable.Vector[A]
+       val Vector : scala.collection.immutable.Vector.type = { /* compiled code */ }
+        }
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

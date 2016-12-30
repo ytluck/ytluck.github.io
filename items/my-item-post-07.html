@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>描述性统计</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-07.html" rel="bookmark"
+           title="Permalink to 描述性统计">描述性统计</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-25T20:22:00+08:00">
+                Published: 2016-12-25 20:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h2>数字真相</h2>
+<div class="highlight"><pre><span></span>整数和非整数
+    与一个整数相比，非整数更容易得到人们的肯定。源于人们的记忆轮廓对整数有着依赖，进而得出约数通常都是错的一种潜意识。然而，一个准确的数字也不总是真实的。通过使用精确数字，表明对细节资料的娴熟。
+    数字本身只是一个标志。-很多数字只是粗糙的，凭借想象力进行修饰的一种估计而已。
+    小数
+分数
+    人们认为分数在数学中具有中立性和客观性。。然而总是有人使用百分数进行夸张。
+    百分数提供了一些信息，同时也掩盖了一些信息。
+    所有百分数都有一个目的：隐藏最基本的数据，用百分数比例来表示这些数据。
+    增长率是统计学家的毒药柜。
+    以百分点来表示的差异要永远低于一百分数来表示的差异。
+    销售中的-分解法，一共多少，用多少天，平均多少。
+比例与倍数
+    数字代表的真正含义。
+平均值
+    平均值很容易受到操作，所以要格外注意。
+    人们根据平均值，很多情况下只是呵呵一笑而已。
+极值和最值
+    每个数字都可以经过认为的方式变大，借助于完全小的计量单位。
+    最高级都是人工合成的产物，专门制定评价标准和比较基础来造就的谎言，参考量指标的最大化开始于“特殊性”。拆穿的方式：扩展比较的基础。数据本身没有骗人，只是评价数据的人在欺骗
+    讨论的出发点如果不是由外界预先设定的话，那么一般来说总要小心一些
+</pre></div>
+
+
+<h1>描述性统计</h1>
+<h2>集中趋势</h2>
+<div class="highlight"><pre><span></span>查看几种趋势的目的是什么呢？   
+    通过确定一个值，来确认数据分布中心。以描述整个分布情况。目标是找一个值作为整体数据分布的最好或者最典型的代表。 在实际中，常使用集中趋势，来反映一组数据所具有的共同趋势。 
+方式有三种：均值，中位数和众数。
+    每种测量方法在特定的情景中都有各自的代表性
+平均值-Mean
+  &lt;1&gt;三种定义方式，理解方式，每种理解都会有各自擅长的地方，例如将平均值理解为平衡点，则当加入或者减少一个已经存在的值，分布会发生什么样的变化，这就可以通过现实生活中的体验来回答，而不需要抽象。
+  &lt;2&gt;总体均值不是两个样本原始均值的平均值，因为样本大小不一样。因此在对合成组做出的贡献就不一样，做的贡献大的，所占具的权重就比较大。所以总体均值也成为加权平均值。
+  &lt;3&gt;平均值的动态特性
+        改变一个数
+        增加或者减少一个数
+            一般情况，特殊情况
+        每个数据--加减乘除
+    算数 几何 调和&lt;倒数平均值&gt; 加权 切尾均值
+中位数--Median
+  对于离散的数据
+    N为奇数 （N+1）/2位置的数字
+    N为偶数的时候 N/2 和(N/2 +1)这两个位置数据的平均值
+  对于连续的数据
+  对于连续的变量可以通过切割寻找精确的中位数
+
+众数-Mode
+    数据中的真实分布，而不通过运算得出
+     双峰式分布，多峰式分布
+     多个相同峰点的分布被认为是没有众数
+        主要众数 和 次要众数
+使用场景粗略介绍
+    一般情况下使用均值
+    使用中位数的情况：
+        极端值或者偏态分布  存在不确定值
+        空端分布             序数数据ordinal
+    使用众数的情况：
+        标称数据nominal
+        离散数据
+        描述形状
+
+说明：均值不一定是位于数据分布的准确中心。
+图表：箱线图 Box-plot 最小值、第一四分位数、中位数、第三四分位数与最大值
+箱线图美中不足之处在于
+&lt;1&gt;它不能提供关于数据分布偏态和尾重程度的精确度量；
+&lt;2&gt;对于批量较大的数据批，箱线图反映的形状信息更加模糊；
+&lt;3&gt;用中位数代表总体平均水平有一定的局限性等等。
+应用箱线图最好结合其它描述统计工具如均值、标准差、偏度、分布函数等来描述数据批的分布形状
+</pre></div>
+
+
+<h2>离中趋势</h2>
+<div class="highlight"><pre><span></span>离中趋势也成离散程度或者是变异指标。
+
+    极差
+    内距--上四分卫-下四分卫
+    离均差--平均离差
+同一平均水平
+    平均差--离差绝对值
+    标准差 --离均差&lt;通过最大离均差估算标准差&gt;Standard Deviation
+    方差
+    总体方差 总体标准差
+    样本方差 样本标准差&lt;无偏估计&gt;
+        抽取样本的时候，通常极端值抽取的概率会小一些，这就意味着样本的变异性会相对小一些。样本估计总体，低估了总体的价值
+    自由度：决定了样本独立、自由变化的个数。
+    标注差的特性
+不同平均水平
+    变异系数--离散系数：标注差与其平均数的比值
+是非标准差
+</pre></div>
+
+
+<h2>偏态和峰态</h2>
+<div class="highlight"><pre><span></span>偏态--偏斜程度
+    中心距，常用三阶中心距
+峰态--扁平程度
+ 单峰 多峰
+    常用四阶中心距  
+    尖峰 平峰 正态
+</pre></div>
+
+
+<h2>图表</h2>
+<div class="highlight"><pre><span></span>表
+ 频数分布表
+图
+ 小心曲线：
+    很多时候会裁剪一部分纵坐标，如果缺乏说明则可能是一些人故意做的。
+    用图解的方式美化数字。通过拉长或者缩短横坐标。
+    曲线始于谷底还是波峰。
+    柱状图进行切割，下方被切割，衡量的刻度被进一步向上延伸。
+    注意：首先看选取的坐标原始位置是不是可以选择的，然后再看起始坐标是不是零，接着看横纵坐标的比例，最后看趋势和关键点。&lt;一般Y轴是X轴的0.6-0.75，不满足则可能会形成误导性分布图&gt;
+ 图标
+    面或者体    
+    数字图像在二维或者三维中的表现
+    通过空间描述进行扭曲，错误的体积关系，表达的是往往多余现实的。
+ 地图：
+    每个人利索当然的都喜欢把之所在的地方看做是世界的中心。人口密度图会渲染一些无关紧要的数据信息。
+    将展示图中的路灯，树木等无关紧要的修饰物移除，你才可能看到，通过布置花哨的事务下所隐藏的信息。
+</pre></div>
+
+
+<h2>数据理念</h2>
+<div class="highlight"><pre><span></span>数据是一种指标。同一个数字有很多面孔，数字提供者可以跟还有需要给你看其中的任何一面，即数字是可以操纵的，所以尤其要注意，自己不作恶，不被他人欺骗。
+数字本身是无辜的，数字只是一个被利用的工具。数学不会错，但数学会被用错。
+提供真实数据不是可能和不可能的事情，而是愿意不愿意的事情
+资深数据科学家
+怀疑一切是职业的信条。结果如何，一定要看到依据。关键性步骤一定亲自查看
+保证数据的安全性，注意原始数据备份和灾难恢复。不对外泄露公司的任何非公开的数据
+培养数据敏感：一种是天赋，一种是后天的训练
+</pre></div>
+
+
+<h2>参考</h2>
+<div class="highlight"><pre><span></span>统计数据的真相 
+行为科学统计精要
+统计与真理:怎样运用偶然性
+女士品茶:统计学如何变革了科学和生活
+统计会犯错:如何避免数据分析中的统计陷阱
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

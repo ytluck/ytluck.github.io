@@ -26,7 +26,338 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-13.html">Hbase数据通过Spark到MySQL</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-13.html">Scala中的符号</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-12-30T20:28:00+08:00">
+                Published: 2016-12-30 20:28:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info --><h3>编程语言中的符号</h3>
+<div class="highlight"><pre><span></span>函数式编程中，符号很多，在这里查看Scala中的符号的含义
+符号作为运算符，符号作为数据结构，符号作为方法，符号作为函数，符号作为对象。
+符号和符号配合，符号和数据配合，符号和控制结构配合。
+</pre></div>
+
+
+<h3>运算符</h3>
+<div class="highlight"><pre><span></span>    算数运算            * / %  +  -
+    关系运算符            ==  !=  &gt;=  &lt;=   ！
+    关系运算与位操作    &gt;   &lt;  &lt;&lt;  &gt;&gt;  &lt;&lt;&lt;  &gt;&gt;&gt;
+    逻辑运算和位操作    &amp;   &amp;&amp;  ^   |    ||
+        单个符号  组合符号
+        一元运算符，二元运算符，三元运算符
+        运算符优先级以及结合方向
+</pre></div>
+
+
+<h3>其他符号</h3>
+<div class="highlight"><pre><span></span>一个符号一个含义，一个符号具有多个含义
+<span class="o">::</span> 运算符 List构造
+<span class="o">::</span><span class="p">(</span>两个冒号<span class="p">)</span>表示普通元素与List的连接操作
+
+<span class="o">:::</span>运算符 List拼接
+<span class="o">:::</span><span class="p">(</span>三个冒号<span class="p">)</span>表示List的连接操作，比如：
+
+<span class="o">&lt;-</span> 运算符
+     <span class="o">&lt;-</span>用于<span class="kr">for</span>循环中，generator
+
+ <span class="o">-&gt;</span>  运算
+    返回一个二元元组
+    比如A<span class="o">-&gt;</span>B<span class="p">,</span><span class="o">-&gt;</span>方法调用的结果是返回一个二元的元组<span class="p">(</span>A<span class="p">,</span>B<span class="p">)</span>
+
+<span class="o">=&gt;</span>  匿名函数；可以看做创建函数实例的语法糖，这个运算符常见的有下面三种：
+    <span class="o">=&gt;</span>：Example：Int <span class="o">=&gt;</span> String表示函数输入为Int型，返回String型，同Function<span class="p">(</span>Int<span class="p">,</span>String<span class="p">)</span>
+    <span class="p">()</span><span class="o">=&gt;</span>：Example：<span class="p">()</span> <span class="o">=&gt;</span> <span class="bp">T</span>表示函数没有输入参数，但返回<span class="bp">T</span>
+    Unit<span class="o">=&gt;</span>：Unit相当于无值的值，相当于C<span class="o">++</span>中的Void
+
+<span class="o">+=</span>：为map类型变量添加元素
+<span class="o">-=</span>：为map类型变量移除元素及其对应的值
+
+<span class="o">+:</span>    <span class="o">:+</span>
+
+<span class="o">++</span>    <span class="o">++:</span>
+
+<span class="o">+</span>  <span class="o">++</span>  <span class="o">+=</span>  <span class="o">++=</span>
+<span class="o">-</span>  <span class="o">--</span>  <span class="o">-=</span>   <span class="o">--=</span>
+
+<span class="c1">#::运算符</span>
+<span class="c1">#::</span>
+
+<span class="c1">#:::运算符</span>
+<span class="c1">#:::</span>
+</pre></div>
+
+
+<h4>Scala 中underscore（下划线）的用法。</h4>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="err">、通配符导入：</span><span class="n">Wildcard</span> <span class="n">imports</span>
+    <span class="kn">import</span> <span class="nn">java.util._</span>
+<span class="mi">2</span><span class="err">、占位符语法：</span><span class="n">Placeholder</span> <span class="n">syntax</span>
+    <span class="n">List</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="nb">map</span> <span class="p">(</span><span class="n">_</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>   
+<span class="mi">3</span><span class="err">、临时变量</span><span class="p">(</span><span class="n">Ignored</span> <span class="n">variables</span><span class="p">),</span><span class="err">高阶类型参数</span>
+    <span class="err">临时参数：</span><span class="n">Ignored</span> <span class="n">parameters</span>
+    <span class="o">//</span><span class="err">访问元组：</span><span class="nb">tuple</span> <span class="n">getters</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">_2</span>    
+<span class="mi">4</span><span class="err">、通配模式：</span><span class="n">Wildcard</span> <span class="n">patterns</span>
+<span class="n">Some</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="n">match</span> <span class="p">{</span> <span class="n">case</span> <span class="n">Some</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">println</span><span class="p">(</span><span class="s2">&quot;Yes&quot;</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">match</span> <span class="p">{</span>
+     <span class="n">case</span> <span class="n">List</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="s2">&quot; a list with three element and the first element is 1&quot;</span>
+     <span class="n">case</span> <span class="n">List</span><span class="p">(</span><span class="n">_</span><span class="o">*</span><span class="p">)</span>  <span class="o">=&gt;</span> <span class="s2">&quot; a list with zero or more elements &quot;</span>
+     <span class="n">case</span> <span class="n">Map</span><span class="p">[</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="s2">&quot; matches a map with any key type and any value type &quot;</span>
+     <span class="n">case</span> <span class="n">_</span> <span class="o">=&gt;</span>
+ <span class="p">}</span>
+<span class="n">val</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">_</span> <span class="o">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="p">)</span>          
+<span class="mi">5</span><span class="err">、连接字母和标点符号：</span><span class="n">Joining</span> <span class="n">letters</span> <span class="n">to</span> <span class="n">punctuation</span>
+    <span class="k">def</span> <span class="nf">bang_</span><span class="err">!</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">=</span> <span class="mi">5</span>  
+<span class="mi">6</span><span class="err">、偏应用函数：</span><span class="n">Partially</span> <span class="n">applied</span> <span class="n">functions</span> 
+<span class="mi">7</span><span class="err">、初始化默认值：</span><span class="n">default</span> <span class="n">value</span>
+     <span class="n">var</span> <span class="n">i</span><span class="p">:</span> <span class="n">Int</span> <span class="o">=</span> <span class="n">_</span>     
+<span class="mi">8</span><span class="err">、参数序列：</span><span class="n">parameters</span> <span class="n">Sequence</span> 
+ <span class="n">_</span><span class="o">*</span><span class="err">作为一个整体，告诉编译器你希望将某个参数当作参数序列处理。</span>
+        <span class="err">例如</span><span class="n">val</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="p">:</span><span class="n">_</span><span class="o">*</span><span class="p">)</span><span class="err">就是将</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="err">当作参数序列处理。</span>
+        <span class="o">//</span><span class="n">Range</span><span class="err">转换为</span><span class="n">List</span>
+        <span class="n">List</span><span class="p">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="p">:</span><span class="n">_</span><span class="o">*</span><span class="p">)</span> 
+        <span class="o">//</span><span class="n">Range</span><span class="err">转换为</span><span class="n">Vector</span>
+        <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="p">:</span> <span class="n">_</span><span class="o">*</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>中文符号的说明</h3>
+<div class="highlight"><pre><span></span>标点符号分为点号、标号、符号三大类。
+    点号：句号（ <span class="m">.</span>）、问号（ <span class="o">?</span>）、感叹号（ <span class="o">!</span>）、逗号（ <span class="p">,</span>）顿号（、）、分号（<span class="p">;</span>）和冒号（<span class="o">:</span>）。
+    标号：引号（“ ” ‘ ’）、括号〔圆括号 <span class="p">(</span> <span class="p">)</span>、方括号 <span class="p">[</span> <span class="p">]</span>、花括号 <span class="p">{</span> <span class="p">}</span>、 〕、破折号（ <span class="o">-</span> ）、
+            省略号（<span class="m">..</span>）、 着重号（ ．）、间隔号（·）、连接号（ — ）和专名号（ ____ ）。
+    符号：注释号（ <span class="o">*</span> ）、斜线号（ <span class="o">/</span> ）、代替号（～）、连珠号（……）、箭头号（ →）。
+其他常用：
+    数学符号 ≈ ≡ ≠ ＝ <span class="o">+</span> <span class="o">-</span> <span class="o">*</span> <span class="o">/</span> <span class="o">=</span>   <span class="o">&gt;&gt;</span>  <span class="o">&lt;&lt;</span> <span class="o">=</span> <span class="o">==</span> <span class="o">!=</span>  <span class="o">!</span>  <span class="o">&amp;</span>
+    <span class="o">!</span> <span class="o">@</span> <span class="c1"># $   % ^  &amp; *  </span>
+组合符号
+    <span class="o">%%</span>   <span class="o">::</span>  <span class="o">:::</span>  <span class="o">==</span>
+    <span class="o">&lt;-</span>   <span class="c1">#::  %/%  %*%    :_*</span>
+</pre></div>
+
+
+<h4>英文符号说明</h4>
+<div class="highlight"><pre><span></span>    .   period, dot     句号，点 
+    ,   comma           逗号 
+    :   colon           冒号 
+    ;   semicolon       分号 
+    ?   question mark   问号 
+    ~   tilde           波浪符
+    !   exclamation mark (英式英语) exclamation point (美式英语) 
+    &#39;   apostrophe 撇号 
+    -   hyphen 连字号 
+    --  dash 破折号 
+    ... dots/ ellipsis 省略号
+    &quot;   single quotation marks 单引号 
+    &quot;&quot;  double quotation marks 双引号 
+    ‖   parallel 双线号 
+    &amp;   ampersand = and 
+    →   arrow 箭号；参见号
+    |   vertical bar, vertical virgule 竖线
+    &amp;   ampersand, and, reference, ref 和，引用 
+    *   asterisk, multiply, star, pointer 星号，乘号，星，指针 
+    /   slash, divide, oblique 斜线，斜杠，除号 
+    //  slash-slash, comment 双斜线，注释符 
+    #   pound 井号 
+    \   escape 反斜线转义符，有时表示转义符或续行符 
+    ()  brakets/ parentheses 括号
+    []  square brackets 方括号 
+    {}  brace 花括号
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>浅谈 Scala 中下划线的用途 https://my.oschina.net/leejun2005/blog/405305
+scala中常用但其他语言不常见的符号含义 http://www.cnblogs.com/xinlingyoulan/p/6031157.html
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-12.html" rel="bookmark"
+                           title="Permalink to Scala中基本语法和结构化数据">Scala中基本语法和结构化数据</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-30T20:12:00+08:00">
+                Published: 2016-12-30 20:12:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>Scala的语法框架以及Options</p>
+                <a class="readmore" href="/program/my-program-post-12.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-08.html" rel="bookmark"
+                           title="Permalink to 数据分析轮廓">数据分析轮廓</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-25T22:12:00+08:00">
+                Published: 2016-12-25 22:12:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>业务理解--方法运用--技术实现</p>
+                <a class="readmore" href="/items/my-item-post-08.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-07.html" rel="bookmark"
+                           title="Permalink to 描述性统计">描述性统计</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-25T20:22:00+08:00">
+                Published: 2016-12-25 20:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>集中趋势-离中趋势-图表</p>
+                <a class="readmore" href="/items/my-item-post-07.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-12.html" rel="bookmark"
+                           title="Permalink to R语言读取Excel以及和调用Java程序">R语言读取Excel以及和调用Java程序</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-24T22:35:00+08:00">
+                Published: 2016-12-24 22:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>R语言读取Excel的方案</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-12.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-11.html" rel="bookmark"
+                           title="Permalink to R语言系统管理和Rstudio的安装和配置">R语言系统管理和Rstudio的安装和配置</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-24T22:26:00+08:00">
+                Published: 2016-12-24 22:26:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>R语言目录-包-批量执行和Rstudio的编码</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-11.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-13.html" rel="bookmark"
+                           title="Permalink to Orcale的连接和常见概念">Orcale的连接和常见概念</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-24T22:15:00+08:00">
+                Published: 2016-12-24 22:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->                <p>Orcale的客户端以及API连接</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-13.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-14.html" rel="bookmark"
+                           title="Permalink to Spark读写JSON和Hbase连接的配置">Spark读写JSON和Hbase连接的配置</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-23T23:11:00+08:00">
+                Published: 2016-12-23 23:11:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>summary：Spark读取JSOn--对连接HBase的配置   </p>
+<h2>Spark的数据读入和写出</h2>
+<h3>依赖</h3>
+<div class="highlight"><pre><span></span>0.pom.xml文件中加入依赖依赖：
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.alibaba<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>fastjson<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.4<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+
+<h3>读取JSON数据</h3>
+<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="err">首先查看</span><span class="n">JSON</span><span class="err">串</span>
+<span class="mf">2.</span><span class="err">解析</span>
+<span class="o">//</span><span class="n">Fastjson</span><span class="err">的最主要的使用入口是 ...</span></pre></div>
+                <a class="readmore" href="/big-data/my-bigdata-post-14.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-13.html" rel="bookmark"
+                           title="Permalink to Hbase数据通过Spark到MySQL">Hbase数据通过Spark到MySQL</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-12-03T23:14:00+08:00">
                 Published: 2016-12-03 23:14:00
@@ -37,7 +368,7 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><p>summary：通过Spark、对HBase、MySQL数据库，R和Python读取MySQL数据   </p>
+</footer><!-- /.post-info -->                <p>summary：通过Spark、对HBase、MySQL数据库，R和Python读取MySQL数据   </p>
 <div class="highlight"><pre><span></span>Spark、HBase、MySQL、R、Python
 </pre></div>
 
@@ -53,278 +384,10 @@
 <div class="highlight"><pre><span></span>    登录主机
      用户名 root密码 ****    
     安装数据库：
-    rpm -ivh MySQL-server-community.rpm 
-    登录
-    mysql  -h localhost -u root  .  
-    登录状态修改密码
-    mysql&gt; SET PASSWORD FOR &#39;root&#39;@&#39;localhost&#39; = PASSWORD(&#39;****&#39;);
-    mysql&gt; FLUSH PRIVILEGES
-    重新登录
-    mysql -u root -p 输入密码登录
-    在登录状态创建数据库
-        show tables;
-        mysql&gt;
-        create database UNIX_DATEST;
-        use  UNIX_DATEST
-        CREATE TABLE Lasy(userID VARCHAR(20) primary key ,sex VARCHAR(2), name VARCHAR(16) )
-        DESC Lasy
-        select * from Lasy limit 3;
-        select count(*) from Lasy;
-
-     删除字段中内容
-        delect from Lasy where userID = &quot;9561&quot;;
-     删除字段
-        alter table Lasy drop column userID;
-     清除表数据
-        delect from Lasy;
-     删除表
-        DROP TABLE IF EXISTS Lasy;
-     //授予访问权限，我登录的主机IP地址是39，所以设置如下
-        GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;172.15.10.39&#39; IDENTIFIED BY &#39;test&#39;;
-
-    主机IP：   172.15.10.30
-    MySQL端口：    3306
-    用户名：    root
-    密码：     test
-    数据库：    UNIX_DATEST
-    数据表：    Lasy
-        //val sql = &quot;insert into Lasy(userID , sex，name ) values (?, ?,?)&quot;
-</pre></div>
-
-
-<h2>&lt;2&gt;Spark读取Hbase，并将数据存储到MySQL</h2>
-<div class="highlight"><pre><span></span> MySQL的JDBC URL编写方式：jdbc:mysql://主机名称：连接端口/数据库的名称?参数=值[用户名 密码]
-Maven依赖
-     <span class="c">&lt;!-- mysql驱动包 --&gt;</span>
-    <span class="nt">&lt;dependency&gt;</span>
-        <span class="nt">&lt;groupId&gt;</span>mysql<span class="nt">&lt;/groupId&gt;</span>
-        <span class="nt">&lt;artifactId&gt;</span>mysql-connector-java<span class="nt">&lt;/artifactId&gt;</span>
-        <span class="nt">&lt;version&gt;</span>5.1.38<span class="nt">&lt;/version&gt;</span>
-        <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
-    <span class="nt">&lt;/dependency&gt;</span>
-
-配置文件
-    #hbase连接配置
-    hbase.zookeeper.quorum=172.15.10.191,172.15.10.192,172.15.10.193
-    hbase.zookeeper.znode.parent=/hbase-unsecure
-    hbase.zookeeper.property.clientPort=2181
-    hbase.master.port=60000
-
-    #hbase表名映射--测试表
-    hbase.UNIX.test=first_test
-
-    #MySQL数据库配置
-    rdb.URL.MySQL=jdbc:mysql://172.15.10.30:3306/UNIX_DATEST
-    rdb.USERNAME.MySQL=root
-    rdb.PASSWORD.MySQL=test
-
-  /**
-    * 建立mysql数据库连接
-    */
-  def getMysqlConnection : Connection = {
-    Class.forName(&quot;com.mysql.jdbc.Driver&quot;)
-    DriverManager.getConnection(getProperties(&quot;rdb.URL.MySQL&quot;),
-      getProperties(&quot;rdb.USERNAME.MySQL&quot;),
-      getProperties(&quot;rdb.PASSWORD.MySQL&quot;))
-  }
-
-      /**
-    * Hbase数据库转换到MySQL数据库
-    */
-
-
-package com.UNIX.analysis
-
-import java.sql.{Connection, DriverManager, PreparedStatement}
-
-import com.UNIX.util.UtilsTrait
-import org.apache.hadoop.hbase.{HBaseConfiguration, HConstants}
-import org.apache.hadoop.hbase.client.Result
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable
-import org.apache.hadoop.hbase.mapreduce.TableInputFormat
-import org.apache.hadoop.hbase.util.Bytes
-import org.apache.spark.mllib.stat.Statistics
-import org.apache.spark.{SparkConf, SparkContext}
-/**
-  * Created by first on 2016/11/23.
-  */
-object readHBase extends UtilsTrait {
-
-    def main(args: Array[String]) {
-
-        //第一步：创建SparkConf对象配置一些通用的属性，并且基于这个创建一个SparkContext对象setMaster(&quot;local[2]&quot;)
-        val SparkConf = new SparkConf().setMaster(&quot;local[2]&quot;).setAppName(&quot;CountingTest&quot;).set(&quot;spark.executor.memory&quot;, &quot;1g&quot;)
-        //使用SparkContext对象中的textFile函数将输入文件转换为一个RDD ，SparkContext对象代表对计算机集群的一个连接
-        val sc = new SparkContext(SparkConf)
-
-        val hbaseConf = HBaseConfiguration.create()
-        //设置zooKeeper集群地址，也可以通过将hbase-site.xml导入classpath，本例在程序里设置
-        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, getProperties(&quot;hbase.zookeeper.quorum&quot;))
-        hbaseConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, getProperties(&quot;hbase.zookeeper.znode.parent&quot;))
-        hbaseConf.set(HConstants.ZOOKEEPER_CLIENT_PORT, getProperties(&quot;hbase.zookeeper.property.clientPort&quot;))
-        hbaseConf.set(HConstants.MASTER_PORT, getProperties(&quot;hbase.master.port&quot;))
-
-        //扫描表，表名
-        hbaseConf.set(TableInputFormat.INPUT_TABLE, getProperties(&quot;hbase.UNIX.test&quot;))
-        //通过Hadoop输入格式 访问HBase，输入数据类型是HBase，输入命令是调用SparkContext.newAPTHadoopRDD
-        //调用命令中的参数hbaseConf包含了Zookeeper设置以及Hbase设置，TableInputFormat中包含了多个可以用来优化对Hbase的读取设置项
-        //返回值类型是键值对，其中键的类型是ImmutableBytesWritable，值得类型是Result
-        val HBase_DATARDD = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
-        //脚手架语句，查看结果
-        println(HBase_DATARDD.count())
-        HBase_DATARDD.foreach(println(_))
-
-        //读取的Hbase的RDD形式
-        //  conn = DriverManager.getConnection(&quot;jdbc:mysql://localhost:3306/spark_testdb&quot;, &quot;root&quot;, &quot;111111&quot;)
-        //&quot;insert into Lasy(userID, sex) values (?, ?)&quot; INSERT INTO table_name (列1, 列2,...) VALUES (值1, 值2,....)
-
-
-       HBase_DATARDD.map(o =&gt; {
-        val strs = new Array[String](7)
-        try {
-            //strs(1) = new String(o._2.getRow)
-            strs(1) = new String(o._1.get())
-            try {
-                strs(2) = new String(o._2.getValue(&quot;it&quot;.getBytes(), &quot;sex&quot;.getBytes()))
-            } catch {
-                case e: Exception =&gt; strs(2) = &quot;0&quot;
-            }
-            try {
-                strs(3) = new String(o._2.getValue(&quot;it&quot;.getBytes(), &quot;dltcode&quot;.getBytes()))
-            } catch {
-                case e: Exception =&gt; strs(3) = &quot;0&quot;
-            }
-
-        } catch {
-            case e: Exception =&gt;
-                System.err.println(e.getStackTrace)
-        }
-        strs
-
-    }).foreachPartition(o =&gt; {
-        var conn: Connection = null
-        var ps: PreparedStatement = null
-        val sql = &quot;insert into Lasy(userID , sex，name ) values (?, ?,?)&quot;
-        println(sql)
-
-        //数据转换一定要查看转换是否正确toString，还是toInt
-        val ageRDD = HBase_DATARDD.map(
-            o =&gt; Bytes.toString(o._2.getValue(&quot;it&quot;.getBytes, &quot;sex&quot;.getBytes))
-        ).map(o =&gt; o.toDouble)
-        ageRDD.foreach(println(_))
-        println(ageRDD.count())
-
-        val nameRDD = HBase_DATARDD.map(
-            o =&gt; Bytes.toString(o._2.getValue(&quot;it&quot;.getBytes, &quot;name&quot;.getBytes))
-        ).map(o =&gt; o.toDouble)
-        nameRDD.foreach(println(_))
-        println(nameRDD.count())
-
-        //相关性分析Correlations
-        //输入数据 ：类型是连续型数据，two RDD[Double]s，两个RDD必须要有相同的长度.同一列的数据不能完全相同
-        //函数以及参数：    calculate the correlation matrix using Pearson&#39;s method. Use &quot;spearman&quot; for Spearman&#39;s method.
-        //输出是the output will be a Double or the correlation Matrix respectively
-        //出现NaN
-        val correlation: Double = Statistics.corr(ageRDD, nameRDD, &quot;pearson&quot;) //计算不同数据的　皮尔逊相关系数
-        println(correlation)    
-        sc.stop()
-    }
-}
-</pre></div>
-
-
-<h2>&lt;3&gt; R/Python 读取MySQL中数据，进行数据探索并将得出的结论以及图标数据进行保存</h2>
-<div class="highlight"><pre><span></span>    <span class="o">&lt;</span><span class="mo">01</span><span class="o">&gt;</span> <span class="n">R</span> <span class="err">从</span><span class="n">MySQL</span><span class="err">以及</span><span class="n">Orcale</span><span class="err">等关系型数据库中读取数据</span>
-        <span class="c1">##本机需要安装和配置好MySQL的客户端</span>
-        <span class="err">流程：</span>
-                <span class="err">安装并引入</span><span class="n">RMySQL</span>
-                <span class="err">使用</span><span class="n">dbConnect</span><span class="err">函数打开数据库的连接</span>
-                <span class="err">使用</span><span class="n">dbGetQuery</span><span class="err">函数发起一个</span><span class="n">select</span><span class="err">语句，并返回结果集</span>
-                <span class="err">读取结束后，使用</span><span class="n">dbDisconnect</span><span class="err">函数终止与数据库的连接</span><span class="mi">3</span>
-         <span class="c1">#install.packages(&quot;RMySQL&quot;)</span>
-        <span class="n">library</span><span class="p">(</span><span class="n">RMySQL</span><span class="p">)</span>
-        <span class="n">con</span> <span class="o">&lt;-</span> <span class="n">dbConnect</span><span class="p">(</span><span class="n">MySQL</span><span class="p">(),</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;****&quot;</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;172.15.10.***&quot;</span><span class="p">)</span>
-        <span class="n">sql</span> <span class="o">&lt;-</span> <span class="s2">&quot; select  userID,sex,dltcode from UNIX_DATEST.Lasy&quot;</span>
-        <span class="n">rows</span> <span class="o">&lt;-</span> <span class="n">dbGetQuery</span><span class="p">(</span><span class="n">con</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
-        <span class="nb">str</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dbMoreRessylts</span><span class="p">(</span><span class="n">con</span><span class="p">))</span> <span class="n">dbNextResult</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
-        <span class="n">dbDisconnect</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
-
-    <span class="o">&lt;</span><span class="mo">02</span><span class="o">&gt;</span><span class="n">Python</span><span class="err">从</span><span class="n">MySQL</span><span class="err">和</span><span class="n">Orcale</span><span class="err">等关系型数据库中读取数据</span>     
-    <span class="err">安装</span><span class="n">MySQLdb</span>
-    <span class="err">使用流程：</span>
-        <span class="err">引入</span> <span class="n">API</span> <span class="err">模块。</span>
-        <span class="err">获取与数据库的连接。</span>
-        <span class="err">执行</span><span class="n">SQL</span><span class="err">语句和存储过程。</span>
-        <span class="err">关闭数据库连接。</span>
-<span class="c1">#!/usr/bin/python</span>
-<span class="c1"># -*- coding: UTF-8 -*-</span>
-<span class="kn">import</span> <span class="nn">MySQLdb</span>
-<span class="kn">import</span> <span class="nn">pandas</span>
-<span class="c1"># 打开数据库连接</span>
-<span class="c1">#port:MySQL服务使用的TCP端口.默认是3306.</span>
-<span class="c1">#charset:数据库编码 charset=&quot;utf8&quot;</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">MySQLdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;172.15.10.30&quot;</span><span class="p">,</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="n">passwd</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span><span class="n">db</span><span class="o">=</span><span class="s2">&quot;UNIX_DATEST&quot;</span><span class="p">)</span>
-<span class="c1"># 创建数据表SQL语句  占位符 %s</span>
-<span class="n">MySQLsql</span> <span class="o">=</span> <span class="s2">&quot;select * from Lasy&quot;</span>
-<span class="c1"># 使用cursor()方法获取操作游标 </span>
-<span class="c1"># 执行sql语句</span>
-<span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-<span class="c1">#cursor对象提供方法包括两大类:1.执行命令,2.接收返回值</span>
-<span class="c1">#第一类方法：执行命令</span>
-<span class="c1">#execute(self, query, args):执行单条sql语句,接收的参数为sql语句本身和使用的参数列表,返回值为受影响的行数 </span>
-<span class="c1">#executemany(self, query, args):执行单条sql语句,但是重复执行参数列表里的参数,返回值为受影响的行数 </span>
-<span class="n">n</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">MySQLsql</span><span class="p">)</span>
-
-<span class="c1">##第二类方法 接收返回值</span>
-<span class="c1">#使用 fetchone() 方法获取单条数据, 使用fetchall() 方法获取多条数据</span>
-<span class="c1">#fetchmany(self, size=None):接收size条返回结果行.如果size的值大于返回的结果行的数量,则会返回</span>
-<span class="c1">#使用 fetchone() 方法获取一条数据</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-<span class="k">print</span> <span class="n">data</span>
-<span class="k">print</span>  <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="c1">##fetchall() 方法取余下的数据</span>
-<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
-    <span class="k">print</span> <span class="n">row</span>
-    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
-        <span class="k">print</span> <span class="n">r</span>
-<span class="c1">#Pandas读取Mysql数据</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">MySQLsql</span><span class="p">,</span><span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">df</span>
-<span class="c1">#需要分别的关闭指针对象和连接对象</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
-<span class="c1"># 关闭数据库连接</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="err">关于安装</span><span class="n">Python</span><span class="err">安装数据库</span>
-    <span class="c1">#MySQLdb 是用于Python链接Mysql数据库的接口，它实现了 Python 数据库 API 规范</span>
-    <span class="c1">#pip install MySQL-python  </span>
-    <span class="n">MySQL</span><span class="o">-</span><span class="n">Python</span> <span class="mf">1.2</span><span class="o">.</span><span class="mi">5</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">support</span> <span class="n">Python</span> <span class="mf">3.0</span><span class="o">+</span> <span class="n">yet</span>
-</pre></div>
-
-
-<h2>概念：</h2>
-<div class="highlight"><pre><span></span>时间戳是指格林威治时间1970年01月01日00时00分00秒(北京时间1970年01月01日08时00分00秒)起至现在的总秒数
-Unix时间戳(Unix timestamp)，或称Unix时间(Unix time)、POSIX时间(POSIX time)，是一种时间表示方式
-时间戳：
-    Unix时间戳记是从&#39;1970-01-01 00:00:00&#39;GMT开始的秒数     
-    MySQL中“完整”TIMESTAMP格式是14位，
-        TIMESTAMP值可以从1970的某时的开始一直到2037年，精度为一秒，其值作为数字显示。
-        0000-00-00 00:00:00     
-    Orcale 获得当前时间的，精确到毫秒，可以指定精确豪秒的位数
-</pre></div>
-
-
-<h2>参考：</h2>
-<div class="highlight"><pre><span></span>MySQLdb用户指南: http://mysql-python.sourceforge.net/MySQLdb.html 
-MySQLdb文档: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/public/MySQLdb-module.html
-python下的MySQLdb使用 http://blog.csdn.net/vincent_czz/article/details/7697039/
-十分钟搞定pandas http://pandas.pydata.org/pandas-docs/stable/dsintro.html#dsintro
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+    rpm ...</pre></div>
+                <a class="readmore" href="/big-data/my-bigdata-post-13.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -521,6 +584,28 @@ python下的MySQLdb使用 http://blog.csdn.net/vincent_czz/article/details/76970
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>服务器安装操作系统</p>
                 <a class="readmore" href="/os/my-super-os-post-04.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-14.html" rel="bookmark"
+                           title="Permalink to 各种语言的IO以及数据类型">各种语言的IO以及数据类型</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-20T20:30:00+08:00">
+                Published: 2016-11-20 20:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>C-Java—Scala-Python-R</p>
+                <a class="readmore" href="/program/my-program-post-14.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
@@ -1182,6 +1267,28 @@ python下的MySQLdb使用 http://blog.csdn.net/vincent_czz/article/details/76970
 <p>tags: <a href="/tag/linux.html">Linux</a> </p>
 </footer><!-- /.post-info -->                <p>介绍 目录 路径 磁盘以及文件系统</p>
                 <a class="readmore" href="/os/my-os-01.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-09.html" rel="bookmark"
+                           title="Permalink to R语言中文分词和小说分析">R语言中文分词和小说分析</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-25T23:20:00+08:00">
+                Published: 2016-04-25 23:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>R进行词语统计-分词</p>
+                <a class="readmore" href="/items/my-item-post-09.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
