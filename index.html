@@ -26,7 +26,153 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-13.html">Scala中的符号</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-17.html">HDFS和Spark的交互</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T09:02:00+08:00">
+                Published: 2017-01-08 09:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>Spark使用Scala连接HDFS</h3>
+<div class="highlight"><pre><span></span>总共分为三个步骤
+第一步：配置包依赖Maven
+第二步：配置文件的参数的设置与读写.properties 在HDFS暂时没有使用
+第三步：编写程序
+
+    //第一步：创建SparkConf对象配置一些通用的属性，并且基于这个创建一个SparkContext对象setMaster(&quot;local[2]&quot;)
+    val SparkConf = new SparkConf().setMaster(&quot;local[2]&quot;).setAppName(&quot;CountTest&quot;).set(&quot;spark.executor.memory&quot;, &quot;1g&quot;)
+    //使用SparkContext对象中的textFile函数将输入文件转换为一个RDD ，SparkContext对象代表对计算机集群的一个连接
+    val sc = new SparkContext(SparkConf)
+    //路径前面加上file:// 表示从本地文件系统读；读取本地文本文件，创建一个字符串的RDD
+    val fluxRDD = sc.textFile(&quot;file:///C:\\Items.json&quot;)
+    //在路径前面加上hdfs://表示从hdfs文件系统；读取HDFS中文件参数是一个path,这个path
+    // val fluxRDD = sc.textFile(&quot;hdfs://localhost:8102/15*.json&quot;)
+    //hdfs://master:port/path
+</pre></div>
+
+
+<h3>Spark存储对象到HDFS</h3>
+<h4>保存RDD为对象</h4>
+<div class="highlight"><pre><span></span>    将RDD保存为对象saveAsObjectFile()
+   .objectFile()函数接收路径，返回对应的RDD
+</pre></div>
+
+
+<h4>保存模型到RDD上为对象</h4>
+<div class="highlight"><pre><span></span><span class="o">//</span><span class="err">将上面的模型存储到</span><span class="n">hdfs</span><span class="o">---</span><span class="n">Spark</span><span class="err">环境下生成一个</span><span class="n">word2vec</span><span class="err">模型</span><span class="p">,</span> <span class="err">存储到</span><span class="n">hdfs</span><span class="o">.</span>
+<span class="n">ObjectInputStream</span><span class="err">与</span><span class="n">ObjectOutputStream</span><span class="err">类所读写的对象必须实现</span><span class="n">Serializable</span><span class="err">接口，只能将支持</span> <span class="n">java</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">Serializable</span> <span class="err">接口的对象写入流中。对象中的</span><span class="n">transient</span><span class="err">和</span><span class="n">static</span><span class="err">类型成员变量不会被读取和写入</span>
+<span class="err">可以使用</span><span class="n">ObjectOutputStream</span> <span class="err">将</span> <span class="n">Java</span> <span class="err">对象的基本数据类型和图形写入</span> <span class="n">OutputStream</span><span class="err">。</span>
+<span class="err">可以使用</span> <span class="n">ObjectInputStream</span> <span class="err">读取（重构）对象。通过在流中使用文件可以实现对象的持久存储</span>
+<span class="n">val</span> <span class="n">hadoopConf</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">hadoopConfiguration</span>
+<span class="n">hadoopConf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fs.defaultFS&quot;</span><span class="p">,</span> <span class="s2">&quot;hdfs://myhadoop:9000/&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">fileSystem</span> <span class="o">=</span> <span class="n">FileSystem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hadoopConf</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">path</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/user/hadoop/data/mllib/word2vec-object&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">oos</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectOutputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FSDataOutputStream</span><span class="p">(</span><span class="n">fileSystem</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+<span class="n">oos</span><span class="o">.</span><span class="n">writeObject</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="n">oos</span><span class="o">.</span><span class="n">close</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="err">这里示例另外一个程序直接从</span><span class="n">hdfs</span><span class="err">读取序列化对象使用模型</span>
+<span class="n">val</span> <span class="n">ois</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FSDataInputStream</span><span class="p">(</span><span class="n">fileSystem</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+<span class="n">val</span> <span class="n">sample_model</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="n">readObject</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="p">[</span><span class="n">Word2VecModel</span><span class="p">]</span>
+
+  <span class="o">/*</span>
+    <span class="o">*</span> <span class="o">//</span><span class="err">以将序列化文件从</span><span class="n">hdfs</span><span class="err">放到本地</span><span class="p">,</span> <span class="n">scala</span><span class="err">程序使用模型</span>
+    <span class="o">*</span> <span class="kn">import</span> <span class="nn">java.io._</span>
+    <span class="o">*</span> <span class="kn">import</span> <span class="nn">org.apache.spark.mllib.feature.</span><span class="p">{</span><span class="n">Word2Vec</span><span class="p">,</span> <span class="n">Word2VecModel</span><span class="p">}</span>
+    <span class="o">*</span> <span class="n">val</span> <span class="n">ois</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FileInputStream</span><span class="p">(</span><span class="s2">&quot;/home/cherokee/tmp/word2vec-object&quot;</span><span class="p">))</span>
+    <span class="o">*</span> <span class="n">val</span> <span class="n">sample_model</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="n">readObject</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="p">[</span><span class="n">Word2VecModel</span><span class="p">]</span>
+    <span class="o">*</span> <span class="n">ois</span><span class="o">.</span><span class="n">close</span>
+    <span class="o">*/</span>
+</pre></div>
+
+
+<h3>Hadoop现在同时提供了新旧的两套API接口</h3>
+<div class="highlight"><pre><span></span>旧版API 放在org.apache.hadoop.mapred 包中，
+而新版API 则放在org.apache.hadoop.mapreduce 包及其子包中
+</pre></div>
+
+
+<h4>老式</h4>
+<div class="highlight"><pre><span></span>hadoopFile
+saveAsHadoopFile()
+</pre></div>
+
+
+<h4>新式</h4>
+<div class="highlight"><pre><span></span> hadoopDataset    saveAsHadoopDataset     
+ newAPIHadoopDataset saveAsNewAPIHadoopDataset
+                    saveAsNewAPIHadoopFile
+
+val HBase_DATARDD = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
+    //脚手架语句，查看结果
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Spark中将对象序列化存储到hdfs https://my.oschina.net/waterbear/blog/525347
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-16.html" rel="bookmark"
+                           title="Permalink to HDFS使用JavaAPI操作">HDFS使用JavaAPI操作</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:25:00+08:00">
+                Published: 2017-01-08 08:25:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HDFS的API接口</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-16.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-15.html" rel="bookmark"
+                           title="Permalink to HDFS基本概念和命令行操作">HDFS基本概念和命令行操作</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:11:00+08:00">
+                Published: 2017-01-08 08:11:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HDFS通过命令行和UI等</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-15.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-13.html" rel="bookmark"
+                           title="Permalink to Scala中的符号">Scala中的符号</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-12-30T20:28:00+08:00">
                 Published: 2016-12-30 20:28:00
@@ -37,150 +183,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/scala.html">Scala</a> </p>
-</footer><!-- /.post-info --><h3>编程语言中的符号</h3>
-<div class="highlight"><pre><span></span>函数式编程中，符号很多，在这里查看Scala中的符号的含义
-符号作为运算符，符号作为数据结构，符号作为方法，符号作为函数，符号作为对象。
-符号和符号配合，符号和数据配合，符号和控制结构配合。
-</pre></div>
-
-
-<h3>运算符</h3>
-<div class="highlight"><pre><span></span>    算数运算            * / %  +  -
-    关系运算符            ==  !=  &gt;=  &lt;=   ！
-    关系运算与位操作    &gt;   &lt;  &lt;&lt;  &gt;&gt;  &lt;&lt;&lt;  &gt;&gt;&gt;
-    逻辑运算和位操作    &amp;   &amp;&amp;  ^   |    ||
-        单个符号  组合符号
-        一元运算符，二元运算符，三元运算符
-        运算符优先级以及结合方向
-</pre></div>
-
-
-<h3>其他符号</h3>
-<div class="highlight"><pre><span></span>一个符号一个含义，一个符号具有多个含义
-<span class="o">::</span> 运算符 List构造
-<span class="o">::</span><span class="p">(</span>两个冒号<span class="p">)</span>表示普通元素与List的连接操作
-
-<span class="o">:::</span>运算符 List拼接
-<span class="o">:::</span><span class="p">(</span>三个冒号<span class="p">)</span>表示List的连接操作，比如：
-
-<span class="o">&lt;-</span> 运算符
-     <span class="o">&lt;-</span>用于<span class="kr">for</span>循环中，generator
-
- <span class="o">-&gt;</span>  运算
-    返回一个二元元组
-    比如A<span class="o">-&gt;</span>B<span class="p">,</span><span class="o">-&gt;</span>方法调用的结果是返回一个二元的元组<span class="p">(</span>A<span class="p">,</span>B<span class="p">)</span>
-
-<span class="o">=&gt;</span>  匿名函数；可以看做创建函数实例的语法糖，这个运算符常见的有下面三种：
-    <span class="o">=&gt;</span>：Example：Int <span class="o">=&gt;</span> String表示函数输入为Int型，返回String型，同Function<span class="p">(</span>Int<span class="p">,</span>String<span class="p">)</span>
-    <span class="p">()</span><span class="o">=&gt;</span>：Example：<span class="p">()</span> <span class="o">=&gt;</span> <span class="bp">T</span>表示函数没有输入参数，但返回<span class="bp">T</span>
-    Unit<span class="o">=&gt;</span>：Unit相当于无值的值，相当于C<span class="o">++</span>中的Void
-
-<span class="o">+=</span>：为map类型变量添加元素
-<span class="o">-=</span>：为map类型变量移除元素及其对应的值
-
-<span class="o">+:</span>    <span class="o">:+</span>
-
-<span class="o">++</span>    <span class="o">++:</span>
-
-<span class="o">+</span>  <span class="o">++</span>  <span class="o">+=</span>  <span class="o">++=</span>
-<span class="o">-</span>  <span class="o">--</span>  <span class="o">-=</span>   <span class="o">--=</span>
-
-<span class="c1">#::运算符</span>
-<span class="c1">#::</span>
-
-<span class="c1">#:::运算符</span>
-<span class="c1">#:::</span>
-</pre></div>
-
-
-<h4>Scala 中underscore（下划线）的用法。</h4>
-<div class="highlight"><pre><span></span><span class="mi">1</span><span class="err">、通配符导入：</span><span class="n">Wildcard</span> <span class="n">imports</span>
-    <span class="kn">import</span> <span class="nn">java.util._</span>
-<span class="mi">2</span><span class="err">、占位符语法：</span><span class="n">Placeholder</span> <span class="n">syntax</span>
-    <span class="n">List</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="nb">map</span> <span class="p">(</span><span class="n">_</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>   
-<span class="mi">3</span><span class="err">、临时变量</span><span class="p">(</span><span class="n">Ignored</span> <span class="n">variables</span><span class="p">),</span><span class="err">高阶类型参数</span>
-    <span class="err">临时参数：</span><span class="n">Ignored</span> <span class="n">parameters</span>
-    <span class="o">//</span><span class="err">访问元组：</span><span class="nb">tuple</span> <span class="n">getters</span>
-    <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">_2</span>    
-<span class="mi">4</span><span class="err">、通配模式：</span><span class="n">Wildcard</span> <span class="n">patterns</span>
-<span class="n">Some</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="n">match</span> <span class="p">{</span> <span class="n">case</span> <span class="n">Some</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">println</span><span class="p">(</span><span class="s2">&quot;Yes&quot;</span><span class="p">)</span> <span class="p">}</span>
-<span class="n">match</span> <span class="p">{</span>
-     <span class="n">case</span> <span class="n">List</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="s2">&quot; a list with three element and the first element is 1&quot;</span>
-     <span class="n">case</span> <span class="n">List</span><span class="p">(</span><span class="n">_</span><span class="o">*</span><span class="p">)</span>  <span class="o">=&gt;</span> <span class="s2">&quot; a list with zero or more elements &quot;</span>
-     <span class="n">case</span> <span class="n">Map</span><span class="p">[</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="s2">&quot; matches a map with any key type and any value type &quot;</span>
-     <span class="n">case</span> <span class="n">_</span> <span class="o">=&gt;</span>
- <span class="p">}</span>
-<span class="n">val</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">_</span> <span class="o">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="p">)</span>          
-<span class="mi">5</span><span class="err">、连接字母和标点符号：</span><span class="n">Joining</span> <span class="n">letters</span> <span class="n">to</span> <span class="n">punctuation</span>
-    <span class="k">def</span> <span class="nf">bang_</span><span class="err">!</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">=</span> <span class="mi">5</span>  
-<span class="mi">6</span><span class="err">、偏应用函数：</span><span class="n">Partially</span> <span class="n">applied</span> <span class="n">functions</span> 
-<span class="mi">7</span><span class="err">、初始化默认值：</span><span class="n">default</span> <span class="n">value</span>
-     <span class="n">var</span> <span class="n">i</span><span class="p">:</span> <span class="n">Int</span> <span class="o">=</span> <span class="n">_</span>     
-<span class="mi">8</span><span class="err">、参数序列：</span><span class="n">parameters</span> <span class="n">Sequence</span> 
- <span class="n">_</span><span class="o">*</span><span class="err">作为一个整体，告诉编译器你希望将某个参数当作参数序列处理。</span>
-        <span class="err">例如</span><span class="n">val</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="p">:</span><span class="n">_</span><span class="o">*</span><span class="p">)</span><span class="err">就是将</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="err">当作参数序列处理。</span>
-        <span class="o">//</span><span class="n">Range</span><span class="err">转换为</span><span class="n">List</span>
-        <span class="n">List</span><span class="p">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="p">:</span><span class="n">_</span><span class="o">*</span><span class="p">)</span> 
-        <span class="o">//</span><span class="n">Range</span><span class="err">转换为</span><span class="n">Vector</span>
-        <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">5</span><span class="p">:</span> <span class="n">_</span><span class="o">*</span><span class="p">)</span>
-</pre></div>
-
-
-<h3>中文符号的说明</h3>
-<div class="highlight"><pre><span></span>标点符号分为点号、标号、符号三大类。
-    点号：句号（ <span class="m">.</span>）、问号（ <span class="o">?</span>）、感叹号（ <span class="o">!</span>）、逗号（ <span class="p">,</span>）顿号（、）、分号（<span class="p">;</span>）和冒号（<span class="o">:</span>）。
-    标号：引号（“ ” ‘ ’）、括号〔圆括号 <span class="p">(</span> <span class="p">)</span>、方括号 <span class="p">[</span> <span class="p">]</span>、花括号 <span class="p">{</span> <span class="p">}</span>、 〕、破折号（ <span class="o">-</span> ）、
-            省略号（<span class="m">..</span>）、 着重号（ ．）、间隔号（·）、连接号（ — ）和专名号（ ____ ）。
-    符号：注释号（ <span class="o">*</span> ）、斜线号（ <span class="o">/</span> ）、代替号（～）、连珠号（……）、箭头号（ →）。
-其他常用：
-    数学符号 ≈ ≡ ≠ ＝ <span class="o">+</span> <span class="o">-</span> <span class="o">*</span> <span class="o">/</span> <span class="o">=</span>   <span class="o">&gt;&gt;</span>  <span class="o">&lt;&lt;</span> <span class="o">=</span> <span class="o">==</span> <span class="o">!=</span>  <span class="o">!</span>  <span class="o">&amp;</span>
-    <span class="o">!</span> <span class="o">@</span> <span class="c1"># $   % ^  &amp; *  </span>
-组合符号
-    <span class="o">%%</span>   <span class="o">::</span>  <span class="o">:::</span>  <span class="o">==</span>
-    <span class="o">&lt;-</span>   <span class="c1">#::  %/%  %*%    :_*</span>
-</pre></div>
-
-
-<h4>英文符号说明</h4>
-<div class="highlight"><pre><span></span>    .   period, dot     句号，点 
-    ,   comma           逗号 
-    :   colon           冒号 
-    ;   semicolon       分号 
-    ?   question mark   问号 
-    ~   tilde           波浪符
-    !   exclamation mark (英式英语) exclamation point (美式英语) 
-    &#39;   apostrophe 撇号 
-    -   hyphen 连字号 
-    --  dash 破折号 
-    ... dots/ ellipsis 省略号
-    &quot;   single quotation marks 单引号 
-    &quot;&quot;  double quotation marks 双引号 
-    ‖   parallel 双线号 
-    &amp;   ampersand = and 
-    →   arrow 箭号；参见号
-    |   vertical bar, vertical virgule 竖线
-    &amp;   ampersand, and, reference, ref 和，引用 
-    *   asterisk, multiply, star, pointer 星号，乘号，星，指针 
-    /   slash, divide, oblique 斜线，斜杠，除号 
-    //  slash-slash, comment 双斜线，注释符 
-    #   pound 井号 
-    \   escape 反斜线转义符，有时表示转义符或续行符 
-    ()  brakets/ parentheses 括号
-    []  square brackets 方括号 
-    {}  brace 花括号
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>浅谈 Scala 中下划线的用途 https://my.oschina.net/leejun2005/blog/405305
-scala中常用但其他语言不常见的符号含义 http://www.cnblogs.com/xinlingyoulan/p/6031157.html
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Scala的符号以及其他符号</p>
+                <a class="readmore" href="/program/my-program-post-13.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>HDFS基本概念和命令行操作</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-15.html" rel="bookmark"
+           title="Permalink to HDFS基本概念和命令行操作">HDFS基本概念和命令行操作</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:11:00+08:00">
+                Published: 2017-01-08 08:11:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>HDFS--Hadoop分布式文件系统</h3>
+<div class="highlight"><pre><span></span>Client
+HDFS集群有两类节点，以master/slave模式运行的
+    namenode-- 查看Metadata信息    -----SecondaryNamenode
+    datanode-- block以文件形式存放在本地磁盘上
+副本机制--replication
+心跳检测----HDFS HeartBeat
+RCP(远程过程调用)对ClientProtocol和DataNode Protocol做了封装，HBase-RPC(Protobuf)实现机制，HBase0.95内部引入了Google-Protobuf作为中间数据组织方式，并在Protobuf提供的Rpc接口之上，实现了基于服务的Rpc实现，
+  Protostuff是基于的Google protobuff技术的Java版本
+### 提高spark批量读取HBase数据的性能
+Hadoop代码中已经默认了Protocol buffer（以下简称PB，http://code.google.com/p/protobuf/）作为RPC的默认实现
+org.apache.hadoop.hbase.protobuf.ProtobufUtil
+org.apache.hadoop.hbase.protobuf.generated.ClientProtos
+ /**
+ * HBASE scan查询
+    */
+def convertScanToString(scan: Scan): String = {
+val proto: ClientProtos.Scan = ProtobufUtil.toScan(scan)
+Base64.encodeBytes(proto.toByteArray)
+ }
+属性
+ fs.default.name --客户端通过该属性得知namenode在哪里运行进而连接到namenode
+ HDFS默认会将文件分割成block，64M为1个block。然后将block按键值对存储在HDFS上，并将键值对的映射存到内存中HDFS在Linux上的物理地址：
+</pre></div>
+
+
+<h3>HDFS在Linux上的文件位置</h3>
+<div class="highlight"><pre><span></span>    /hadoop/hdfs/data/
+    /hadoop/hdfs/namenode 
+    统计HDFS文件占用磁盘空间： du -ha /hadoop/hdfs
+</pre></div>
+
+
+<h3>hadoop</h3>
+<div class="highlight"><pre><span></span>一种是命令行方式，即Hadoop提供了一套与Linux文件命令类似的命令行工具；
+    添加到了环境变量中，查看环境变量
+另一种是JavaAPI，即利用Hadoop的Java库，采用编程的方式操作HDFS的文件
+</pre></div>
+
+
+<h3>基础内容</h3>
+<div class="highlight"><pre><span></span>命令行交互工具。File System (FS) shell
+通过日志文件
+通过Web UI 查看
+    HDFS Web界面上只能查看文件系统数据。网址：http://172.19.100.191:50070/ 其中172.19.100.191是本例中集群的主机IP
+                http://172.19.100.191:50070/logs/
+                http://172.19.100.191:50070/explorer.html#/
+</pre></div>
+
+
+<h3>HDFS上的命令行操作：</h3>
+<div class="highlight"><pre><span></span>    分为管理员命令和一般用户命令
+    所有的HDFS命令都位于脚本 bin/hdfs    
+HDFS查看文件，注意是HDFS上的目录，不是本地目录
+  hadoop fs -help ##所有命令的详细帮助文档
+    查看HDFS文件下的文件
+    hadoop fs -ls /             hdfs dfs -ls /
+    hadoop fs -ls -R /
+    查看hdfs文件夹的大小
+    hadoop fs -du -s /spark-history
+    hadoop fs -du -s /hdp
+    查看目录下的文件
+    hadoop fs -ls /hdp
+    查看内容
+    hadoop fs -tail /tmp/entity-file-history
+现在的命令是
+    hdfs getconf -namenodes
+    hdfs getconf -secondaryNameNodes
+
+上传文件到HDFS中去
+    su hdfs
+    hdfs dfs -mkdir /test
+    hdfs dfs -put /opt/testjarDir/word.txt  /test/word.txt
+    (/opt/testjarDir/word.txt是本地输入文件， /test是HDFS上的目标文件）
+
+
+Hadoop  fs：使用面最广，可以操作任何文件系统。
+        FS relates to a generic file system which can point to any file systems like local, HDFS etc. 
+        So this can be used when you are dealing with different file systems such as Local FS, HFTP FS, S3 FS, and others
+hdfs    dfs：只能操作HDFS文件系统相关（包括与Local FS间的操作）
+
+hadoop  dfs:&lt;已经Deprecated&gt;
+        不推荐(deprecated)
+        不支持(Discontinued)
+</pre></div>
+
+
+<h3>查看日志文件</h3>
+<div class="highlight"><pre><span></span>Hadoop技术家族的日志：
+cd /hadoop
+cd /hadoop/zookeeper/version-2 
+    ls
+    cat log.100000001
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

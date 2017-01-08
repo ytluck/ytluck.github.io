@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>HDFS使用JavaAPI操作</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-16.html" rel="bookmark"
+           title="Permalink to HDFS使用JavaAPI操作">HDFS使用JavaAPI操作</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:25:00+08:00">
+                Published: 2017-01-08 08:25:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>环境：</h3>
+<div class="highlight"><pre><span></span>开发环境是Windows下的Eclipse，
+其中host已经设置了对集群的IP和主机名
+在环境变量中，设置了JAVA_HOME ,设置好JAVA的默认路径
+有C:\My_Files\Config\hadoop-common-2.2.0-bin-master\bin
+
+生产环境：一个集群
+</pre></div>
+
+
+<h3>开发步骤：</h3>
+<div class="highlight"><pre><span></span>1.通过Maven工程中的pom.xml引入依赖关系
+2.配置与连接
+3.对HDFS进行编程操作
+</pre></div>
+
+
+<h3>HDFS的操作包含：对HDFS进行操作，文件夹和目录，权限，文件等</h3>
+<div class="highlight"><pre><span></span>对分HDFS中的文件操作主要涉及一下几个类：
+Configuration类：该类的对象封转了客户端或者服务器的配置。
+FileSystem类：该类的对象是一个文件系统对象，可以用该对象的一些方法来对文件进行操作。
+        FileSystem fs = FileSystem.get(conf);通过FileSystem的静态方法get获得该对象。
+FSDataInputStream和FSDataOutputStream：这两个类是HDFS中的输入输出流。
+分别通过FileSystem的open方法和create方法获得
+</pre></div>
+
+
+<h3>配置文件设置</h3>
+<div class="highlight"><pre><span></span><span class="err">方式一</span><span class="o">:</span><span class="err">从配置文件中读取</span>
+<span class="o">//</span><span class="nt">initialization</span>
+<span class="nt">static</span> <span class="nt">Configuration</span> <span class="nt">conf</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">Configuration</span><span class="o">();</span>
+<span class="nt">static</span> <span class="nt">FileSystem</span> <span class="nt">hdfs</span><span class="o">;</span>
+<span class="nt">static</span> <span class="p">{</span>
+    <span class="n">String</span> <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/usr/java/hadoop-1.0.3/conf/&quot;</span><span class="p">;</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">addResource</span><span class="p">(</span><span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;core-site.xml&quot;</span><span class="p">));</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">addResource</span><span class="p">(</span><span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;hdfs-site.xml&quot;</span><span class="p">));</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">addResource</span><span class="p">(</span><span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;mapred-site.xml&quot;</span><span class="p">));</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/usr/java/hbase-0.90.3/conf/&quot;</span><span class="p">;</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">addResource</span><span class="p">(</span><span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;hbase-site.xml&quot;</span><span class="p">));</span>
+    <span class="n">try</span> <span class="err">{</span>
+        <span class="n">hdfs</span> <span class="o">=</span> <span class="n">FileSystem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">conf</span><span class="p">);</span>
+    <span class="p">}</span> <span class="nt">catch</span> <span class="o">(</span><span class="nt">IOException</span> <span class="nt">e</span><span class="o">)</span> <span class="p">{</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="err">}</span>
+<span class="err">##方式二</span>
+<span class="nt">public</span> <span class="nt">static</span> <span class="nt">final</span> <span class="nt">String</span> <span class="nt">toolConfigPath</span> <span class="o">=</span> <span class="s2">&quot;C:/Users/unix/workspace/JavaHDFS/src/main/resources/HDFSConfig.properties&quot;</span><span class="o">;</span>    
+   <span class="c">/**</span>
+<span class="c">    * 取得通用配置文件属性</span>
+<span class="c">    * @param CongfigfilePath  配置文件的文件路径和配置文件明后才能</span>
+<span class="c">    * @param key               调取的参数</span>
+<span class="c">    * @return</span>
+<span class="c">    */</span>
+    <span class="nt">private</span> <span class="nt">static</span>  <span class="nt">String</span> <span class="nt">getProptFile</span><span class="o">(</span><span class="nt">String</span> <span class="nt">CongfigfilePath</span><span class="o">,</span><span class="nt">String</span> <span class="nt">key</span><span class="o">)</span><span class="p">{</span>
+        <span class="n">Properties</span> <span class="n">prop</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Properties</span><span class="p">();</span> 
+        <span class="n">InputStream</span> <span class="n">propInStream</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+                      <span class="o">//</span><span class="err">读取属性文件</span><span class="n">CongfigFilenName</span>
+         <span class="n">try</span> <span class="err">{</span>
+                 <span class="o">//</span><span class="err">从文件获取</span><span class="n">InputStream</span>
+              <span class="n">propInStream</span>  <span class="o">=</span> <span class="n">new</span>  <span class="n">FileInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">File</span><span class="p">(</span><span class="n">CongfigfilePath</span><span class="p">));</span>
+              <span class="p">}</span> <span class="nt">catch</span> <span class="o">(</span><span class="nt">FileNotFoundException</span> <span class="nt">e</span><span class="o">)</span> <span class="p">{</span>
+                <span class="o">//</span> <span class="n">TODO</span> <span class="n">Auto</span><span class="o">-</span><span class="n">generated</span> <span class="n">catch</span> <span class="nb">block</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+              <span class="p">}</span>
+              <span class="nt">try</span> <span class="p">{</span>
+                <span class="n">prop</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">propInStream</span><span class="p">);</span>
+              <span class="p">}</span> <span class="nt">catch</span> <span class="o">(</span><span class="nt">IOException</span> <span class="nt">e</span><span class="o">)</span> <span class="p">{</span>
+                <span class="o">//</span> <span class="n">TODO</span> <span class="n">Auto</span><span class="o">-</span><span class="n">generated</span> <span class="n">catch</span> <span class="nb">block</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+              <span class="p">}</span>     <span class="o">///</span><span class="err">加载对应属性</span>
+            <span class="o">//</span> <span class="nt">String</span> <span class="nt">configParam</span> <span class="o">=</span> <span class="o">(</span><span class="nt">String</span><span class="o">)</span> <span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="nt">key</span><span class="o">);</span> 
+              <span class="nt">String</span> <span class="nt">configParam</span> <span class="o">=</span>  <span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="nt">key</span><span class="o">);</span>
+
+             <span class="o">//</span><span class="err">关闭资源</span>
+             <span class="nt">try</span> <span class="p">{</span>
+                <span class="n">propInStream</span> <span class="o">.</span><span class="n">close</span><span class="p">();</span>
+              <span class="p">}</span> <span class="nt">catch</span> <span class="o">(</span><span class="nt">IOException</span> <span class="nt">e</span><span class="o">)</span> <span class="p">{</span>
+                <span class="o">//</span> <span class="n">TODO</span> <span class="n">Auto</span><span class="o">-</span><span class="n">generated</span> <span class="n">catch</span> <span class="nb">block</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+              <span class="p">}</span>
+
+             <span class="nt">return</span>  <span class="nt">configParam</span><span class="o">;</span>
+        <span class="err">}</span>
+
+        <span class="c">/**</span>
+<span class="c">         * 初始化配置 静态初始化块</span>
+<span class="c">         * @return</span>
+<span class="c">         */</span>
+        <span class="nt">private</span> <span class="nt">static</span> <span class="nt">Configuration</span> <span class="nt">getConf</span><span class="o">()</span><span class="p">{</span>  
+            <span class="o">////</span><span class="n">Configuration</span> <span class="err">对象封装了客户端或者服务端的配置</span>
+            <span class="n">Configuration</span> <span class="n">HDFS_CONFIG</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Configuration</span><span class="p">();</span>  
+            <span class="o">//</span> <span class="err">这句话很关键，这些信息就是</span><span class="n">hadoop</span><span class="err">配置文件中的信息</span> <span class="o">//</span> <span class="err">文件系统连接到</span> <span class="n">hdfs</span><span class="err">的配置信息</span>  
+          <span class="o">//</span>  <span class="n">HDFSConfig</span><span class="o">.</span><span class="n">properties</span><span class="err">文件在系统下，如果不在的话</span>
+            <span class="n">String</span>  <span class="n">HDFS_fs_default_name</span><span class="o">=</span> <span class="n">getProptFile</span><span class="p">(</span><span class="n">HdfsUtil</span><span class="o">.</span><span class="n">toolConfigPath</span><span class="o">,</span><span class="s2">&quot;fs.default.name&quot;</span><span class="p">);</span>
+            <span class="n">HDFS_CONFIG</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fs.default.name&quot;</span><span class="o">,</span> <span class="n">HDFS_fs_default_name</span><span class="p">);</span>  
+            <span class="n">return</span> <span class="n">HDFS_CONFIG</span><span class="p">;</span>  
+        <span class="p">}</span>
+
+        <span class="c">/**</span>
+<span class="c">         * 创建目录</span>
+<span class="c">         * @param path</span>
+<span class="c">         * @throws IOException</span>
+<span class="c">         */</span>
+        <span class="nt">public</span> <span class="nt">static</span> <span class="nt">void</span> <span class="nt">mkdir</span><span class="o">(</span><span class="nt">String</span> <span class="nt">path</span><span class="o">)</span> <span class="nt">throws</span> <span class="nt">IOException</span><span class="p">{</span>
+            <span class="n">Configuration</span> <span class="n">conf</span> <span class="o">=</span> <span class="n">getConf</span><span class="p">();</span>  
+            <span class="n">FileSystem</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">FileSystem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">conf</span><span class="p">);</span> 
+            <span class="n">Path</span> <span class="n">srcPath</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+            <span class="o">//</span><span class="n">FileSystem</span> <span class="err">实例提供创建目录的方法</span><span class="n">mkdirs</span><span class="err">，如果创建成功则会返回</span><span class="n">true</span>
+            <span class="n">boolean</span> <span class="n">isok</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="n">srcPath</span><span class="p">);</span>
+            <span class="n">if</span><span class="p">(</span><span class="n">isok</span><span class="p">)</span><span class="err">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;create dir ok!&quot;</span><span class="p">);</span>
+            <span class="p">}</span><span class="nt">else</span><span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;create dir failure&quot;</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="nt">fs</span><span class="nc">.close</span><span class="o">();</span>
+        <span class="err">}</span>
+
+<span class="err">方式二</span><span class="nt">--</span><span class="err">使用加载当前类读取</span>
+<span class="nt">public</span> <span class="nt">static</span> <span class="nt">final</span> <span class="nt">String</span> <span class="nt">toolConfigPath</span> <span class="o">=</span> <span class="s2">&quot;C:/Users/unix/workspace/JavaHDFS/src/main/resources/HDFSConfig.properties&quot;</span><span class="o">;</span>
+
+   <span class="c">/**</span>
+<span class="c">    * 取得通用配置文件属性</span>
+<span class="c">    * @param CongfigfilePath  配置文件的文件路径和配置文件名称</span>
+<span class="c">    * @param key               调取的参数</span>
+<span class="c">    * @return</span>
+<span class="c">    */</span>
+<span class="nt">public</span> <span class="nt">static</span> <span class="nt">String</span> <span class="nt">getConfigProperty</span><span class="o">(</span><span class="nt">String</span> <span class="nt">path</span><span class="o">,</span><span class="nt">String</span> <span class="nt">name</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">Properties</span> <span class="n">prop</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Properties</span><span class="p">();</span>
+    <span class="n">InputStream</span> <span class="n">in</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+    <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+    <span class="n">try</span> <span class="err">{</span>
+        <span class="n">File</span> <span class="n">f</span> <span class="o">=</span> <span class="n">new</span> <span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+        <span class="n">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SystemUtils</span><span class="o">.</span><span class="n">IS_OS_WINDOWS</span><span class="p">)</span> <span class="err">{</span>
+            <span class="n">in</span> <span class="o">=</span> <span class="n">new</span> <span class="n">FileInputStream</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+        <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+            <span class="o">//</span><span class="err">通过当前类加载器的</span><span class="n">getResourceAsStream</span><span class="err">方法获取</span><span class="n">InputStream</span>
+            <span class="o">//</span><span class="err">注意：在使用</span><span class="n">getResourceAsStream</span><span class="p">()</span><span class="err">读取配置文件时，要特别注意配置文件的路径的写法。</span>
+            <span class="o">//</span><span class="n">this</span><span class="o">.</span><span class="n">getClass</span><span class="o">.</span><span class="n">getResourceAsStream</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">..</span><span class="err">使用类和资源文件在同一目录下；</span>
+            <span class="o">//</span><span class="n">this</span><span class="o">.</span><span class="n">getclass</span><span class="o">.</span><span class="n">getLoader</span><span class="o">.</span><span class="n">getResourceAsStream</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">..</span><span class="err">资源文件和</span><span class="n">classes</span><span class="err">同级。</span>
+            <span class="n">in</span> <span class="o">=</span> <span class="n">SingleHDFS</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">getClassLoader</span><span class="p">()</span><span class="o">.</span><span class="n">getResourceAsStream</span><span class="p">(</span><span class="s2">&quot;HDFSConfig.properties&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nt">prop</span><span class="nc">.load</span><span class="o">(</span><span class="nt">in</span><span class="o">);</span>
+        <span class="nt">value</span> <span class="o">=</span> <span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="nt">name</span><span class="o">);</span>
+    <span class="err">}</span> <span class="nt">catch</span> <span class="o">(</span><span class="nt">IOException</span> <span class="nt">e</span><span class="o">)</span> <span class="p">{</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+    <span class="p">}</span> <span class="nt">finally</span> <span class="p">{</span>
+        <span class="n">try</span> <span class="err">{</span>
+            <span class="n">if</span><span class="p">(</span><span class="n">in</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span><span class="err">{</span>
+                <span class="n">in</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="err">}</span> <span class="nt">catch</span> <span class="o">(</span><span class="nt">IOException</span> <span class="nt">e</span><span class="o">)</span> <span class="p">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="err">}</span>
+    <span class="nt">return</span> <span class="nt">value</span><span class="o">;</span>
+<span class="err">}</span>
+
+        <span class="c">/**</span>
+<span class="c">         * 初始化配置 静态初始化块</span>
+<span class="c">         * @return</span>
+<span class="c">         */</span>
+        <span class="nt">private</span> <span class="nt">static</span> <span class="nt">Configuration</span> <span class="nt">getConf</span><span class="o">()</span><span class="p">{</span>  
+            <span class="o">////</span><span class="n">Configuration</span> <span class="err">对象封装了客户端或者服务端的配置</span>
+            <span class="n">Configuration</span> <span class="n">HDFS_CONFIG</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Configuration</span><span class="p">();</span>  
+            <span class="o">//</span> <span class="err">这句话很关键，这些信息就是</span><span class="n">hadoop</span><span class="err">配置文件中的信息</span> <span class="o">//</span> <span class="err">文件系统连接到</span> <span class="n">hdfs</span><span class="err">的配置信息</span>  
+          <span class="o">//</span>  <span class="n">HDFSConfig</span><span class="o">.</span><span class="n">properties</span><span class="err">文件在系统下，如果不在的话</span>
+            <span class="n">String</span>  <span class="n">HDFS_fs_default_name</span><span class="o">=</span> <span class="n">SingleHDFS</span><span class="o">.</span><span class="n">getConfigProperty</span><span class="p">(</span><span class="n">SingleHDFS</span><span class="o">.</span><span class="n">toolConfigPath</span><span class="o">,</span><span class="s2">&quot;fs.default.name&quot;</span><span class="p">);</span>
+            <span class="n">HDFS_CONFIG</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fs.default.name&quot;</span><span class="o">,</span> <span class="n">HDFS_fs_default_name</span><span class="p">);</span>  
+            <span class="n">return</span> <span class="n">HDFS_CONFIG</span><span class="p">;</span>  
+        <span class="p">}</span>
+</pre></div>
+
+
+<h3>出现的错误</h3>
+<div class="highlight"><pre><span></span>出错：java.lang.UnsatisfiedLinkError: org.apache.hadoop.util.NativeCrc32.nativeComputeChunkedSums
+原因：
+    hadoop2.6版本的dll，网上比较多的是2.2的dll，
+    如果2.6版本用2.2的dll，会报hadoop 2.6 UnsatisfiedLinkError: org.apache.hadoop.util.NativeCrc32.nativeComputeChunkedSumsByteArra 错误，
+    因为2.2的dll中NativeCrc32只nativeVerifyChunkedSums，没有nativeComputeChunkedSums和nativeComputeChunkedSumsByteArray，所以会报错，
+    至于网上说的建同名包，拷贝NativeCrc32.java是没有用的，至少对于2.6.0来说是没有用的
+解决方法：下载2.7版本的，然后将其中2.2的替换为2.7的
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>HDFS的API  http://blog.csdn.net/silentwolfyh/article/details/51485288
+HDFS中JAVA API的使用 http://blog.csdn.net/flood_dragon/article/details/17957505
+java读取.properties配置文件的几种方法 http://blog.csdn.net/mhmyqn/article/details/7683909
+HDFS中JAVA API的使用 http://www.cnblogs.com/liuling/p/2013-6-17-01.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

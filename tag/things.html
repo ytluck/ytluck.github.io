@@ -26,7 +26,153 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-14.html">Spark读写JSON和Hbase连接的配置</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-17.html">HDFS和Spark的交互</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T09:02:00+08:00">
+                Published: 2017-01-08 09:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>Spark使用Scala连接HDFS</h3>
+<div class="highlight"><pre><span></span>总共分为三个步骤
+第一步：配置包依赖Maven
+第二步：配置文件的参数的设置与读写.properties 在HDFS暂时没有使用
+第三步：编写程序
+
+    //第一步：创建SparkConf对象配置一些通用的属性，并且基于这个创建一个SparkContext对象setMaster(&quot;local[2]&quot;)
+    val SparkConf = new SparkConf().setMaster(&quot;local[2]&quot;).setAppName(&quot;CountTest&quot;).set(&quot;spark.executor.memory&quot;, &quot;1g&quot;)
+    //使用SparkContext对象中的textFile函数将输入文件转换为一个RDD ，SparkContext对象代表对计算机集群的一个连接
+    val sc = new SparkContext(SparkConf)
+    //路径前面加上file:// 表示从本地文件系统读；读取本地文本文件，创建一个字符串的RDD
+    val fluxRDD = sc.textFile(&quot;file:///C:\\Items.json&quot;)
+    //在路径前面加上hdfs://表示从hdfs文件系统；读取HDFS中文件参数是一个path,这个path
+    // val fluxRDD = sc.textFile(&quot;hdfs://localhost:8102/15*.json&quot;)
+    //hdfs://master:port/path
+</pre></div>
+
+
+<h3>Spark存储对象到HDFS</h3>
+<h4>保存RDD为对象</h4>
+<div class="highlight"><pre><span></span>    将RDD保存为对象saveAsObjectFile()
+   .objectFile()函数接收路径，返回对应的RDD
+</pre></div>
+
+
+<h4>保存模型到RDD上为对象</h4>
+<div class="highlight"><pre><span></span><span class="o">//</span><span class="err">将上面的模型存储到</span><span class="n">hdfs</span><span class="o">---</span><span class="n">Spark</span><span class="err">环境下生成一个</span><span class="n">word2vec</span><span class="err">模型</span><span class="p">,</span> <span class="err">存储到</span><span class="n">hdfs</span><span class="o">.</span>
+<span class="n">ObjectInputStream</span><span class="err">与</span><span class="n">ObjectOutputStream</span><span class="err">类所读写的对象必须实现</span><span class="n">Serializable</span><span class="err">接口，只能将支持</span> <span class="n">java</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">Serializable</span> <span class="err">接口的对象写入流中。对象中的</span><span class="n">transient</span><span class="err">和</span><span class="n">static</span><span class="err">类型成员变量不会被读取和写入</span>
+<span class="err">可以使用</span><span class="n">ObjectOutputStream</span> <span class="err">将</span> <span class="n">Java</span> <span class="err">对象的基本数据类型和图形写入</span> <span class="n">OutputStream</span><span class="err">。</span>
+<span class="err">可以使用</span> <span class="n">ObjectInputStream</span> <span class="err">读取（重构）对象。通过在流中使用文件可以实现对象的持久存储</span>
+<span class="n">val</span> <span class="n">hadoopConf</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">hadoopConfiguration</span>
+<span class="n">hadoopConf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fs.defaultFS&quot;</span><span class="p">,</span> <span class="s2">&quot;hdfs://myhadoop:9000/&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">fileSystem</span> <span class="o">=</span> <span class="n">FileSystem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hadoopConf</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">path</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/user/hadoop/data/mllib/word2vec-object&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">oos</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectOutputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FSDataOutputStream</span><span class="p">(</span><span class="n">fileSystem</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+<span class="n">oos</span><span class="o">.</span><span class="n">writeObject</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="n">oos</span><span class="o">.</span><span class="n">close</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="err">这里示例另外一个程序直接从</span><span class="n">hdfs</span><span class="err">读取序列化对象使用模型</span>
+<span class="n">val</span> <span class="n">ois</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FSDataInputStream</span><span class="p">(</span><span class="n">fileSystem</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+<span class="n">val</span> <span class="n">sample_model</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="n">readObject</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="p">[</span><span class="n">Word2VecModel</span><span class="p">]</span>
+
+  <span class="o">/*</span>
+    <span class="o">*</span> <span class="o">//</span><span class="err">以将序列化文件从</span><span class="n">hdfs</span><span class="err">放到本地</span><span class="p">,</span> <span class="n">scala</span><span class="err">程序使用模型</span>
+    <span class="o">*</span> <span class="kn">import</span> <span class="nn">java.io._</span>
+    <span class="o">*</span> <span class="kn">import</span> <span class="nn">org.apache.spark.mllib.feature.</span><span class="p">{</span><span class="n">Word2Vec</span><span class="p">,</span> <span class="n">Word2VecModel</span><span class="p">}</span>
+    <span class="o">*</span> <span class="n">val</span> <span class="n">ois</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FileInputStream</span><span class="p">(</span><span class="s2">&quot;/home/cherokee/tmp/word2vec-object&quot;</span><span class="p">))</span>
+    <span class="o">*</span> <span class="n">val</span> <span class="n">sample_model</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="n">readObject</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="p">[</span><span class="n">Word2VecModel</span><span class="p">]</span>
+    <span class="o">*</span> <span class="n">ois</span><span class="o">.</span><span class="n">close</span>
+    <span class="o">*/</span>
+</pre></div>
+
+
+<h3>Hadoop现在同时提供了新旧的两套API接口</h3>
+<div class="highlight"><pre><span></span>旧版API 放在org.apache.hadoop.mapred 包中，
+而新版API 则放在org.apache.hadoop.mapreduce 包及其子包中
+</pre></div>
+
+
+<h4>老式</h4>
+<div class="highlight"><pre><span></span>hadoopFile
+saveAsHadoopFile()
+</pre></div>
+
+
+<h4>新式</h4>
+<div class="highlight"><pre><span></span> hadoopDataset    saveAsHadoopDataset     
+ newAPIHadoopDataset saveAsNewAPIHadoopDataset
+                    saveAsNewAPIHadoopFile
+
+val HBase_DATARDD = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
+    //脚手架语句，查看结果
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Spark中将对象序列化存储到hdfs https://my.oschina.net/waterbear/blog/525347
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-16.html" rel="bookmark"
+                           title="Permalink to HDFS使用JavaAPI操作">HDFS使用JavaAPI操作</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:25:00+08:00">
+                Published: 2017-01-08 08:25:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HDFS的API接口</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-16.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-15.html" rel="bookmark"
+                           title="Permalink to HDFS基本概念和命令行操作">HDFS基本概念和命令行操作</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:11:00+08:00">
+                Published: 2017-01-08 08:11:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HDFS通过命令行和UI等</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-15.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-14.html" rel="bookmark"
+                           title="Permalink to Spark读写JSON和Hbase连接的配置">Spark读写JSON和Hbase连接的配置</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-12-23T23:11:00+08:00">
                 Published: 2016-12-23 23:11:00
@@ -37,133 +183,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><p>Spark的数据读入和写出JSON</p>
-<h3>依赖</h3>
-<div class="highlight"><pre><span></span>0.pom.xml文件中加入依赖依赖：
-<span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>com.alibaba<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>fastjson<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>1.0.4<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</pre></div>
-
-
-<h3>读取JSON数据</h3>
-<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="err">首先查看</span><span class="n">JSON</span><span class="err">串</span>
-<span class="mf">2.</span><span class="err">解析</span>
-<span class="o">//</span><span class="n">Fastjson</span><span class="err">的最主要的使用入口是</span><span class="n">com</span><span class="o">.</span><span class="n">alibaba</span><span class="o">.</span><span class="n">fastjson</span><span class="o">.</span><span class="n">JSON</span>
-<span class="o">//</span><span class="n">Object</span>     <span class="n">parse</span><span class="p">(</span><span class="n">String</span> <span class="n">text</span><span class="p">);</span>                        <span class="o">//</span> <span class="err">把</span><span class="n">JSON</span><span class="err">文本</span><span class="n">parse</span><span class="err">为</span><span class="n">JSONObject</span><span class="err">或者</span><span class="n">JSONArray</span>
-<span class="o">//</span><span class="n">JSONObject</span> <span class="n">parseObject</span><span class="p">(</span><span class="n">String</span> <span class="n">text</span><span class="p">)</span><span class="err">；</span>                  <span class="o">//</span> <span class="err">把</span><span class="n">JSON</span><span class="err">文本</span><span class="n">parse</span><span class="err">成</span><span class="n">JSONObject</span>
-<span class="o">//&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span>      <span class="n">parseObject</span><span class="p">(</span><span class="n">String</span> <span class="n">text</span><span class="p">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">clazz</span><span class="p">);</span>  <span class="o">//</span> <span class="err">把</span><span class="n">JSON</span><span class="err">文本</span><span class="n">parse</span><span class="err">为</span><span class="n">JavaBean</span>
-<span class="o">//</span><span class="n">JSONArray</span>  <span class="n">parseArray</span><span class="p">(</span><span class="n">String</span> <span class="n">text</span><span class="p">);</span>                   <span class="o">//</span> <span class="err">把</span><span class="n">JSON</span><span class="err">文本</span><span class="n">parse</span><span class="err">成</span><span class="n">JSONArray</span>
-<span class="o">//&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="n">parseArray</span><span class="p">(</span><span class="n">String</span> <span class="n">text</span><span class="p">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">clazz</span><span class="p">);</span>   <span class="o">//</span><span class="err">把</span><span class="n">JSON</span><span class="err">文本</span><span class="n">parse</span><span class="err">成</span><span class="n">JavaBean</span><span class="err">集合</span>
-<span class="err">例子：</span>
- <span class="kn">import</span> <span class="nn">com.alibaba.fastjson.JSON</span>
- <span class="n">val</span> <span class="n">_o</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">JSON</span><span class="o">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">toString</span><span class="p">)</span>
-  <span class="o">//</span><span class="err">筛选出现特定年龄的数据</span>
-  <span class="n">val</span> <span class="n">DA_AGE</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="s2">&quot;18&quot;</span><span class="p">,</span><span class="s2">&quot;28&quot;</span><span class="p">,</span><span class="s2">&quot;38&quot;</span><span class="p">,</span><span class="s2">&quot;48&quot;</span><span class="p">,</span><span class="s2">&quot;58&quot;</span><span class="p">)</span>
-  <span class="n">val</span> <span class="n">orderRDD</span> <span class="o">=</span> <span class="n">fluxRDD</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">o</span> <span class="o">=&gt;</span>  <span class="p">{</span><span class="n">o</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">DA_AGE</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">JSON</span><span class="o">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">JSON</span><span class="o">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">toString</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;age&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">toString</span><span class="p">))}</span> <span class="p">)</span>
-</pre></div>
-
-
-<h3>写成JSON格式</h3>
-<div class="highlight"><pre><span></span>1&gt;明确要保存的格式
-2&gt;将数据变化成结构化RDD--然后转为字符串RDD
-3&gt;将字符串RDD转换成JSON数据保存
- String toJSONString(Object object);                        // 将JavaBean序列化为JSON文本
- String toJSONString(Object object, boolean prettyFormat);  // 将JavaBean序列化为带格式的JSON文本
- Object toJSON(Object javaObject);                          //将JavaBean转换为JSONObject或者JSONArray。
-    方法一、将JavaBean序列化 的get 和set
-    方法二、使用JSONObject中的put方法
-        val k = 3
-        val centers = center.map(_.toArray)
-        val requestJson = new com.alibaba.fastjson.JSONObject()
-        requestJson.put(&quot;k&quot;, k)
-        requestJson.put(&quot;center&quot;, center)
-        println(requestJson.toJSONString)
-</pre></div>
-
-
-<h2>设置zooKeeper集群地址</h2>
-<div class="highlight"><pre><span></span>&lt;1&gt;也可以通过将hbase-site.xml导入classpath
-&lt;2&gt;可以在程序中配置
-</pre></div>
-
-
-<h3>在集群中配置环境变量将jar包和当前目录加入CLASSPATH</h3>
-<div class="highlight"><pre><span></span>Java客户端使用的配置信息是被映射在一个HBaseConfiguration 实例中. 
-HBaseConfiguration有一个工厂方法, HBaseConfiguration.create(); 
-运行这个方法的时候，会去CLASSPATH,下找Hbase-site.xml，读其发现的第一个配置文件的内容。 
-(这个方法还会去找hbase-default.xml ; hbase.X.X.X.jar里面也会有一个an hbase-default.xml).
-</pre></div>
-
-
-<h3>本例在程序里设置</h3>
-<div class="highlight"><pre><span></span>在程序内配置
-连接HBase的方式有两种，
-  其一是直接在程序中明文配置，
-  其二是通过读取配置文件配置
-val hbaseConf = HBaseConfiguration.create()
-hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, &quot;***.***.***.***,***.***.***.***,***.***.***.***,***.***.***.***,***.***.***.***&quot;)
-hbaseConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, &quot;/hbase-unsecure&quot;)
-hbaseConf.set(HConstants.ZOOKEEPER_CLIENT_PORT, &quot;2181&quot;)
-hbaseConf.set(HConstants.MASTER_PORT, &quot;1****&quot;)
-</pre></div>
-
-
-<h4>使用配置方式</h4>
-<div class="highlight"><pre><span></span>val hbaseConf = HBaseConfiguration.create()
-hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, getProperties(&quot;hbase.zookeeper.quorum&quot;))
-hbaseConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, getProperties(&quot;hbase.zookeeper.znode.parent&quot;))
-hbaseConf.set(HConstants.ZOOKEEPER_CLIENT_PORT, getProperties(&quot;hbase.zookeeper.property.clientPort&quot;))
-hbaseConf.set(HConstants.MASTER_PORT, getProperties(&quot;hbase.master.port&quot;))
-</pre></div>
-
-
-<h4>使用配置文件的话有两种方式</h4>
-<div class="highlight"><pre><span></span>获取InputStream方法有两种
-//配置内容从 Ambari中的内容查看和提取
-</pre></div>
-
-
-<p>/<em>      //获取InputStream方法一  ：通过当前类加载器的getResourceAsStream方法获取
-        //关于配置文件的路径问题：因为属性文件已经复制到src根目录下，可直接使用
-        InputStream propInStream = getClass().getClassLoader().getResourceAsStream("HbaseConfig.properties");
-        Properties prop = new Properties();</em>/</p>
-<div class="highlight"><pre><span></span>    <span class="o">//</span><span class="err">获取</span><span class="nt">InputStream</span><span class="err">方法二</span>   <span class="err">是从文件获取</span>
-    <span class="o">//</span><span class="nt">String</span> <span class="nt">filePath</span> <span class="o">=</span> <span class="s2">&quot;C:/My_Files/Config/HbaseConfig.properties&quot;</span><span class="o">;</span>
-    <span class="nt">String</span> <span class="nt">filePath</span> <span class="o">=</span> <span class="s2">&quot;HbaseConfig.properties&quot;</span><span class="o">;</span>
-    <span class="nt">InputStream</span> <span class="nt">propInStream</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">FileInputStream</span><span class="o">(</span><span class="nt">new</span> <span class="nt">File</span><span class="o">(</span><span class="nt">filePath</span><span class="o">));</span> 
-    <span class="nt">System</span><span class="nc">.out.println</span><span class="o">(</span><span class="nt">propInStream</span><span class="o">);</span>
-    <span class="nt">Properties</span> <span class="nt">prop</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">Properties</span><span class="o">();</span>       
-    <span class="o">//</span><span class="nt">load</span><span class="o">(</span><span class="nt">InputStream</span> <span class="nt">inStream</span><span class="o">)</span><span class="err">方法从</span><span class="nc">.properties</span><span class="err">属性文件对应的文件输入流中，加载属性列表到</span><span class="nt">Properties</span><span class="err">类对象</span>
-    <span class="nt">try</span><span class="p">{</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">propInStream</span><span class="p">);</span>
-    <span class="p">}</span><span class="nt">catch</span><span class="o">(</span><span class="nt">IOException</span> <span class="nt">e</span><span class="o">)</span><span class="p">{</span>
-        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">getMessage</span><span class="p">());</span>
-    <span class="p">}</span><span class="nt">finally</span><span class="p">{</span>
-        <span class="n">propInStream</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="nt">System</span><span class="nc">.out.println</span><span class="o">(</span><span class="nt">prop</span><span class="o">);</span>
-    <span class="nt">System</span><span class="nc">.out.println</span><span class="o">(</span><span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="s2">&quot;hbase.master.port&quot;</span><span class="o">));</span>
-    <span class="o">//</span><span class="nt">Hbase</span><span class="err">读取配置文件中的内容</span>
-    <span class="o">//</span><span class="nt">prop</span><span class="nc">.getProperty</span><span class="err">方法是分别是获取属性信息。</span>
-    <span class="nt">Configuration</span> <span class="nt">HBASE_CONFIG</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">Configuration</span><span class="o">();</span>
-    <span class="nt">HBASE_CONFIG</span><span class="nc">.set</span><span class="o">(</span><span class="s2">&quot;hbase.zookeeper.property.clientPort&quot;</span><span class="o">,</span><span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="s2">&quot;hbase.zookeeper.property.clientPort&quot;</span><span class="o">));</span> 
-    <span class="nt">HBASE_CONFIG</span><span class="nc">.set</span><span class="o">(</span><span class="s2">&quot;hbase.zookeeper.quorum&quot;</span><span class="o">,</span><span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="s2">&quot;hbase.zookeeper.quorum&quot;</span><span class="o">));</span> 
-    <span class="nt">HBASE_CONFIG</span><span class="nc">.set</span><span class="o">(</span><span class="s2">&quot;hbase.master.port&quot;</span><span class="o">,</span><span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="s2">&quot;hbase.master.port&quot;</span><span class="o">));</span>
-    <span class="nt">HBASE_CONFIG</span><span class="nc">.set</span><span class="o">(</span><span class="s2">&quot;zookeeper.znode.parent&quot;</span><span class="o">,</span><span class="nt">prop</span><span class="nc">.getProperty</span><span class="o">(</span><span class="s2">&quot;zookeeper.znode.parent&quot;</span><span class="o">));</span>
-    <span class="nt">Configuration</span> <span class="nt">configuration</span> <span class="o">=</span> <span class="nt">HBaseConfiguration</span><span class="nc">.create</span><span class="o">(</span><span class="nt">HBASE_CONFIG</span><span class="o">);</span>
-</pre></div>
-
-
-<p>具体程序如下：
-        如下</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Spark读取JSOn--对连接HBase的配置</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-14.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
