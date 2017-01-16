@@ -26,7 +26,143 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/items/my-item-post-08.html">数据分析轮廓</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-14.html">R语言对团队能力结构的可视化</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-01-15T21:18:00+08:00">
+                Published: 2017-01-15 21:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info --><h2>柱状图-饼图--双柱状图--圆环图</h2>
+<div class="highlight"><pre><span></span><span class="c1">####本文通过使用R语言重的ggplot对数据团队中的一些知识结构进行数据可视化</span>
+<span class="c1">####首先对可视化的数据进行准备--为了无缝重现文中内容--在这里将数据直接给出，而没有采用读取文件的方式。</span>
+
+<span class="c1">###思考的时候需要加上时间</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>  <span class="c1">##如果没安装需要安装</span>
+<span class="c1">##评分采用十分制</span>
+labels <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;统计学&quot;</span><span class="p">,</span><span class="s">&quot;数学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;机器学习&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;领域知识&quot;</span><span class="p">,</span><span class="s">&quot;沟通技巧&quot;</span><span class="p">)</span>
+<span class="c1">##</span>
+needablity <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">6</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+<span class="c1">##个人的能力值评估</span>
+nameA <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
+nameB <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">)</span>
+nameC <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+Thinkdata <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span><span class="kp">labels</span><span class="p">,</span>needablity<span class="p">,</span>nameA<span class="p">,</span>nameB<span class="p">,</span>nameC<span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="c1">##团队知识体系是一个比较复杂的问题，在这里的可视化只是采取比较同一值取其最大作为其能力值表现</span>
+
+<span class="c1">#Thinkdata[,3:5] ##取成员所在的列</span>
+teamabilty <span class="o">&lt;-</span> <span class="kp">apply</span><span class="p">(</span>Thinkdata<span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">5</span><span class="p">]</span> <span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="kp">max</span><span class="p">)</span>
+Thinkdata <span class="o">&lt;-</span> <span class="kp">cbind</span><span class="p">(</span>Thinkdata<span class="p">,</span>teamabilty<span class="p">)</span>
+<span class="c1">##数据的长格式和宽格式--ggplot的分组只能根据行而不能根据列</span>
+<span class="kn">library</span><span class="p">(</span>reshape2<span class="p">)</span> <span class="c1">##如果没安装需要安装</span>
+<span class="c1">#melt(data, id.vars, measure.vars,variable.name = &quot;variable&quot;, ..., na.rm = FALSE, value.name = &quot;value&quot;, factorsAsStrings = TRUE)</span>
+Transdata <span class="o">&lt;-</span>  melt<span class="p">(</span>Thinkdata<span class="p">,</span> id.vars<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;labels&quot;</span><span class="p">),</span> measure.vars<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;needablity&quot;</span><span class="p">,</span><span class="s">&quot;teamabilty&quot;</span><span class="p">),</span>variable.name<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;compare&quot;</span><span class="p">),</span>value.name <span class="o">=</span> <span class="s">&quot;abiltyvalue&quot;</span><span class="p">,</span> factorsAsStrings <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1">##每个分类的总和是相同的，因为在本例中每个分类是7，所以前七个数之和要等于后七个数字</span>
+onedata <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">14</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
+<span class="kp">sum</span><span class="p">(</span>onedata<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">7</span><span class="p">])</span>
+<span class="kp">sum</span><span class="p">(</span>onedata<span class="p">[</span><span class="m">8</span><span class="o">:</span><span class="m">14</span><span class="p">])</span>
+Trone <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>Transdata<span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span>onedata<span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+
+<span class="c1">##绘制图形</span>
+ p1 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>needablity<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> 
+ p1<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+
+<span class="c1">##各个角色的能力评估</span>
+
+p2 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>nameA <span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;nameA&quot;</span><span class="p">)</span> 
+p3 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>nameB <span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;nameB&quot;</span><span class="p">)</span> 
+p4 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>nameC <span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;nameC&quot;</span><span class="p">)</span> 
+    <span class="kn">library</span><span class="p">(</span>grid<span class="p">)</span>  <span class="c1">##如果没安装需要安装</span>
+    <span class="c1">##清除当前设备或移动到新的page</span>
+    grid.newpage<span class="p">()</span>
+    <span class="c1">##用viewport创建视图窗口，并用grid.layout创建布局，同时把布局给视窗</span>
+    VP <span class="o">&lt;-</span> viewport<span class="p">(</span>layout <span class="o">=</span> grid.layout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">))</span>
+    <span class="c1">##用pushViewport()命令锁定该图层，使之成为目标区域</span>
+    pushViewport<span class="p">(</span>VP<span class="p">)</span>
+    <span class="c1">#创建布局函数,函数参数是放置图形的位置</span>
+vplayout <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span> viewport<span class="p">(</span>layout.pos.row <span class="o">=</span> x<span class="p">,</span> layout.pos.col <span class="o">=</span> y<span class="p">)</span>
+<span class="c1">#绘图</span>
+<span class="kp">print</span><span class="p">(</span>p2<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+<span class="kp">print</span><span class="p">(</span>p3<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">))</span>
+<span class="kp">print</span><span class="p">(</span>p4<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">))</span>
+<span class="c1">##关闭图形设备</span>
+dev.off<span class="p">()</span>
+<span class="c1">##解决问题和团队目前的状况对比，使用双柱状图</span>
+ p5 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>Transdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>abiltyvalue<span class="p">,</span>fill<span class="o">=</span>compare<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+p5<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+
+<span class="c1">##堆叠柱状图</span>
+ p6 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>Transdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>abiltyvalue<span class="p">,</span>fill<span class="o">=</span>compare<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+ p6<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+
+<span class="c1">#不同的角色定位需要主要的技能不同，在这些公共的技能中有一些比较</span>
+<span class="c1">##同一角色在不同成长阶段的知识体系评估</span>
+ p7 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>Trone<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span>compare<span class="p">,</span>y<span class="o">=</span>onedata<span class="p">,</span>fill<span class="o">=</span><span class="kp">labels</span><span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+p7<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>可视化知识网络图谱---网络图</h3>
+<div class="highlight"><pre><span></span><span class="c1">##构建数据，在实际中可以从文本中读取，在这里使用构造的数据来展示核心知识体系，借助于借助networkD3包里面的simpleNetwork 函数</span>
+中心 <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">)</span>
+次级中心 <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;统计学&quot;</span><span class="p">,</span><span class="s">&quot;数学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;机器学习&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;领域知识&quot;</span><span class="p">,</span><span class="s">&quot;沟通技巧&quot;</span><span class="p">)</span>
+次级中心<span class="m">01</span>  <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">)</span>
+关联<span class="m">01</span> <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;目的性&quot;</span><span class="p">,</span><span class="s">&quot;简洁&quot;</span><span class="p">,</span><span class="s">&quot;明了&quot;</span><span class="p">)</span>
+次级中心<span class="m">02</span> <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">)</span>
+关联<span class="m">02</span> <span class="o">&lt;-</span>   <span class="kt">c</span><span class="p">(</span><span class="s">&quot;数据结构&quot;</span><span class="p">,</span><span class="s">&quot;算法&quot;</span><span class="p">,</span><span class="s">&quot;场景&quot;</span><span class="p">,</span><span class="s">&quot;编程语言&quot;</span><span class="p">)</span>
+data <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span> <span class="kp">cbind</span><span class="p">(</span> <span class="kt">c</span><span class="p">(</span>中心<span class="p">,</span>次级中心<span class="m">01</span><span class="p">,</span>次级中心<span class="m">02</span><span class="p">)</span> <span class="p">,</span><span class="kt">c</span><span class="p">(</span>次级中心<span class="p">,</span>关联<span class="m">01</span><span class="p">,</span>关联<span class="m">02</span> <span class="p">)</span> <span class="p">)</span> <span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+
+<span class="kn">library</span><span class="p">(</span>networkD3<span class="p">)</span>
+simpleNetwork<span class="p">(</span>data<span class="p">)</span> 
+simpleNetwork<span class="p">(</span>data<span class="p">,</span><span class="c1">#数据 </span>
+       fontFamily<span class="o">=</span><span class="s">&quot;华文行楷&quot;</span><span class="p">,</span><span class="c1">#字体设置 </span>
+       linkColour<span class="o">=</span><span class="s">&quot;#B23AEE&quot;</span><span class="p">,</span><span class="c1">#连线颜色 </span>
+       nodeColour<span class="o">=</span><span class="s">&quot;#00CD66&quot;</span><span class="p">,</span><span class="c1">#节点颜色 </span>
+       textColour<span class="o">=</span><span class="s">&quot;#0000FF&quot;</span><span class="p">,</span><span class="c1">#文本颜色 </span>
+       charge <span class="o">=</span> <span class="m">-550</span><span class="p">,</span><span class="c1">#节点之间的引力 </span>
+       opacity<span class="o">=</span><span class="m">0.9</span><span class="p">,</span><span class="c1">#透明度 </span>
+       zoom<span class="o">=</span><span class="kc">TRUE</span> <span class="c1">#可缩放 )</span>
+       <span class="p">)</span>
+</pre></div>
+
+
+<h2>调用plotly</h2>
+<div class="highlight"><pre><span></span>##Plotly.js 是开源的 JavaScript 图表库，它基于 d3.js 和 stack.gl    
+##绘制圆环图，excel中饼图--在数量级相差比较大的情况下--通过圆环图比较百分比--对于在一起的双换图-可以采用Excel来绘制--
+##这里采用饼图--不过饼图在超过7个的情况下就少用吧
+library(plotly)
+Thinkdata 
+plot_ly(Thinkdata ,labels=labels,values = needablity , type = &quot;pie&quot;) %&gt;%layout(title = &quot;customeValue distribution&quot;)
+plot_ly(Thinkdata ,labels=labels,values = nameA , type = &quot;pie&quot;) %&gt;%layout(title = &quot;custome peopel distribution&quot;)
+  ##多个饼图放在一起
+plot_ly(data=Thinkdata ,labels=labels,values = needablity, type = &quot;pie&quot;, domain = list(x = c(0, 0.4), y = c(0.4, 1)),
+    name = &quot;sum of Contribution_Value&quot;, showlegend = F) %&gt;%
+ add_trace(data = Thinkdata ,labels=labels,values = nameA , type = &quot;pie&quot;, domain = list(x = c(0.6, 1), y = c(0.4, 1)),
+        name = &quot;People_number&quot;, showlegend = F) %&gt;%  layout(title = &quot;People and Contribution_Value&quot;)
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>R语言：绘制知识图谱 http://www.cnblogs.com/wheng/p/6218990.html
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-08.html" rel="bookmark"
+                           title="Permalink to 数据分析轮廓">数据分析轮廓</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-12-25T22:12:00+08:00">
                 Published: 2016-12-25 22:12:00
@@ -37,322 +173,10 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><h2>背景</h2>
-<div class="highlight"><pre><span></span>数据分析是以解决问题开始。数据分析注重的是结果转化，理论和只是最终服务于方案和最终结果
-如何有效的获取数据，如何有效的经营用户
-</pre></div>
-
-
-<h2>一.业务</h2>
-<div class="highlight"><pre><span></span>业务理解：具备同理心&lt;人同此心，心同此理&gt;--去理解人们所想和所需
-角度：宏观和微观
-    宏观
-        产品存在的环境和外部因素的理解--强调环境的理解
-        行业数据表现
-    微观
-        产品机制和内容的理解，强调对自身的理解
-        使用者--设计者&lt;数据策划&gt;--运营者
-
-方面：产品体验分析，产品运用策略
-    用户理解。
-    渠道平台特征
-    运营理解--为产品和用户提供增效服务，将用户作为运营中心，市场作为运营方向
-    运营策略和方法，运营刺激，以及运营总结分析
-    新手教程，注册模块
-    内容：文字情感，推送与弹窗 触摸设置
-    感觉：流畅性
-    用户培养--培养用户消费习惯
-    核心用户规模
-能力要求：产品体验的敏感性和专业性
-</pre></div>
-
-
-<h2>二.方法与知识</h2>
-<div class="highlight"><pre><span></span>方法--数据分析-营销-社会学-心理学-互联网-经济-广告
-</pre></div>
-
-
-<h3>数据分析</h3>
-<div class="highlight"><pre><span></span>使用集中趋势或者离散程度的指标
-    基本数据--度量数据
-        本月金额
-        本月人数
-        本月金额占比
-        本月人数占比
-        较上月占比增幅         
-    集中趋势：
-        人均购买金额
-        月人均ARPU值---总收入/总人数  但是存在二八效应
-    统计描述指标
-        比：静态指标，用来描述现象各个组成部分所占的比重或者分布
-          同比--环比
-            同比：消除数据周期性或者季节性变动带来的影响
-            环比：体现数据连续性变化的趋势
-            定基比
-            渠道对比
-            时间序列
-        率：动态指标，表示一定人群中现象发生的频率或者强度
-            异众比率
-        幅度
-</pre></div>
-
-
-<h3>实验设计</h3>
-<div class="highlight"><pre><span></span>    A/B test
-    贝叶斯理论--
-</pre></div>
-
-
-<h3>统计推断</h3>
-<div class="highlight"><pre><span></span>分布
-    正态分布 Gaussian Distribution 高斯分布
-    偏态分布
-        Gamma Distribution          伽马分布
-        Exponential Distribution    指数分布
-        Power Law                   幂律分布
-    二项分布-Bernoulli Distribution
-    泊松分布-Poisson Distribution
-图
-    散点图 折线图 密度曲线图 箱体图 柱状图
-    时序图--线条图、路径图
-    小提琴图
-</pre></div>
-
-
-<h3>数据挖掘</h3>
-<div class="highlight"><pre><span></span>    关联分析
-    分类
-    聚类
-    回归
-    异常检测
-</pre></div>
-
-
-<h3>机器学习</h3>
-<h3>特定分析方法</h3>
-<div class="highlight"><pre><span></span>断代分析--CoHorton Analysis--对特定的渠道，时间段的用户数据进行分析，而不是针对全部用户
-</pre></div>
-
-
-<h3>业务和方法：</h3>
-<div class="highlight"><pre><span></span>                获取用户的质量---留存率
-                产品体验--留存率和次日留存率
-                用户规模---活跃用户
-                            新增用户
-                            流失用户
-                收益能力--ARPU分析
-                            付费潜力挖掘
-                营销效果---留存用户分析
-                             ROI分析
-                消费习惯--默认购买的金额
-
-                付费用户--概率，在一定的条件下的概率
-    分析体系和指标，使用指标，是了解指标背后所折射的问题和影响因素。
-    了解指标背后用户行为
-</pre></div>
-
-
-<h2>三.技术</h2>
-<div class="highlight"><pre><span></span>技术能力
-    常用的分析工具：    Excel 、SQL、R、Python、Spark
-    数据报告撰写和分析
-    解决方案和评估报告
-数据收集技术
-    客户端
-        埋点
-        第三方SDK
-    服务端--
-        通过日志和数据库
-数据存储技术
-
-数据分析技术
-
-分析报表
-    现状，表现-问题，趋势
-        表现--新增
-              转化
-    市场，产品，运营
-    什么时候，什么业务，怎样的趋势，增长速度，平均水平
-    制作技巧和原则
-    了解阅读者的需要，从一个非分析师的角度看数据--场景使用价值
-        做出何种改变
-        需要的成本，提升的价值
-        其他策略--场景
-</pre></div>
-
-
-<h2>流程：</h2>
-<div class="highlight"><pre><span></span>分析业务--建立指标体系
-模型：投入和回报是一个完整的商业逻辑
-PRAPA模型
-AARRR模型：重心从成本转向价值
-  Acquisition：获取用户
-    CPM：Cost Per Thousand Impression    千次成本
-    CPC： Cost Per Click             点击成本
-    CPA： Cost Per Action                行动成本
-    日新增用户
-  Activation 活跃
-    活跃度--用户质量--渠道质量
-            产品本身
-            DAU--Daily Active users 日活跃用户---&lt;用户规模，产品生命周期分析等&gt;
-            WAU--Weekly Active User 周活跃用户---周期性用户规模
-            MAU--Month Active User  月活跃用户---评估推广效果，总体游戏用户规模
-  Retention
-    用户黏性--用户留存--- 留存率&lt;日留存率，周留存率和月留存率&gt;
-        留存率--作用：衡量有效用户，衡量运营表现，挖掘用户特征
-            次日留存率 Day 1Retention Ratio  产品初期的体验效果和满意度
-            三日留存率
-            七日留存率
-            留存率
-                留存矩阵
-                    比较渠道留存优劣
-                    考虑流量的因素
-                    考虑实际情况--对门户网站的酌情考虑
-                留存率的衰减
-                    设计--优化新手体验，强化用户个性化体验
-                    运营--每日登陆奖励，退出界面提醒 消息推送 短信提醒
-                留存作弊
-
-        流失率
-            日流失率Day 1Churn Ratio
-            周流失率
-        使用次数和时长
-            新用户关心留存率&lt;体验&gt;
-                环境：获取用户的方式、渠道和方法
-                用户：用户的兴趣 效果和质量
-                产品：产品的质量和人群受众定位
-            老用户关心流失率
-  Revenue:收入
-    衡量收益
-        转化率
-        付费率
-            PR--Payment Ratio 付费率
-        用户价值--大客户小客户
-            APA--Active Payment Account 活跃付费用户数
-                活跃付费用户数==月活跃用户*月付费率
-                充值
-                消费
-                    新付费用户
-                    老付费用户
-            ARPU--Average Revenue Per User 平均每用户收入
-                分群了解每个群体的真实收益贡献能力
-            LTV----life time value 生命周期总价值
-                LTV=LT*ARPU。
-                根据talkingdata的方法，
-                LT=R1+R2+…+RN，（R1表示第一天的留存率，R2表示第二天的留存率，RN表示第N天的留存率）
-                ARPU=充值金额/活跃玩家数=ARRPU*付费率。
-            用户付费能力和梯度变化
-  Refer：自传播
-</pre></div>
-
-
-<h2>方面：</h2>
-<div class="highlight"><pre><span></span> 从技术：单变量分析，双变量分析
- 从业务：用户分析----留存分析---收入分析--渠道分析---内容分析
-  渠道：-
-    分类--- 分包追踪类-----安卓常见
-            短链接追踪类---iOS常见
-        官方市场
-        手机助手
-        手机厂商商店
-        运营商商店
-        第三方市场
-        渠道本身和资源用户存在潜在的稳定关系
-        渠道数据分析体系
-        数据监控体系--根据自己的商业逻辑，业务模型
-        了解渠道前，先了解自己，渠道本身对产品来讲值存在合适以及不合适。
-        什么能做，什么不能做？目前不能，还是一段时间内不能
-        数量 质量 和收入
-        哪些先做，哪些后做
-    内容分析
-        AnyWhere  Anywhen  Anyone
-    场景分析
-        回炉型转化
-        常规型转化
-        优质型转化
-        问题型转化
-    长尾效应与二八法则
-    活动运营分析
-        数值反馈数据
-        需求反馈数据
-</pre></div>
-
-
-<h2>PC互联网和移动互联网</h2>
-<div class="highlight"><pre><span></span>页游和端游
-
-手游
-很少听到如何通过数据分析真正的提高产品的价值，以及如何通过数据分析改善或者优化产品的案例说明。缺少具体的方案
-寻找用户需求，挖掘问题所在，优化产品
-狭义的数据分析
-        渠道管理与运营
-        流量粉刺
-        运营
-        部分产品设计分析
-        活动
-用户体验
-核心素质：业务解决方案 
-生命周期
-        获取用户------用户获取---用户来源更加分散
-        了解介质------移动设备特性--碎片化，差异化，信息输入方式，网络条件
-        经营用户------用户的运营和维持
-权限与合作：开发 设计 运营 维护
-基础数据分析
-        指标体系--业务导向和监测作用
-数据-信息化
-数据获取流程--数据埋点
-总结需要长期使用的分析模块，并将其模块化。在新得方向时，不需要额外的开发成本
-        留存分析
-        充值分析
-        消费分析
-两种数据分析--
-    其中一种，分析结果体现不了价值，最终还是要和业务结合，真正的体现价值的是如何运用结果
-个人定位和能力要求--成长和职业发展： 
-        数据分析能力 和业务理解能力
-        数据分析的方法论--解决问题，方法和工具的概述
-        数据敏感性
-黑色一分钟
-    安装--卸载-更新   -兼容性    
-    电量--设备过热
-    CPU使用率 内存泄露
-    流量
-    连接超时 网络劫持
-    启动延迟
-    卡顿-闪退--崩溃
-体验--用户只是去感受-听到的，看到的以及触摸到的。这就是体验
-冲动型付费用户
-</pre></div>
-
-
-<h3>提出问题</h3>
-<div class="highlight"><pre><span></span>    相关行业
-            游戏分析行业
-            电商行业
-    维度：
-            时间维度  地域维度 渠道维度 用户群维度 
-            设备，系统，网络 分辨率等，不同设备下的用户表现
-            游戏行为，付费行为
-            计算周期
-    竞争对手分析
-        入手--对手名称--对手用户 
-        进入--对手官网--招聘信息--分析平台
-        差异--比较分析--行业--波特分析
-        免费游戏不遵循正态分布，而是幂指数分布--幂律分布
-    付费用户更倾向于使用哪种手机？大客户呢
-    社交关系是否会影响用户的流失以及活跃度？
-    决策树对首次付费用户进行研究？1代表首次付费后又二次付费，0代表没有二次付费。确定模型，然后对首次付费中还会二次付费的用户重点运营和维护
-    充值金额，充值次数，充值间隔--购买金额，购买次数，购买间隔。通过这三类指标区分用户
-</pre></div>
-
-
-<h2>参考：</h2>
-<div class="highlight"><pre><span></span>游戏数据分析的艺术
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>业务理解--方法运用--技术实现</p>
+                <a class="readmore" href="/items/my-item-post-08.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

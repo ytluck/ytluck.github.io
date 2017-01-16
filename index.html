@@ -26,7 +26,143 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-17.html">HDFS和Spark的交互</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-14.html">R语言对团队能力结构的可视化</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-01-15T21:18:00+08:00">
+                Published: 2017-01-15 21:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info --><h2>柱状图-饼图--双柱状图--圆环图</h2>
+<div class="highlight"><pre><span></span><span class="c1">####本文通过使用R语言重的ggplot对数据团队中的一些知识结构进行数据可视化</span>
+<span class="c1">####首先对可视化的数据进行准备--为了无缝重现文中内容--在这里将数据直接给出，而没有采用读取文件的方式。</span>
+
+<span class="c1">###思考的时候需要加上时间</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>  <span class="c1">##如果没安装需要安装</span>
+<span class="c1">##评分采用十分制</span>
+labels <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;统计学&quot;</span><span class="p">,</span><span class="s">&quot;数学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;机器学习&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;领域知识&quot;</span><span class="p">,</span><span class="s">&quot;沟通技巧&quot;</span><span class="p">)</span>
+<span class="c1">##</span>
+needablity <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">6</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+<span class="c1">##个人的能力值评估</span>
+nameA <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
+nameB <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">)</span>
+nameC <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+Thinkdata <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span><span class="kp">labels</span><span class="p">,</span>needablity<span class="p">,</span>nameA<span class="p">,</span>nameB<span class="p">,</span>nameC<span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="c1">##团队知识体系是一个比较复杂的问题，在这里的可视化只是采取比较同一值取其最大作为其能力值表现</span>
+
+<span class="c1">#Thinkdata[,3:5] ##取成员所在的列</span>
+teamabilty <span class="o">&lt;-</span> <span class="kp">apply</span><span class="p">(</span>Thinkdata<span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">5</span><span class="p">]</span> <span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="kp">max</span><span class="p">)</span>
+Thinkdata <span class="o">&lt;-</span> <span class="kp">cbind</span><span class="p">(</span>Thinkdata<span class="p">,</span>teamabilty<span class="p">)</span>
+<span class="c1">##数据的长格式和宽格式--ggplot的分组只能根据行而不能根据列</span>
+<span class="kn">library</span><span class="p">(</span>reshape2<span class="p">)</span> <span class="c1">##如果没安装需要安装</span>
+<span class="c1">#melt(data, id.vars, measure.vars,variable.name = &quot;variable&quot;, ..., na.rm = FALSE, value.name = &quot;value&quot;, factorsAsStrings = TRUE)</span>
+Transdata <span class="o">&lt;-</span>  melt<span class="p">(</span>Thinkdata<span class="p">,</span> id.vars<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;labels&quot;</span><span class="p">),</span> measure.vars<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;needablity&quot;</span><span class="p">,</span><span class="s">&quot;teamabilty&quot;</span><span class="p">),</span>variable.name<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;compare&quot;</span><span class="p">),</span>value.name <span class="o">=</span> <span class="s">&quot;abiltyvalue&quot;</span><span class="p">,</span> factorsAsStrings <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1">##每个分类的总和是相同的，因为在本例中每个分类是7，所以前七个数之和要等于后七个数字</span>
+onedata <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">14</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
+<span class="kp">sum</span><span class="p">(</span>onedata<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">7</span><span class="p">])</span>
+<span class="kp">sum</span><span class="p">(</span>onedata<span class="p">[</span><span class="m">8</span><span class="o">:</span><span class="m">14</span><span class="p">])</span>
+Trone <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>Transdata<span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span>onedata<span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+
+<span class="c1">##绘制图形</span>
+ p1 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>needablity<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> 
+ p1<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+
+<span class="c1">##各个角色的能力评估</span>
+
+p2 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>nameA <span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;nameA&quot;</span><span class="p">)</span> 
+p3 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>nameB <span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;nameB&quot;</span><span class="p">)</span> 
+p4 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Thinkdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>nameC <span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span> <span class="o">+</span>ylim<span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;nameC&quot;</span><span class="p">)</span> 
+    <span class="kn">library</span><span class="p">(</span>grid<span class="p">)</span>  <span class="c1">##如果没安装需要安装</span>
+    <span class="c1">##清除当前设备或移动到新的page</span>
+    grid.newpage<span class="p">()</span>
+    <span class="c1">##用viewport创建视图窗口，并用grid.layout创建布局，同时把布局给视窗</span>
+    VP <span class="o">&lt;-</span> viewport<span class="p">(</span>layout <span class="o">=</span> grid.layout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">))</span>
+    <span class="c1">##用pushViewport()命令锁定该图层，使之成为目标区域</span>
+    pushViewport<span class="p">(</span>VP<span class="p">)</span>
+    <span class="c1">#创建布局函数,函数参数是放置图形的位置</span>
+vplayout <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span> viewport<span class="p">(</span>layout.pos.row <span class="o">=</span> x<span class="p">,</span> layout.pos.col <span class="o">=</span> y<span class="p">)</span>
+<span class="c1">#绘图</span>
+<span class="kp">print</span><span class="p">(</span>p2<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+<span class="kp">print</span><span class="p">(</span>p3<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">))</span>
+<span class="kp">print</span><span class="p">(</span>p4<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">))</span>
+<span class="c1">##关闭图形设备</span>
+dev.off<span class="p">()</span>
+<span class="c1">##解决问题和团队目前的状况对比，使用双柱状图</span>
+ p5 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>Transdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>abiltyvalue<span class="p">,</span>fill<span class="o">=</span>compare<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>position<span class="o">=</span><span class="s">&quot;dodge&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+p5<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+
+<span class="c1">##堆叠柱状图</span>
+ p6 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>Transdata<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span><span class="kp">labels</span><span class="p">,</span>y<span class="o">=</span>abiltyvalue<span class="p">,</span>fill<span class="o">=</span>compare<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+ p6<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+
+<span class="c1">#不同的角色定位需要主要的技能不同，在这些公共的技能中有一些比较</span>
+<span class="c1">##同一角色在不同成长阶段的知识体系评估</span>
+ p7 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>Trone<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span>compare<span class="p">,</span>y<span class="o">=</span>onedata<span class="p">,</span>fill<span class="o">=</span><span class="kp">labels</span><span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span><span class="o">+</span>guides<span class="p">(</span>fill<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>  
+p7<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;主要能力&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;能力评估值&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;解决问题需要的知识架构&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>可视化知识网络图谱---网络图</h3>
+<div class="highlight"><pre><span></span><span class="c1">##构建数据，在实际中可以从文本中读取，在这里使用构造的数据来展示核心知识体系，借助于借助networkD3包里面的simpleNetwork 函数</span>
+中心 <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">,</span><span class="s">&quot;数据挖掘&quot;</span><span class="p">)</span>
+次级中心 <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;统计学&quot;</span><span class="p">,</span><span class="s">&quot;数学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;机器学习&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;领域知识&quot;</span><span class="p">,</span><span class="s">&quot;沟通技巧&quot;</span><span class="p">)</span>
+次级中心<span class="m">01</span>  <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">,</span><span class="s">&quot;数据可视化&quot;</span><span class="p">)</span>
+关联<span class="m">01</span> <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;目的性&quot;</span><span class="p">,</span><span class="s">&quot;简洁&quot;</span><span class="p">,</span><span class="s">&quot;明了&quot;</span><span class="p">)</span>
+次级中心<span class="m">02</span> <span class="o">&lt;-</span>  <span class="kt">c</span><span class="p">(</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">,</span><span class="s">&quot;计算机科学&quot;</span><span class="p">)</span>
+关联<span class="m">02</span> <span class="o">&lt;-</span>   <span class="kt">c</span><span class="p">(</span><span class="s">&quot;数据结构&quot;</span><span class="p">,</span><span class="s">&quot;算法&quot;</span><span class="p">,</span><span class="s">&quot;场景&quot;</span><span class="p">,</span><span class="s">&quot;编程语言&quot;</span><span class="p">)</span>
+data <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span> <span class="kp">cbind</span><span class="p">(</span> <span class="kt">c</span><span class="p">(</span>中心<span class="p">,</span>次级中心<span class="m">01</span><span class="p">,</span>次级中心<span class="m">02</span><span class="p">)</span> <span class="p">,</span><span class="kt">c</span><span class="p">(</span>次级中心<span class="p">,</span>关联<span class="m">01</span><span class="p">,</span>关联<span class="m">02</span> <span class="p">)</span> <span class="p">)</span> <span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+
+<span class="kn">library</span><span class="p">(</span>networkD3<span class="p">)</span>
+simpleNetwork<span class="p">(</span>data<span class="p">)</span> 
+simpleNetwork<span class="p">(</span>data<span class="p">,</span><span class="c1">#数据 </span>
+       fontFamily<span class="o">=</span><span class="s">&quot;华文行楷&quot;</span><span class="p">,</span><span class="c1">#字体设置 </span>
+       linkColour<span class="o">=</span><span class="s">&quot;#B23AEE&quot;</span><span class="p">,</span><span class="c1">#连线颜色 </span>
+       nodeColour<span class="o">=</span><span class="s">&quot;#00CD66&quot;</span><span class="p">,</span><span class="c1">#节点颜色 </span>
+       textColour<span class="o">=</span><span class="s">&quot;#0000FF&quot;</span><span class="p">,</span><span class="c1">#文本颜色 </span>
+       charge <span class="o">=</span> <span class="m">-550</span><span class="p">,</span><span class="c1">#节点之间的引力 </span>
+       opacity<span class="o">=</span><span class="m">0.9</span><span class="p">,</span><span class="c1">#透明度 </span>
+       zoom<span class="o">=</span><span class="kc">TRUE</span> <span class="c1">#可缩放 )</span>
+       <span class="p">)</span>
+</pre></div>
+
+
+<h2>调用plotly</h2>
+<div class="highlight"><pre><span></span>##Plotly.js 是开源的 JavaScript 图表库，它基于 d3.js 和 stack.gl    
+##绘制圆环图，excel中饼图--在数量级相差比较大的情况下--通过圆环图比较百分比--对于在一起的双换图-可以采用Excel来绘制--
+##这里采用饼图--不过饼图在超过7个的情况下就少用吧
+library(plotly)
+Thinkdata 
+plot_ly(Thinkdata ,labels=labels,values = needablity , type = &quot;pie&quot;) %&gt;%layout(title = &quot;customeValue distribution&quot;)
+plot_ly(Thinkdata ,labels=labels,values = nameA , type = &quot;pie&quot;) %&gt;%layout(title = &quot;custome peopel distribution&quot;)
+  ##多个饼图放在一起
+plot_ly(data=Thinkdata ,labels=labels,values = needablity, type = &quot;pie&quot;, domain = list(x = c(0, 0.4), y = c(0.4, 1)),
+    name = &quot;sum of Contribution_Value&quot;, showlegend = F) %&gt;%
+ add_trace(data = Thinkdata ,labels=labels,values = nameA , type = &quot;pie&quot;, domain = list(x = c(0.6, 1), y = c(0.4, 1)),
+        name = &quot;People_number&quot;, showlegend = F) %&gt;%  layout(title = &quot;People and Contribution_Value&quot;)
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>R语言：绘制知识图谱 http://www.cnblogs.com/wheng/p/6218990.html
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-17.html" rel="bookmark"
+                           title="Permalink to HDFS和Spark的交互">HDFS和Spark的交互</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-01-08T09:02:00+08:00">
                 Published: 2017-01-08 09:02:00
@@ -37,90 +173,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>Spark使用Scala连接HDFS</h3>
-<div class="highlight"><pre><span></span>总共分为三个步骤
-第一步：配置包依赖Maven
-第二步：配置文件的参数的设置与读写.properties 在HDFS暂时没有使用
-第三步：编写程序
-
-    //第一步：创建SparkConf对象配置一些通用的属性，并且基于这个创建一个SparkContext对象setMaster(&quot;local[2]&quot;)
-    val SparkConf = new SparkConf().setMaster(&quot;local[2]&quot;).setAppName(&quot;CountTest&quot;).set(&quot;spark.executor.memory&quot;, &quot;1g&quot;)
-    //使用SparkContext对象中的textFile函数将输入文件转换为一个RDD ，SparkContext对象代表对计算机集群的一个连接
-    val sc = new SparkContext(SparkConf)
-    //路径前面加上file:// 表示从本地文件系统读；读取本地文本文件，创建一个字符串的RDD
-    val fluxRDD = sc.textFile(&quot;file:///C:\\Items.json&quot;)
-    //在路径前面加上hdfs://表示从hdfs文件系统；读取HDFS中文件参数是一个path,这个path
-    // val fluxRDD = sc.textFile(&quot;hdfs://localhost:8102/15*.json&quot;)
-    //hdfs://master:port/path
-</pre></div>
-
-
-<h3>Spark存储对象到HDFS</h3>
-<h4>保存RDD为对象</h4>
-<div class="highlight"><pre><span></span>    将RDD保存为对象saveAsObjectFile()
-   .objectFile()函数接收路径，返回对应的RDD
-</pre></div>
-
-
-<h4>保存模型到RDD上为对象</h4>
-<div class="highlight"><pre><span></span><span class="o">//</span><span class="err">将上面的模型存储到</span><span class="n">hdfs</span><span class="o">---</span><span class="n">Spark</span><span class="err">环境下生成一个</span><span class="n">word2vec</span><span class="err">模型</span><span class="p">,</span> <span class="err">存储到</span><span class="n">hdfs</span><span class="o">.</span>
-<span class="n">ObjectInputStream</span><span class="err">与</span><span class="n">ObjectOutputStream</span><span class="err">类所读写的对象必须实现</span><span class="n">Serializable</span><span class="err">接口，只能将支持</span> <span class="n">java</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">Serializable</span> <span class="err">接口的对象写入流中。对象中的</span><span class="n">transient</span><span class="err">和</span><span class="n">static</span><span class="err">类型成员变量不会被读取和写入</span>
-<span class="err">可以使用</span><span class="n">ObjectOutputStream</span> <span class="err">将</span> <span class="n">Java</span> <span class="err">对象的基本数据类型和图形写入</span> <span class="n">OutputStream</span><span class="err">。</span>
-<span class="err">可以使用</span> <span class="n">ObjectInputStream</span> <span class="err">读取（重构）对象。通过在流中使用文件可以实现对象的持久存储</span>
-<span class="n">val</span> <span class="n">hadoopConf</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">hadoopConfiguration</span>
-<span class="n">hadoopConf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fs.defaultFS&quot;</span><span class="p">,</span> <span class="s2">&quot;hdfs://myhadoop:9000/&quot;</span><span class="p">)</span>
-<span class="n">val</span> <span class="n">fileSystem</span> <span class="o">=</span> <span class="n">FileSystem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hadoopConf</span><span class="p">)</span>
-<span class="n">val</span> <span class="n">path</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/user/hadoop/data/mllib/word2vec-object&quot;</span><span class="p">)</span>
-<span class="n">val</span> <span class="n">oos</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectOutputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FSDataOutputStream</span><span class="p">(</span><span class="n">fileSystem</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
-<span class="n">oos</span><span class="o">.</span><span class="n">writeObject</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-<span class="n">oos</span><span class="o">.</span><span class="n">close</span>
-<span class="p">}</span>
-
-<span class="o">//</span><span class="err">这里示例另外一个程序直接从</span><span class="n">hdfs</span><span class="err">读取序列化对象使用模型</span>
-<span class="n">val</span> <span class="n">ois</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FSDataInputStream</span><span class="p">(</span><span class="n">fileSystem</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
-<span class="n">val</span> <span class="n">sample_model</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="n">readObject</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="p">[</span><span class="n">Word2VecModel</span><span class="p">]</span>
-
-  <span class="o">/*</span>
-    <span class="o">*</span> <span class="o">//</span><span class="err">以将序列化文件从</span><span class="n">hdfs</span><span class="err">放到本地</span><span class="p">,</span> <span class="n">scala</span><span class="err">程序使用模型</span>
-    <span class="o">*</span> <span class="kn">import</span> <span class="nn">java.io._</span>
-    <span class="o">*</span> <span class="kn">import</span> <span class="nn">org.apache.spark.mllib.feature.</span><span class="p">{</span><span class="n">Word2Vec</span><span class="p">,</span> <span class="n">Word2VecModel</span><span class="p">}</span>
-    <span class="o">*</span> <span class="n">val</span> <span class="n">ois</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectInputStream</span><span class="p">(</span><span class="n">new</span> <span class="n">FileInputStream</span><span class="p">(</span><span class="s2">&quot;/home/cherokee/tmp/word2vec-object&quot;</span><span class="p">))</span>
-    <span class="o">*</span> <span class="n">val</span> <span class="n">sample_model</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="n">readObject</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="p">[</span><span class="n">Word2VecModel</span><span class="p">]</span>
-    <span class="o">*</span> <span class="n">ois</span><span class="o">.</span><span class="n">close</span>
-    <span class="o">*/</span>
-</pre></div>
-
-
-<h3>Hadoop现在同时提供了新旧的两套API接口</h3>
-<div class="highlight"><pre><span></span>旧版API 放在org.apache.hadoop.mapred 包中，
-而新版API 则放在org.apache.hadoop.mapreduce 包及其子包中
-</pre></div>
-
-
-<h4>老式</h4>
-<div class="highlight"><pre><span></span>hadoopFile
-saveAsHadoopFile()
-</pre></div>
-
-
-<h4>新式</h4>
-<div class="highlight"><pre><span></span> hadoopDataset    saveAsHadoopDataset     
- newAPIHadoopDataset saveAsNewAPIHadoopDataset
-                    saveAsNewAPIHadoopFile
-
-val HBase_DATARDD = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
-    //脚手架语句，查看结果
-</pre></div>
-
-
-<h3>参考</h3>
-<div class="highlight"><pre><span></span>Spark中将对象序列化存储到hdfs https://my.oschina.net/waterbear/blog/525347
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>HDFS的与Spark的交互-Scala语言</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-17.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
