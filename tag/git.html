@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>ytluck—For you - Git</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/program/my-program-post-15.html">Git的常用命令和使用</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-02-10T21:05:00+08:00">
+                Published: 2017-02-10 21:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/git.html">Git</a> </p>
+</footer><!-- /.post-info --><h3>配置登录的内容</h3>
+<div class="highlight"><pre><span></span>Git是分布式的版本控制系统
+Git的第一件事就是设置你的名字和email,这些就是你在提交commit时的签名，每次提交记录里都会包含这些信息。使用git config命令进行配置：
+git config --global user.email &quot;***@gmail.com&quot;
+git config --global user.name &quot;***&quot;
+</pre></div>
+
+
+<h3>上传更新</h3>
+<div class="highlight"><pre><span></span>设置路径，到.git所在的文件路径下
+    cd /c/Items/CorAna_Spark/
+    git status
+    git checkout --  .idea/workspace.xml
+将改动添加到索引中
+    git add src/main/scala/Util.scala 
+注释改动 
+    git commit -m &quot;整理&quot;
+推送本地的修改到远程Git仓库
+    git push origin feature/test
+  如果远程仓库修改了git pull合并最新的修改后再执行git push
+</pre></div>
+
+
+<h3>切换分支</h3>
+<div class="highlight"><pre><span></span>命令可以查看当前的分支列表以及当前处在哪个分支上&lt;星号标识&gt;
+    git branch  
+切换分支
+    git checkout master   切换
+    git checkout -b feature/Relations  在上一个分支中新增
+合并分支
+    git merge master  将master合并到当前分支
+恢复版本
+    git reset --hard HEAD^
+    git pull origin master
+查看远程仓库
+    git remote -v
+</pre></div>
+
+
+<h3>其他</h3>
+<div class="highlight"><pre><span></span>比较不同
+    git diff
+撤销(revert)了前期修改的提交(commit)
+     git revert HEAD
+日志系统
+    git log
+    git log --stat
+快捷键
+    ctr+r  输入可以快捷调出历史命令
+</pre></div>
+
+
+<h3>git的文件系统</h3>
+<div class="highlight"><pre><span></span> .gitignore 配置文件用于配置不需要加入版本管理的文件
+一个隐藏的.git文件件
+    1.hooks:这个目录存放一些shell脚本，可以设置特定的git命令后触发相应的脚本；在搭建gitweb系统或其他git托管系统会经常用到hook script。
+    2.info:包含仓库的一些信息
+    3.logs:保存所有更新的引用记录
+    4.objects:该目录存放所有的Git对象，对象的SHA1哈希值的前两位是文件夹名称，后38位作为对象文件名
+    5.refs:具体的引用，Reference Specification，这个目录一般包括三个子文件夹，heads、remotes和tags，比如，heads中的master文件标识了项目中的master分支指向的当前commit，其他类似。
+    6.COMMIT_EDITMSG:保存最新的commit message，Git系统不会用到这个文件，只是给用户一个参考
+    7.config:这个是GIt仓库的配置文件
+    8.description:仓库的描述信息，主要给gitweb等git托管系统使用
+    9.index:这个文件就是我们前面提到的暂存区（stage），是一个二进制文件
+    10.HEAD:这个文件包含了一个分支（branch）的引用，通过这个文件Git可以得到下一次commit的parent，什么是引用呢，你可以理解为指针，哪儿都可以指，但是不能指向没有的东西。
+    11.ORIG_HEAD:HEAD指针的前一个状态
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
