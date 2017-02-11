@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>埋点-数据采集技术</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-15.html" rel="bookmark"
+           title="Permalink to 埋点-数据采集技术">埋点-数据采集技术</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-11T22:20:00+08:00">
+                Published: 2017-02-11 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h3>问题开始</h3>
+<div class="highlight"><pre><span></span>采集什么样的数据，采用什么样的技术采集，数据采集的合理和容错？
+什么是埋点，埋点需不需要管理，怎么管理？
+对于数据分析人员而言，数据的来源的准确性和全面性很重要，了解数据的统计口径，避免Garbage In Garbage Out，数据采集是最核心的问题。数据采集是否丰富，采集的数据是否准确，采集是否及时，都直接影响整个数据分析的效果
+</pre></div>
+
+
+<h3>埋点概念</h3>
+<div class="highlight"><pre><span></span>就是在正常的功能逻辑中添加统计逻辑--在这里主要指客户端的埋点
+    客户端日志记录，一般的，记录的内容包括事件类型，控件编号，控件属性及相关参数，事件时间等。
+    都要确认在什么地方记录日志 ， 于是我们就引入了 埋点 的概念。
+</pre></div>
+
+
+<h3>埋点分类</h3>
+<div class="highlight"><pre><span></span>---页面统计和事件统计
+    页面统计---页面访问时长--各个页面的访问情况
+        页面访问数--页面流向分布
+        页面访问次数，即当前页面的被访问的次数，即浏览量PV；
+        页面访问人数，即访问该页面的活跃用户数，即独立访问数UV        
+    自定义事件统计--统计APP内部的操作行为
+        简单事件统计，即记录事件的发生次数（可理解为PV）和事件发生人数
+        事件转化漏斗  
+---异常日志点 和 行为日志点
+    用户诊断日志----功能出现错误的埋点统计---性能埋点
+    用户行为的埋点
+</pre></div>
+
+
+<h3>埋点管理</h3>
+<div class="highlight"><pre><span></span>埋点的目的：
+    功能迭代--产品演进
+    质量监控
+埋点的规范
+    数据采集点的名称--类型--以及说明
+    需要计量时间的模块
+    数据采集的准确性
+    全和细，准确，效率的平衡和良好的扩充性
+埋点的粗细度
+    用户行为的关键路径的细节程度
+原则
+    建议统计关键路径的事件数据
+    行为只发生在客户端的，在客户端进行埋点
+埋点的代价
+    和用户的代价--用户
+    团队代价------数据团队和工程团队
+    平衡--只看数据采集的方式，而不考虑数据的传输，存储，分析，可视化反馈，都是耍流氓。
+</pre></div>
+
+
+<h3>埋点原理</h3>
+<div class="highlight"><pre><span></span>客户端记录用户行为，发送预先定义好的页面标记信息
+将发送的请求经过etl，格式化自己需要的数据字段，保存在结果到数据库
+客户端日志记录---上报到后台记录日志---ETL入库----埋点数据的展现
+    上传机制--暂存机制--保留时间
+        并不是每统计到一次事件或者状态就会发起数据上报，客户端统计到的数据会先暂时存储在内存或者磁盘上，
+        当用户启动、退出应用程序的时候，或者在其他更合适的时机，将当前周期统计到的事件批量上报到服务器，
+        这样做的目的主要是考虑到与服务器多次建立连接的性能损耗和流量问题(相同大小的数据分多次发送比一次发送要消耗更多流量)，
+        另外客户端在上报具体的统计事件之外，还会将标识用户的ID一并上报，后续用于计算用户相关的数据如日使用用户和留存率等
+</pre></div>
+
+
+<h3>埋点的技术方案</h3>
+<div class="highlight"><pre><span></span> 1.代码埋点：
+   &lt;1&gt;开发者直接在客户端埋点---埋点下发平台--埋点管理--&lt;版本升级，传输时效性和数据可靠性&gt;
+   &lt;2&gt;第三方SDK--前端数据采集--&lt;注意一定要了解彼此的统计口径&gt;
+ 2.可视化埋点
+
+ 3.无埋点技术---并非完全不用埋点，而是不用在设置代码前先行定义需要采集的事件或功能
+        一种是预先跟踪所有的渲染信息
+        一种是滞后跟踪的渲染信息
+    移动端的应用使用无埋点技术，这就意味着更多的移动流量成本和耗电量以及相关的隐私风险
+</pre></div>
+
+
+<h3>埋点代码示例</h3>
+<div class="highlight"><pre><span></span>编写少量的javascript代码
+    实现自定义事件和自定义指标的跟踪和分析--这个坑先挖着
+</pre></div>
+
+
+<h3>附录-一些前置概念</h3>
+<div class="highlight"><pre><span></span>大多对于可交互式的应用程序，例如Android应用，iOS应用，Windows Phone应用等等，
+其实在界面渲染时都有几点共性： 
+1. 图形背后都有图形树，我们所看到的输入框、文本框、按钮等等其实都是view，
+    而view的摆放其实也都是有对应的视图方式，例如线性布局、网格布局、表格布局、相对、绝对等等，
+    然后view加布局就组成了我们要看到的界面，比如最简单的就是网站的DOM结构了，有层级关系，
+    对于Android而言就是View视图的层级关系了，调用系统级API基本上都能获取这个树结果。 
+2. 窗体都有生命周期，比如Android的Activity的生命周期 
+3. 对于我们可视的这些界面元素，当他们显示出来、被点击了、被选中了、被滑动等等操作的时候，
+    系统也都会有相应的接口给开发者通知他们去处理，所以也就是对于View而言可以绑定或者委托或者是监听他们的一些触发事件，
+    比如加载、点击、选中等操作。
+    应用程序在呈现程序界面的时候，其实有一套生命周期的准则在里面，控制了从界面元素创造到响应用户操作到销毁，
+    同时也有一个图形树的准则在里面，控制了这些界面元素的显示层级和顺序，
+    最后在用户交互（包括展现）各个界面元素的时候，会给开发者提供一系列的接口，让开发者去处理这些行为。
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>数据采集与埋点 https://www.sensorsdata.cn/blog/shu-ju-jie-ru-yu-mai-dian/
+神策 Sensors Analytics 使用手册https://www.sensorsdata.cn/manual/index.html
+埋点方案汇总--http://www.itechdog.com/blog/event-tracking?utm_source=tuicool&amp;utm_medium=referral
+整天看用户埋点数据，知道数据是咋来的吗？--http://www.woshipm.com/pmd/284172.html
+移动应用要如何埋点上传才能收集更多数据？--http://www.open-open.com/lib/view/open1472476988056.html
+蓝鲸的网站分析笔记：GIGO原则：输入的是垃圾，输出的也是垃圾--http://bluewhale.cc/2014-03-02/garbage-in-garbage-out.html
+APP埋点：页面统计与事件统计该如何入手？--http://www.woshipm.com/data-analysis/450268.html?utm_source=tuicool&amp;utm_medium=referral
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
