@@ -62,8 +62,50 @@
 
 
 <h3>3、fork（/home/script.sh）</h3>
-<p>直接运行脚本，会以当前shell为父进程，产生新的进程，并且继承主脚本的环境变量和声明变量。
-   执行完毕后，主脚本不会保留其环境变量和声明变量。</p>
+<div class="highlight"><pre><span></span> 直接运行脚本，会以当前shell为父进程，产生新的进程，并且继承主脚本的环境变量和声明变量。
+执行完毕后，主脚本不会保留其环境变量和声明变量。
+</pre></div>
+
+
+<h2>Linux系统的安全策略</h2>
+<h3>安全策略一</h3>
+<div class="highlight"><pre><span></span>用户-用户组-文件权限
+    文件的所有者
+</pre></div>
+
+
+<h3>安全策略二</h3>
+<div class="highlight"><pre><span></span>  DAC
+     自主访问控制&lt;Discretionary Access Control,DAC&gt;.依据进程的所有者与文件资源的rwx权限决定有无访问权限。
+     文件系统的rwx 
+    MAC
+    委托访问控制&lt;Mandatory Access Control&gt;，针对特定的进程和特定的文件资源进行权限控制。
+SElinux &lt;Security Enhanced Linux&gt;
+Subject、Object、Policy、Security context
+SELinux是在进行程序、文件等权限设置依据的一个内核模块。控制的subject&lt;主体&gt;是进程。目标则是该进程能否读取文件资源。会对某些服务
+制定基本的安全性策略。主体与目标的安全上下文一致才能顺利访问。安全上下文的类型，重设安全上下文的命令有restorecon 以及chcon,若要
+管理默认的SELinux布尔值，可使用getsebool和setsebool.
+SELinux三种模式： enforcing、permissive、disabled。三种模式，强制模式，许可模式以及关闭。其中策略有targeted和strict两种。
+
+安全上下文主要用冒号分为三个字段 Identify:Role:type
+        Identity:root system_u user_u
+        Role    ： object_r system_r
+        Type    : 
+  domain 需要与 Type 搭配才能顺利读取文件资源。
+ 确定内核中selinux
+重置安全上下文  chcon -R
+    &lt;1&gt;查看SELinux当前状态：  getenforce 以及  sestatus
+
+APPArmor&lt;Application Armor&gt;  AppArmor通过一个配置文件（即profile）来指定一个应用程序的相关权限。AppArmor support was first introduced in Ubuntu 7.04, 
+and is turned on by default in Ubuntu 7.10 and late.Apparmor使用内核标准安全文件系统机制（/sys/kernel/security）来加载和监控profiles文件。
+而虚拟文件/sys/kernel/security/apparmor/profiles里记录了当前加载的profiles文件。
+    &lt;1&gt;查看当前AppArmor的状态：在Ubuntu下通过命令sudo apparmor_status可以。 
+    pparmor的启动、停止等操作的相关命令如下：
+        Start : sudo /etc/init.d/apparmor start
+        Stop : sudo /etc/init.d/apparmor stop
+        reload: sudo /etc/init.d/apparmor reload
+        Show status: sudo /etc/init.d/apparmor status
+</pre></div>
     </div><!-- /.entry-content -->
 
   </article>
