@@ -2,7 +2,7 @@
 <html lang="zh_cn">
 <head>
         <meta charset="utf-8" />
-        <title>ytluck—For you - Authors</title>
+        <title>服务器安装操作系统和配置</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -19,18 +19,55 @@
                     <li><a href="/big-data/index.html">Big Data</a></li>
                     <li><a href="/data-mining/index.html">Data Mining</a></li>
                     <li><a href="/items/index.html">Items</a></li>
-                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
                     <li><a href="/program/index.html">Program</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
-
 <section id="content" class="body">
-    <h1>Authors on ytluck—For you</h1>
-    <ul>
-        <li><a href="/author/ytwan.html">ytwan</a> (69)</li>
-    </ul>
-</section>
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-05.html" rel="bookmark"
+           title="Permalink to 服务器安装操作系统和配置">服务器安装操作系统和配置</a></h1>
+    </header>
 
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-18T21:04:00+08:00">
+                Published: 2017-02-18 21:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>在运行shell脚本时候，有三种方式来调用外部的脚本，</h3>
+<div class="highlight"><pre><span></span>exec（exec script.sh）、source（source script.sh）、fork（./script.sh）
+</pre></div>
+
+
+<h3>1、exec（exec /home/script.sh）：</h3>
+<div class="highlight"><pre><span></span>使用exec来调用脚本，被执行的脚本会继承当前shell的环境变量。
+但事实上exec产生了新的进程，他会把主shell的进程资源占用并替换脚本内容，继承了原主shell的PID号，
+即原主shell剩下的内容不会执行。
+</pre></div>
+
+
+<h3>2、source（source /home/script.sh）</h3>
+<div class="highlight"><pre><span></span>使用source或者“.”来调用外部脚本，不会产生新的进程，继承当前shell环境变量，
+而且被调用的脚本运行结束后，它拥有的环境变量和声明变量会被当前shell保留，   
+类似将调用脚本的内容复制过来直接执行。执行完毕后原主shell继续运行。
+</pre></div>
+
+
+<h3>3、fork（/home/script.sh）</h3>
+<p>直接运行脚本，会以当前shell为父进程，产生新的进程，并且继承主脚本的环境变量和声明变量。
+   执行完毕后，主脚本不会保留其环境变量和声明变量。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>

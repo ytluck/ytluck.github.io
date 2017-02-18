@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>HDFS基本概念和命令行操作</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-18.html" rel="bookmark"
+           title="Permalink to HDFS基本概念和命令行操作">HDFS基本概念和命令行操作</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T08:11:00+08:00">
+                Published: 2017-01-08 08:11:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>0.帮助命令</h3>
+<div class="highlight"><pre><span></span>hdfs dfs -help
+</pre></div>
+
+
+<h3>1.创建目录</h3>
+<div class="highlight"><pre><span></span>多级目录-需要一级一级的创建
+首先到hdfs的用户-然后创建
+su hdfs
+    hdfs dfs -mkdir /Test
+    hdfs dfs -mkdir /Test/first
+    hdfs dfs -mkdir /Test/first/data
+    hdfs dfs -mkdir /Test/first/data/ok
+</pre></div>
+
+
+<h3>2.列出HDFS上的文件</h3>
+<div class="highlight"><pre><span></span>    hdfs dfs -ls  /Test/tmp/first_data_ok_20131031*
+    hdfs dfs -ls  /Test/tmp/first_data_ok_20131101*
+    hdfs dfs -ls  /Test/tmp/first_data_ok_20131130*
+    hdfs dfs -ls  /Test/tmp/first_data_ok_20131201*
+</pre></div>
+
+
+<h3>3.删除目录</h3>
+<div class="highlight"><pre><span></span>删除目录首先查看当前用户，再查看准备删除的目录的文件之后--删除，以确保没有误操作
+    rf参数表示递归强制删除-尽量不用强制删除
+        rm命令删除指定的文件，只删除 非空目录 和 文件
+        删除空目录 - r 指示rm将参数中列出的全部目录和子目录均递归地删除
+0.hdfs  dfsadmin -report
+1.hdfs dfs -ls  /test/
+  hdfs dfs -ls  /test/happy
+2.hdfs dfs -rm  -r -f /test/happy
+</pre></div>
+
+
+<h3>4.查看</h3>
+<div class="highlight"><pre><span></span>1.报告HDFS的基本统计信息     
+    hdfs  dfsadmin -report 
+2.统计多个文件行数 
+    hdfs dfs -cat  /test/first_data_ok_20129* | wc -l 
+3.统计文件大小 
+    hdfs dfs -count /test/first_data_ok_20129*
+4.查看文件的前几行--具体到文件
+    hdfs dfs -tail /test/first_data_ok_2012.json
+5.统计目录下个文件大小
+    hdfs dfs -du /Test
+    32171    /Test/gc
+    9599769  /Test/first
+    hdfs dfs -du -s /Test
+6.查看部分文件
+    hdfs dfs -ls  /Test/tmp/first_data_ok_20151203*
+</pre></div>
+
+
+<h3>5.查看目录结构</h3>
+<div class="highlight"><pre><span></span>逐个查看路径的目录结构
+    hdfs dfs -ls  /
+             /app-logs
+             /apps
+             /ats
+             /Test
+             /hdp
+             /mapred
+             /mr-history
+             /first
+             /spark-history
+             /test
+             /tmp
+             /user          
+    hdfs dfs -ls  /Test/first/
+        /Test/first/data        
+    hdfs dfs -ls  /Test/first/data/
+         /Test/first/data/ok
+
+递归查看指定路径的目录结构
+    hdfs dfs -ls -R  /Test
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
