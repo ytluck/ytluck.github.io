@@ -26,7 +26,289 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/os/my-super-os-post-05.html">Shell脚本的执行和Linux安全策略</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-18.html">不同语言对时间的处理</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T21:05:00+08:00">
+                Published: 2017-02-26 21:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info --><h3>世界时区表（World Time）</h3>
+<div class="highlight"><pre><span></span> GMT--Greenwich Mean Time           格林尼治时间
+ UTC--Universal Time Coordinated    通用协调时间  
+ CST--Central Standard Time
+ DST--Daylight Saving Time
+ PDT--PacificDaylight Time          太平洋夏季时间
+ PST--Pacific Standard Time         太平洋标准时间
+</pre></div>
+
+
+<h3>SQL中时间</h3>
+<div class="highlight"><pre><span></span>MySQL中
+    时间的数据类型：
+        date  year   datetime  timestamp
+    处理函数
+        now()
+        sysdate()
+        utc_date(), utc_time(), utc_timestamp()
+        str_to_date函数
+         日期时间 Extract（选取） 函数
+
+Oracle  时间数据类型
+        date    timestamp
+    处理函数
+        当前
+        转换 to_char(sysdate,&#39;YYYY-MM-DD HH24:MI:SS&#39;)
+             to_date(&#39;2017-02-24 15:01:54&#39;,&#39;YYYY-MM-DD HH24:MI:SS&#39;)
+             to_timestamp(&#39;2017-02-01 11:00:00.123456&#39;,&#39;YYYY-MM-DD HH:MI:SS.FF6&#39;)
+        提取：EXTRACT
+        时间间隔select date&#39;2017-02-21&#39;-sysdate from dual
+        ADD_MONTHS--自动处理大小月及闰月
+</pre></div>
+
+
+<h3>R语言</h3>
+<div class="highlight"><pre><span></span><span class="x">字符串string</span>
+<span class="x">  字符串的格式</span>
+<span class="x">    ISO-8601格式  yyyy-mm-dd  format = &quot;%Y-%m-%d&quot;</span>
+<span class="x">    美国风格：       mm/dd/yyyy  format = &quot;%m/%d/%y&quot;   %y表示没有世纪的年份</span>
+<span class="x">日期类：Date对象</span>
+
+<span class="x">日期类 ：   Date对象</span>
+<span class="x">日期时间类   POSIXct对象、POSIXlt对象</span>
+<span class="x">    POSIXlt对象把一个日期表示为该日期的各个部分的列表</span>
+<span class="x">    PoSIXct对象：ISOdate()、ISOdatetime()</span>
+
+<span class="x">获得当前日期</span>
+<span class="x">    Sys.Date()</span>
+
+<span class="x">    as.Date</span>
+<span class="x">    as.POSIXlt(as.Date(&quot;2017-02-20&quot;))</span><span class="p">$</span><span class="nv">wday</span><span class="x"></span>
+<span class="x">    PoSIXct对象</span>
+<span class="x">        ISOdate()</span>
+<span class="x">        ISOdatetime()</span>
+</pre></div>
+
+
+<h3>Python</h3>
+<div class="highlight"><pre><span></span>Python 提供了 
+    模块  ：time 和 calendar 以及datetime模块
+    数据类型：date（日期）和time（时间）两种数据类型
+    方法  ：
+#coding=utf-8
+</pre></div>
+
+
+<h3>Java</h3>
+<div class="highlight"><pre><span></span><span class="err">内置</span>
+    <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Calendar</span>
+            <span class="n">Calendar</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">Calendar</span><span class="o">.</span><span class="n">getInstance</span><span class="p">();</span><span class="o">//</span><span class="err">获取实例</span>
+            <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Calendar</span><span class="o">.</span><span class="n">DAY_OF_MONTH</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="o">//</span><span class="err">取当前日期的前一天</span><span class="o">.</span>
+            <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Calendar</span><span class="o">.</span><span class="n">DAY_OF_MONTH</span><span class="p">,</span> <span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="o">//</span><span class="err">取当前日期的后一天</span><span class="o">.</span>
+        <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">GregorianCalendar</span> <span class="err">是</span><span class="n">Calendar</span> <span class="err">的一个具体子类</span>
+
+    <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Date</span>
+                <span class="n">Date</span><span class="p">()</span><span class="o">.</span><span class="n">getTime</span><span class="err">所返回的是一个</span><span class="nb">long</span><span class="err">型的毫秒数</span>  
+        <span class="n">java</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">Date</span> <span class="err">：继承自</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Date</span><span class="p">,</span><span class="err">是操作数据库用的日期类型</span>
+
+
+    <span class="n">java</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">DateFormat</span><span class="err">是日期</span><span class="o">/</span><span class="err">时间格式化子类的抽象类</span>
+        <span class="n">java</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">SimpleDateFormat</span> <span class="err">日期</span><span class="o">/</span><span class="err">时间格式化子类</span>
+<span class="err">第三方包</span><span class="o">--</span><span class="n">Joda</span> <span class="n">Time</span>     
+    <span class="n">Joda</span> <span class="n">Time</span><span class="err">，一个面向</span> <span class="n">Java</span><span class="err">™</span> <span class="err">平台的易于使用的开源时间</span><span class="o">/</span><span class="err">日期库</span>
+    <span class="err">首先要引入依赖</span><span class="o">--</span><span class="n">pom</span><span class="o">.</span><span class="n">xml</span> <span class="err">和本地的</span><span class="kn">import</span> 
+        <span class="nn">DateTime</span> <span class="nn">dateTime</span> <span class="o">=</span> <span class="n">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+
+<h3>Scala</h3>
+<div class="highlight"><pre><span></span><span class="err">使用</span><span class="n">Java</span><span class="err">中的库和</span><span class="n">Java</span><span class="err">中的第三方库</span>    
+<span class="n">Scala</span><span class="err">中的第三方包：</span>
+    <span class="err">（</span><span class="n">nscala</span><span class="o">-</span><span class="n">time</span>  <span class="err">对</span><span class="n">Joda</span> <span class="n">Time</span><span class="err">的</span><span class="n">scala</span><span class="err">封装）</span>  <span class="n">Maven</span>
+     <span class="kn">import</span> <span class="nn">com.github.nscala_time.time.Imports._</span>
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>Scala 时间数据处理 编程模块 http://gaoqingyue.win/Scala-%E6%97%B6%E9%97%B4%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86-%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9D%97/
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-17.html" rel="bookmark"
+                           title="Permalink to 不同语言的命名">不同语言的命名</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T20:05:00+08:00">
+                Published: 2017-02-26 20:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>语言的命名风格
+不同语言有不同的编程风格，在风格中不同的命名风格要有所了解--以下是做的一些总结
+匈牙利命名法。
+该命名法是在每个变量名的前面加上若干表示数据类型的字符。基本原则是：变量名=属性+类型+对象描述。如i表示int,所有i开头的变量命都表示int类型。
+s表示String,所有变量命以s开头的都表示String类型变量。
+骆驼命名法。正如它的名称所表示的那样，是指混合使用大小写字母来构成变量和函数的名字
+驼峰命名法跟帕斯卡命名法相似，只是首字母为小写，如userName。因为看上去像驼峰，因此而得名</p>
+                <a class="readmore" href="/program/my-program-post-17.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-16.html" rel="bookmark"
+                           title="Permalink to Maven的使用">Maven的使用</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T19:55:00+08:00">
+                Published: 2017-02-26 19:55:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/maven.html">Maven</a> </p>
+</footer><!-- /.post-info -->                <p>Maven在不同IDE的使用</p>
+                <a class="readmore" href="/program/my-program-post-16.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-10.html" rel="bookmark"
+                           title="Permalink to Web网页的一些技术介绍">Web网页的一些技术介绍</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T23:50:00+08:00">
+                Published: 2017-02-25 23:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/web.html">Web</a> </p>
+</footer><!-- /.post-info -->                <p>前端技术-浏览器以及网络技术</p>
+                <a class="readmore" href="/items/my-item-post-10.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-22.html" rel="bookmark"
+                           title="Permalink to 集群开发和部署测试">集群开发和部署测试</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:46:00+08:00">
+                Published: 2017-02-25 22:46:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>开发和运行环境调试和了解</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-22.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-21.html" rel="bookmark"
+                           title="Permalink to Spark SQL读取数据">Spark SQL读取数据</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:35:00+08:00">
+                Published: 2017-02-25 22:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>处理半结构和Hive结构数据</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-21.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-20.html" rel="bookmark"
+                           title="Permalink to Hive通过JavaAPI操作">Hive通过JavaAPI操作</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:24:00+08:00">
+                Published: 2017-02-25 22:24:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HiveJDBC连接</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-20.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-19.html" rel="bookmark"
+                           title="Permalink to Hive的基本介绍">Hive的基本介绍</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:23:00+08:00">
+                Published: 2017-02-25 22:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Hive架构以及常见操作</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-19.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/os/my-super-os-post-05.html" rel="bookmark"
+                           title="Permalink to Shell脚本的执行和Linux安全策略">Shell脚本的执行和Linux安全策略</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-18T22:04:00+08:00">
                 Published: 2017-02-18 22:04:00
@@ -37,75 +319,11 @@
         </address>
 <p>In <a href="/os/index.html">OS</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>在运行shell脚本时候，有三种方式来调用外部的脚本，</h3>
-<div class="highlight"><pre><span></span>exec（exec script.sh）、source（source script.sh）、fork（./script.sh）
-</pre></div>
-
-
-<h3>1、exec（exec /home/script.sh）：</h3>
-<div class="highlight"><pre><span></span>使用exec来调用脚本，被执行的脚本会继承当前shell的环境变量。
-但事实上exec产生了新的进程，他会把主shell的进程资源占用并替换脚本内容，继承了原主shell的PID号，
-即原主shell剩下的内容不会执行。-
-</pre></div>
-
-
-<h3>2、source（source /home/script.sh）</h3>
-<div class="highlight"><pre><span></span>使用source或者“.”来调用外部脚本，不会产生新的进程，继承当前shell环境变量，
-而且被调用的脚本运行结束后，它拥有的环境变量和声明变量会被当前shell保留，   
-类似将调用脚本的内容复制过来直接执行。执行完毕后原主shell继续运行。
-</pre></div>
-
-
-<h3>3、fork（/home/script.sh）</h3>
-<div class="highlight"><pre><span></span> 直接运行脚本，会以当前shell为父进程，产生新的进程，并且继承主脚本的环境变量和声明变量。
-执行完毕后，主脚本不会保留其环境变量和声明变量。
-</pre></div>
-
-
-<h2>Linux系统的安全策略</h2>
-<h3>安全策略一</h3>
-<div class="highlight"><pre><span></span>用户-用户组-文件权限
-    文件的所有者
-</pre></div>
-
-
-<h3>安全策略二</h3>
-<div class="highlight"><pre><span></span>  DAC
-     自主访问控制&lt;Discretionary Access Control,DAC&gt;.依据进程的所有者与文件资源的rwx权限决定有无访问权限。
-     文件系统的rwx 
-    MAC
-    委托访问控制&lt;Mandatory Access Control&gt;，针对特定的进程和特定的文件资源进行权限控制。
-SElinux &lt;Security Enhanced Linux&gt;
-Subject、Object、Policy、Security context
-SELinux是在进行程序、文件等权限设置依据的一个内核模块。控制的subject&lt;主体&gt;是进程。目标则是该进程能否读取文件资源。会对某些服务
-制定基本的安全性策略。主体与目标的安全上下文一致才能顺利访问。安全上下文的类型，重设安全上下文的命令有restorecon 以及chcon,若要
-管理默认的SELinux布尔值，可使用getsebool和setsebool.
-SELinux三种模式： enforcing、permissive、disabled。三种模式，强制模式，许可模式以及关闭。其中策略有targeted和strict两种。
-
-安全上下文主要用冒号分为三个字段 Identify:Role:type
-        Identity:root system_u user_u
-        Role    ： object_r system_r
-        Type    : 
-  domain 需要与 Type 搭配才能顺利读取文件资源。
- 确定内核中selinux
-重置安全上下文  chcon -R
-    &lt;1&gt;查看SELinux当前状态：  getenforce 以及  sestatus
-
-APPArmor&lt;Application Armor&gt;  AppArmor通过一个配置文件（即profile）来指定一个应用程序的相关权限。AppArmor support was first introduced in Ubuntu 7.04, 
-and is turned on by default in Ubuntu 7.10 and late.Apparmor使用内核标准安全文件系统机制（/sys/kernel/security）来加载和监控profiles文件。
-而虚拟文件/sys/kernel/security/apparmor/profiles里记录了当前加载的profiles文件。
-    &lt;1&gt;查看当前AppArmor的状态：在Ubuntu下通过命令sudo apparmor_status可以。 
-    pparmor的启动、停止等操作的相关命令如下：
-        Start : sudo /etc/init.d/apparmor start
-        Stop : sudo /etc/init.d/apparmor stop
-        reload: sudo /etc/init.d/apparmor reload
-        Show status: sudo /etc/init.d/apparmor status
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>exec-source-fork
+关于shell</p>
+                <a class="readmore" href="/os/my-super-os-post-05.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -128,6 +346,29 @@ and is turned on by default in Ubuntu 7.10 and late.Apparmor使用内核标准�
 入行有段时间了，把自己阅读和理解的做一个汇总，自己使用的工具做一个总结。
 技能本身并不是障碍，主要是在在于经验的积累，有些坑要跳，有些坑要绕。该走的路必须走~  经验--对问题有自己的预判和依据</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-18.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-16.html" rel="bookmark"
+                           title="Permalink to PostgreSQL的了解">PostgreSQL的了解</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-16T21:20:00+08:00">
+                Published: 2017-02-16 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->                <p>安装和查看
+PostgreSQL 采用的是C/S（client/server）结构，也就是一个客户端对应一个服务器端守护进程的模式</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-16.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

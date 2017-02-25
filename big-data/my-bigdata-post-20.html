@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Hive通过JavaAPI操作</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-20.html" rel="bookmark"
+           title="Permalink to Hive通过JavaAPI操作">Hive通过JavaAPI操作</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:24:00+08:00">
+                Published: 2017-02-25 22:24:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>Hive的连接</h3>
+<div class="highlight"><pre><span></span>Hive的连接方式有几种--在这里介绍JDBC连接的方式
+</pre></div>
+
+
+<h3>1.首先了解配置</h3>
+<div class="highlight"><pre><span></span>配置文件所在的位置：
+HiveServer2远程连接的端口，默认为10000--------------hive.server2.thrift.port
+hive中的数据库和表在HDFS中存放的文件夹的位置--------hive.metastore.warehouse.dir
+                                                    /apps/hive/warehouse
+hive所在集群的IP地址--------------------------------hive.server2.thrift.bind.host
+默认为5000L,此处修改为5000，不然程序会报错 ---------hive.server2.long.polling.timeout
+
+Hive的元数据库，采用的是本地Mysql作为元数据库-----javax.jdo.option.ConnectionURL
+连接元数据的驱动名----------------------------------javax.jdo.option.ConnectionDriverName
+连接元数据库用户名----------------------------------javax.jdo.option.ConnectionUserName
+连接元数据库用户名连接元数据库密码------------------javax.jdo.option.ConnectionPassword
+
+
+
+查看hiveserver2是否已经开启
+    启动元数据库 ：        hive --service metastore <span class="err">&amp;</span>
+    启动hiveserver2：  hive --service hiveserver2 <span class="err">&amp;</span>
+
+    查看日志：
+        日志文件hive.log的路径在
+         cd  /etc/hive/conf/hive-log4j.properties
+         cat hive-log4j.properties
+             #Define some default values that can be overridden by system properties
+                hive.log.threshold=ALL
+                hive.root.logger=INFO,DRFA
+                hive.log.dir=<span class="cp">${</span><span class="n">java</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">tmpdir</span><span class="cp">}</span>/<span class="cp">${</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span>
+                hive.log.file=hive.log
+
+        在Ambari中设置为  /var/log/hive
+         cd  /var/log/hive
+    查看命令
+        netstat -nl |grep 10000
+    查看Ambari中的hive
+</pre></div>
+
+
+<h3>2. 依赖的jar包</h3>
+<div class="highlight"><pre><span></span>    <span class="nt">&lt;hive.version&gt;</span>1.1.2<span class="nt">&lt;/hive.version&gt;</span>
+    <span class="cp">${</span><span class="n">hive</span><span class="o">.</span><span class="n">version</span><span class="cp">}</span>
+org.apache.hive.hive-exec
+org.apache.hive.hive-metastore
+org.apache.hive.hive-jdbc
+org.apache.hive.hive-service
+</pre></div>
+
+
+<h3>代码</h3>
+<div class="highlight"><pre><span></span>相关代码--使用JDBC连接
+   hiveCon = DriverManager.getConnection(getProptFileLoador(&quot;hive.URL&quot;),
+                getProptFileLoador(&quot;hive.USERNAME&quot;), getProptFileLoador(&quot;hive.PASSWORD&quot;) );
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>jdbc远程连接hiveserver2 http://www.cnblogs.com/superAng/p/5939642.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

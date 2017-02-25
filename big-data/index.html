@@ -26,7 +26,238 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-18.html">大数据认识和工具汇总-深度学习</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-22.html">集群开发和部署测试</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:46:00+08:00">
+                Published: 2017-02-25 22:46:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>开发环境</h3>
+<div class="highlight"><pre><span></span>1.Windows开发环境的修改
+A.环境变量以及文件的添加
+    环境变量
+    0.需存在：JAVA_HOME
+    1.新添加：
+            变量：
+                HADOOP_HOME 值为 C:\Config\hadoop-common-2.7.1-bin-master\bin  
+                HADOOP_USER_NAME    hdfs
+            路径：将C:\Config\hadoop-common-2.7.1-bin-master\bin  添加到变量Path中
+    添加的文件
+        spark-assembly-1.6.0.2.4.0.0-169-hadoop2.7.1.2.4.0.0-169.jar
+        hadoop-common-2.7.1-bin-master
+    说明--路径对应自己电脑的路径，版本对应线网环境的版本
+B.网络的设置：将集群中机器名和IP地址对应--注意用命令ipconfig /flushdns
+    C:\Windows\System32\drivers\etc\hosts
+2.在生产环境中的配置还需要了解
+    生产环境中jar包复制到了-/usr/hdp/2.4.0.0-169/hadoop/lib
+</pre></div>
+
+
+<h3>本地环境的程序</h3>
+<div class="highlight"><pre><span></span>clone下来之后，
+01.首先是环境的设置--
+    本地环境是否有程序所需要的提交，例如 JAVA_HOME等
+02.接着查看依赖
+    是否需要修改pom.xml
+    在library中是否有所需要的库--本地开发环境
+    &lt;1&gt;add as a maven project
+        然后在Maven中reimport
+    &lt;2&gt;setup Scala SDK
+        添加SDK
+        添加spark-assembly-1.6.0.2.4.0.0-169-hadoop2.7.1.2.4.0.0-169
+    &lt;3&gt;mark as resource root/以及unmark
+    &lt;4&gt; JDK.tool.1.8
+03.程序中的package路径是否正确
+    以及config所在的路径和内容
+</pre></div>
+
+
+<h3>集群环境运行问题排查</h3>
+<div class="highlight"><pre><span></span><span class="s s-Atom">问题原因所在</span>
+    <span class="s s-Atom">环境问题：</span>   <span class="s s-Atom">集群的环境</span>
+    <span class="s s-Atom">命令问题：</span>   <span class="s s-Atom">后缀名是否需要加上，文件路径是否错误，是否有空格；</span>
+    <span class="s s-Atom">jar包问题：</span> <span class="s s-Atom">第三方jar包是否打入</span>
+                <span class="s s-Atom">设置文件：设置文件中的集群还是本地</span>
+    <span class="s s-Atom">程序问题：</span>   <span class="s s-Atom">逻辑问题等</span>
+<span class="s s-Atom">问题的类型：</span>
+
+<span class="s s-Atom">具体示例</span>
+ <span class="mf">1.</span><span class="nv">Exception</span> <span class="s s-Atom">in</span> <span class="s s-Atom">thread</span> <span class="s2">&quot;main&quot;</span> <span class="s s-Atom">java</span><span class="p">.</span><span class="s s-Atom">io</span><span class="p">.</span><span class="nv">FileNotFoundException</span><span class="s s-Atom">:</span> <span class="nv">File</span> <span class="o">/</span><span class="s s-Atom">datacenter</span><span class="o">/</span><span class="s s-Atom">data</span> <span class="s s-Atom">does</span> <span class="o">not</span> <span class="s s-Atom">exist</span>   
+ <span class="s s-Atom">val</span> <span class="s s-Atom">hdfs</span> <span class="o">=</span> <span class="nv">FileSystem</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="nv">HBaseConfiguration</span><span class="p">.</span><span class="nf">create</span><span class="p">()</span> <span class="p">)</span>
+
+ <span class="mf">2.</span><span class="nv">Exception</span> <span class="s s-Atom">in</span> <span class="s s-Atom">thread</span> <span class="s2">&quot;main&quot;</span> <span class="s s-Atom">java</span><span class="p">.</span><span class="s s-Atom">lang</span><span class="p">.</span><span class="nv">NoClassDefFoundError</span><span class="s s-Atom">:</span> <span class="s s-Atom">com</span><span class="o">/</span><span class="s s-Atom">alibaba</span><span class="o">/</span><span class="s s-Atom">fastjson</span><span class="o">/</span><span class="nv">JSONObject</span>
+<span class="s s-Atom">java</span><span class="p">.</span><span class="s s-Atom">lang</span><span class="p">.</span><span class="nv">NoClassDefFoundError</span> <span class="s s-Atom">with</span> <span class="nv">HBase</span> <span class="nv">Scan</span>
+<span class="s s-Atom">解决方式一</span>
+<span class="s s-Atom">解决环境</span>
+    <span class="s s-Atom">原因01</span>
+        <span class="s s-Atom">我们将</span> <span class="nv">Hadoop</span> <span class="s s-Atom">的</span> <span class="s s-Atom">classpath</span> <span class="s s-Atom">信息添加到</span> <span class="nv">CLASSPATH</span> <span class="s s-Atom">变量中</span>
+         <span class="s s-Atom">cd</span>  <span class="o">/</span><span class="s s-Atom">etc</span><span class="o">/</span><span class="s s-Atom">hadoop</span><span class="o">/</span><span class="s s-Atom">conf</span>
+         <span class="s s-Atom">cat</span> <span class="s s-Atom">hadoop</span><span class="o">-</span><span class="s s-Atom">env</span><span class="p">.</span><span class="s s-Atom">sh</span> <span class="s s-Atom">配置与hadoop运行环境相关的变量</span>
+                <span class="s s-Atom">export</span> <span class="nv">JAVA_HOME</span><span class="s s-Atom">=/opt</span><span class="o">/</span><span class="s s-Atom">jdk1</span><span class="mf">.8.0</span><span class="k">_</span><span class="mi">111</span><span class="o">/</span>
+                <span class="s s-Atom">export</span> <span class="nv">HADOOP_HOME</span><span class="s s-Atom">=</span><span class="err">$</span><span class="p">{</span><span class="nv">HADOOP_HOME</span><span class="p">:-</span><span class="o">/</span><span class="s s-Atom">usr</span><span class="o">/</span><span class="s s-Atom">hdp</span><span class="o">/</span><span class="s s-Atom">current</span><span class="o">/</span><span class="s s-Atom">hadoop</span><span class="o">-</span><span class="s s-Atom">client</span><span class="p">}</span>
+                <span class="s s-Atom">export</span> <span class="nv">HADOOP_CLASSPATH</span><span class="s s-Atom">=</span><span class="err">$</span><span class="p">{</span><span class="nv">HADOOP_CLASSPATH</span><span class="p">}</span><span class="err">$</span><span class="p">{</span><span class="nv">JAVA_JDBC_LIBS</span><span class="p">}</span>
+    <span class="s s-Atom">原因02</span>
+        <span class="s s-Atom">hadoop中的classpath没有所谓的jar包</span>
+            <span class="s s-Atom">方法一：将第三方jar包复制到集群中每个节点的HADOOP_CLASSPATH的lib文件夹下：eg：</span><span class="o">/</span><span class="s s-Atom">usr</span><span class="o">/</span><span class="s s-Atom">hdp</span><span class="o">/</span><span class="mf">2.4.0.0</span><span class="o">-</span><span class="mi">169</span><span class="o">/</span><span class="s s-Atom">hadoop</span><span class="o">/</span><span class="s s-Atom">lib</span><span class="o">/</span>
+                    <span class="s s-Atom">或者</span>
+            <span class="s s-Atom">方法二：shell命令：将hbase的lib全部加入hadoop_classpath:</span>
+                <span class="s s-Atom">在hadoop</span><span class="o">-</span><span class="s s-Atom">env</span><span class="p">.</span><span class="s s-Atom">sh文件中添加如下：</span>
+                        <span class="s s-Atom">#</span> <span class="s s-Atom">add</span>
+                        <span class="s s-Atom">for</span> <span class="s s-Atom">f</span> <span class="s s-Atom">in</span> <span class="err">$</span><span class="nv">HBASE_HOME</span><span class="o">/</span><span class="s s-Atom">lib</span><span class="cm">/*.jar; do</span>
+<span class="cm">                          if [ &quot;$HADOOP_CLASSPATH&quot; ]; then</span>
+<span class="cm">                            export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$f</span>
+<span class="cm">                          else</span>
+<span class="cm">                            export HADOOP_CLASSPATH=$f</span>
+<span class="cm">                          fi</span>
+<span class="cm">                        done</span>
+<span class="cm">                        #add</span>
+<span class="cm">解决方式二       </span>
+<span class="cm">    在程序中解决</span>
+<span class="cm">    将所需要第三方的jar包打入到 程序包中        </span>
+<span class="cm"> 3.重新打包过程中出现的错误</span>
+<span class="cm">C:\Items\Spark_Develop\src\main\java</span>
+<span class="cm">Error “MANIFEST.MF already exists in VFS” when creating new artifact</span>
+<span class="cm">http://stackoverflow.com/questions/31189449/error-manifest-mf-already-exists-in-vfs-when-creating-new-artifact</span>
+</pre></div>
+
+
+<h3>集群位于Linux上的位置</h3>
+<div class="highlight"><pre><span></span>YARN会调用以下的lib-----yarn logs
+集群上的库所在位置
+  /usr/hdp/
+    /usr/hdp/2.4.0.0-169/hbase/lib
+    /usr/hdp/2.4.0.0-169/hive/lib
+    /usr/hdp/2.4.0.0-169/hadoop/lib
+    /usr/hdp/2.4.0.0-169/spark/lib
+        spark-assembly-1.6.0.2.4.0.0-169-hadoop2.7.1.2.4.0.0-169.jar
+配置文件所在的位置
+    /etc/hadoop/conf
+            hadoop-env.sh 
+            mapred-env.sh
+            yarn-env.sh
+    /etc/hbase/conf
+    /etc/hive/conf
+日志文件
+    /var/log/hadoop
+    /var/log/hadoop-mapreduce
+    /var/log/hadoop-yarn
+    /var/log/hbase
+    /var/log/hive
+    /var/log/zookeeper
+    /var/log/spark
+</pre></div>
+
+
+<h3>集群连接设置</h3>
+<div class="highlight"><pre><span></span>在程序内--&lt;注意依赖的包和环境&gt;
+HDFS的连接设置
+    val HDFS_CONFIG = new Configuration();
+    HDFS_CONFIG.set(&quot;fs.default.name&quot;, getProperties(&quot;fs.default.name&quot;));
+    val  hdfs = FileSystem.get(HDFS_CONFIG);
+    val hdfs = FileSystem.get(HBaseConfiguration.create() 
+     HBaseConfiguration.create() 默认会从classpath 中查找 hbase-site.xml 中的配置信息，初始化 Configuration，在集群环境中可以，在本地开发使用上述HDFS_CONFIG的的连接设置
+ HBase设置
+    //连接设置
+    val hbaseConf = HBaseConfiguration.create()
+    hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, getProperties(&quot;hbase.zookeeper.quorum&quot;))
+    hbaseConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, getProperties(&quot;hbase.zookeeper.znode.parent&quot;))
+    hbaseConf.set(HConstants.ZOOKEEPER_CLIENT_PORT, getProperties(&quot;hbase.zookeeper.property.clientPort&quot;))
+    hbaseConf.set(HConstants.MASTER_PORT, getProperties(&quot;hbase.master.port&quot;))
+    //读取设置--表名--列族
+    val columnFamily = &quot;info&quot;
+    //设置输入格式和表名
+     hbaseConf.set(TableInputFormat.INPUT_TABLE, getProperties(tableName01))
+     val hbaseRDD01 = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
+Hive的设置
+
+        val SparkConf = new SparkConf().set()
+        val sc = new SparkContext(SparkConf)
+        val hiveCtx = new import org.apache.spark.sql.hive.HiveContext(sc)
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-21.html" rel="bookmark"
+                           title="Permalink to Spark SQL读取数据">Spark SQL读取数据</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:35:00+08:00">
+                Published: 2017-02-25 22:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>处理半结构和Hive结构数据</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-21.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-20.html" rel="bookmark"
+                           title="Permalink to Hive通过JavaAPI操作">Hive通过JavaAPI操作</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:24:00+08:00">
+                Published: 2017-02-25 22:24:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HiveJDBC连接</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-20.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-19.html" rel="bookmark"
+                           title="Permalink to Hive的基本介绍">Hive的基本介绍</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:23:00+08:00">
+                Published: 2017-02-25 22:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Hive架构以及常见操作</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-19.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-18.html" rel="bookmark"
+                           title="Permalink to 大数据认识和工具汇总-深度学习">大数据认识和工具汇总-深度学习</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-18T22:01:00+08:00">
                 Published: 2017-02-18 22:01:00
@@ -37,169 +268,12 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>0.方向和阶段</h3>
-<div class="highlight"><pre><span></span>方向和阶段
-    理论数据科学家
-        数据科学的理论研究，为其他的数据科学家创造框架和工具
-    应用数据科学家和行业数据科学家
-        A，即Analysis（分析）
-            分析型数据科学家主要致力于寻找数据背后的含义，或是以一种静态的方式使用这些数据。
-            分析型数据科学家类似于统计学家（他们很可能本来就是搞统计的），但他们还懂得统计课程里不涉及的与数据工作相关的具体的实际操作，
-            比如数据清理、大型数据集、数据可视化、对某一领域的深度了解和如何用数据讲一个漂亮的故事，等等。
-        B型数据科学家：B，即Building（构建）。
-            构建型数据科学家和分析型分局科学家的共同点是都有统计学背景，但前者还是编程高手，抑或是训练有素的软件工程师
-            构建型数据科学家的关注点是把数据“投入生产”。他们建立的模型通常以“推荐”的方式与用户互动，
-            比如产品、你可能认识的人、广告、电影、搜索结果等。
-    E型--数据工程师,软件工程师的一种
-        数据工具二次开发工程师:基于源码进行定制开发,或者从底部开始创建系统
-        数据应用开发工程师:搭建集群,解决数据存储等
-        大数据运维工程师: 维护集群，安全和运行
-    阶段--小白--初级--中级--高级--顶级--大师级
-    个人--
-        理论--技能--经验
-
-        理论内容
-            至少有那么一两个能推导，能说出适用范围，能自己实现，有过应用 
-        经验：
-          作品或者项目：要求独立的项目经验--独立工作的能力
-            做具体的开发或者分析任务
-            做一个具体的活动-项目
-            达成的目标---执行能力
-            理解数据--数据从哪里来，到哪里去，哪些数据要重点关注
-         比赛:天猫大数据比赛和Kaggle比赛
-            处理过的最大数据量，如何处理以及处理结果
-公司和企业
-        方式--自建、合作、引入外援以及外包
-            拥有的数据量和处理能力--数据量：PB TB GB MB 
-    发展初期的公司：
-        数据分析主要致力于执行记录(log)，建立ETL过程（Extract-Transform-Load 的缩写，
-        用来描述将数据从来源端经过抽取（extract）、转换（transform）、加载（load）至目的端的过程——译者注），
-        模拟数据，设计一个框架来追踪并储存数据。这种公司的工作重点在于打好分析数据的基础，而不是分析数据本身。
-    发展中期的公司：
-        企业在成长，相应地，企业的数据也会增长。数据平台需要适应增长的数据，
-        但由于数据的“地基”已经建好了，公司会自然地从单纯收集数据转向从数据中形成观点、提炼价值。
-        除非这个企业本来对数据的战略用途就是非常规的，大多数分析型工作主要涉及定义关键绩效指标、促进业绩增长、寻找增长的下个契机。
-    达到一定规模的公司：
-        企业规模增长，数据规模会跟着增长。这时，企业需要利用数据创造或保持它的竞争优势，精细化运作--源于市场的竞争
-        比如：搜索结果要更加优化、推荐内容的相关性要更高、物流与企业运作要更加高效。
-        机器学习工程师、企业运营优化专家、实验设计者之类的专家能够有效帮助企业实现以上各种诉求。
-    和公司--
-        1.熟悉公司的业务流程以及业务架构，大数据的架构，组织结构
-            成本与收益--减少运营成本，增加市场收入
-                渠道成本
-                生产和商务成本
-                经营成本---
-                营销成本
-                人力成本--                  
-        2.自己的技能提升和经验的总结
-数据团队和部门
-        问题： 
-            完成目标我需要什么样的人？ 这样的人有什么特点？如何考察这些人？
-            考察哪些方面？我需要的多长时间？目前团队情况与这个人磨合等
-       个人心性  
-       知识架构： 统计方面，数据挖掘方面，机器学习方面  数据可视化
-       能力构成： 工作能力：编程能力  解决问题能力  沟通能力 归纳总结能力
-                  英文文献阅读
-       实际工作经验：
-       培养-竞争-合作
-</pre></div>
-
-
-<h3>1.数据分析和挖掘环境</h3>
-<div class="highlight"><pre><span></span>底层数据存储          HDFS/
-计算框架和资源管理   Spark、Storm、Yarn、MapReduce
-数据存储                HBase、MySQL
-ETL工具               Stat-Transfer、Kettle/
-大数据分析工具     Spark、Hive、Pig
-小数据分析工具     Python-R-SQL-Excel
-数据集成                Kafka 、Flume
-可视化工具           Tableau、Echarts
-说明
-    这里有一些工具暂时还没用到，作为技术储备先放这里
-    Stat/Transfer(www.stattransfer.com)是一款可在34种数据格式之间作转换的独立应用程序,其中包括R中的数据格式
-    数据格式-Json XML  正则表达式
-    爬虫涉及-JavaScript  HTML  http协议
-</pre></div>
-
-
-<h3>2.大数据开发环境</h3>
-<div class="highlight"><pre><span></span>I、操作系统-Windows和Linux环境
-语言环境
-    Java--并设置好环境变量JDK1.8--JDK1.7
-    Scala
-    Python
-    Linux操作系统-Shell
-    编译器--gcc等
-Scala集成开发环境-Idea
- 安装了Scala插件
- gitos插件--intellij-gitosc
- Maven工程以及Maven常用的命令
-
-Java集成开发环境
- Eclipse
-
-Python开发环境
-    IPython--简单的脚本和分析
-    PyCharm--用于开发   
-R语言
-    R--原生环境
-    R Stuido
-SQL
-    MySQL
-    Orcale
-    SQLite
-其他工具
-    github
-      git--并设置环境变量
-     Xshell
-     Editplus
-     Markdown
-     StatTransfer
-</pre></div>
-
-
-<h3>3.、云端环境--网络环境-集群环境</h3>
-<div class="highlight"><pre><span></span>代码托管
-    github
-    码云
-商业服务
-    阿里云 https://www.aliyun.com/
-        分析--大数据计算服务(MaxCompute，原名ODPS)是一种快速、完全托管的TB/PB级数据仓库解决方案--支持SQL和MapReduce
-        分析--E-MapReduce--Hadoop，Spark 等大数据软件
-</pre></div>
-
-
-<h3>4.机器学习-深度学习</h3>
-<div class="highlight"><pre><span></span>深度学习框架
-    来源--名称--开发语言--调用语言--编程模式--支持等
-    蒙特利尔理工学院---Theano       ---Python   --Python调用----开源跨平台
-    Facebook        ---Torch        ---Lua      ---Lua
-    Skymind         ---Deeplearning4j---Java    --Java、Scala、Clojure    --编程模式---
-    Google          ---TensorFlow   ---C++      --：Python---开源
-    加州伯克利分校 ---Caffe        ---C++ Python       ---C++ C Python
-    个人组合        ---MXNet        ---开发       ---C++, Python, R, Matlab, Java, Scala,Julia,JavaScript 
-                                            --Amazon AWS 选为官方深度学习平台
-机器学习平台
-     Keras是基于Theano的一个深度学习框架,它的设计参考了Torch,用Python语言编写
-硬件
- CPU 和 GPU
-编程模式    
-    符号式语言（symbolic language）-符号计算构架（如 CNTK，MXNET，TensorFlow，Theano）
-    命令式语言（imperative language）---命令计算构架（如 Torch
-各种连接
-    雅虎 CaffeOnSpark
-    雅虎 TensorFlowOnSpark   https://github.com/yahoo/TensorFlowOnSpark
-    DataBricks 提出 tensorframe--TensorFlow 连接到 Spark         
-    英特尔开源了基于 Apache Spark 框架的分布式深度学习库 BigDL-Scala语言实现-- https://github.com/intel-analytics/BigDL 
-集群
-    设定独立的集群则需要我们转移大数据集 -----带来了不必要的系统复杂性和端到端的学习延迟
-    雅虎开源--在大数据集群上进行分布式深度学习
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>大数据团队和个人以及工具和深度学习
+入行有段时间了，把自己阅读和理解的做一个汇总，自己使用的工具做一个总结。
+技能本身并不是障碍，主要是在在于经验的积累，有些坑要跳，有些坑要绕。该走的路必须走~  经验--对问题有自己的预判和依据</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-18.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

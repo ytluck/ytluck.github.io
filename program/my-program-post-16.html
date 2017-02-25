@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Maven的使用</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-16.html" rel="bookmark"
+           title="Permalink to Maven的使用">Maven的使用</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T19:55:00+08:00">
+                Published: 2017-02-26 19:55:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/maven.html">Maven</a> </p>
+</footer><!-- /.post-info -->      <h3>Maven介绍</h3>
+<div class="highlight"><pre><span></span>Maven依赖Java运行环境，因此使用Maven之前需要配置Java的运行环境
+</pre></div>
+
+
+<h3>不同IDE中的Maven</h3>
+<h4>Eclipse</h4>
+<div class="highlight"><pre><span></span>Windows--Preference
+    C:\My_Files\Maven\apache-maven-3.3.9\conf\settings.xml
+    C:\My_Files\Maven\Repository\3.3.9
+    C:\My_Files\Maven\apache-maven-3.3.9\bin
+Eclipse使用的Maven库
+    C:\My_Files\Maven\Repository\3.3.9
+    C:\Users\yt\.m2\repository\org\apache\hive
+</pre></div>
+
+
+<h4>Idea 中使用的Maven版本和使用的Maven库</h4>
+<div class="highlight"><pre><span></span>Setting---Build，Execution,Deployment------Build Tools---Maven
+intellij idea已经集成maven插件了，省去了安装的麻烦
+    Maven 版本  bunbled Maven 3.0.5  捆绑
+    Maven库： C:\Users\yt\.m2\
+</pre></div>
+
+
+<h3>Maven的pom.xml</h3>
+<div class="highlight"><pre><span></span>依赖设置
+        <span class="nt">&lt;build&gt;</span>
+            <span class="nt">&lt;plugins&gt;</span>
+                <span class="nt">&lt;plugin&gt;</span>
+                    <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+                    <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+                    <span class="nt">&lt;configuration&gt;</span>
+                        <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+                        <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+                    <span class="nt">&lt;/configuration&gt;</span>
+                <span class="nt">&lt;/plugin&gt;</span>
+                <span class="nt">&lt;plugin&gt;</span>
+                    <span class="nt">&lt;artifactId&gt;</span> maven-assembly-plugin <span class="nt">&lt;/artifactId&gt;</span>
+                    <span class="nt">&lt;version&gt;</span>2.6<span class="nt">&lt;/version&gt;</span>
+                    <span class="nt">&lt;configuration&gt;</span>
+                        <span class="nt">&lt;descriptorRefs&gt;</span>
+                            <span class="nt">&lt;descriptorRef&gt;</span>jar-with-dependencies<span class="nt">&lt;/descriptorRef&gt;</span>
+                        <span class="nt">&lt;/descriptorRefs&gt;</span>
+                        <span class="nt">&lt;archive&gt;</span>
+                            <span class="nt">&lt;manifest&gt;</span>
+                                <span class="nt">&lt;mainClass&gt;</span>TopologyMain.java<span class="nt">&lt;/mainClass&gt;</span>
+                            <span class="nt">&lt;/manifest&gt;</span>
+                        <span class="nt">&lt;/archive&gt;</span>
+                    <span class="nt">&lt;/configuration&gt;</span>
+                    <span class="nt">&lt;executions&gt;</span>
+                        <span class="nt">&lt;execution&gt;</span>
+                            <span class="nt">&lt;id&gt;</span>make-assembly<span class="nt">&lt;/id&gt;</span>
+                            <span class="nt">&lt;phase&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
+                            <span class="nt">&lt;goals&gt;</span>
+                                <span class="nt">&lt;goal&gt;</span>single<span class="nt">&lt;/goal&gt;</span>
+                            <span class="nt">&lt;/goals&gt;</span>
+                        <span class="nt">&lt;/execution&gt;</span>
+                    <span class="nt">&lt;/executions&gt;</span>
+                <span class="nt">&lt;/plugin&gt;</span>
+            <span class="nt">&lt;/plugins&gt;</span>
+            <span class="nt">&lt;resources&gt;</span>
+                <span class="nt">&lt;resource&gt;</span>
+                    <span class="nt">&lt;directory&gt;</span>src/main/java<span class="nt">&lt;/directory&gt;</span>
+                    <span class="nt">&lt;includes&gt;</span>
+                        <span class="nt">&lt;include&gt;</span>**/*.properties<span class="nt">&lt;/include&gt;</span>
+                    <span class="nt">&lt;/includes&gt;</span>
+                <span class="nt">&lt;/resource&gt;</span>
+            <span class="nt">&lt;/resources&gt;</span>
+        <span class="nt">&lt;/build&gt;</span>
+</pre></div>
+
+
+<h3>Maven命令</h3>
+<div class="highlight"><pre><span></span>         mvn -version
+         mvn clean package
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

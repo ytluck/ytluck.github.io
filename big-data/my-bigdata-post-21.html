@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark SQL读取数据</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-21.html" rel="bookmark"
+           title="Permalink to Spark SQL读取数据">Spark SQL读取数据</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:35:00+08:00">
+                Published: 2017-02-25 22:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>Spark SQL--处理半结构和结构数据</h3>
+<div class="highlight"><pre><span></span>Spark SQL--将Hive的查询作为Spark的任务提交到Spark集群上
+SchemaRDD,专门用于Spark SQL 查询的RDD，是存放Row对象的RDD。每个Row对象代表一行记录。在本次使用的版本中作为DataFrame。
+</pre></div>
+
+
+<h3>操作过程</h3>
+<div class="highlight"><pre><span></span>    <span class="n">Spark</span><span class="err">支持</span><span class="n">Hive</span><span class="o">---</span><span class="err">在</span><span class="n">Spark</span><span class="err">编译期中设定，</span><span class="n">Spark2</span><span class="o">.</span><span class="mi">0</span><span class="o">--</span><span class="err">中</span><span class="n">SparkSession</span> <span class="err">统一了</span><span class="n">SQLContext</span> <span class="err">和</span><span class="n">HiveContext</span><span class="o">.</span>
+      <span class="err">前情</span><span class="o">--</span><span class="err">配置</span><span class="o">--</span><span class="err">依赖</span><span class="o">--</span><span class="err">引入</span><span class="o">--</span><span class="err">逻辑实现</span>
+    <span class="n">Spark</span><span class="err">不支持</span><span class="n">Hive</span>  <span class="kn">import</span> <span class="nn">org.apache.spark.sql.SQLContext</span> <span class="o">//</span><span class="err">如果</span><span class="n">spark</span><span class="err">版本不支持</span><span class="n">Hive</span><span class="err">，则需要创建</span><span class="n">SQLContext</span>
+    <span class="n">SparkSession</span> <span class="err">在</span><span class="mf">1.6</span><span class="err">引入，</span>
+<span class="mf">0.</span><span class="err">在使用中引入</span><span class="n">Spark</span> <span class="n">SQL</span><span class="err">需要添加一些额外的依赖</span><span class="o">--</span><span class="err">支持</span><span class="n">hive</span><span class="err">的版本的依赖</span><span class="o">---</span>
+<span class="err">在集成环境中如果已经添加，则不需要引入，</span>
+<span class="err">集成环境地址</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">hdp</span><span class="o">/</span><span class="mf">2.4</span><span class="o">.</span><span class="mf">0.0</span><span class="o">-</span><span class="mi">169</span><span class="o">/</span><span class="n">spark</span><span class="o">/</span><span class="n">lib</span><span class="err">中</span>
+<span class="n">spark</span><span class="o">-</span><span class="n">assembly</span><span class="o">-</span><span class="mf">1.6</span><span class="o">.</span><span class="mf">0.2</span><span class="o">.</span><span class="mf">4.0</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="mi">169</span><span class="o">-</span><span class="n">hadoop2</span><span class="o">.</span><span class="mf">7.1</span><span class="o">.</span><span class="mf">2.4</span><span class="o">.</span><span class="mf">0.0</span><span class="o">-</span><span class="mf">169.j</span><span class="n">ar</span>
+        <span class="o">&lt;</span><span class="err">!</span><span class="o">--</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mvnrepository</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">artifact</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">spark</span><span class="o">/</span><span class="n">spark</span><span class="o">-</span><span class="n">sql_2</span><span class="o">.</span><span class="mi">10</span> <span class="o">--&gt;</span>
+        <span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">spark</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">spark</span><span class="o">-</span><span class="n">sql_2</span><span class="o">.</span><span class="mi">10</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">2.1</span><span class="o">.</span><span class="mi">0</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+        <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+
+<span class="mf">1.</span><span class="err">输入：</span>
+    <span class="mf">1.</span><span class="err">基于</span><span class="n">Hive</span><span class="err">表</span>
+      <span class="kn">import</span> <span class="nn">org.apache.spark.sql.hive.HiveContext</span>  <span class="o">//</span><span class="err">导入</span><span class="n">Spark</span> <span class="n">SQL</span>
+
+        <span class="n">val</span> <span class="n">SparkConf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">val</span> <span class="n">sc</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkContext</span><span class="p">(</span><span class="n">SparkConf</span><span class="p">)</span>
+        <span class="n">val</span> <span class="n">hiveCtx</span> <span class="o">=</span> <span class="n">new</span> <span class="kn">import</span> <span class="nn">org.apache.spark.sql.hive.HiveContext</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="n">rows</span> <span class="o">=</span> <span class="n">hiveCtx</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT key,value FROM users&quot;</span><span class="p">)</span><span class="o">//</span><span class="err">生成</span><span class="n">SchemaRDD</span>
+        <span class="n">val</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">row</span> <span class="o">=&gt;</span> <span class="n">row</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="mi">2</span><span class="err">基于</span><span class="n">Hive</span><span class="err">操作</span><span class="n">Parquet</span><span class="err">文件</span>
+     <span class="kn">import</span> <span class="nn">org.apache.spark.sql.hive.HiveContext</span>  <span class="o">//</span><span class="err">导入</span><span class="n">Spark</span> <span class="n">SQL</span>
+            <span class="n">Parquet</span><span class="err">是基于列存储的数据结构</span><span class="o">.</span>
+             <span class="n">parquet</span><span class="err">是列式存储格式的一种文件类型，列式存储有以下的核心优势：</span>
+                <span class="n">a</span><span class="p">)</span><span class="err">可以跳过不符合条件的数据，只读取需要的数据，降低</span><span class="n">IO</span><span class="err">数据量。</span> 
+                <span class="n">b</span><span class="p">)</span><span class="err">压缩编码可以降低磁盘存储空间。由于同一列的数据类型是一样的，</span>
+                    <span class="err">可以使用更高效的压缩编码（例如</span><span class="n">Run</span> <span class="n">Length</span> <span class="n">Encoding</span><span class="err">和</span><span class="n">Delta</span> <span class="n">Encoding</span><span class="err">）进一步节约存储空间。</span> 
+                <span class="n">c</span><span class="p">)</span><span class="err">只读取需要的列，支持向量运算，能够获取更好的扫描性能</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="n">parquet</span><span class="err">文件加载</span>
+                <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="p">(</span><span class="s2">&quot;people.parquet&quot;</span><span class="p">);(</span><span class="err">也可用</span><span class="n">load</span><span class="err">方法加载</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="n">parquet</span><span class="err">文件输出</span>
+                 <span class="n">val</span> <span class="n">people</span><span class="p">:</span><span class="n">RDD</span><span class="p">[</span><span class="n">Person</span><span class="p">],</span> <span class="n">people</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">parquet</span><span class="p">(</span><span class="s2">&quot;people.parquet&quot;</span><span class="p">)</span>
+            <span class="n">Hive</span><span class="err">区分大小写，</span><span class="n">Parquet</span><span class="err">不区分大小写</span>
+            <span class="n">hive</span><span class="err">允许所有的列为空，而</span><span class="n">Parquet</span><span class="err">不允许所有的列全为空</span>
+                <span class="err">当将</span><span class="n">Hive</span> <span class="n">metastore</span> <span class="n">Parquet</span><span class="err">表转换为</span><span class="n">Spark</span> <span class="n">SQL</span> <span class="n">Parquet</span><span class="err">表时，</span>
+                <span class="err">需要将</span><span class="n">Hive</span> <span class="n">metastore</span> <span class="n">schema</span><span class="err">和</span><span class="n">Parquet</span> <span class="n">schema</span><span class="err">进行一致化</span>
+
+        <span class="n">val</span> <span class="n">SparkConf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">val</span> <span class="n">sc</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkContext</span><span class="p">(</span><span class="n">SparkConf</span><span class="p">)</span>
+        <span class="n">val</span> <span class="n">hiveCtx</span> <span class="o">=</span> <span class="n">new</span> <span class="kn">import</span> <span class="nn">org.apache.spark.sql.hive.HiveContext</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>          
+        <span class="o">//</span><span class="err">读取数据</span>
+        <span class="n">val</span> <span class="n">tweets</span> <span class="o">=</span> <span class="n">hiveCtx</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">ParquetFile</span><span class="p">)</span>
+        <span class="o">//</span><span class="err">将</span><span class="n">Parquet</span><span class="err">文件注册为</span><span class="n">Spark</span> <span class="n">SQL</span><span class="err">临时表，在表上运行查询语句</span>
+        <span class="n">tweets</span><span class="o">.</span><span class="n">registerTempTable</span><span class="p">(</span><span class="s2">&quot;Atweets&quot;</span><span class="p">)</span>
+        <span class="n">val</span> <span class="n">rows</span> <span class="o">=</span> <span class="n">hiveCtx</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT key,value FROM users&quot;</span><span class="p">)</span><span class="o">//</span><span class="err">生成</span><span class="n">SchemaRDD</span>
+        <span class="n">val</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">row</span> <span class="o">=&gt;</span> <span class="n">row</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="err">基于</span><span class="n">JSON</span><span class="err">文件</span><span class="o">--</span><span class="n">Spark</span> <span class="n">SQL</span> <span class="err">结构信息推断</span>
+      <span class="kn">import</span> <span class="nn">org.apache.spark.sql.hive.HiveContext</span>
+
+        <span class="n">val</span> <span class="n">SparkConf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">val</span> <span class="n">sc</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkContext</span><span class="p">(</span><span class="n">SparkConf</span><span class="p">)</span>
+        <span class="n">val</span> <span class="n">hiveCtx</span> <span class="o">=</span> <span class="n">new</span> <span class="kn">import</span> <span class="nn">org.apache.spark.sql.hive.HiveContext</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="n">tweets</span> <span class="o">=</span> <span class="n">hiveCtx</span><span class="o">.</span><span class="n">jsonFile</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
+        <span class="n">tweets</span><span class="o">.</span><span class="n">registerTempTable</span><span class="p">(</span><span class="s2">&quot;Atweets&quot;</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="n">results</span>  <span class="o">=</span> <span class="n">hiveCtx</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT userID,age FROM tweets&quot;</span><span class="p">)</span>  <span class="o">//</span><span class="err">生成</span><span class="n">SchemaRDD</span>
+    <span class="err">基于</span><span class="n">case</span> <span class="k">class</span> <span class="nc">RDD</span>
+        <span class="n">case</span> <span class="k">class</span> <span class="nc">HappyPerson</span><span class="p">()</span>
+        <span class="n">val</span> <span class="n">ha</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallellize</span><span class="p">()</span>
+        <span class="n">ha</span><span class="o">.</span><span class="n">registerTempTable</span><span class="p">()</span>
+<span class="mf">2.</span><span class="err">中间</span>
+    <span class="err">生成</span><span class="n">SchemaRDD</span><span class="o">---</span><span class="mf">1.3</span><span class="err">后已经使用</span><span class="n">DataFrame</span><span class="err">代替了</span>
+<span class="mf">3.</span><span class="err">输出</span>
+<span class="err">创建</span><span class="n">HiveContext</span>
+<span class="n">Spark</span> <span class="n">SQL</span><span class="err">将</span><span class="n">Hive</span><span class="err">作为文件读入</span>
+<span class="n">Spark</span> <span class="n">SQL</span><span class="err">将</span><span class="n">hive</span><span class="err">作为一个表读入</span>
+
+<span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span>
+</pre></div>
+
+
+<h3>Spark--处理非结构数据-半结构数据-结构数据</h3>
+<div class="highlight"><pre><span></span>1.原生态的输入命令
+    sc.textFile()-------------saveAsTextFile()
+    sc.wholeTextFiles()-------saveAsTextFile()
+    sc.sequenceFile()---------saveAsSequenceFile()
+    sc.objectFile()------------RDD.saveAsObjectFile()
+
+2.HadoopAPI--有新旧两套API接口
+      val HBase_DATARDD = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], 
+                            classOf[ImmutableBytesWritable], classOf[Result])
+3.其他输入和输出命令
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Spark SQL官方文档阅读--待完善    http://blog.csdn.net/dabokele/article/details/48707511
+Spark SQL 之 Data Sources    http://www.cnblogs.com/BYRans/p/5005342.html
+http://spark.apache.org/docs/1.6.0/sql-programming-guide.html#datasets
+Intel李锐：Hive on Spark解析 http://www.csdn.net/article/2015-04-24/2824545
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -26,7 +26,179 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-15.html">Git的常用命令和使用</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-18.html">不同语言对时间的处理</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T21:05:00+08:00">
+                Published: 2017-02-26 21:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info --><h3>世界时区表（World Time）</h3>
+<div class="highlight"><pre><span></span> GMT--Greenwich Mean Time           格林尼治时间
+ UTC--Universal Time Coordinated    通用协调时间  
+ CST--Central Standard Time
+ DST--Daylight Saving Time
+ PDT--PacificDaylight Time          太平洋夏季时间
+ PST--Pacific Standard Time         太平洋标准时间
+</pre></div>
+
+
+<h3>SQL中时间</h3>
+<div class="highlight"><pre><span></span>MySQL中
+    时间的数据类型：
+        date  year   datetime  timestamp
+    处理函数
+        now()
+        sysdate()
+        utc_date(), utc_time(), utc_timestamp()
+        str_to_date函数
+         日期时间 Extract（选取） 函数
+
+Oracle  时间数据类型
+        date    timestamp
+    处理函数
+        当前
+        转换 to_char(sysdate,&#39;YYYY-MM-DD HH24:MI:SS&#39;)
+             to_date(&#39;2017-02-24 15:01:54&#39;,&#39;YYYY-MM-DD HH24:MI:SS&#39;)
+             to_timestamp(&#39;2017-02-01 11:00:00.123456&#39;,&#39;YYYY-MM-DD HH:MI:SS.FF6&#39;)
+        提取：EXTRACT
+        时间间隔select date&#39;2017-02-21&#39;-sysdate from dual
+        ADD_MONTHS--自动处理大小月及闰月
+</pre></div>
+
+
+<h3>R语言</h3>
+<div class="highlight"><pre><span></span><span class="x">字符串string</span>
+<span class="x">  字符串的格式</span>
+<span class="x">    ISO-8601格式  yyyy-mm-dd  format = &quot;%Y-%m-%d&quot;</span>
+<span class="x">    美国风格：       mm/dd/yyyy  format = &quot;%m/%d/%y&quot;   %y表示没有世纪的年份</span>
+<span class="x">日期类：Date对象</span>
+
+<span class="x">日期类 ：   Date对象</span>
+<span class="x">日期时间类   POSIXct对象、POSIXlt对象</span>
+<span class="x">    POSIXlt对象把一个日期表示为该日期的各个部分的列表</span>
+<span class="x">    PoSIXct对象：ISOdate()、ISOdatetime()</span>
+
+<span class="x">获得当前日期</span>
+<span class="x">    Sys.Date()</span>
+
+<span class="x">    as.Date</span>
+<span class="x">    as.POSIXlt(as.Date(&quot;2017-02-20&quot;))</span><span class="p">$</span><span class="nv">wday</span><span class="x"></span>
+<span class="x">    PoSIXct对象</span>
+<span class="x">        ISOdate()</span>
+<span class="x">        ISOdatetime()</span>
+</pre></div>
+
+
+<h3>Python</h3>
+<div class="highlight"><pre><span></span>Python 提供了 
+    模块  ：time 和 calendar 以及datetime模块
+    数据类型：date（日期）和time（时间）两种数据类型
+    方法  ：
+#coding=utf-8
+</pre></div>
+
+
+<h3>Java</h3>
+<div class="highlight"><pre><span></span><span class="err">内置</span>
+    <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Calendar</span>
+            <span class="n">Calendar</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">Calendar</span><span class="o">.</span><span class="n">getInstance</span><span class="p">();</span><span class="o">//</span><span class="err">获取实例</span>
+            <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Calendar</span><span class="o">.</span><span class="n">DAY_OF_MONTH</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="o">//</span><span class="err">取当前日期的前一天</span><span class="o">.</span>
+            <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Calendar</span><span class="o">.</span><span class="n">DAY_OF_MONTH</span><span class="p">,</span> <span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="o">//</span><span class="err">取当前日期的后一天</span><span class="o">.</span>
+        <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">GregorianCalendar</span> <span class="err">是</span><span class="n">Calendar</span> <span class="err">的一个具体子类</span>
+
+    <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Date</span>
+                <span class="n">Date</span><span class="p">()</span><span class="o">.</span><span class="n">getTime</span><span class="err">所返回的是一个</span><span class="nb">long</span><span class="err">型的毫秒数</span>  
+        <span class="n">java</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">Date</span> <span class="err">：继承自</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Date</span><span class="p">,</span><span class="err">是操作数据库用的日期类型</span>
+
+
+    <span class="n">java</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">DateFormat</span><span class="err">是日期</span><span class="o">/</span><span class="err">时间格式化子类的抽象类</span>
+        <span class="n">java</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">SimpleDateFormat</span> <span class="err">日期</span><span class="o">/</span><span class="err">时间格式化子类</span>
+<span class="err">第三方包</span><span class="o">--</span><span class="n">Joda</span> <span class="n">Time</span>     
+    <span class="n">Joda</span> <span class="n">Time</span><span class="err">，一个面向</span> <span class="n">Java</span><span class="err">™</span> <span class="err">平台的易于使用的开源时间</span><span class="o">/</span><span class="err">日期库</span>
+    <span class="err">首先要引入依赖</span><span class="o">--</span><span class="n">pom</span><span class="o">.</span><span class="n">xml</span> <span class="err">和本地的</span><span class="kn">import</span> 
+        <span class="nn">DateTime</span> <span class="nn">dateTime</span> <span class="o">=</span> <span class="n">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+
+<h3>Scala</h3>
+<div class="highlight"><pre><span></span><span class="err">使用</span><span class="n">Java</span><span class="err">中的库和</span><span class="n">Java</span><span class="err">中的第三方库</span>    
+<span class="n">Scala</span><span class="err">中的第三方包：</span>
+    <span class="err">（</span><span class="n">nscala</span><span class="o">-</span><span class="n">time</span>  <span class="err">对</span><span class="n">Joda</span> <span class="n">Time</span><span class="err">的</span><span class="n">scala</span><span class="err">封装）</span>  <span class="n">Maven</span>
+     <span class="kn">import</span> <span class="nn">com.github.nscala_time.time.Imports._</span>
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>Scala 时间数据处理 编程模块 http://gaoqingyue.win/Scala-%E6%97%B6%E9%97%B4%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86-%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9D%97/
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-17.html" rel="bookmark"
+                           title="Permalink to 不同语言的命名">不同语言的命名</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T20:05:00+08:00">
+                Published: 2017-02-26 20:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>语言的命名风格
+不同语言有不同的编程风格，在风格中不同的命名风格要有所了解--以下是做的一些总结
+匈牙利命名法。
+该命名法是在每个变量名的前面加上若干表示数据类型的字符。基本原则是：变量名=属性+类型+对象描述。如i表示int,所有i开头的变量命都表示int类型。
+s表示String,所有变量命以s开头的都表示String类型变量。
+骆驼命名法。正如它的名称所表示的那样，是指混合使用大小写字母来构成变量和函数的名字
+驼峰命名法跟帕斯卡命名法相似，只是首字母为小写，如userName。因为看上去像驼峰，因此而得名</p>
+                <a class="readmore" href="/program/my-program-post-17.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-16.html" rel="bookmark"
+                           title="Permalink to Maven的使用">Maven的使用</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-26T19:55:00+08:00">
+                Published: 2017-02-26 19:55:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/maven.html">Maven</a> </p>
+</footer><!-- /.post-info -->                <p>Maven在不同IDE的使用</p>
+                <a class="readmore" href="/program/my-program-post-16.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-15.html" rel="bookmark"
+                           title="Permalink to Git的常用命令和使用">Git的常用命令和使用</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-10T21:05:00+08:00">
                 Published: 2017-02-10 21:05:00
@@ -37,78 +209,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/git.html">Git</a> </p>
-</footer><!-- /.post-info --><h3>配置登录的内容</h3>
-<div class="highlight"><pre><span></span>Git是分布式的版本控制系统
-Git的第一件事就是设置你的名字和email,这些就是你在提交commit时的签名，每次提交记录里都会包含这些信息。使用git config命令进行配置：
-git config --global user.email &quot;***@gmail.com&quot;
-git config --global user.name &quot;***&quot;
-</pre></div>
-
-
-<h3>上传更新</h3>
-<div class="highlight"><pre><span></span>设置路径，到.git所在的文件路径下
-    cd /c/Items/CorAna_Spark/
-    git status
-    git checkout --  .idea/workspace.xml
-将改动添加到索引中
-    git add src/main/scala/Util.scala 
-注释改动 
-    git commit -m &quot;整理&quot;
-推送本地的修改到远程Git仓库
-    git push origin feature/test
-  如果远程仓库修改了git pull合并最新的修改后再执行git push
-</pre></div>
-
-
-<h3>切换分支</h3>
-<div class="highlight"><pre><span></span>命令可以查看当前的分支列表以及当前处在哪个分支上&lt;星号标识&gt;
-    git branch  
-切换分支
-    git checkout master   切换
-    git checkout -b feature/Relations  在上一个分支中新增
-合并分支
-    git merge master  将master合并到当前分支
-恢复版本
-    git reset --hard HEAD^
-    git pull origin master
-查看远程仓库
-    git remote -v
-</pre></div>
-
-
-<h3>其他</h3>
-<div class="highlight"><pre><span></span>比较不同
-    git diff
-撤销(revert)了前期修改的提交(commit)
-     git revert HEAD
-日志系统
-    git log
-    git log --stat
-快捷键
-    ctr+r  输入可以快捷调出历史命令
-</pre></div>
-
-
-<h3>git的文件系统</h3>
-<div class="highlight"><pre><span></span> .gitignore 配置文件用于配置不需要加入版本管理的文件
-一个隐藏的.git文件件
-    1.hooks:这个目录存放一些shell脚本，可以设置特定的git命令后触发相应的脚本；在搭建gitweb系统或其他git托管系统会经常用到hook script。
-    2.info:包含仓库的一些信息
-    3.logs:保存所有更新的引用记录
-    4.objects:该目录存放所有的Git对象，对象的SHA1哈希值的前两位是文件夹名称，后38位作为对象文件名
-    5.refs:具体的引用，Reference Specification，这个目录一般包括三个子文件夹，heads、remotes和tags，比如，heads中的master文件标识了项目中的master分支指向的当前commit，其他类似。
-    6.COMMIT_EDITMSG:保存最新的commit message，Git系统不会用到这个文件，只是给用户一个参考
-    7.config:这个是GIt仓库的配置文件
-    8.description:仓库的描述信息，主要给gitweb等git托管系统使用
-    9.index:这个文件就是我们前面提到的暂存区（stage），是一个二进制文件
-    10.HEAD:这个文件包含了一个分支（branch）的引用，通过这个文件Git可以得到下一次commit的parent，什么是引用呢，你可以理解为指针，哪儿都可以指，但是不能指向没有的东西。
-    11.ORIG_HEAD:HEAD指针的前一个状态
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Git的使用</p>
+                <a class="readmore" href="/program/my-program-post-15.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Hive的基本介绍</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-19.html" rel="bookmark"
+           title="Permalink to Hive的基本介绍">Hive的基本介绍</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-25T22:23:00+08:00">
+                Published: 2017-02-25 22:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>Hive-介绍</h3>
+<div class="highlight"><pre><span></span>Hive--海量数据做数据挖掘--查询--分析-映射-hive里导入数据只是简单的将数据移动到表所在的目录中
+作为ETL工具--用来进行数据提取-转化-加载
+容易扩展自己的存储能力和计算能力
+hive使用的文件系统--hadoop的HDFS
+    使用的计算模型有如下
+        MapReduce--
+        Hive on Spark----Spark SQL
+        Hive不再使用它默认的MapReduce计算引擎，
+        Spark会直接读取Hive的元数据存储，将Hive数据转换成Spark RDD数据--&lt;本版本升级为DataFrame&gt;，通过Spark提供的计算操作来实现（Transformation和Action）
+</pre></div>
+
+
+<h3>Hive的版本</h3>
+<div class="highlight"><pre><span></span>版本--本例子基于版本release 1.2.1
+    2016-12-08 :    release 2.1.1 available
+    2016-06-20 :    release 2.1.0 available
+    2016-03-25 :    release 2.0.1 available
+    2016-02-15 :    release 2.0.0 available
+    2016-01-28 :    hive-parent-auth-hook made available
+    2015-06-27 :    release 1.2.1 available
+
+    2015-05-21 :    release 1.0.1, 1.1.1, and ldap-fix are available
+    2015-05-18 :    release 1.2.0 available
+    2015-03-08 :    release 1.1.0 available
+    2015-02-04 :    release 1.0.0 available
+</pre></div>
+
+
+<h3>Hive-架构</h3>
+<div class="highlight"><pre><span></span>服务端
+    Driver组件：该组件包括Complier、Optimizer和Executor，
+                它的作用是将我们写的HiveQL（类SQL）语句进行解析、编译优化，生成执行计划，
+                然后调用底层的mapreduce计算框架。  
+Metastore组件：元数据服务组件，这个组件存储hive的元数据，hive的元数据存储在关系数据库里，
+                    hive支持的关系数据库有Derby MySQL PostgreSQL等。
+                元数据对于hive十分重要，因此hive支持把metastore服务独立出来，安装到远程的服务器集群里，
+                从而解耦hive服务和metastore服务，保证hive运行的健壮性
+                Hive中的元数据包括表的名字，表的列和分区及其属性，表的属性(是否为外部表等)，表的数据所在目录等。 
+                由于Hive的元数据需要不断的更新、修改，
+                而HDFS系统中的文件是多读少改的，这显然不能将Hive的元数据存储在HDFS中。所以使用关系型数据库
+Thrift服务：thrift是facebook开发的一个软件框架，它用来进行可扩展且跨语言的服务的开发，
+         hive集成了该服务，能让不同的编程语言调用hive的接口。
+            HiveServer或者HiveServer2都是基于Thrift的，但HiveSever有时被称为Thrift server
+            HiveServer2支持多客户端的并发和认证，为开放API客户端如JDBC、ODBC提供更好的支持。
+           在本版本中HiveServer已经被移除，
+           启动Hiveserver2有两种方式，一种是hive --service hiveserver2，另一种更为简洁，为hiveserver2
+
+HiveClient-客户端
+    JDBC
+    CLI：command line interface，命令行接口。
+Thrift客户端：上面的架构图里没有写上Thrift客户端，但是hive架构的许多客户端接口是建立在thrift客户端之上，
+                    包括JDBC和ODBC接口。
+    WEBGUI：hive客户端提供了一种通过网页的方式访问hive所提供的服务。这个接口对应hive的hwi组件
+                （hive web interface），使用前要启动hwi服务。
+Hive的启动
+  1.hive  命令行模式
+    进入hive安装目录，输入bin/hive的执行程序，或者输入 hive –service cli
+    用于Linux平台命令行查询，查询语句基本跟MySQL查询语句类似
+   2.hive  web界面的启动方式
+    bin/hive –service hwi  （&amp; 表示后台运行）
+    用于通过浏览器来访问hive，感觉没多大用途，浏览器访问地址是：127.0.0.1:9999/hwi
+   3.hive  远程服务 (端口号10000) 启动方式
+    bin/hive –service hiveserver2  &amp;       其中（&amp;表示后台运行）
+    用java，Python等程序实现通过jdbc等驱动的访问hive就用这种起动方式了，这个是程序员最需要的方式了
+</pre></div>
+
+
+<h3>Hive数据类型</h3>
+<div class="highlight"><pre><span></span><span class="err">数据模型：表</span><span class="o">(</span><span class="nt">Table</span><span class="o">)</span><span class="err">，外部表</span><span class="o">(</span><span class="nt">External</span> <span class="nt">Table</span><span class="o">)</span><span class="err">，分区</span><span class="o">(</span><span class="nt">Partition</span><span class="o">)</span><span class="err">，桶</span><span class="o">(</span><span class="nt">Bucket</span><span class="o">)</span><span class="err">。</span>
+<span class="err">数据类型</span>
+    <span class="nt">1</span><span class="o">.</span><span class="err">原始数据类型</span>
+        <span class="err">•</span><span class="nt">Integers</span>
+            <span class="nt">TINYINT</span>     <span class="nt">-</span> <span class="nt">1</span> <span class="nt">byte</span>
+            <span class="nt">SMALLINT</span>    <span class="nt">-</span> <span class="nt">2</span> <span class="nt">byte</span>
+            <span class="nt">INT</span>         <span class="nt">-</span> <span class="nt">4</span> <span class="nt">byte</span>
+            <span class="nt">BIGINT</span>      <span class="nt">-</span> <span class="nt">8</span> <span class="nt">byte</span>
+        <span class="err">•</span><span class="nt">Boolean</span> <span class="nt">type</span>
+            <span class="nt">BOOLEAN</span>     <span class="nt">-</span> <span class="nt">TRUE</span><span class="o">/</span><span class="nt">FALSE</span>
+            <span class="nt">BINARY</span> 
+        <span class="err">•</span><span class="nt">Floating</span> <span class="nt">point</span> <span class="nt">numbers</span>
+            <span class="nt">FLOAT</span>        <span class="err">–单精度</span>
+            <span class="nt">DOUBLE</span>      <span class="err">–</span> <span class="err">双精度</span>
+        <span class="err">•</span><span class="nt">String</span> <span class="nt">type</span>
+            <span class="nt">STRING</span>      <span class="nt">-</span> <span class="nt">sequence</span> <span class="nt">of</span> <span class="nt">characters</span> <span class="nt">in</span> <span class="nt">a</span> <span class="nt">specified</span> <span class="nt">character</span> <span class="nt">set</span>
+            <span class="nt">VARCHAR</span> 
+            <span class="nt">CHAR</span> 
+        <span class="err">•</span><span class="nt">Date</span><span class="o">/</span><span class="nt">Time</span> <span class="nt">Types</span>
+            <span class="nt">TIMESTAMP</span> 
+            <span class="nt">DATE</span>
+            <span class="nt">INTERVAL</span>          
+    <span class="nt">2</span><span class="o">.</span><span class="err">复杂数据类型</span>
+        <span class="err">•</span><span class="nt">Structs</span><span class="o">:</span>                    <span class="err">例子</span>  <span class="p">{</span><span class="n">c</span> <span class="n">INT</span><span class="p">;</span> <span class="n">d</span> <span class="n">INT</span><span class="p">}</span>
+        <span class="err">•</span><span class="nt">Maps</span> <span class="o">(</span><span class="nt">key-value</span> <span class="nt">tuples</span><span class="o">):.</span>   <span class="err">例子</span><span class="s1">&#39;group&#39;</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">gid</span>  <span class="nt">M</span><span class="cp">[</span><span class="s1">&#39;group&#39;</span><span class="cp">]</span>
+        <span class="err">•</span><span class="nt">Arrays</span> <span class="o">(</span><span class="nt">indexable</span> <span class="nt">lists</span><span class="o">):</span>   <span class="err">例子</span><span class="cp">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="cp">]</span>
+        <span class="err">•</span><span class="nt">union</span>
+        <span class="err">•</span><span class="nt">structs</span>
+</pre></div>
+
+
+<h3>Hive的操作和函数</h3>
+<div class="highlight"><pre><span></span>操作
+    关系操作-Relational Operators
+    逻辑操作-Logical Operators
+    算数操作-Arithmetic Operators
+函数
+    count(*) 
+    to_date
+</pre></div>
+
+
+<h3>操作方式</h3>
+<div class="highlight"><pre><span></span><span class="x">hive 执行有二种模式，一种是客户端，</span>
+<span class="x">                    一种是 HiveServer 模式</span>
+<span class="x">--前提条件之一：在环境路径中有设置</span>
+<span class="x">1.不进入交互模式</span>
+<span class="x">    Hive命令行接口(Hive Command Line) </span>
+<span class="x">        显示帮助hive –H </span>
+<span class="x">            从命令行执行指定的sql语句</span>
+<span class="x">                hive    -e      &#39;select a.col from tab1 a&#39;</span>
+<span class="x">            以非交互式模式执行sql文件</span>
+<span class="x">                hive    -f      /home/my/hive-script.sql</span>
+<span class="x">            在进入交互模式之前，执行初始化sql文件</span>
+<span class="x">                hive    -i      /home/my/hive-init.sql</span>
+<span class="x">            设计Hive的日志级别</span>
+<span class="x">                hive -hiveconf hive.root.logger=INFO,console</span>
+<span class="x">2.进入交互模式         </span>
+<span class="x">    Hive交互Shell(Hive Interactive Shell)</span>
+<span class="x">        当命令 </span><span class="p">$</span><span class="nv">HIVE_HOME</span><span class="x">/bin/hive       以不带 -e/-f 选项的方式运行时，hive将进入到交互模式</span>
+<span class="x">        进入的有hive&gt; 提示符的交互式命令行</span>
+<span class="x">            在这里可以执行查询语句，设置参数等等。</span>
+<span class="x">            所有的命令必须以分号结束</span>
+<span class="x">3.JavaAPI模式</span>
+<span class="x">    另起一章介绍</span>
+</pre></div>
+
+
+<h3>Hive常见操作</h3>
+<div class="highlight"><pre><span></span>进入Hive，类 SQL 查询语言，称为 HQL
+DDL数据库模式定义语言
+    show databases;
+    show tables;
+    DESCRIBE invites;
+
+   创建表--CREATE）
+        创建普通表       CREATE TABLE pokes (foo INT, bar STRING); 
+        创建外部表       CREATE EXTERNAL TABLE pokes( id INT,name   STRING
+                                                )LOCATION &#39;/home/hive/external&#39;;
+                        external的关键字说明以及LOCATION指定外部表存放的路径
+                        没有LOCATION，Hive将在
+                            HDFS上的/user/hive/warehouse文件夹下以外部表的表名创建一个文件夹，
+                            并将属于这个表的数据存放在这
+        创建分区表
+                        先创建分区,然后使用PARTITIONED
+        创建Bucket表
+                        设置环境变量 hive&gt;set hive.enforce.bucketing = true
+
+DML：数据操纵语言
+    LOAD DATA LOCAL INPATH &#39;./examples/files/kv1.txt&#39; OVERWRITE INTO TABLE pokes
+
+DQL：数据库查询语言
+    基本的 Select 操作
+    基于 Partition 的查询
+    HAVING 查询
+    Join 查询
+</pre></div>
+
+
+<h3>其他</h3>
+<div class="highlight"><pre><span></span>Hive本身不存储数据，它完全依赖HDFS和MapReduce，
+    只需要在创建表的时候告诉 Hive 数据中的列分隔符和行分隔符，Hive就可以解析数据
+    Hive表格的存储格式
+        TEXTFILE------textfile---------默认格式，数据不做压缩
+        SEQUENCEFILE--sequencefile-----Hadoop API提供的一种二进制文件支持，三种压缩-NONE, RECORD, BLOCK
+        RCFILE--------rcfile----------列式存储方式，数据加载时性能消耗较大，但是具有较好的压缩比和查询响应
+        ORCfile------orcfile---------对rcfile的优化，可以提高hive的读、写、数据处理性能，提供更高的压缩效率
+        parquet存储格式
+        自定义格式
+
+HCatalog作为各种数据格式和数据处理工具之间的数据管理层
+    HCatalog库提供应用程序与集群中的MAPR-FS层的表视图，扩展您的应用程序的选项从读/写数据流添加表的操作，
+    如获取行和存储行。该HCatalog库存储要求其在蜂房Metastore操作的元数据
+WebHCat服务器提供HCatalog一个类似REST的网络API
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span> 版本--http://hive.apache.org/downloads.html
+ hive的架构 https://cwiki.apache.org/confluence/display/Hive/Design
+ 数据类型-- https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
+ [一起学Hive]之八-使用Hive命令行  http://lxw1234.com/archives/2015/06/292.htm
+ LanguageManual DDL https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL
+ jdbc远程连接hiveserver2 http://www.cnblogs.com/superAng/p/5939642.html
+ JDBC  hive  https://cwiki.apache.org/confluence/display/Hive/HiveClient
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
