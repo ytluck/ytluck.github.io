@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark Streaming流式计算基础</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-23.html" rel="bookmark"
+           title="Permalink to Spark Streaming流式计算基础">Spark Streaming流式计算基础</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-05T20:46:00+08:00">
+                Published: 2017-03-05 20:46:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>版本</h3>
+<div class="highlight"><pre><span></span>1.6.0-Spark Streaming
+2.1.0-Spark Streaming和Structured Streaming
+    Spark Streaming
+    Structured Streaming是基于Spark SQL引擎，目前版本还是alpha-实验阶段
+</pre></div>
+
+
+<h3>架构</h3>
+<div class="highlight"><pre><span></span>微批次架构
+    时间区间--批次间隔
+</pre></div>
+
+
+<h3>Spark-Streaming了解</h3>
+<div class="highlight"><pre><span></span>    离散化Discretized
+
+    输入源
+        核心输入源  spark-streaming
+        其他输入源--spark-streaming-kafaka
+
+    读取命令
+        textFilesStream() //文本流
+        KafkaUtils        //kafaka
+        FlumeUtils          //Flume
+
+        StreamingContext
+        读入后返回
+            DStream
+    对DStream的转化操作
+        无状态操作--批处理不依赖与之前批次
+        有状态操作--需要使用之前批次的数据或者中间计算结果来计算当前批次
+            跨时间区间跟踪数据的操作
+                滑动窗口--
+                    批次间隔
+                        窗口时长--控制每次计算最近的多少个批次的数据 bathInterval--windowDuration
+                        滑动步长--对新的DStream进行计算的间隔 
+                        .window()
+                        reduceByWindow()
+                        reduceByKeyWindow()
+                        +   -
+                        countByWindow()
+                updataStateByKey()
+                    跨批次维护状态
+                    update()
+    对DStream的输出操作
+            saveAsTextFiles()
+            saveAsHadoopFiles()
+</pre></div>
+
+
+<h3>机制</h3>
+<div class="highlight"><pre><span></span>容错性
+一致性
+    重算--谱系图
+    检查点机制
+        1.控制发生失效时需要重新计算的状态数--2.提供驱动程序容错--3.接收器容错
+        设置检查点
+            ssc.checkpoint(&quot;hdfs://&quot;)
+
+    7*24不间断运行配置
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

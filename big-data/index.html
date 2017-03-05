@@ -26,7 +26,92 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-22.html">集群开发和部署测试</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-23.html">Spark Streaming流式计算基础</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-03-05T20:46:00+08:00">
+                Published: 2017-03-05 20:46:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>版本</h3>
+<div class="highlight"><pre><span></span>1.6.0-Spark Streaming
+2.1.0-Spark Streaming和Structured Streaming
+    Spark Streaming
+    Structured Streaming是基于Spark SQL引擎，目前版本还是alpha-实验阶段
+</pre></div>
+
+
+<h3>架构</h3>
+<div class="highlight"><pre><span></span>微批次架构
+    时间区间--批次间隔
+</pre></div>
+
+
+<h3>Spark-Streaming了解</h3>
+<div class="highlight"><pre><span></span>    离散化Discretized
+
+    输入源
+        核心输入源  spark-streaming
+        其他输入源--spark-streaming-kafaka
+
+    读取命令
+        textFilesStream() //文本流
+        KafkaUtils        //kafaka
+        FlumeUtils          //Flume
+
+        StreamingContext
+        读入后返回
+            DStream
+    对DStream的转化操作
+        无状态操作--批处理不依赖与之前批次
+        有状态操作--需要使用之前批次的数据或者中间计算结果来计算当前批次
+            跨时间区间跟踪数据的操作
+                滑动窗口--
+                    批次间隔
+                        窗口时长--控制每次计算最近的多少个批次的数据 bathInterval--windowDuration
+                        滑动步长--对新的DStream进行计算的间隔 
+                        .window()
+                        reduceByWindow()
+                        reduceByKeyWindow()
+                        +   -
+                        countByWindow()
+                updataStateByKey()
+                    跨批次维护状态
+                    update()
+    对DStream的输出操作
+            saveAsTextFiles()
+            saveAsHadoopFiles()
+</pre></div>
+
+
+<h3>机制</h3>
+<div class="highlight"><pre><span></span>容错性
+一致性
+    重算--谱系图
+    检查点机制
+        1.控制发生失效时需要重新计算的状态数--2.提供驱动程序容错--3.接收器容错
+        设置检查点
+            ssc.checkpoint(&quot;hdfs://&quot;)
+
+    7*24不间断运行配置
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-22.html" rel="bookmark"
+                           title="Permalink to 集群开发和部署测试">集群开发和部署测试</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-25T22:46:00+08:00">
                 Published: 2017-02-25 22:46:00
@@ -37,153 +122,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>开发环境</h3>
-<div class="highlight"><pre><span></span>1.Windows开发环境的修改
-A.环境变量以及文件的添加
-    环境变量
-    0.需存在：JAVA_HOME
-    1.新添加：
-            变量：
-                HADOOP_HOME 值为 C:\Config\hadoop-common-2.7.1-bin-master\bin  
-                HADOOP_USER_NAME    hdfs
-            路径：将C:\Config\hadoop-common-2.7.1-bin-master\bin  添加到变量Path中
-    添加的文件
-        spark-assembly-1.6.0.2.4.0.0-169-hadoop2.7.1.2.4.0.0-169.jar
-        hadoop-common-2.7.1-bin-master
-    说明--路径对应自己电脑的路径，版本对应线网环境的版本
-B.网络的设置：将集群中机器名和IP地址对应--注意用命令ipconfig /flushdns
-    C:\Windows\System32\drivers\etc\hosts
-2.在生产环境中的配置还需要了解
-    生产环境中jar包复制到了-/usr/hdp/2.4.0.0-169/hadoop/lib
-</pre></div>
-
-
-<h3>本地环境的程序</h3>
-<div class="highlight"><pre><span></span>clone下来之后，
-01.首先是环境的设置--
-    本地环境是否有程序所需要的提交，例如 JAVA_HOME等
-02.接着查看依赖
-    是否需要修改pom.xml
-    在library中是否有所需要的库--本地开发环境
-    &lt;1&gt;add as a maven project
-        然后在Maven中reimport
-    &lt;2&gt;setup Scala SDK
-        添加SDK
-        添加spark-assembly-1.6.0.2.4.0.0-169-hadoop2.7.1.2.4.0.0-169
-    &lt;3&gt;mark as resource root/以及unmark
-    &lt;4&gt; JDK.tool.1.8
-03.程序中的package路径是否正确
-    以及config所在的路径和内容
-</pre></div>
-
-
-<h3>集群环境运行问题排查</h3>
-<div class="highlight"><pre><span></span><span class="s s-Atom">问题原因所在</span>
-    <span class="s s-Atom">环境问题：</span>   <span class="s s-Atom">集群的环境</span>
-    <span class="s s-Atom">命令问题：</span>   <span class="s s-Atom">后缀名是否需要加上，文件路径是否错误，是否有空格；</span>
-    <span class="s s-Atom">jar包问题：</span> <span class="s s-Atom">第三方jar包是否打入</span>
-                <span class="s s-Atom">设置文件：设置文件中的集群还是本地</span>
-    <span class="s s-Atom">程序问题：</span>   <span class="s s-Atom">逻辑问题等</span>
-<span class="s s-Atom">问题的类型：</span>
-
-<span class="s s-Atom">具体示例</span>
- <span class="mf">1.</span><span class="nv">Exception</span> <span class="s s-Atom">in</span> <span class="s s-Atom">thread</span> <span class="s2">&quot;main&quot;</span> <span class="s s-Atom">java</span><span class="p">.</span><span class="s s-Atom">io</span><span class="p">.</span><span class="nv">FileNotFoundException</span><span class="s s-Atom">:</span> <span class="nv">File</span> <span class="o">/</span><span class="s s-Atom">datacenter</span><span class="o">/</span><span class="s s-Atom">data</span> <span class="s s-Atom">does</span> <span class="o">not</span> <span class="s s-Atom">exist</span>   
- <span class="s s-Atom">val</span> <span class="s s-Atom">hdfs</span> <span class="o">=</span> <span class="nv">FileSystem</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="nv">HBaseConfiguration</span><span class="p">.</span><span class="nf">create</span><span class="p">()</span> <span class="p">)</span>
-
- <span class="mf">2.</span><span class="nv">Exception</span> <span class="s s-Atom">in</span> <span class="s s-Atom">thread</span> <span class="s2">&quot;main&quot;</span> <span class="s s-Atom">java</span><span class="p">.</span><span class="s s-Atom">lang</span><span class="p">.</span><span class="nv">NoClassDefFoundError</span><span class="s s-Atom">:</span> <span class="s s-Atom">com</span><span class="o">/</span><span class="s s-Atom">alibaba</span><span class="o">/</span><span class="s s-Atom">fastjson</span><span class="o">/</span><span class="nv">JSONObject</span>
-<span class="s s-Atom">java</span><span class="p">.</span><span class="s s-Atom">lang</span><span class="p">.</span><span class="nv">NoClassDefFoundError</span> <span class="s s-Atom">with</span> <span class="nv">HBase</span> <span class="nv">Scan</span>
-<span class="s s-Atom">解决方式一</span>
-<span class="s s-Atom">解决环境</span>
-    <span class="s s-Atom">原因01</span>
-        <span class="s s-Atom">我们将</span> <span class="nv">Hadoop</span> <span class="s s-Atom">的</span> <span class="s s-Atom">classpath</span> <span class="s s-Atom">信息添加到</span> <span class="nv">CLASSPATH</span> <span class="s s-Atom">变量中</span>
-         <span class="s s-Atom">cd</span>  <span class="o">/</span><span class="s s-Atom">etc</span><span class="o">/</span><span class="s s-Atom">hadoop</span><span class="o">/</span><span class="s s-Atom">conf</span>
-         <span class="s s-Atom">cat</span> <span class="s s-Atom">hadoop</span><span class="o">-</span><span class="s s-Atom">env</span><span class="p">.</span><span class="s s-Atom">sh</span> <span class="s s-Atom">配置与hadoop运行环境相关的变量</span>
-                <span class="s s-Atom">export</span> <span class="nv">JAVA_HOME</span><span class="s s-Atom">=/opt</span><span class="o">/</span><span class="s s-Atom">jdk1</span><span class="mf">.8.0</span><span class="k">_</span><span class="mi">111</span><span class="o">/</span>
-                <span class="s s-Atom">export</span> <span class="nv">HADOOP_HOME</span><span class="s s-Atom">=</span><span class="err">$</span><span class="p">{</span><span class="nv">HADOOP_HOME</span><span class="p">:-</span><span class="o">/</span><span class="s s-Atom">usr</span><span class="o">/</span><span class="s s-Atom">hdp</span><span class="o">/</span><span class="s s-Atom">current</span><span class="o">/</span><span class="s s-Atom">hadoop</span><span class="o">-</span><span class="s s-Atom">client</span><span class="p">}</span>
-                <span class="s s-Atom">export</span> <span class="nv">HADOOP_CLASSPATH</span><span class="s s-Atom">=</span><span class="err">$</span><span class="p">{</span><span class="nv">HADOOP_CLASSPATH</span><span class="p">}</span><span class="err">$</span><span class="p">{</span><span class="nv">JAVA_JDBC_LIBS</span><span class="p">}</span>
-    <span class="s s-Atom">原因02</span>
-        <span class="s s-Atom">hadoop中的classpath没有所谓的jar包</span>
-            <span class="s s-Atom">方法一：将第三方jar包复制到集群中每个节点的HADOOP_CLASSPATH的lib文件夹下：eg：</span><span class="o">/</span><span class="s s-Atom">usr</span><span class="o">/</span><span class="s s-Atom">hdp</span><span class="o">/</span><span class="mf">2.4.0.0</span><span class="o">-</span><span class="mi">169</span><span class="o">/</span><span class="s s-Atom">hadoop</span><span class="o">/</span><span class="s s-Atom">lib</span><span class="o">/</span>
-                    <span class="s s-Atom">或者</span>
-            <span class="s s-Atom">方法二：shell命令：将hbase的lib全部加入hadoop_classpath:</span>
-                <span class="s s-Atom">在hadoop</span><span class="o">-</span><span class="s s-Atom">env</span><span class="p">.</span><span class="s s-Atom">sh文件中添加如下：</span>
-                        <span class="s s-Atom">#</span> <span class="s s-Atom">add</span>
-                        <span class="s s-Atom">for</span> <span class="s s-Atom">f</span> <span class="s s-Atom">in</span> <span class="err">$</span><span class="nv">HBASE_HOME</span><span class="o">/</span><span class="s s-Atom">lib</span><span class="cm">/*.jar; do</span>
-<span class="cm">                          if [ &quot;$HADOOP_CLASSPATH&quot; ]; then</span>
-<span class="cm">                            export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$f</span>
-<span class="cm">                          else</span>
-<span class="cm">                            export HADOOP_CLASSPATH=$f</span>
-<span class="cm">                          fi</span>
-<span class="cm">                        done</span>
-<span class="cm">                        #add</span>
-<span class="cm">解决方式二       </span>
-<span class="cm">    在程序中解决</span>
-<span class="cm">    将所需要第三方的jar包打入到 程序包中        </span>
-<span class="cm"> 3.重新打包过程中出现的错误</span>
-<span class="cm">C:\Items\Spark_Develop\src\main\java</span>
-<span class="cm">Error “MANIFEST.MF already exists in VFS” when creating new artifact</span>
-<span class="cm">http://stackoverflow.com/questions/31189449/error-manifest-mf-already-exists-in-vfs-when-creating-new-artifact</span>
-</pre></div>
-
-
-<h3>集群位于Linux上的位置</h3>
-<div class="highlight"><pre><span></span>YARN会调用以下的lib-----yarn logs
-集群上的库所在位置
-  /usr/hdp/
-    /usr/hdp/2.4.0.0-169/hbase/lib
-    /usr/hdp/2.4.0.0-169/hive/lib
-    /usr/hdp/2.4.0.0-169/hadoop/lib
-    /usr/hdp/2.4.0.0-169/spark/lib
-        spark-assembly-1.6.0.2.4.0.0-169-hadoop2.7.1.2.4.0.0-169.jar
-配置文件所在的位置
-    /etc/hadoop/conf
-            hadoop-env.sh 
-            mapred-env.sh
-            yarn-env.sh
-    /etc/hbase/conf
-    /etc/hive/conf
-日志文件
-    /var/log/hadoop
-    /var/log/hadoop-mapreduce
-    /var/log/hadoop-yarn
-    /var/log/hbase
-    /var/log/hive
-    /var/log/zookeeper
-    /var/log/spark
-</pre></div>
-
-
-<h3>集群连接设置</h3>
-<div class="highlight"><pre><span></span>在程序内--&lt;注意依赖的包和环境&gt;
-HDFS的连接设置
-    val HDFS_CONFIG = new Configuration();
-    HDFS_CONFIG.set(&quot;fs.default.name&quot;, getProperties(&quot;fs.default.name&quot;));
-    val  hdfs = FileSystem.get(HDFS_CONFIG);
-    val hdfs = FileSystem.get(HBaseConfiguration.create() 
-     HBaseConfiguration.create() 默认会从classpath 中查找 hbase-site.xml 中的配置信息，初始化 Configuration，在集群环境中可以，在本地开发使用上述HDFS_CONFIG的的连接设置
- HBase设置
-    //连接设置
-    val hbaseConf = HBaseConfiguration.create()
-    hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, getProperties(&quot;hbase.zookeeper.quorum&quot;))
-    hbaseConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, getProperties(&quot;hbase.zookeeper.znode.parent&quot;))
-    hbaseConf.set(HConstants.ZOOKEEPER_CLIENT_PORT, getProperties(&quot;hbase.zookeeper.property.clientPort&quot;))
-    hbaseConf.set(HConstants.MASTER_PORT, getProperties(&quot;hbase.master.port&quot;))
-    //读取设置--表名--列族
-    val columnFamily = &quot;info&quot;
-    //设置输入格式和表名
-     hbaseConf.set(TableInputFormat.INPUT_TABLE, getProperties(tableName01))
-     val hbaseRDD01 = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
-Hive的设置
-
-        val SparkConf = new SparkConf().set()
-        val sc = new SparkContext(SparkConf)
-        val hiveCtx = new import org.apache.spark.sql.hive.HiveContext(sc)
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>开发和运行环境调试和了解</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-22.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -268,9 +210,7 @@ Hive的设置
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info -->                <p>大数据团队和个人以及工具和深度学习
-入行有段时间了，把自己阅读和理解的做一个汇总，自己使用的工具做一个总结。
-技能本身并不是障碍，主要是在在于经验的积累，有些坑要跳，有些坑要绕。该走的路必须走~  经验--对问题有自己的预判和依据</p>
+</footer><!-- /.post-info -->                <p>大数据团队和个人以及工具和深度学习</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-18.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>

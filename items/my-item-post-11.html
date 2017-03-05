@@ -2,7 +2,7 @@
 <html lang="zh_cn">
 <head>
         <meta charset="utf-8" />
-        <title>ytluck—For you - Web</title>
+        <title>Scrapy中的选择器</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -18,15 +18,20 @@
                     <li><a href="/About me.html">About Me</a></li>
                     <li><a href="/big-data/index.html">Big Data</a></li>
                     <li><a href="/data-mining/index.html">Data Mining</a></li>
-                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
                     <li><a href="/os/index.html">OS</a></li>
                     <li><a href="/program/index.html">Program</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-11.html" rel="bookmark"
+           title="Permalink to Scrapy中的选择器">Scrapy中的选择器</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/items/my-item-post-11.html">Scrapy中的选择器</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-03-05T20:10:00+08:00">
                 Published: 2017-03-05 20:10:00
@@ -37,7 +42,7 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/web.html">Web</a> </p>
-</footer><!-- /.post-info --><h3>bs4</h3>
+</footer><!-- /.post-info -->      <h3>bs4</h3>
 <div class="highlight"><pre><span></span><span class="err">步骤</span>
   <span class="c1">##01.第一步：导入 bs4 库     </span>
     <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
@@ -110,36 +115,11 @@
 <div class="highlight"><pre><span></span>Beautiful Soup 4.2.0 文档       https://www.crummy.com/software/BeautifulSoup/bs4/doc.zh/
 lxml - XML and HTML with Python http://lxml.de/index.html 
 Selectors                       https://doc.scrapy.org/en/latest/topics/selectors.html#
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</pre></div>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/items/my-item-post-10.html" rel="bookmark"
-                           title="Permalink to Web网页的一些技术介绍">Web网页的一些技术介绍</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2017-02-25T23:50:00+08:00">
-                Published: 2017-02-25 23:50:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/items/index.html">Items</a>.</p>
-<p>tags: <a href="/tag/web.html">Web</a> </p>
-</footer><!-- /.post-info -->                <p>前端技术-浏览器以及网络技术</p>
-                <a class="readmore" href="/items/my-item-post-10.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>
