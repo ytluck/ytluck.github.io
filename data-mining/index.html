@@ -26,7 +26,219 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-16.html">PostgreSQL的了解</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-17.html">Orcale的一些基本查询和中高级查询</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-04-07T22:30:00+08:00">
+                Published: 2017-04-07 22:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info --><h3>Orale数据库</h3>
+<div class="highlight"><pre><span></span>Oracle数据库在之前介绍过，在这里总结一些相对进阶的一些内容，作为以后分析的基石。
+</pre></div>
+
+
+<h3>1.Orcale的用户与表空间</h3>
+<div class="highlight"><pre><span></span>    启用      alter user scott account unlock;
+    表空间tablespace
+            查询表空间--  select * from user_tablespaces;
+            设置表空间--  alter user system  default tablespace  system;   默认普通用户没有改变表空间的权限
+            创建表空间--  create
+            修改表空间--  修改表空间状态  以及修改表数据文件alter tablespace  xxx  drop datafile xxx
+            删除表空间--  drop tablespace
+            一个数据库可以由多个表空间
+                    永久表空间--表，视图等     -------------------- users  system sysaux
+                    临时表空间--中间执行过程，执行结束后自动释放----------- temp
+                    undo表空间--用于保存事务被修改之前的数据-用于数据回滚 ----------undotbs1
+        数据字典
+            dba_tablespace
+            user_tablespace
+    表是基本的存储单位，存在表空间中。
+    查看脚本 get   d:\temp\test.sql
+    执行脚本 @d:\temp\test.sql
+    按行查询
+</pre></div>
+
+
+<h3>Orcale中的基本查询</h3>
+<div class="highlight"><pre><span></span>基本查询-在之前对Orcale以及SQL的介绍中有所涉及，在这里就不做详细的介绍了。
+条件查询
+范围查询
+模糊查询--通配符 %  _
+占位符  ?
+给字段设置别名--以及给表设置别名
+column_name AS new_name
+</pre></div>
+
+
+<h3>2.Orcale中高级查询</h3>
+<div class="highlight"><pre><span></span>在Orcale中，基本的查询，在之前有所介绍。而在数据分析中，仅仅这些查询是不够的，在此需要学习
+rowid就是唯一标志记录物理位置的一个id
+SQL语句一般情况下需使用分号;来结尾
+针对列
+    一张表的查询---一个列和多个列
+    多张表的查询
+针对行
+    集合运算
+</pre></div>
+
+
+<h4>针对列的查询</h4>
+<div class="highlight"><pre><span></span>单表查询
+    分组查询--group by
+            --having  ------order by 
+        常用的组函数group_function
+            min max sum avg count  wm_concat&lt;行转列&gt;
+                            variance stddev
+            注意--组函数会自动忽略空值--count(*) count(no)
+             count(*)  ==   count(nvl(no,0))
+        组函数的嵌套使用
+            select max(avg(sal)) 
+            from emp 
+            group by deptno;
+        单列和多列分组
+            select deptno,avg(sal) 
+            from emp 
+            group by deptno;
+            select deptno, job,avg(sal) 
+            from emp 
+            group by deptno,job;
+            select deptno, job,avg(sal) 
+            from emp    
+            group by deptno;
+            group by 增强型
+                select deptno, job,sum(sal) 
+                from emp    
+                group by deptno,job;
+                select deptno,sum(sal) 
+                from emp    
+                group by deptno;
+                select sum(sal) from emp;
+                    === 
+                select deptno,job,sum(sal) 
+                from emp 
+                group by rollup(deptno,job);
+
+                    break on deptno skip 2
+                    set pagesize  30
+                单列和多列分组--过滤分组
+                    select deptno, job,avg(sal) from emp    group by deptno,job having avg(sal)&gt;2000;
+                    where子句中 不能使用组函数--having可以使用组函数
+                     这个语句是错误的--- select deptno,avg(sal) from emp where avg(sal)&gt;2000 group by deptno；--这个语句是错误的
+                   Where的效率高一些
+                  select deptno,avg(sal) 
+                  from emp 
+                  where deptno= 10 
+                  group by deptno; 先过滤再分组
+                  select deptno,avg(sal) 
+                  from emp 
+                  group by deptno 
+                  having depto=10;  先分组，再过滤
+    子查询-
+        问题不能一步求解--实质是-select 语句的嵌套
+        书写风格要便于查看
+        必须有小括号( )-select from where having  --不可以使用的地方group by
+            select * 
+            from emp 
+            where  sal &gt; (select sal from emp where ename=&#39;SCOTT&#39;);
+
+            select  deptno,avg(sal) from emp group   by deptno having avg(sal) &gt; (select max(sal)
+            from emp                    
+            where deptno=30 );
+            单行子查询--单行操作符--空值问题--根据返回值
+            &gt;  &gt;=          子查询不返回任何行    
+            多行子查询--多行操作符--空值问题
+            in any all
+
+            伪行号--行号只能使用小于以及小于等于，默认的顺序
+             select rownum,empno,ename,sal
+             from emp  (select * from emp order by sal desc)
+             where rownum &lt;=3;
+            单表将查询到结果作为临时表
+自连接操作
+    --通过表的别名，将同一张表视为多张表,本质是多表查询，结果直观
+    --会产生笛卡尔积，不适合操作大表
+             select  e.name 员工姓名, b.name 老板姓名 from emp e,emp b
+                 where e.mgr=b.mgr;                     
+            层次查询 --单表查询--结果不直观
+        select  level ,empno，ename，sal，mgr
+        from  emp
+        connect by   prior empno = mgr
+        start with  empno =7839
+        order by 1;
+
+    level  伪字段
+    start with mgr is null;根节点
+
+多张表的查询
+    笛卡尔积
+
+    01.交叉连接--笛卡尔积
+        显式的和隐式的
+
+    02.内连接又包括等值连接，非等值连接。
+        连接查询==等值连接和不等值连接
+            ==根据连接条件
+            ==
+            between  and --小值在前，大值在后
+        显式的内连接，一般称为内连接，有INNER JOIN，形成的中间表为两个表经过ON条件过滤后的笛卡尔积。
+
+    03.外连接
+        --核心是-可以把对于连接不成立的记录，仍然包含在最后的结果中
+        --外连接又分为左外连接（left join）与右外连接（right join）
+    子查询
+            select  e.* 
+            from emp e,dept d 
+            where e.deptno=d.deptno and d.dnem=&#39;SALES&#39;
+            主查询和子查询可以不是同一张表
+                select *
+               from emp 
+                where deptno=(select deptno from dept where dname=&#39;SALES&#39;);
+</pre></div>
+
+
+<h3>集合运算</h3>
+<div class="highlight"><pre><span></span>针对行-
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-18.html" rel="bookmark"
+                           title="Permalink to 数据分析中常用的SQL语句">数据分析中常用的SQL语句</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-04-07T21:20:00+08:00">
+                Published: 2017-04-07 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->                <p>关系型和非关系型数据库</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-18.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-16.html" rel="bookmark"
+                           title="Permalink to PostgreSQL的了解">PostgreSQL的了解</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-16T21:20:00+08:00">
                 Published: 2017-02-16 21:20:00
@@ -37,87 +249,10 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/sql.html">SQL</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>PostgreSQL 采用的是C/S（client/server）结构，也就是一个客户端对应一个服务器端守护进程的模式
-</pre></div>
-
-
-<h3>安装</h3>
-<div class="highlight"><pre><span></span>Linux下安装PostgreSQL客户端和PostgreSQL服务器-使用的端口是5432。
-    sudo apt-get install postgresql-client
-    sudo apt-get install postgresql
-</pre></div>
-
-
-<h3>安装后</h3>
-<div class="highlight"><pre><span></span>初次安装后，默认生成
-      一个名为postgres的数据库
-    和一个名为postgres的数据库用户。
-同时还生成了一个名为postgres的Linux系统用户。
-</pre></div>
-
-
-<h3>设置</h3>
-<div class="highlight"><pre><span></span>    sudo su - postgres  //切换用户
-    psql                //登录
-    \password postgres  //设置密码
-    \?                  //查看psql命令列表
-    \q                  //退出
-登录
-    psql -U dbuser -d exampledb -h 127.0.0.1 -p 5432  
-    //-U指定用户，-d指定数据库，-h指定服务器，-p指定端口
-</pre></div>
-
-
-<h3>查看以及增删改</h3>
-<div class="highlight"><pre><span></span>查看
-    \h：查看SQL命令的解释，比如\h select。
-    \?：查看psql命令列表。
-    \l：列出所有数据库。
-    \c [database_name]：连接其他数据库。
-    \d：列出当前数据库的所有表格。
-    \d [table_name]：列出某一张表格的结构。
-    \du：列出所有用户。
-    \e：打开文本编辑器。
-    \conninfo：列出当前数据库和连接的信息
-数据类型
-  数值类型      ：smallint、integer、bigint、decimal、numeric、real、double、serial、bigserial
-  字符类型      :varchar(n), char(n), text
-  日期/时间类型   :timestamp[含时区], timestamp[无时区], interval, date,time[无时区]
-  布尔类型      :真(True)或 假(False)
-  位串类型      :bit(n)和bit varying(n)
-  数组
-  复合类型
-
-数据库的常见操作：
-</pre></div>
-
-
-<h3>数据导入和导出</h3>
-<div class="highlight"><pre><span></span>    psql导入
-        psql -d databaename(数据库名) -U username(用户名) -f &lt; 路径/文件名.sql
-</pre></div>
-
-
-<h3>相关内容</h3>
-<div class="highlight"><pre><span></span>1.文件体系
-2.greenplum：联机分析处理OLAP(On-Line Analytical Processing)olap--侧重决策支持，并且提供直观易懂的查询结果。 
-    架构：MPP---MPP(大规模并行处理-Massive Parallel Processing)架构
-        数据库由Master Severs和Segment Severs通过Interconnect互联组成。
-        Master主机负责：建立与客户端的连接和管理；SQL的解析并形成执行计划；
-                        执行计划向Segment的分发收集Segment的执行结果；Master不存储业务数据，只存储数据字典。  
-        Segment主机负责：业务数据的存储和存取；用户查询SQL的执行
-</pre></div>
-
-
-<h3>参考</h3>
-<div class="highlight"><pre><span></span>PostgreSQL新手入门 http://www.ruanyifeng.com/blog/2013/12/getting_started_with_postgresql.html
-PostgreSQL学习手册(常用数据类型) http://blog.itpub.net/9521459/viewspace-759337/
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>安装和查看</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-16.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

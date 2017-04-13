@@ -26,7 +26,132 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-18.html">不同语言对时间的处理</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-19.html">不同语言的计算精度和范围</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-04-13T21:05:00+08:00">
+                Published: 2017-04-13 21:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info --><h3>不同语言的计算精度和范围问题</h3>
+<div class="highlight"><pre><span></span>精度是数字中的数字个数,浮点数在计算机中的表达有限制，不能以任意精度存储  
+尤其是微小的或巨大的数字在运算时经常会有些意外情况，  
+在处理大数据的时候，数据量大，其中的一些关于数据量的运算很可能造成结果在少量数据时正常，而在大量数据时运算出现错误的情况。
+</pre></div>
+
+
+<h3>说明</h3>
+<div class="highlight"><pre><span></span>采用计算机计算数据的时候，数据的精度和数据的范围一定要注意，这方面的问题很隐蔽，在这里总结一下，  
+计算机是二进制的。浮点数没有办法是用二进制进行精确表示。我们的CPU表示浮点数由两个部分组成：指数和尾数，  
+这样的表示方法一般都会失去一定的精确度，有些浮点数运算也会产生一定的误差，是实数的无限精度跟计算机的有限内存之间的矛盾  
+通用语言中的浮点数都是按照 IEEE 754是IEEE二进位浮点数算术标准（IEEE Standard for Floating-Point Arithmetic）  
+浮点数的格式（包括负零-0）与反常值（denormal number），一些特殊数值（无穷（Inf）与非数值（NaN））
+作为常识，不管是JAVA还是其它语言，我们都应该知道：
+0.1+0.2 不一定等于0.3　。
+１/3 * 3　不一定等于1 。
+log2 + log5　也不一写等于1 。
+把这个当作常识，精度有点损失似乎就没有影响了--可以在不同的语言中中输入，然后查看结果
+</pre></div>
+
+
+<h3>C语言</h3>
+<div class="highlight"><pre><span></span>C语言中的计算精度
+    double
+    可自行设计算法实现精度的再次升级--这个以后再说吧
+</pre></div>
+
+
+<h3>Java/Scala</h3>
+<div class="highlight"><pre><span></span>BigInt  BigDecimal类来进行计算
+BigDecimal，用来对超过16位有效位的数进行精确的运算
+BigDecimal对超出16位有效数字的货币值，百分值，以及一般数值进行格式化控制。  
+在大多数的商业计算中，一般采用java.math.BigDecimal类来进行精确计算。
+Java语言中
+  数学运算和计算机计算的不同之处
+    数学运算：1/3
+      计算机运算：1/3.toDouble
+      计算机运算：1/3.0
+  Math.floor()返回不大于的最大整数 
+  Math.round()--round方法，它表示“四舍五入”，
+    算法为Math.floor(x+0.5)，即将原来的数字加上0.5后再向下取整，
+    所以，Math.round(11.5)的结果为12，Math.round(-11.5)的结果为-11。
+  Math.ceil 则是不小于的最小整数
+
+Scala语言中
+    数据类型
+        scala.math.BigInt
+        scala.math.BigDecimal
+    //保留两位小数
+    val a = 3.1415926
+    val b =  a.formatted(&quot;%.2f&quot;)
+举例：
+    极大值运算
+    choose() 超过choose(200,160),则会出现问题
+          def choose(n: Int, k: Int): Int ={
+               if (k == 0 || k == n) 1
+               else choose(n - 1, k - 1) + choose(n - 1, k)
+             }
+            因为后面的数据会超出Int存储的范围---修改方法，将返回值设为Double
+</pre></div>
+
+
+<h3>Python</h3>
+<div class="highlight"><pre><span></span><span class="n">Python</span><span class="err">默认的是</span><span class="mi">17</span><span class="err">位精度</span><span class="p">,</span><span class="err">也就是小数点后</span><span class="mi">16</span><span class="err">位</span>
+     <span class="err">一般的情况，四舍五入和使用格式化控制</span>
+     <span class="n">math</span><span class="err">模块的</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="err">取大于或者等于</span><span class="n">x</span><span class="err">的最小整数。</span>
+     <span class="n">math</span><span class="err">模块的</span><span class="n">floor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="o">--</span> 
+        <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
+        <span class="n">ceil</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>       
+<span class="err">高精度使用</span><span class="n">decimal</span><span class="err">模块，配合</span><span class="n">getcontext</span>
+</pre></div>
+
+
+<h3>R 语言</h3>
+<div class="highlight"><pre><span></span>R 语言数据超过千万的时候，要注意数据类型转换 int--numri
+Double数据类型中
+    最大 和最小 1e-316
+
+1/3*3  在R语言里是1   NA(not available）
+
+R语言出现无穷（Inf）与非数值（NaN）的时候，考虑是不是数值计算的原因
+默认双精度型数据（double－precision）
+    floor()：向下取整；
+    ceiling(): 向上取整；
+    round(): 四舍五入取整；
+    turnc(): 向0取整；
+    signif(): 保留给定位数的精度。
+注意字符型数值和数字型数值的区别
+        numeirc
+        character
+</pre></div>
+
+
+<h3>SQL语言中</h3>
+<div class="highlight"><pre><span></span>在数值处理功能时，MySQL能给出极其精确的结果，并能对无效值进行高度控制
+定义良好的四舍五入特性：对于准确值数值，ROUND()的结果取决于其参量
+    convert(decimal(8,6),(63883.63/23625))
+
+使用对数值排序的时候，一定要查看数据定义的类型，string也会显示为数字，但是排序方式是有所不同的
+    注意字符型数值和数字型数值的区别
+    这个和Excel中文本型数值和数字型数值类似，Excel中还有公式数据。
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-18.html" rel="bookmark"
+                           title="Permalink to 不同语言对时间的处理">不同语言对时间的处理</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-26T21:05:00+08:00">
                 Published: 2017-02-26 21:05:00
@@ -37,110 +162,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/scala.html">Scala</a> </p>
-</footer><!-- /.post-info --><h3>世界时区表（World Time）</h3>
-<div class="highlight"><pre><span></span> GMT--Greenwich Mean Time           格林尼治时间
- UTC--Universal Time Coordinated    通用协调时间  
- CST--Central Standard Time
- DST--Daylight Saving Time
- PDT--PacificDaylight Time          太平洋夏季时间
- PST--Pacific Standard Time         太平洋标准时间
-</pre></div>
-
-
-<h3>SQL中时间</h3>
-<div class="highlight"><pre><span></span>MySQL中
-    时间的数据类型：
-        date  year   datetime  timestamp
-    处理函数
-        now()
-        sysdate()
-        utc_date(), utc_time(), utc_timestamp()
-        str_to_date函数
-         日期时间 Extract（选取） 函数
-
-Oracle  时间数据类型
-        date    timestamp
-    处理函数
-        当前
-        转换 to_char(sysdate,&#39;YYYY-MM-DD HH24:MI:SS&#39;)
-             to_date(&#39;2017-02-24 15:01:54&#39;,&#39;YYYY-MM-DD HH24:MI:SS&#39;)
-             to_timestamp(&#39;2017-02-01 11:00:00.123456&#39;,&#39;YYYY-MM-DD HH:MI:SS.FF6&#39;)
-        提取：EXTRACT
-        时间间隔select date&#39;2017-02-21&#39;-sysdate from dual
-        ADD_MONTHS--自动处理大小月及闰月
-</pre></div>
-
-
-<h3>R语言</h3>
-<div class="highlight"><pre><span></span><span class="x">字符串string</span>
-<span class="x">  字符串的格式</span>
-<span class="x">    ISO-8601格式  yyyy-mm-dd  format = &quot;%Y-%m-%d&quot;</span>
-<span class="x">    美国风格：       mm/dd/yyyy  format = &quot;%m/%d/%y&quot;   %y表示没有世纪的年份</span>
-<span class="x">日期类：Date对象</span>
-
-<span class="x">日期类 ：   Date对象</span>
-<span class="x">日期时间类   POSIXct对象、POSIXlt对象</span>
-<span class="x">    POSIXlt对象把一个日期表示为该日期的各个部分的列表</span>
-<span class="x">    PoSIXct对象：ISOdate()、ISOdatetime()</span>
-
-<span class="x">获得当前日期</span>
-<span class="x">    Sys.Date()</span>
-
-<span class="x">    as.Date</span>
-<span class="x">    as.POSIXlt(as.Date(&quot;2017-02-20&quot;))</span><span class="p">$</span><span class="nv">wday</span><span class="x"></span>
-<span class="x">    PoSIXct对象</span>
-<span class="x">        ISOdate()</span>
-<span class="x">        ISOdatetime()</span>
-</pre></div>
-
-
-<h3>Python</h3>
-<div class="highlight"><pre><span></span>Python 提供了 
-    模块  ：time 和 calendar 以及datetime模块
-    数据类型：date（日期）和time（时间）两种数据类型
-    方法  ：
-#coding=utf-8
-</pre></div>
-
-
-<h3>Java</h3>
-<div class="highlight"><pre><span></span><span class="err">内置</span>
-    <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Calendar</span>
-            <span class="n">Calendar</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">Calendar</span><span class="o">.</span><span class="n">getInstance</span><span class="p">();</span><span class="o">//</span><span class="err">获取实例</span>
-            <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Calendar</span><span class="o">.</span><span class="n">DAY_OF_MONTH</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="o">//</span><span class="err">取当前日期的前一天</span><span class="o">.</span>
-            <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Calendar</span><span class="o">.</span><span class="n">DAY_OF_MONTH</span><span class="p">,</span> <span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="o">//</span><span class="err">取当前日期的后一天</span><span class="o">.</span>
-        <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">GregorianCalendar</span> <span class="err">是</span><span class="n">Calendar</span> <span class="err">的一个具体子类</span>
-
-    <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Date</span>
-                <span class="n">Date</span><span class="p">()</span><span class="o">.</span><span class="n">getTime</span><span class="err">所返回的是一个</span><span class="nb">long</span><span class="err">型的毫秒数</span>  
-        <span class="n">java</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">Date</span> <span class="err">：继承自</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Date</span><span class="p">,</span><span class="err">是操作数据库用的日期类型</span>
-
-
-    <span class="n">java</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">DateFormat</span><span class="err">是日期</span><span class="o">/</span><span class="err">时间格式化子类的抽象类</span>
-        <span class="n">java</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">SimpleDateFormat</span> <span class="err">日期</span><span class="o">/</span><span class="err">时间格式化子类</span>
-<span class="err">第三方包</span><span class="o">--</span><span class="n">Joda</span> <span class="n">Time</span>     
-    <span class="n">Joda</span> <span class="n">Time</span><span class="err">，一个面向</span> <span class="n">Java</span><span class="err">™</span> <span class="err">平台的易于使用的开源时间</span><span class="o">/</span><span class="err">日期库</span>
-    <span class="err">首先要引入依赖</span><span class="o">--</span><span class="n">pom</span><span class="o">.</span><span class="n">xml</span> <span class="err">和本地的</span><span class="kn">import</span> 
-        <span class="nn">DateTime</span> <span class="nn">dateTime</span> <span class="o">=</span> <span class="n">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</pre></div>
-
-
-<h3>Scala</h3>
-<div class="highlight"><pre><span></span><span class="err">使用</span><span class="n">Java</span><span class="err">中的库和</span><span class="n">Java</span><span class="err">中的第三方库</span>    
-<span class="n">Scala</span><span class="err">中的第三方包：</span>
-    <span class="err">（</span><span class="n">nscala</span><span class="o">-</span><span class="n">time</span>  <span class="err">对</span><span class="n">Joda</span> <span class="n">Time</span><span class="err">的</span><span class="n">scala</span><span class="err">封装）</span>  <span class="n">Maven</span>
-     <span class="kn">import</span> <span class="nn">com.github.nscala_time.time.Imports._</span>
-</pre></div>
-
-
-<h2>参考：</h2>
-<div class="highlight"><pre><span></span>Scala 时间数据处理 编程模块 http://gaoqingyue.win/Scala-%E6%97%B6%E9%97%B4%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86-%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9D%97/
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>时间的-数据类型-处理函数</p>
+                <a class="readmore" href="/program/my-program-post-18.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

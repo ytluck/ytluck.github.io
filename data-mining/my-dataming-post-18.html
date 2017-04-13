@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据分析中常用的SQL语句</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-18.html" rel="bookmark"
+           title="Permalink to 数据分析中常用的SQL语句">数据分析中常用的SQL语句</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-04-07T21:20:00+08:00">
+                Published: 2017-04-07 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->      <h3>主要目的</h3>
+<div class="highlight"><pre><span></span>汇总一些分析型SQL操作，为数据分析师们做一些基本的命令总结。包括关系型以及非关系型中的一些数据库，MySQL-Oracle--Hbase-Hive-Spark SQL
+</pre></div>
+
+
+<h3>数据分析中常用的SQL语句</h3>
+<div class="highlight"><pre><span></span>关系型数据库SQL--MySQL和Orcale
+基本查看--查看数据库。表名和表结构-表数据和总数
+    show status
+    show databases;
+    use   your_database;
+    show tables;
+    DESC your_table;
+
+查询单列或者多列
+    select user_birthday from user
+查看行以及行数
+    select * from your_table limit 3;
+        计数：select count(*) from your_table  
+排序
+    1.只排一列
+    select user_birthday from user order by user_birthday;
+    select user_birthday from user order by user_birthday DESC;  
+    2.多列排序,升序ASC是默认的
+    select * from user order by user_id,user_birthday;
+    select * from user order by user_id DESC,user_birthday;
+    select * from user order by user_id ,user_birthday DESC;
+
+筛选以及过滤
+    过滤行以及查找  where  in  not  like
+    select user_birthday from user where id&gt;3;
+    select user_birthday from user where id like &#39;3%&#39;;
+去重
+     select distinct  user_birthday from user
+
+字符串和数值操作
+    拼接：select   name||id   as tiele from tableA ; 
+    求和：select sum(field1) as sumvalue from tableA
+    平均：select avg(field1) as avgvalue from tableA
+    最大：select max(field1) as maxvalue from tableA
+    最小：select min(field1) as minvalue from tableA
+
+分组和汇总
+    select   count(*)       from tableA  group by  sex;
+    select   id,count(*)    from tableA  group by  sex;
+    过滤分组
+    select   id,count(*)  from tableA  group by  sex having count(*)&gt;2;
+
+嵌套查询
+    select   name,sex,id  from tableA where id  in (select   id  from tableB where id &gt;3)
+
+联结查询--以列为单位对表进行联结
+    select   name,sex,id  from tableA ,tableB  where tableA.id = tableB.id;
+    select   name,sex,id  from tableA  inner join    tableB  on tableA.id = tableB.id;
+    select   name,sex,id  from tableA ,tableB,tableC  where tableA.id = tableB.id and  tableC.hot = tableB.hot;
+
+组合查询--以行位单位对表进行操作
+    select   name,sex,id  from tableA   union       select   name,sex,id  from tableB  where tableB.id&gt;3;
+    select   name,sex,id  from tableA   union all   select   name,sex,id  from tableB  where tableB.id&gt;3;
+
+使用索引以及存储过程
+说明
+    join 是两张表做交连后里面条件相同的部分记录产生一个记录集， 
+    union是产生的两个记录集(字段要一样的)并在一起，成为一个新的记录集
+
+帮助系统
+    help
+    help index
+    ？index
+退出
+    exit
+注意：
+    MySQL和Orcale有不一样的地方
+    除了多表关联查询，子查询以及表集合查询外，还有层次查询
+</pre></div>
+
+
+<h3>Hive中基本的数据分析型语句</h3>
+<div class="highlight"><pre><span></span>HQL---进入Hive中类 SQL 查询语言-关系型分析查询作业 
+        进入
+            su  hdfs
+            hbase shell
+查看已存在的表
+    show databases;
+    show tables;
+    SHOW TABLES &#39;page.*&#39;;
+    查看表中有多少分区：
+        show partitions logs;
+    查看invites的表的结构
+        DESCRIBE invites;
+    查看部分行--查询的结果是随机选择的
+        SELECT foo FROM invites  limit 3;
+      查看分区部分行
+        SELECT a.foo FROM invites a limit 3;
+查看行以及行数
+            SELECT * FROM invites  limit 3;
+            计数 select count(*) from invites;
+排序
+    在分布式中的排序有所不同---全局排序和reduced有关
+            order by
+            sort by
+            distribute by
+            cluster By
+筛选以及过滤
+    SELECT a.foo FROM invites a WHERE a.ds=&#39;2008-08-15&#39;;
+
+去重查询
+    Hive上一个典型表内除重的写法
+    select ad ,sum(plus),count(distinct name,id) from  invites;
+
+分组和汇总
+    SELECT a.bar, count(*) WHERE a.foo &gt; 0 GROUP BY a.bar;
+    SELECT year(ymd), avg(price_close) FROM stocks WHERE exchange = &#39;NASDAQ&#39; AND symbol = &#39;AAPL&#39;  GROUP BY year(ymd)  HAVING avg(price_close) &gt; 50.0;
+联结
+    SELECT sales.*, things.* FROM sales JOIN things ON (sales.id = things.id);
+    SELECT sales.*, things.* FROM sales LEFT OUTER JOIN things ON (sales.id = things.id);
+帮助系统
+    显示所有函数：
+        show functions;
+    查看函数用法：
+        describe function substr;
+退出
+    exit;
+</pre></div>
+
+
+<h3>Spark SQL</h3>
+<div class="highlight"><pre><span></span>进入
+    spark-sql
+支持Hive的查询命令
+        SELECT
+        GROUP BY
+                ORDER BY
+                CLUSTER BY
+                SORT BY
+        All Hive operators, including:
+            Relational operators (=, ⇔, ==, &lt;&gt;, &lt;, &gt;, &gt;=, &lt;=, etc)
+            Arithmetic operators (+, -, *, /, %, etc)
+            Logical operators (AND, &amp;&amp;, OR, ||, etc)
+            Complex type constructors
+            Mathematical functions (sign, ln, cos, etc)
+            String functions (instr, length, printf, etc)
+        User defined functions (UDF)
+        User defined aggregation functions (UDAF)
+        User defined serialization formats (SerDes)
+        Window functions
+        Joins
+                JOIN
+                {LEFT|RIGHT|FULL} OUTER JOIN
+                LEFT SEMI JOIN
+                CROSS JOIN
+                例子
+                        SELECT people.name FROM people join parquetFile where people.name=parquetFile.name
+        Unions
+        Sub-queries
+            SELECT col FROM ( SELECT a + b AS col from t1) t2
+</pre></div>
+
+
+<h3>Hbase</h3>
+<div class="highlight"><pre><span></span>查看基本信息
+    version  
+    status  
+    whoami
+查看有哪些表  
+    list  
+    describe &#39;table&#39; 
+查数据内容：  
+    scan &#39;my_test&#39;,{LIMIT =&gt; 5}
+    get  &#39;my_test&#39;,&#39;rowkey001&#39;
+查看数据量--在数据量相对较小的时候用
+     count &#39;tablename&#39;, {INTERVAL =&gt; 100, CACHE =&gt; 500}
+退出
+    exit
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
