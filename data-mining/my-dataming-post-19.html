@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言常见结构的创建</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-19.html" rel="bookmark"
+           title="Permalink to R语言常见结构的创建">R语言常见结构的创建</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-01T21:20:00+08:00">
+                Published: 2017-05-01 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h3>向量</h3>
+<div class="highlight"><pre><span></span>创建空的向量创建<span class="o">--</span>填充<span class="o">--</span>添加<span class="o">--</span>移除
+a <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">()</span>
+vec <span class="o">&lt;-</span> <span class="kp">rep</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
+<span class="kp">append</span><span class="p">(</span>vec<span class="p">,</span><span class="kp">seq</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">33</span><span class="p">,</span><span class="m">2</span><span class="p">))</span>
+tt <span class="o">&lt;-</span> <span class="kp">append</span><span class="p">(</span>vec<span class="p">,</span><span class="kp">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">32</span><span class="p">,</span><span class="m">2</span><span class="p">))</span>
+</pre></div>
+
+
+<h3>因子</h3>
+<div class="highlight"><pre><span></span><span class="o">--</span>用于分组
+tt2 <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span><span class="kp">append</span><span class="p">(</span>vec<span class="p">,</span><span class="kp">seq</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">33</span><span class="p">,</span><span class="m">2</span><span class="p">))</span> <span class="p">)</span>
+<span class="kp">levels</span><span class="p">(</span>tt2<span class="p">)</span>
+<span class="kp">labels</span><span class="p">(</span>tt2<span class="p">)</span>
+</pre></div>
+
+
+<h3>矩阵和数组</h3>
+<div class="highlight"><pre><span></span>创建空的矩阵<span class="o">--</span>创建<span class="o">--</span>填充<span class="o">--</span>添加<span class="o">--</span>移除
+<span class="c1">##具有维度属性-dim()</span>
+tt3 <span class="o">&lt;-</span>  <span class="kt">matrix</span><span class="p">(</span>vec<span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">)</span>  <span class="c1">##两行三列</span>
+<span class="kt">matrix</span><span class="p">(</span>vec<span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span>byrow <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>  <span class="c1">#默认是按行填充</span>
+<span class="kt">matrix</span><span class="p">(</span>vec<span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span>byrow <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span> <span class="c1">#按列填充</span>
+
+tt3<span class="p">[,</span><span class="m">1</span><span class="p">,</span>drop<span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+tt3<span class="p">[,</span><span class="m">1</span><span class="p">,</span>drop<span class="o">=</span><span class="bp">F</span><span class="p">]</span>
+<span class="kt">array</span><span class="p">()</span>
+</pre></div>
+
+
+<h3>数据框</h3>
+<div class="highlight"><pre><span></span>创建空的数据框<span class="o">--</span>创建<span class="o">--</span>填充<span class="o">--</span>添加<span class="o">--</span>移除
+dfr <span class="o">&lt;-</span>  <span class="kt">data.frame</span><span class="p">(</span>tt<span class="p">,</span>tt2<span class="p">,</span>stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+dfr
+na.omit<span class="p">(</span>dfr<span class="p">)</span>
+str<span class="p">(</span>dfr<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
+str<span class="p">(</span>dfr<span class="p">[,</span><span class="m">1</span><span class="p">,</span>drop<span class="o">=</span><span class="kc">FALSE</span><span class="p">])</span>
+str<span class="p">(</span>dfr<span class="p">[,</span><span class="m">2</span><span class="p">])</span>
+str<span class="p">(</span>dfr<span class="p">[,</span><span class="m">2</span><span class="p">,</span>drop<span class="o">=</span><span class="kc">FALSE</span><span class="p">])</span> 
+<span class="c1">###在提取dataframe的行或者列的时候，通过设置，</span>
+<span class="c1">##drop=FALSE可以放置提取的行或者列变为向量结构，保持dataframe结果。</span>
+<span class="c1">#data.frame(colname1 =numeric(n), colname2 = character(n))</span>
+<span class="c1">##cbind  将参数按列合并，使用前保证参数的行数相同--如不相同也不报错--自动填补-注意！！！</span>
+<span class="c1">##rbind  merge</span>
+<span class="c1">##subset</span>
+</pre></div>
+
+
+<h3>列表</h3>
+<div class="highlight"><pre><span></span><span class="c1">#----创建--填充--添加--移除</span>
+<span class="c1">##创建空列表，然后对列表进行数据添加</span>
+a <span class="o">&lt;-</span> <span class="kp">rep</span><span class="p">(</span><span class="m">0</span><span class="o">:</span><span class="m">9</span><span class="p">)</span>
+K <span class="o">&lt;-</span> <span class="kp">length</span><span class="p">(</span>a<span class="p">)</span>
+lst <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span><span class="kc">NULL</span><span class="p">)</span>
+<span class="kp">length</span><span class="p">(</span>lst<span class="p">)</span> <span class="o">&lt;-</span> <span class="m">2</span><span class="o">*</span><span class="p">(</span>K<span class="m">-1</span><span class="p">)</span>
+
+
+i <span class="o">&lt;-</span> <span class="m">1</span>
+j <span class="o">&lt;-</span> <span class="m">1</span>
+<span class="kr">repeat</span><span class="p">{</span> 
+        lst<span class="p">[[</span>j<span class="p">]]</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span>a<span class="p">[</span><span class="m">0</span><span class="o">:</span>i<span class="p">])</span>
+        lst<span class="p">[[</span>j<span class="m">+1</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span>a<span class="p">[</span>i<span class="m">+1</span><span class="o">:</span><span class="p">(</span>K<span class="o">-</span>i<span class="p">)])</span>
+        i <span class="o">&lt;-</span> i<span class="m">+1</span>
+        j <span class="o">&lt;-</span> j<span class="m">+2</span>
+        <span class="kr">if</span><span class="p">(</span>i<span class="o">&gt;</span> K<span class="m">-1</span><span class="p">)</span> <span class="kr">break</span>
+    <span class="p">}</span>
+
+
+ lst<span class="p">[[</span><span class="m">18</span><span class="p">]]</span>   <span class="o">&lt;-</span> <span class="kc">NULL</span>
+ lst<span class="p">[</span><span class="kp">sapply</span><span class="p">(</span>lst<span class="p">,</span><span class="kp">is.null</span><span class="p">)]</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+</pre></div>
+
+
+<h3>引用方式</h3>
+<div class="highlight"><pre><span></span>名称索引--位置索引--条件索引
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

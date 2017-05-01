@@ -26,7 +26,154 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-19.html">不同语言的计算精度和范围</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-21.html">JVM参数以及Spark不同运行模式下对其参数调用</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-05-01T20:05:00+08:00">
+                Published: 2017-05-01 20:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info --><h3>1.JVM的参数主要分为三类，分别是如下</h3>
+<div class="highlight"><pre><span></span>1堆大小设置
+    堆(Heap)和非堆(Non-heap)内存
+        JVM 中最大堆大小有三方面限制：
+            相关操作系统的数据模型（32-bt还是64-bit）限制；
+            系统的可用物理内存限制；
+            系统的可用虚拟内存限制。
+2.回收器选择
+        JVM给了三种选择：串行收集器、并行收集器、并发收集器
+3.辅助信息
+        JVM提供了大量命令行参数，打印信息，供调试使用
+</pre></div>
+
+
+<h3>2.常用参数配置汇总</h3>
+<div class="highlight"><pre><span></span>堆以及非堆设置-- 
+    JVM最大内存首先取决于实际的物理内存和操作系统
+    JVM初始分配的堆内存由-Xms指定，默认是物理内存的1/64；
+    JVM最大分配的堆内存由-Xmx指定，默认是物理内存的1/4。默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；
+    JVM使用-XX:PermSize设置非堆内存初始值，默认是物理内存的1/64；
+    JVM使用XX:MaxPermSize设置最大非堆内存的大小，默认是物理内存的1/4。
+    空余堆内存大于70%时，JVM会减少堆直到-Xms的最小限制。因此服务器一般设置-Xms、-Xmx 相等以避免在每次GC 后调整堆的大小。
+     说明：如果-Xmx 不指定或者指定偏小，应用可能会导致java.lang.OutOfMemory错误，此错误来自JVM，不是Throwable的，无法用try...catch捕捉。 
+        -Xms:初始堆大小
+        -Xmx:最大堆大小
+        -XX:NewSize=n:设置年轻代大小
+        -XX:NewRatio=n:设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4
+        -XX:SurvivorRatio=n:年轻代中Eden区与两个Survivor区的比值。注意Survivor区有两个。如：3，表示Eden：Survivor=3：2，一个Survivor区占整个年轻代的1/5
+        -XX:PermSize=64M JVM初始分配的非堆内存
+        -XX:MaxPermSize=128M JVM最大允许分配的非堆内存，按需分配
+
+收集器设置       
+        -XX:+UseSerialGC:设置串行收集器
+        -XX:+UseParallelGC:设置并行收集器
+        -XX:+UseParalledlOldGC:设置并行年老代收集器
+        -XX:+UseConcMarkSweepGC:设置并发收集器
+        垃圾回收统计信息
+            -XX:+PrintGC
+            -XX:+PrintGCDetails
+            -XX:+PrintGCTimeStamps
+            -Xloggc:filename
+        并行收集器设置
+            -XX:ParallelGCThreads=n:设置并行收集器收集时使用的CPU数。并行收集线程数。
+            -XX:MaxGCPauseMillis=n:设置并行收集最大暂停时间
+            -XX:GCTimeRatio=n:设置垃圾回收时间占程序运行时间的百分比。公式为1/(1+n)
+        并发收集器设置
+            -XX:+CMSIncrementalMode:设置为增量模式。适用于单CPU情况。
+            -XX:ParallelGCThreads=n:设置并发收集器年轻代收集方式为并行收集时，使用的CPU数。并行收集线程数。
+
+    辅助信息
+            -XX:+PrintGC
+            -XX:+PrintGCDetails
+            -XX:+PrintGCTimeStamps 
+            -Xloggc:filename:
+    调优总结
+        虚拟机的设置
+</pre></div>
+
+
+<h3>开发环境中的设置</h3>
+<div class="highlight"><pre><span></span>当在命令提示符下启动并使用JVM时
+    Eclipse中JVM内存设置
+            eclipse.ini内存设置
+    Idea设置内存
+    idea64.exe.vmoptions
+</pre></div>
+
+
+<h3>Spark中的JVM参数设置</h3>
+<div class="highlight"><pre><span></span><span class="x">(1)Driver的JVM参数：</span>
+<span class="x">        如果是yarn-cluster模式，</span>
+<span class="x">            -Xmx，-Xms--读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的JVM参数值。</span>
+<span class="x">            PermSize-------读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的JVM参数值。</span>
+<span class="x">            GC方式--------读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的参数值。</span>
+
+<span class="x">        如果是yarn-client模式，</span>
+<span class="x">            -Xmx，-Xms--默认读取spark-env文件中的SPARK_DRIVER_MEMORY值，-Xmx，-Xms值一样大小；</span>
+<span class="x">            PermSize-----是默认读取spark-class文件中的JAVA_OPTS=&quot;-XX:MaxPermSize=256m </span><span class="p">$</span><span class="nv">OUR_JAVA_OPTS</span><span class="x">&quot;值；</span>
+<span class="x">            GC方式----默认读取的是spark-class文件中的JAVA_OPTS；</span>
+<span class="x">以上值最后均可被spark-submit工具中的--driver-java-options参数覆盖。</span>
+
+<span class="x">(2)Executor的JVM参数：</span>
+<span class="x">        -Xmx，-Xms，</span>
+<span class="x">                    如果是yarn-cluster模式，则读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。</span>
+<span class="x">                    如果是yarn-client模式，则默认读取spark-env文件中的SPARK_EXECUTOR_MEMORY值，-Xmx，-Xms值一样大小；                   </span>
+<span class="x">        PermSize，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。</span>
+<span class="x">        GC方式，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值</span>
+
+<span class="x">cd /etc/spark/conf</span>
+<span class="x">ll</span>
+<span class="x">cat  spark-defaults.conf</span>
+<span class="x">        spark.yarn.driver.memoryOverhead 384</span>
+<span class="x">        spark.yarn.executor.memoryOverhead 384</span>
+<span class="x">cat spark-env.sh</span>
+
+
+<span class="x">cd /usr/hdp/2.4.0.0-169/spark/bin</span>
+<span class="x">ll</span>
+<span class="x">cat spark-class</span>
+
+<span class="x">spark-env</span>
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-20.html" rel="bookmark"
+                           title="Permalink to Scala常见特性小结">Scala常见特性小结</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-01T20:00:00+08:00">
+                Published: 2017-05-01 20:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>Scala常见问题</p>
+                <a class="readmore" href="/program/my-program-post-20.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-19.html" rel="bookmark"
+                           title="Permalink to 不同语言的计算精度和范围">不同语言的计算精度和范围</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-04-13T21:05:00+08:00">
                 Published: 2017-04-13 21:05:00
@@ -37,113 +184,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/scala.html">Scala</a> </p>
-</footer><!-- /.post-info --><h3>不同语言的计算精度和范围问题</h3>
-<div class="highlight"><pre><span></span>精度是数字中的数字个数,浮点数在计算机中的表达有限制，不能以任意精度存储  
-尤其是微小的或巨大的数字在运算时经常会有些意外情况，  
-在处理大数据的时候，数据量大，其中的一些关于数据量的运算很可能造成结果在少量数据时正常，而在大量数据时运算出现错误的情况。
-</pre></div>
-
-
-<h3>说明</h3>
-<div class="highlight"><pre><span></span>采用计算机计算数据的时候，数据的精度和数据的范围一定要注意，这方面的问题很隐蔽，在这里总结一下，  
-计算机是二进制的。浮点数没有办法是用二进制进行精确表示。我们的CPU表示浮点数由两个部分组成：指数和尾数，  
-这样的表示方法一般都会失去一定的精确度，有些浮点数运算也会产生一定的误差，是实数的无限精度跟计算机的有限内存之间的矛盾  
-通用语言中的浮点数都是按照 IEEE 754是IEEE二进位浮点数算术标准（IEEE Standard for Floating-Point Arithmetic）  
-浮点数的格式（包括负零-0）与反常值（denormal number），一些特殊数值（无穷（Inf）与非数值（NaN））
-作为常识，不管是JAVA还是其它语言，我们都应该知道：
-0.1+0.2 不一定等于0.3　。
-１/3 * 3　不一定等于1 。
-log2 + log5　也不一写等于1 。
-把这个当作常识，精度有点损失似乎就没有影响了--可以在不同的语言中中输入，然后查看结果
-</pre></div>
-
-
-<h3>C语言</h3>
-<div class="highlight"><pre><span></span>C语言中的计算精度
-    double
-    可自行设计算法实现精度的再次升级--这个以后再说吧
-</pre></div>
-
-
-<h3>Java/Scala</h3>
-<div class="highlight"><pre><span></span>BigInt  BigDecimal类来进行计算
-BigDecimal，用来对超过16位有效位的数进行精确的运算
-BigDecimal对超出16位有效数字的货币值，百分值，以及一般数值进行格式化控制。  
-在大多数的商业计算中，一般采用java.math.BigDecimal类来进行精确计算。
-Java语言中
-  数学运算和计算机计算的不同之处
-    数学运算：1/3
-      计算机运算：1/3.toDouble
-      计算机运算：1/3.0
-  Math.floor()返回不大于的最大整数 
-  Math.round()--round方法，它表示“四舍五入”，
-    算法为Math.floor(x+0.5)，即将原来的数字加上0.5后再向下取整，
-    所以，Math.round(11.5)的结果为12，Math.round(-11.5)的结果为-11。
-  Math.ceil 则是不小于的最小整数
-
-Scala语言中
-    数据类型
-        scala.math.BigInt
-        scala.math.BigDecimal
-    //保留两位小数
-    val a = 3.1415926
-    val b =  a.formatted(&quot;%.2f&quot;)
-举例：
-    极大值运算
-    choose() 超过choose(200,160),则会出现问题
-          def choose(n: Int, k: Int): Int ={
-               if (k == 0 || k == n) 1
-               else choose(n - 1, k - 1) + choose(n - 1, k)
-             }
-            因为后面的数据会超出Int存储的范围---修改方法，将返回值设为Double
-</pre></div>
-
-
-<h3>Python</h3>
-<div class="highlight"><pre><span></span><span class="n">Python</span><span class="err">默认的是</span><span class="mi">17</span><span class="err">位精度</span><span class="p">,</span><span class="err">也就是小数点后</span><span class="mi">16</span><span class="err">位</span>
-     <span class="err">一般的情况，四舍五入和使用格式化控制</span>
-     <span class="n">math</span><span class="err">模块的</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="err">取大于或者等于</span><span class="n">x</span><span class="err">的最小整数。</span>
-     <span class="n">math</span><span class="err">模块的</span><span class="n">floor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="o">--</span> 
-        <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
-        <span class="n">ceil</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>       
-<span class="err">高精度使用</span><span class="n">decimal</span><span class="err">模块，配合</span><span class="n">getcontext</span>
-</pre></div>
-
-
-<h3>R 语言</h3>
-<div class="highlight"><pre><span></span>R 语言数据超过千万的时候，要注意数据类型转换 int--numri
-Double数据类型中
-    最大 和最小 1e-316
-
-1/3*3  在R语言里是1   NA(not available）
-
-R语言出现无穷（Inf）与非数值（NaN）的时候，考虑是不是数值计算的原因
-默认双精度型数据（double－precision）
-    floor()：向下取整；
-    ceiling(): 向上取整；
-    round(): 四舍五入取整；
-    turnc(): 向0取整；
-    signif(): 保留给定位数的精度。
-注意字符型数值和数字型数值的区别
-        numeirc
-        character
-</pre></div>
-
-
-<h3>SQL语言中</h3>
-<div class="highlight"><pre><span></span>在数值处理功能时，MySQL能给出极其精确的结果，并能对无效值进行高度控制
-定义良好的四舍五入特性：对于准确值数值，ROUND()的结果取决于其参量
-    convert(decimal(8,6),(63883.63/23625))
-
-使用对数值排序的时候，一定要查看数据定义的类型，string也会显示为数字，但是排序方式是有所不同的
-    注意字符型数值和数字型数值的区别
-    这个和Excel中文本型数值和数字型数值类似，Excel中还有公式数据。
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>计算机处理数据的精度和范围问题</p>
+                <a class="readmore" href="/program/my-program-post-19.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
