@@ -26,7 +26,105 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/items/my-item-post-13.html">了解数据以及看什么数据</a></h1>
+                    <h1 class="entry-title"><a href="/items/my-item-post-15.html">Python的Web网络编程</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T21:54:00+08:00">
+                Published: 2017-05-14 21:54:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/api.html">API</a> </p>
+</footer><!-- /.post-info --><h4>手动</h4>
+<div class="highlight"><pre><span></span>    0.人工打开--然后复制保存
+</pre></div>
+
+
+<h4>使用现有工具</h4>
+<div class="highlight"><pre><span></span>    1.1使用浏览器以及对应插件
+            httpfox--监控浏览器执行htt请求和响应
+    1.2使用整站下载工具
+            Teleport Ultra
+</pre></div>
+
+
+<h4>使用Python库</h4>
+<div class="highlight"><pre><span></span>    <span class="mf">2.</span><span class="err">使用</span><span class="n">urllib2</span><span class="err">以及</span><span class="n">urllib</span>  <span class="o">----</span><span class="err">如外的可能使用</span><span class="o">&lt;</span><span class="n">cookielib</span><span class="o">&gt;</span>
+            <span class="n">urllib2</span><span class="err">库里面的</span><span class="n">urlopen</span><span class="err">方法，传入一个</span><span class="n">URL</span><span class="err">，</span><span class="n">data</span><span class="err">默认为空</span><span class="bp">None</span><span class="err">，返回一个</span><span class="n">response</span><span class="err">对象，返回信息便保存在这里面</span>
+                <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+            <span class="err">例子</span>
+                <span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="err">构造</span><span class="n">Request</span><span class="err">类</span><span class="o">-</span><span class="err">参数可以传入一个</span><span class="n">request</span><span class="err">请求</span><span class="p">,</span><span class="err">它其实就是一个</span><span class="n">Request</span><span class="err">类的实例</span>
+                <span class="kn">import</span> <span class="nn">urllib2</span>
+                <span class="n">request</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="mf">3.</span><span class="err">使用</span><span class="n">Requests</span>
+            <span class="c1">#-*- coding:utf-8 -*-</span>
+            <span class="kn">import</span> <span class="nn">requests</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://www.baidu.com&#39;</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;key1&#39;</span><span class="p">:</span> <span class="s1">&#39;value1&#39;</span><span class="p">,</span> <span class="s1">&#39;key2&#39;</span><span class="p">:</span> <span class="s1">&#39;value2&#39;</span><span class="p">}</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>使用Python爬虫框架</h4>
+<div class="highlight"><pre><span></span>    4.1--使用Selenium
+    4.2---使用爬虫框架--Scrapy
+</pre></div>
+
+
+<h4>商业软件</h4>
+<div class="highlight"><pre><span></span>八爪鱼
+import.io
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Python 爬虫的工具列表 http://python.jobbole.com/82633/
+[Python]网络爬虫（三）：异常的处理和HTTP状态码的分类 http://blog.csdn.net/pleasecallmewhy/article/details/8923725
+Selenium 爬取淘宝实战练习 https://ask.hellobi.com/blog/JiangYiXin/7837
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-14.html" rel="bookmark"
+                           title="Permalink to Python调用网络应用程序接口">Python调用网络应用程序接口</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T21:50:00+08:00">
+                Published: 2017-05-14 21:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/api.html">API</a> </p>
+</footer><!-- /.post-info -->                <p>调用返回JSON或者XML数据格式</p>
+                <a class="readmore" href="/items/my-item-post-14.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-13.html" rel="bookmark"
+                           title="Permalink to 了解数据以及看什么数据">了解数据以及看什么数据</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-04-13T21:50:00+08:00">
                 Published: 2017-04-13 21:50:00
@@ -37,250 +135,10 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/app.html">APP</a> </p>
-</footer><!-- /.post-info --><h3>说明</h3>
-<div class="highlight"><pre><span></span>主要是对最近阅读和思考的内容做一个总结
-关于数据和数据集，关于数据质量，而这一切都是建立在你要确认清楚你想要解决的问题是什么！同时，明确假设有助于减少基本的错误。
-</pre></div>
-
-
-<h3>1.了解数据</h3>
-<div class="highlight"><pre><span></span>数据
-    1.测量标度类型
-      属性本源并不是数字或者符号，通过测量标度将数值或者符号和对象的属性建立关联。
-       属性的类型--测量尺度
-         nominal  标称----等于或者不等于--------一对一的变换
-         ordinal  序数---大于或者小于----------单调函数的变换
-         interval 区间----加减------------------- 一次函数
-         ratio    比率---- 乘除------------------- 比例函数
-        数据的大类：离散数据和连续数据-
-        数据的度量单位：分、元
-       举例
-         温度--华氏温度和摄氏温度
-         计数属性是离散的也是比率属性
-    2.有序数据--属性涉及时间或者空间的联系
-        截面数据--在相同或者近似相同的时间点上收集的数据
-        时序数据
-          时间序列数据
-        序列数据--考虑项的位置
-        空间数据        
-数据集
-    数据集的属性
-        维度
-        稀疏性
-        数据集的平衡性--非平衡数据
-        粒度--分辨率
-        时效性
-        相关性
-        训练集和测试集--为了评估模型的可靠性以及扩展性
-    数据集的表示--数据格式
-        数据矩阵
-        购物篮数据
-数据背景
-    数据分析和判断，其中对数据背景的了解是必不可少的
-    例如：股市数据不是对市场的独立测度，虽然数据是市场不可分割的一部分，使用股票代码作为唯一键是有问题的
-</pre></div>
-
-
-<h3>2.了解数据过程中的常见问题</h3>
-<div class="highlight"><pre><span></span>数据的安全性
-    数据的保密：权限以及抵抗力
-    数据的恢复：冗余-备份-容灾
-    数据的追溯：可追溯
-        数据来源--保存数据来源
-                 建立快照
-        数据过程可重复
-              分阶段处理数据，并保持各阶段的独立性
-
-数据的可用性
-    数据质量问题
-        完整，全面，一致，准确，可解释-可靠性
-            现象--原因---解决方式
-               异常值--缺失值--重复值--不一致值--噪声--遗漏值
-            数据质量的检测和纠正
-            数据算法的容忍度
-    数据的复用性
-        数据格式--数据是给人看的，同时也是给机器看的--文件格式与编码
-            通过一定的数据格式--自解释数据格式          例如：CSV、JSON，XML等
-                Protocol buffers
-                Parquet
-            编码格式--采用Linux中的file a.txt可以查看a.txt的文件格式
-
-        数据架构可用性
-            架构的可扩展性
-    数据的流动
-        异构数据源流向统一的目标数据--数据的ETL
-        采集误差--转换规则          
-数据陷阱
-        沉默数据缺失
-        生存偏差
-        数据的成本和时效
-        数据过拟合--评估模型的可靠性--分为训练集和测试集
-        数据造假
-            案例-
-                孙膑   减灶诱敌
-                诸葛亮 增灶退兵
-</pre></div>
-
-
-<h3>3.数据服务与价值链</h3>
-<div class="highlight"><pre><span></span>服务对象
-    政府公共服务、企业用户、消费者用户
-领域
-    安防、交通、医疗、商业
-
-数据的采集、收集和加工
-        以电子商务为代表的交易数据、
-        以社交网络为代表的交互数据、
-        以移动终端数据为代表的传感数据
-数据存储和传输以及维护
-        文件--数据库
-        文件适合阅读量大，几乎不用修改的等数据
-数据分析和说明
-数据结果展现
-</pre></div>
-
-
-<h3>4.数据工具</h3>
-<div class="highlight"><pre><span></span>工具只是解决问题的手段，我还是喜欢用不同的工具解决不同的问题，一方面，单一语言不能很好的和现在各种技术人员交流
-另一方面，多种工具适应不同的场景，对于场景下选择特定的工具可以有效的节省时间。
-语言环境：   :   Java--Scala--Python---R
-数据采集工具： Python语言---Scrapy或者R语言--------rvast
-数据格式变换： Stat/Transfer---商业软件，买买买,工具节省力气
-数据存储    ：   SQLite，MySQL------Orcale.分布式----HDFS、HBase、Hive
-数据分析工具： Excel、SQL、R语言---Rstudio、Python、Spark
-数据可视化：  R语言
-办公软件：       Word Excel PPT Visio    
-版本管理：       git github
-集成开发环境  Eclipse、IntelliJ IDEA 、PyCharm
-</pre></div>
-
-
-<h3>5.数据分析报告</h3>
-<div class="highlight"><pre><span></span>把数据报告按照阶段分为两种。
-一种是追踪型的数据报告，或者成为dashboard。它是对日常业务数据高频率的展现，它一般用于回答“怎么了”。
-    关键在于发现问题，而不是解决问题。这类报告往往是规律性地长期进行制作。
-另一种就是解决问题的数据报告，它一般是专题型的研究报告，用于回答“为什么”。
-    这类报告往往是不定期地进行制作，而且很有可能是由浅入深的系列报告    
-  在数据分析的实际报告中，常常有两种工作模式
-    第一种：拿到基础数据集后给出分析结果？
-    第二种：拿到一个问题，自己去收集数据，分析结果
- 在这里主要拿到数据集的怎么办
-当拿到一个数据集时，你通常会怎么做？拿到任何数据集的时候有一个框架思路，对有条不紊地开始工作有很大的帮助。
-将遵循这样的顺序：
-    &lt;1&gt;数据基础了解：  数据源质量→数据类型→数据集质量
-        给你一份数据集--洞察数据
-        背景了解：数据来源、如何收集、字段含义，格式以及编码方式
-        背景校验：
-                字段校验
-                    字段的单位和含义
-                    是使用什么来表示控制和缺失值？
-                值校验：    
-                简单的统计说明：
-                简单的图形展示：直方图等
-        复杂的生态系统中存在着一种无序状态，不要把完美和准确对立起来
-    &lt;2&gt;数据描述性分析： 平均水平→数据分布→量变关系→多维交叉
-    &lt;3&gt;数据可视化分析： 数据可视化
-    &lt;4&gt;机器学习算法       这步非必须
-    &lt;5&gt;数据报告展示： 
-        三种展示信息的工具：表格、文字、数据图表
-        关键信息优先
-        宏观到微观
-          同时考虑到：
-            人脑理解信息的层次关系，并不会依据信息本身的层次关系，反而更依赖接受信息的先后顺序
-            视觉思考的特点
-        建议：
-            判断---行为数据和商业数据的关系
-            方案---基于自己的思考所得出的策略建议
-    &lt;6&gt;数据附录：
-        附上明细数据集和制作过程
-            报告可重复--内容可继续深入
-直觉好，却很难复制。
-        一、直觉依赖于经验，但当缺少经验的时候怎么办？
-        二、直觉善于处理明显的异常值，但隐蔽的怎么办
-        三、直觉可能是错的
-</pre></div>
-
-
-<h3>6.数据看什么</h3>
-<div class="highlight"><pre><span></span>提出四个主要问题
-1．整体来说，这个行业什么状况，行业由哪几部分构成
-    01.商业模式是什么，
-        目标客户：市场
-        盈利模式：
-        竞争优势：竞品分析-他们为什么选我们不选其他人     
-    02.行业经营状况如何
-      收入
-         在册用户
-         活跃用户
-         购买用户以及购买量
-      成本：
-        产品成本（开发--策划--内容--数据）
-        运营成本（公司必须负担的基础开支--网络）
-        渠道成本--用户成本（每新增一个用户带来的成本）
-        营销成本-活动成本（临时性为了激励销量付出的成本）
-     行业排名--数据参考
-    03.
-      行业发展态势-走势
-            变化趋势                    
-2．细部说了什么，怎么说的？
-      具体的业务线
-        渠道
-        营销
-        内容
-        产品          
-3．数据合理吗？是全部有道理，还是部分有道理？
-        抛出初步假设，方法-发红包，抛话题
-4．这些数据跟你有什么关系？
-        领导---做什么
-        协调者--怎么做
-        执行者--做
-
-建议--复盘
-    深入理解--关注核心问题
-    独立负责--完成一件工作，要把自己的眼光拔到和领导一样的水平
-</pre></div>
-
-
-<h3>7.职业信条</h3>
-<div class="highlight"><pre><span></span> 1.保证经过我手的数据经得起考验---方式，做验证和自我提问 
- 2.不要将你的游戏毫无保留的交于他人，他们的方案我们顶多只能作为参考，我们必须不断学习，提高自己对事物分析的能力
- 3.怀疑一切是职业的信条。结果如何，一定要看到依据。关键性步骤一定亲自查看
- 4.保证数据的安全性，注意原始数据备份和灾难恢复。不对外泄露公司的任何非公开的数据
- 5.建立在不完善的数据基础上的决策以及建立在没有任何数据基础上的决策不能简而言之说其中的一种不好，所以的评判都是有其场景的
-</pre></div>
-
-
-<h3>交流常用语</h3>
-<div class="highlight"><pre><span></span>要有时间的观念
-    数据是从XX年开始
-    截至20XX年XX月
-
-有参考的习惯
-    数据来源是：
-取数周期
-
-示例：
-目前互联网***有**类，分别是***，***，***，其中
-        **类，具有**功能和**特色，代表的有***，***
-
-主流上线时间轴
-    我们应该如何……？
-    我复述一下
-
-产业链
-</pre></div>
-
-
-<h3>参考</h3>
-<div class="highlight"><pre><span></span>运营报告的6个必备要素 https://ask.hellobi.com/blog/chuanshu108/6035
-面试心不慌，3天快入行，经营分析实战应用 https://ask.hellobi.com/blog/chenwen/6414
-数据整理时间指南--Bad Data Handbook
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>数据以及数据集--数据分析过程和分析报告</p>
+                <a class="readmore" href="/items/my-item-post-13.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -455,6 +313,28 @@
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>介绍数据收集以及爬虫基本内容。</p>
                 <a class="readmore" href="/items/my-item-post-03.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-16.html" rel="bookmark"
+                           title="Permalink to R语言中文分词-jiebaR">R语言中文分词-jiebaR</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-25T23:28:00+08:00">
+                Published: 2016-04-25 23:28:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>R进行jieba中文分词</p>
+                <a class="readmore" href="/items/my-item-post-16.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

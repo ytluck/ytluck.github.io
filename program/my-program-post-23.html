@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Web服务器</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-23.html" rel="bookmark"
+           title="Permalink to Web服务器">Web服务器</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-13T20:15:00+08:00">
+                Published: 2017-05-13 20:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->      <h3>提供服务</h3>
+<div class="highlight"><pre><span></span>应用程序服务器：应用服务器，有业务逻辑
+Web服务器
+</pre></div>
+
+
+<h3>Web服务器-</h3>
+<div class="highlight"><pre><span></span>    Web服务器的基本功能就是提供Web信息浏览服务。它需支持HTTP协议、HTML文档格式及URL
+        静态HTML网页+动态网页
+                动态网页--与后台数据库进行交互，数据传递
+                动态网页除了早期的CGI外，目前主流的动态网页技术有JSP,ASP,PHP等
+            1.CGI--通用网关接口&lt;Common Gateway Interface&gt;，
+                    通过CGI建立WEB页面与脚本程序之间的联系，
+                    并且可以利用脚本程序来处理访问者输入的信息并据此作出响应
+            三大技术栈--   .NET      JSP       LAMP
+                 1.ASP即Active Server Pages，是MicroSOft公司开发的服务器端脚本环境。
+                    微软开发的一种类似超文本标识语言(HTML)、脚本(Script)与CGI(公用网关接口)的结合体，
+                    它没有提供自己专门的编程语言，而是允许用户使用许多已有的脚本语言编写ASP的应用程序
+                    产生动态网页内容的方式：
+                 2.JSP页面由HTML代码和嵌入其中的Java代码所组成
+                 3.LAMP
+        Web服务器
+            Apache---开源的Web服务器-
+            Nginx---开源的Web服务器-俄罗斯
+            IIS----Internet Information Server微软公司
+            Lighttpd--德国
+            Tomcat
+</pre></div>
+
+
+<h3>Web开发框架与部署方式</h3>
+<div class="highlight"><pre><span></span>            Python Web 开发框架
+                    Web2py
+                    Web.py
+                    Flask
+                    Django
+            Python部署方式
+                    协议
+                            CGI   即通用网关接口(Common Gateway Interface)
+                            FastCGI
+                            WSGI (Python Web Server Gateway Interface，Python Web服务器网关接口)是基于现存的CGI标准而设计的
+                            uwsgi
+                Web服务器，例如Gunicorn或uWSGI
+                            WSGI Server: Gunicorn
+                            Web Server: Nginx
+                            进程管理工具： supervisor
+
+            Java Web开发框架
+                        三大框架
+                                Spring
+                                Struts2
+                                Hibernate
+                        框架整合
+
+            Java部署
+                    在tomcat中的conf目录中，在server.xml中的，&lt;host/&gt;节点中添加
+</pre></div>
+
+
+<h3>Tomcat与Web服务器</h3>
+<div class="highlight"><pre><span></span>Tomcat是提供一个支持Servlet和JSP运行的容器。Servlet和JSP能根据实时需要，产生动态网页内容
+                    OA/ERP多是Java/JSP开发的
+                    Java EE为例，Web服务器主要是处理静态页面处理和作为 Servlet容器，解释和执行servlet/JSP,
+一般来说，大的站点都是将Tomcat与Apache的结合，
+                    Apache负责接受所有来自客户端的HTTP请求，然后将Servlets和JSP的请求转发给Tomcat来处理。
+                    Tomcat完成处理后，将响应传回给Apache，最后Apache将响应返回给客户端。
+而且为了提高性能，可以一台apache连接多台tomcat实现负载平衡
+
+缓存机制--内存缓存-内存数据库缓存
+            持久化机制--写入到数据库或者文件
+</pre></div>
+
+
+<h3>Tomcat中部署Servlet与JSP  Web应用程序</h3>
+<div class="highlight"><pre><span></span>部署环境要求-- 
+    0.0操作系统 01.JDK 环境   02. Web 服务器  03.数据库
+部署的方式以及步骤
+        1.WAR 包&lt;Web Application aRchive, Web应用程序归档文件&gt; Java Servlet规范定义的文件格式和结构
+            Tomcat提供无需重启而部署应用程序的方法，也可以解除对应用程序的部署--热部署&lt;hot deployment&gt;
+            Tomcat配置文件--server.xml有一个叫做Context的XML元素
+                                        Context XML片段文件部署--context.xml片段文件
+        2.  
+            01.Host Manager Web应用程序 或者Apache Ant自动化部署
+                    通过Web管理自己的Web应用程序
+
+            02.解包目录--用解包的webapp目录进行部署
+
+            03.war文件部署--用war文件部署web应用程序
+                1、直接放到Webapps目录下
+                    Tomcat的Webapps目录是Tomcat默认的应用目录，当服务器启动时，会加载所有这个目录下的应用。
+                    也可以将JSP程序打包成一个war包放在目录下，服务器会自动解开这个war包，并在这个目录下生成一个同名的文件夹。
+                        解包WAR文件的内容到相同文件名的路径中，去除war扩展名，然后从解包的目录中服务文件
+                        步骤：打包上传--- war 文件移动到 Tomcat 目录下的 webapps 下--重启 Tomcat以访问项目
+
+            说明
+                    注意：部署和重新加载不同
+
+        3.分布式集群部署
+                Java Servlet Container
+        4.与Apache web服务器整合
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

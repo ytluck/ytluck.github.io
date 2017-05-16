@@ -26,7 +26,153 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-21.html">JVM参数以及Spark不同运行模式下对其参数调用</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-23.html">Web服务器</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-05-13T20:15:00+08:00">
+                Published: 2017-05-13 20:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info --><h3>提供服务</h3>
+<div class="highlight"><pre><span></span>应用程序服务器：应用服务器，有业务逻辑
+Web服务器
+</pre></div>
+
+
+<h3>Web服务器-</h3>
+<div class="highlight"><pre><span></span>    Web服务器的基本功能就是提供Web信息浏览服务。它需支持HTTP协议、HTML文档格式及URL
+        静态HTML网页+动态网页
+                动态网页--与后台数据库进行交互，数据传递
+                动态网页除了早期的CGI外，目前主流的动态网页技术有JSP,ASP,PHP等
+            1.CGI--通用网关接口&lt;Common Gateway Interface&gt;，
+                    通过CGI建立WEB页面与脚本程序之间的联系，
+                    并且可以利用脚本程序来处理访问者输入的信息并据此作出响应
+            三大技术栈--   .NET      JSP       LAMP
+                 1.ASP即Active Server Pages，是MicroSOft公司开发的服务器端脚本环境。
+                    微软开发的一种类似超文本标识语言(HTML)、脚本(Script)与CGI(公用网关接口)的结合体，
+                    它没有提供自己专门的编程语言，而是允许用户使用许多已有的脚本语言编写ASP的应用程序
+                    产生动态网页内容的方式：
+                 2.JSP页面由HTML代码和嵌入其中的Java代码所组成
+                 3.LAMP
+        Web服务器
+            Apache---开源的Web服务器-
+            Nginx---开源的Web服务器-俄罗斯
+            IIS----Internet Information Server微软公司
+            Lighttpd--德国
+            Tomcat
+</pre></div>
+
+
+<h3>Web开发框架与部署方式</h3>
+<div class="highlight"><pre><span></span>            Python Web 开发框架
+                    Web2py
+                    Web.py
+                    Flask
+                    Django
+            Python部署方式
+                    协议
+                            CGI   即通用网关接口(Common Gateway Interface)
+                            FastCGI
+                            WSGI (Python Web Server Gateway Interface，Python Web服务器网关接口)是基于现存的CGI标准而设计的
+                            uwsgi
+                Web服务器，例如Gunicorn或uWSGI
+                            WSGI Server: Gunicorn
+                            Web Server: Nginx
+                            进程管理工具： supervisor
+
+            Java Web开发框架
+                        三大框架
+                                Spring
+                                Struts2
+                                Hibernate
+                        框架整合
+
+            Java部署
+                    在tomcat中的conf目录中，在server.xml中的，&lt;host/&gt;节点中添加
+</pre></div>
+
+
+<h3>Tomcat与Web服务器</h3>
+<div class="highlight"><pre><span></span>Tomcat是提供一个支持Servlet和JSP运行的容器。Servlet和JSP能根据实时需要，产生动态网页内容
+                    OA/ERP多是Java/JSP开发的
+                    Java EE为例，Web服务器主要是处理静态页面处理和作为 Servlet容器，解释和执行servlet/JSP,
+一般来说，大的站点都是将Tomcat与Apache的结合，
+                    Apache负责接受所有来自客户端的HTTP请求，然后将Servlets和JSP的请求转发给Tomcat来处理。
+                    Tomcat完成处理后，将响应传回给Apache，最后Apache将响应返回给客户端。
+而且为了提高性能，可以一台apache连接多台tomcat实现负载平衡
+
+缓存机制--内存缓存-内存数据库缓存
+            持久化机制--写入到数据库或者文件
+</pre></div>
+
+
+<h3>Tomcat中部署Servlet与JSP  Web应用程序</h3>
+<div class="highlight"><pre><span></span>部署环境要求-- 
+    0.0操作系统 01.JDK 环境   02. Web 服务器  03.数据库
+部署的方式以及步骤
+        1.WAR 包&lt;Web Application aRchive, Web应用程序归档文件&gt; Java Servlet规范定义的文件格式和结构
+            Tomcat提供无需重启而部署应用程序的方法，也可以解除对应用程序的部署--热部署&lt;hot deployment&gt;
+            Tomcat配置文件--server.xml有一个叫做Context的XML元素
+                                        Context XML片段文件部署--context.xml片段文件
+        2.  
+            01.Host Manager Web应用程序 或者Apache Ant自动化部署
+                    通过Web管理自己的Web应用程序
+
+            02.解包目录--用解包的webapp目录进行部署
+
+            03.war文件部署--用war文件部署web应用程序
+                1、直接放到Webapps目录下
+                    Tomcat的Webapps目录是Tomcat默认的应用目录，当服务器启动时，会加载所有这个目录下的应用。
+                    也可以将JSP程序打包成一个war包放在目录下，服务器会自动解开这个war包，并在这个目录下生成一个同名的文件夹。
+                        解包WAR文件的内容到相同文件名的路径中，去除war扩展名，然后从解包的目录中服务文件
+                        步骤：打包上传--- war 文件移动到 Tomcat 目录下的 webapps 下--重启 Tomcat以访问项目
+
+            说明
+                    注意：部署和重新加载不同
+
+        3.分布式集群部署
+                Java Servlet Container
+        4.与Apache web服务器整合
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-22.html" rel="bookmark"
+                           title="Permalink to 携程模型部署-小记">携程模型部署-小记</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-13T20:05:00+08:00">
+                Published: 2017-05-13 20:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>R-Python以及Spark在业务模型级别的部署</p>
+                <a class="readmore" href="/program/my-program-post-22.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-21.html" rel="bookmark"
+                           title="Permalink to JVM参数以及Spark不同运行模式下对其参数调用">JVM参数以及Spark不同运行模式下对其参数调用</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-05-01T20:05:00+08:00">
                 Published: 2017-05-01 20:05:00
@@ -37,113 +183,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/java.html">Java</a> </p>
-</footer><!-- /.post-info --><h3>1.JVM的参数主要分为三类，分别是如下</h3>
-<div class="highlight"><pre><span></span>1堆大小设置
-    堆(Heap)和非堆(Non-heap)内存
-        JVM 中最大堆大小有三方面限制：
-            相关操作系统的数据模型（32-bt还是64-bit）限制；
-            系统的可用物理内存限制；
-            系统的可用虚拟内存限制。
-2.回收器选择
-        JVM给了三种选择：串行收集器、并行收集器、并发收集器
-3.辅助信息
-        JVM提供了大量命令行参数，打印信息，供调试使用
-</pre></div>
-
-
-<h3>2.常用参数配置汇总</h3>
-<div class="highlight"><pre><span></span>堆以及非堆设置-- 
-    JVM最大内存首先取决于实际的物理内存和操作系统
-    JVM初始分配的堆内存由-Xms指定，默认是物理内存的1/64；
-    JVM最大分配的堆内存由-Xmx指定，默认是物理内存的1/4。默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；
-    JVM使用-XX:PermSize设置非堆内存初始值，默认是物理内存的1/64；
-    JVM使用XX:MaxPermSize设置最大非堆内存的大小，默认是物理内存的1/4。
-    空余堆内存大于70%时，JVM会减少堆直到-Xms的最小限制。因此服务器一般设置-Xms、-Xmx 相等以避免在每次GC 后调整堆的大小。
-     说明：如果-Xmx 不指定或者指定偏小，应用可能会导致java.lang.OutOfMemory错误，此错误来自JVM，不是Throwable的，无法用try...catch捕捉。 
-        -Xms:初始堆大小
-        -Xmx:最大堆大小
-        -XX:NewSize=n:设置年轻代大小
-        -XX:NewRatio=n:设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4
-        -XX:SurvivorRatio=n:年轻代中Eden区与两个Survivor区的比值。注意Survivor区有两个。如：3，表示Eden：Survivor=3：2，一个Survivor区占整个年轻代的1/5
-        -XX:PermSize=64M JVM初始分配的非堆内存
-        -XX:MaxPermSize=128M JVM最大允许分配的非堆内存，按需分配
-
-收集器设置       
-        -XX:+UseSerialGC:设置串行收集器
-        -XX:+UseParallelGC:设置并行收集器
-        -XX:+UseParalledlOldGC:设置并行年老代收集器
-        -XX:+UseConcMarkSweepGC:设置并发收集器
-        垃圾回收统计信息
-            -XX:+PrintGC
-            -XX:+PrintGCDetails
-            -XX:+PrintGCTimeStamps
-            -Xloggc:filename
-        并行收集器设置
-            -XX:ParallelGCThreads=n:设置并行收集器收集时使用的CPU数。并行收集线程数。
-            -XX:MaxGCPauseMillis=n:设置并行收集最大暂停时间
-            -XX:GCTimeRatio=n:设置垃圾回收时间占程序运行时间的百分比。公式为1/(1+n)
-        并发收集器设置
-            -XX:+CMSIncrementalMode:设置为增量模式。适用于单CPU情况。
-            -XX:ParallelGCThreads=n:设置并发收集器年轻代收集方式为并行收集时，使用的CPU数。并行收集线程数。
-
-    辅助信息
-            -XX:+PrintGC
-            -XX:+PrintGCDetails
-            -XX:+PrintGCTimeStamps 
-            -Xloggc:filename:
-    调优总结
-        虚拟机的设置
-</pre></div>
-
-
-<h3>开发环境中的设置</h3>
-<div class="highlight"><pre><span></span>当在命令提示符下启动并使用JVM时
-    Eclipse中JVM内存设置
-            eclipse.ini内存设置
-    Idea设置内存
-    idea64.exe.vmoptions
-</pre></div>
-
-
-<h3>Spark中的JVM参数设置</h3>
-<div class="highlight"><pre><span></span><span class="x">(1)Driver的JVM参数：</span>
-<span class="x">        如果是yarn-cluster模式，</span>
-<span class="x">            -Xmx，-Xms--读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的JVM参数值。</span>
-<span class="x">            PermSize-------读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的JVM参数值。</span>
-<span class="x">            GC方式--------读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的参数值。</span>
-
-<span class="x">        如果是yarn-client模式，</span>
-<span class="x">            -Xmx，-Xms--默认读取spark-env文件中的SPARK_DRIVER_MEMORY值，-Xmx，-Xms值一样大小；</span>
-<span class="x">            PermSize-----是默认读取spark-class文件中的JAVA_OPTS=&quot;-XX:MaxPermSize=256m </span><span class="p">$</span><span class="nv">OUR_JAVA_OPTS</span><span class="x">&quot;值；</span>
-<span class="x">            GC方式----默认读取的是spark-class文件中的JAVA_OPTS；</span>
-<span class="x">以上值最后均可被spark-submit工具中的--driver-java-options参数覆盖。</span>
-
-<span class="x">(2)Executor的JVM参数：</span>
-<span class="x">        -Xmx，-Xms，</span>
-<span class="x">                    如果是yarn-cluster模式，则读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。</span>
-<span class="x">                    如果是yarn-client模式，则默认读取spark-env文件中的SPARK_EXECUTOR_MEMORY值，-Xmx，-Xms值一样大小；                   </span>
-<span class="x">        PermSize，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。</span>
-<span class="x">        GC方式，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值</span>
-
-<span class="x">cd /etc/spark/conf</span>
-<span class="x">ll</span>
-<span class="x">cat  spark-defaults.conf</span>
-<span class="x">        spark.yarn.driver.memoryOverhead 384</span>
-<span class="x">        spark.yarn.executor.memoryOverhead 384</span>
-<span class="x">cat spark-env.sh</span>
-
-
-<span class="x">cd /usr/hdp/2.4.0.0-169/spark/bin</span>
-<span class="x">ll</span>
-<span class="x">cat spark-class</span>
-
-<span class="x">spark-env</span>
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>JVM堆以及回收器和Spark在集群和客户端模式下</p>
+                <a class="readmore" href="/program/my-program-post-21.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>ytluck—For you - API</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/items/my-item-post-15.html">Python的Web网络编程</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T21:54:00+08:00">
+                Published: 2017-05-14 21:54:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/api.html">API</a> </p>
+</footer><!-- /.post-info --><h4>手动</h4>
+<div class="highlight"><pre><span></span>    0.人工打开--然后复制保存
+</pre></div>
+
+
+<h4>使用现有工具</h4>
+<div class="highlight"><pre><span></span>    1.1使用浏览器以及对应插件
+            httpfox--监控浏览器执行htt请求和响应
+    1.2使用整站下载工具
+            Teleport Ultra
+</pre></div>
+
+
+<h4>使用Python库</h4>
+<div class="highlight"><pre><span></span>    <span class="mf">2.</span><span class="err">使用</span><span class="n">urllib2</span><span class="err">以及</span><span class="n">urllib</span>  <span class="o">----</span><span class="err">如外的可能使用</span><span class="o">&lt;</span><span class="n">cookielib</span><span class="o">&gt;</span>
+            <span class="n">urllib2</span><span class="err">库里面的</span><span class="n">urlopen</span><span class="err">方法，传入一个</span><span class="n">URL</span><span class="err">，</span><span class="n">data</span><span class="err">默认为空</span><span class="bp">None</span><span class="err">，返回一个</span><span class="n">response</span><span class="err">对象，返回信息便保存在这里面</span>
+                <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+            <span class="err">例子</span>
+                <span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="err">构造</span><span class="n">Request</span><span class="err">类</span><span class="o">-</span><span class="err">参数可以传入一个</span><span class="n">request</span><span class="err">请求</span><span class="p">,</span><span class="err">它其实就是一个</span><span class="n">Request</span><span class="err">类的实例</span>
+                <span class="kn">import</span> <span class="nn">urllib2</span>
+                <span class="n">request</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="mf">3.</span><span class="err">使用</span><span class="n">Requests</span>
+            <span class="c1">#-*- coding:utf-8 -*-</span>
+            <span class="kn">import</span> <span class="nn">requests</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://www.baidu.com&#39;</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;key1&#39;</span><span class="p">:</span> <span class="s1">&#39;value1&#39;</span><span class="p">,</span> <span class="s1">&#39;key2&#39;</span><span class="p">:</span> <span class="s1">&#39;value2&#39;</span><span class="p">}</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>使用Python爬虫框架</h4>
+<div class="highlight"><pre><span></span>    4.1--使用Selenium
+    4.2---使用爬虫框架--Scrapy
+</pre></div>
+
+
+<h4>商业软件</h4>
+<div class="highlight"><pre><span></span>八爪鱼
+import.io
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Python 爬虫的工具列表 http://python.jobbole.com/82633/
+[Python]网络爬虫（三）：异常的处理和HTTP状态码的分类 http://blog.csdn.net/pleasecallmewhy/article/details/8923725
+Selenium 爬取淘宝实战练习 https://ask.hellobi.com/blog/JiangYiXin/7837
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-14.html" rel="bookmark"
+                           title="Permalink to Python调用网络应用程序接口">Python调用网络应用程序接口</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T21:50:00+08:00">
+                Published: 2017-05-14 21:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/api.html">API</a> </p>
+</footer><!-- /.post-info -->                <p>调用返回JSON或者XML数据格式</p>
+                <a class="readmore" href="/items/my-item-post-14.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

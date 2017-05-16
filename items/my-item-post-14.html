@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python调用网络应用程序接口</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-14.html" rel="bookmark"
+           title="Permalink to Python调用网络应用程序接口">Python调用网络应用程序接口</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T21:50:00+08:00">
+                Published: 2017-05-14 21:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/api.html">API</a> </p>
+</footer><!-- /.post-info -->      <h3>Web API-网络应用程序接口</h3>
+<div class="highlight"><pre><span></span>web API 网络应用程序接口，是一套成熟系统所必需的接口，可以被其他系统或脚本来调用。
+如果一个URL返回的不是HTML，而是机器能直接解析的数据，这个URL就可以看成是一个Web API
+        http    :GET  POST
+</pre></div>
+
+
+<h4>一般步骤</h4>
+<div class="highlight"><pre><span></span>    第一步，申请”Web服务API”密钥（Key）；
+    第二步，拼接HTTP请求URL，第一步申请的Key需作为必填参数一同发送；
+    第三步，接收HTTP请求返回的数据（JSON或XML格式），解析数据。
+</pre></div>
+
+
+<h4>Python调用Web API实现方式--获取请求网页--提取信息</h4>
+<div class="highlight"><pre><span></span>        方式： 1.利用python第三方库Requests实现，Requests是基于urllib3，
+                    2.基于http协议利用标准库http.client实现
+                    3.利用基于传输层上socket实现
+            解析数据--提取信息
+                    返回的是XML格式：Beautiful Soup 是一个可以从HTML或XML文件中提取数据的Python库
+                    返回的是JSON格式：json和simplejson 以及请求库自带的JSON解析器                      
+        注释
+        一般情况下，接口的输入参数和输出数据编码全部统一为UTF-8。
+</pre></div>
+
+
+<h4>举例：</h4>
+<div class="highlight"><pre><span></span><span class="c1">#-*- coding:utf-8 -*- </span>
+<span class="sd">&#39;&#39;&#39; 利用高德地图api实现地址和经纬度的转换  &#39;&#39;&#39;</span> 
+<span class="kn">import</span> <span class="nn">requests</span> 
+<span class="c1"># 获取respnose</span>
+<span class="k">def</span> <span class="nf">geocode</span><span class="p">(</span><span class="n">address</span><span class="p">):</span> 
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="n">address</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;599a3c249c91a5cc001c7350740ddeb3&#39;</span><span class="p">}</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;http://restapi.amap.com/v3/geocode/geo&#39;</span>
+     <span class="c1"># 最基本的GET请求-#带参数的GET请求</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="c1">#返回一个response对象，其存储了服务器响应的内容</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="c1">#Requests中内置的JSON解码器</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">address</span> <span class="o">+</span> <span class="s2">&quot;的经纬度：&quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">[</span><span class="s1">&#39;geocodes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;请输入地址:&quot;</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="s1">&#39;北京市海淀区&#39;</span>
+    <span class="n">geocode</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>说明</h4>
+<div class="highlight"><pre><span></span>其他方法都是统一的接口样式,，例如requests.post(“http://httpbin.org/post”) #POST请求
+    data = {&#39;some&#39;: &#39;data&#39;}
+    headers = {&#39;content-type&#39;: &#39;application/json&#39;,
+                     &#39;User-Agent&#39;: &#39;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0&#39;}
+    requests.post(&#39;https://api.github.com/some/endpoint&#39;, data=data, headers=headers)
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>高德地图web服务API：http://lbs.amap.com/api/webservice/summary
+Requests的文档：http://www.python-requests.org/en/master/
+中文文档：http://cn.python-requests.org/zh_CN/latest/
+Python-开发库资源文档：http://hao.jobbole.com/?catid=144
+谷歌地球网页版：https://earth.google.com/web/
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

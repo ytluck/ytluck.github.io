@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言调用第三方地图数据库</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-20.html" rel="bookmark"
+           title="Permalink to R语言调用第三方地图数据库">R语言调用第三方地图数据库</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-13T21:20:00+08:00">
+                Published: 2017-05-13 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h3>1.为什么使用地图作为背景：</h3>
+<div class="highlight"><pre><span></span>地域空间数据可视化
+    当指标数据和要表达的主题跟地域有关联时，一般会选择用地图为大背景。
+    这样用户可以直观的了解整体的数据情况，
+    同时也可以根据地理位置快速的定位到某一地区来查看详细数据。
+    例如：在地图上标出特定位置的数据表现或者一些数值
+</pre></div>
+
+
+<h3>2.地图数据</h3>
+<div class="highlight"><pre><span></span>    第一种思路：有一些R包中存储着常见地图的数据
+    第二种思路：下载所画图的地理数据，然后读入R进行绘制
+    第三种思路：直接去调取专业的地图企业或者网站的数据
+</pre></div>
+
+
+<h3>3.第三方地图数据说明</h3>
+<div class="highlight"><pre><span></span>各家地图服务商使用的坐标并不相同。目前主要有如下三种坐标系：
+    大地坐标（WGS84坐标系）：国际上通用的坐标系。设备一般包含GPS芯片或者北斗芯片获取的经纬度为WGS84地理坐标系, 
+                                                    谷歌地图采用的是WGS84地理坐标系（中国范围除外）。
+    火星坐标（GCJ02坐标系）：是由中国国家测绘局制订的地理信息系统的坐标系统。由WGS84坐标系经加密后的坐标系。
+                                                        高德地图、谷歌中国地图和搜搜中国地图采用的是GCJ02地理坐标系。
+    百度坐标（BD09坐标系）：GCJ02坐标系经加密后的坐标系。 
+    一般从GPS得到的数据是经纬度，百度地图定位偏差-百度地图开发时，输入经纬度 (用google earth或GPS设备得到) ，会发现坐标显示位置偏移
+    坐标偏移--国家要求 + 百度的二次加密
+    主流互联网地图服务商都对外发布了接口，供第三方使用。
+    导航电子地图资质和互联网地图服务资质
+    百度、腾讯、搜狗、图吧等属于互联网地图服务提供商，所使用地图数据均购买于数据提供商
+    互联网地图服务甲级测绘资质单位
+    地图数据公司一方面要有政府背景，同时需要大量成本定期采集、更新全国地图数据
+</pre></div>
+
+
+<h3>4.R语言调用第三方地图数据</h3>
+<div class="highlight"><pre><span></span>调用第三方的地图数据<span class="o">--</span>然后再地图上表现数据<span class="o">--</span>
+    <span class="o">%&gt;%</span>   管道函数<span class="o">--</span>上一步产生的对象管道输出为下一步调用的函数的第一个参数<span class="o">--</span>链式命令<span class="o">--</span>magrittr包
+                        嵌套版本的代码
+                        链式版本的代码<span class="o">--</span> dplyr 包已极大地发挥了管道操作的优势
+<span class="m">01.</span>ggmap包底层地图中可以调取Google <span class="kp">Map</span>的数据，
+                        还可以调取OpenStreetMap <span class="p">(</span>‘osm’<span class="p">)</span>、
+                                            Stamen Maps <span class="p">(</span>‘stamen’<span class="p">)</span>和
+                                            CloudMade maps <span class="p">(</span>‘cloudmade’<span class="p">)</span><span class="o">--</span>需要Api Key
+                        地图类型有
+                            有’terrain’（地势图）、
+                               ’satellite’（卫星图）、
+                               ’roadmap’（道路图）
+                               和 ‘hybrid’（混合）
+        说明<span class="o">---</span>这个需要科学上网<span class="o">--</span>即你懂得，然后每天的调用Google <span class="kp">Map</span>是有次数限制的，同时地图涉及政治问题请谨慎使用
+
+        geocode 获取地点的经纬度，基于Google Maps
+        get_map<span class="o">:</span>获取地图数据函数，输入可以是位置名称或者经纬度<span class="o">--</span>获取的地图是非矢量图
+        ggmap：主要换图函数
+    <span class="c1">##安装包-如果没有安装，则需要将注释去掉，然后再运行</span>
+    <span class="c1">#install.packages(&#39;ggmap&#39;)</span>
+    <span class="c1">#install.packages(&#39;mapproj&#39;)</span>
+    <span class="c1">##加载包</span>
+    <span class="kn">library</span><span class="p">(</span>ggmap<span class="p">)</span>
+    <span class="kn">library</span><span class="p">(</span>mapproj<span class="p">)</span>
+    map <span class="o">&lt;-</span> get_map<span class="p">(</span>location <span class="o">=</span> <span class="s">&#39;China&#39;</span><span class="p">,</span> zoom <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+    ggmap<span class="p">(</span>map<span class="p">)</span>
+    <span class="c1">##南京道路图</span>
+    map2 <span class="o">&lt;-</span> get_map<span class="p">(</span>location <span class="o">=</span> <span class="s">&#39;Nanjing&#39;</span><span class="p">,</span> zoom <span class="o">=</span> <span class="m">10</span><span class="p">,</span> maptype <span class="o">=</span> <span class="s">&#39;roadmap&#39;</span><span class="p">)</span>
+    ggmap<span class="p">(</span>map2<span class="p">)</span>
+
+<span class="m">02.</span>调用百度的API
+        需要注册API密钥
+
+<span class="m">03.</span>搜狗地图API
+        http<span class="o">://</span>map.sogou.com<span class="o">/</span>api<span class="o">/</span>
+                 搜狗地图API是一套由JavaScript语言编写的应用程序接口
+                                一定的JavaScript编程经验，
+                                了解面向对象的设计和开发概念。 
+                                具备电子地图相关的一些基本知识
+<span class="m">04.</span>雅虎的PlaceFinder是一个提供地理编码的Web服务，它可以帮助应用程序实现地理位置感知功能，
+                            并且转换成街道地址，或者把地理位置信息转换成地理坐标（反之亦然）
+                            https<span class="o">://</span>developer.yahoo.com<span class="o">/</span>geo<span class="o">/</span>placefinder<span class="o">/</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>    R时代，你要怎样画地图？https://cos.name/2013/01/drawing-map-in-r-era/
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
