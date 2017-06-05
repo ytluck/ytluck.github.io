@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Scala样例类</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-25.html" rel="bookmark"
+           title="Permalink to Scala样例类">Scala样例类</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:15:00+08:00">
+                Published: 2017-06-03 20:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->      <h3>1.样例类</h3>
+<div class="highlight"><pre><span></span>1.样例类
+        case class 旨在创建的是不可变数据
+        类被定义成为case类后-称之为样例类
+               Scala会自动帮你创建一个伴生对象
+               并默认自动实现了一系列方法        
+              01.实现了apply方法，意味着你不需要使用new关键字就能创建该类对象
+              02.实现了unapply方法，可以通过模式匹配来获取类属性，是Scala中抽取器的实现和模式匹配的关键方法。
+              03.实现了类构造参数的getter方法（构造参数默认被声明为val），
+                        当构造参数是声明为var类型的，它将帮你实现setter和getter方法(不建议将构造参数声明为var)
+                04.样本类参数列表中的所有参数隐式获得了val前缀，因此它被当作字段维护。
+                05.编译器为这个类添加了方法toString,hashCode和equals等方法
+
+案例--参考课程
+        /** A raw stackoverflow posting, either a question or an answer */
+    case class Posting(postingType: Int, id: Int, acceptedAnswer: Option[Int], parentId: Option[Int], score: Int, tags: Option[String]) extends Serializable
+
+      /** Load postings from the given file */
+        def rawPostings(lines: RDD[String]): RDD[Posting] =
+        lines.map(line =&gt; {
+            val arr = line.split(&quot;,&quot;)
+            Posting(
+                postingType =    arr(0).toInt,
+                id =             arr(1).toInt,
+                acceptedAnswer = if (arr(2) == &quot;&quot;) None else Some(arr(2).toInt),
+                parentId =       if (arr(3) == &quot;&quot;) None else Some(arr(3).toInt),
+                score =          arr(4).toInt,
+                tags =           if (arr.length &gt;= 6) Some(arr(5).intern()) else None)
+        })
+
+关于case class
+case class，它其实就是一个普通的class。但是它又和普通的class略有区别。不可变类中的一种简单类型，内置了所有JAVA类的基本方法，比如以下中的2.3。
+提供factory method来方便构造object、class parameter隐含val prefix
+&gt;1、初始化的时候普通类一定需要加new，case calss 可以不用new，当然你也可以加上。
+&gt;2、toString的实现更漂亮
+&gt;3、默认实现了equals 和hashCode
+&gt;4、默认是可以序列化的，也就是实现了Serializable
+&gt;5、自动从scala.Product中继承一些函数;
+&gt;6、case class构造函数的参数是public级别的，我们可以直接访问
+&gt;7、支持模式匹配，case class最重要的特性应该就是支持模式匹配。
+</pre></div>
+
+
+<p>参考：
+    样例类case详解 http://www.bitscn.com/cloud/776801.html
+    Scala class和case class的区别 https://www.iteblog.com/archives/1508.html
+    案例代码-https://github.com/amirziai/big-data-scala-spark/blob/master/stackoverflow/src/main/scala/stackoverflow/StackOverflow.scala</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

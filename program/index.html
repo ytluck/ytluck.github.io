@@ -26,7 +26,278 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-23.html">Web服务器</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-29.html">不同语言中类中方法的定义</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:45:00+08:00">
+                Published: 2017-06-03 20:45:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info --><h2>一.不同语言中的方法</h2>
+<h3>在Python中的方法</h3>
+<div class="highlight"><pre><span></span>01.实例方法 ---的第一个参数必须是”self
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def printInstanceInfo(self):
+        print &quot;%s is %d years old&quot; %(self.name, self.age)
+
+02.静态方法  -----没有参数限制，既不需要实例参数，也不需要类参数，定义的时候使用@staticmethod装饰器
+@staticmethod
+def printClassAttr():
+    print Student.count
+    print Student.books
+
+03.类方法 -----=以cls作为第一个参数，cls表示类本身，定义时使用@classmethod装饰器。通过cls可以访问类的相关属性
+@classmethod
+def printClassInfo(cls):
+    print cls.__name__
+    print dir(cls)
+参数
+    主要区别在于参数，
+    静态方法没有参数限制，既不需要实例参数，也不需要类参数
+使用
+    实例方法被绑定到一个实例，只能通过实例进行调用；
+    但是对于静态方法和类方法，可以通过类名和实例两种方式进行调用。
+</pre></div>
+
+
+<h4>访问控制</h4>
+<div class="highlight"><pre><span></span>访问控制
+Python中没有访问控制的关键字，例如private、protected等等。但是，在Python编码中，有一些约定来进行访问控制。
+单下划线”_”
+    在Python中，通过单下划线”_”来实现模块级别的私有化，一般约定以单下划线”_”开头的变量、函数为模块私有的
+
+双下划线”__”
+</pre></div>
+
+
+<h3>Java中的类方法</h3>
+<div class="highlight"><pre><span></span>    Java 实例方法属于每个对象个体的方法
+    Java中类变量也叫静态变量，也就是在变量前加了static 的变量
+
+    调用--import
+        类名.静态方法名
+        new一个实例，然后实例调用方法
+        继承的方法--直接调用
+        模块名.函数名()
+</pre></div>
+
+
+<h3>scala--中的类</h3>
+<div class="highlight"><pre><span></span>    <span class="kn">import</span> <span class="nn">a_trait</span>
+    <span class="n">extends</span> <span class="n">a_trait</span><span class="o">--</span><span class="err">直接用</span>
+    <span class="nb">apply</span><span class="o">---</span><span class="err">不用</span><span class="n">new</span><span class="err">一个对象，在构造样本类的对象时，可以略去</span><span class="n">new</span><span class="err">关键字，言简意赅，提高了代码的表达力。</span>
+    <span class="n">package</span> <span class="nb">object</span><span class="o">--</span><span class="err">对于包对象，</span><span class="n">import</span><span class="err">之后直接用</span>
+
+
+     <span class="err">包对象可以持有函数和变量</span><span class="o">--</span> <span class="err">引入语句可以出现在任何位置，不限于文件顶部</span>
+     <span class="n">scala</span> <span class="n">import</span><span class="err">引入语句可以引入包、类和对象</span>
+
+     <span class="err">引入包</span><span class="o">.</span><span class="n">_</span> 
+            <span class="err">包下的样例类直接调用，样例类</span><span class="o">--</span><span class="err">样例类有参数</span>
+            <span class="kn">import</span> <span class="nn">org.apache.spark.sql.execution.command._</span>
+             <span class="n">DescribeFunctionCommand</span><span class="p">(</span><span class="n">functionName</span><span class="p">,</span> <span class="n">EXTENDED</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>二.管理大型程序中的名称--包</h2>
+<h3>Java的包管理</h3>
+<div class="highlight"><pre><span></span><span class="err">包管理机制</span><span class="o">-</span>
+    <span class="err">分层管理</span>
+            <span class="err">不同的包</span>
+            <span class="err">同一个包，不同的主类中</span>
+            <span class="err">同一个主类，不同的的类，接口</span>
+            <span class="err">一个类中</span><span class="o">-----------------------</span><span class="err">内部类</span>
+
+<span class="err">复用类</span><span class="o">--</span><span class="err">类的调用</span>
+        <span class="err">利用现有类型生成新的类型</span><span class="o">--</span><span class="err">代码复用机制</span>
+                <span class="err">组合</span><span class="o">--</span>
+                <span class="err">继承</span><span class="o">--</span>
+                <span class="err">实现</span><span class="o">--</span>    
+    <span class="err">组合</span>
+            <span class="err">首先：</span><span class="kn">import</span>
+            <span class="err">其次：</span>
+    <span class="err">继承</span>
+        <span class="n">extends</span>
+    <span class="err">实现</span>
+        <span class="n">implements</span>
+        <span class="err">一个</span><span class="n">java</span><span class="err">主类中引用另一个类的方法</span>
+                <span class="err">类</span><span class="o">--</span><span class="err">静态类</span>
+<span class="err">类说明</span><span class="o">--</span><span class="err">静态变量和静态方法都属于静态对象</span>
+    <span class="err">静态变量的使用</span><span class="o">--</span><span class="n">static</span> 
+            <span class="kn">import</span> <span class="err">类</span> <span class="o">&lt;</span><span class="err">不同包或者类</span><span class="o">&gt;</span>
+            <span class="err">直接用</span> <span class="err">类名</span><span class="o">.</span><span class="err">静态方法名</span>  <span class="err">或者</span>  <span class="err">类名</span><span class="o">.</span><span class="err">静态变量名就可引用</span>
+            <span class="err">不用使用</span><span class="n">new</span><span class="err">一个实例，然后实例调用方法或者变量</span>
+        <span class="err">域</span>
+        <span class="err">方法</span>
+</pre></div>
+
+
+<h3>Scala的包管理</h3>
+<div class="highlight"><pre><span></span>&lt;1&gt;
+- Scala的单例对象Scala不能定义静态成员,而是代之定义单例对象(singleton object)。以object关键字定义
+
+包可以包含类、对象和特质，但不能包含函数或变量的定义。
+    很不幸，这是Java虚拟机的局限。把工具函数或常量添加到包而不是某个Utils对象，这是更加合理的做法。
+包对象的出现正是为了解决这个局限。每个包都可以有一个包对象。你需要在父包中定义它，且名称与子包一样
+</pre></div>
+
+
+<h3>Python模块及包的导入</h3>
+<div class="highlight"><pre><span></span><span class="n">Python</span><span class="err">的包管理</span>
+<span class="err">包下载</span>    <span class="n">pip</span>  <span class="n">install</span>
+
+<span class="err">导入：</span>
+        <span class="kn">from</span> <span class="o">+</span> <span class="n">import</span><span class="err">来导入包中的部分模块</span>
+        <span class="err">整体模块导入</span>
+        <span class="err">包导入</span>
+ <span class="kn">import</span> <span class="err">语句导入的模块共有以下四类</span><span class="p">:</span> 
+                    <span class="err">•使用</span><span class="n">Python</span><span class="err">写的程序</span><span class="p">(</span> <span class="o">.</span><span class="n">py</span><span class="err">文件</span><span class="p">)</span>
+                    <span class="err">•</span><span class="n">C</span><span class="err">或</span><span class="n">C</span><span class="o">++</span><span class="err">扩展</span><span class="p">(</span><span class="err">已编译为共享库或</span><span class="n">DLL</span><span class="err">文件</span><span class="p">)</span>
+                    <span class="err">•包</span><span class="p">(</span><span class="err">包含多个模块</span><span class="p">)</span>
+                    <span class="err">•内建模块</span><span class="p">(</span><span class="err">使用</span><span class="n">C</span><span class="err">编写并已链接到</span><span class="n">Python</span><span class="err">解释器内</span><span class="p">)</span>
+<span class="n">Python</span><span class="err">的包搜索路径</span>    
+            <span class="n">Python</span><span class="err">会在以下路径中搜索它想要寻找的模块：</span>
+            <span class="mf">1.</span> <span class="err">程序所在的文件夹</span>
+            <span class="mf">2.</span> <span class="err">标准库的安装路径</span>
+            <span class="mf">3.</span> <span class="err">操作系统环境变量</span><span class="n">PYTHONPATH</span><span class="err">所包含的路径</span>
+</pre></div>
+
+
+<p>参考：
+         python模块及包的导入 http://blog.csdn.net/zyz511919766/article/details/22678143</p>
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Scala学习(七)---包和引入 http://www.cnblogs.com/sunddenly/p/4436897.html
+Scala样本类  http://www.jianshu.com/p/c374599ed0c4
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-28.html" rel="bookmark"
+                           title="Permalink to python字符串输出">python字符串输出</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:39:00+08:00">
+                Published: 2017-06-03 20:39:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>三种字符串输出-字符串插值</p>
+                <a class="readmore" href="/program/my-program-post-28.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-27.html" rel="bookmark"
+                           title="Permalink to python用户界面">python用户界面</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:36:00+08:00">
+                Published: 2017-06-03 20:36:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>GUI-Tkinter架构</p>
+                <a class="readmore" href="/program/my-program-post-27.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-26.html" rel="bookmark"
+                           title="Permalink to 将python程序打包成exe可执行文件">将python程序打包成exe可执行文件</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:26:00+08:00">
+                Published: 2017-06-03 20:26:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>PyInstaller</p>
+                <a class="readmore" href="/program/my-program-post-26.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-25.html" rel="bookmark"
+                           title="Permalink to Scala样例类">Scala样例类</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:15:00+08:00">
+                Published: 2017-06-03 20:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>样例类说明</p>
+                <a class="readmore" href="/program/my-program-post-25.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-24.html" rel="bookmark"
+                           title="Permalink to Scala注释-序列化和反射">Scala注释-序列化和反射</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:06:00+08:00">
+                Published: 2017-06-03 20:06:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>annotations-serialization</p>
+                <a class="readmore" href="/program/my-program-post-24.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-23.html" rel="bookmark"
+                           title="Permalink to Web服务器">Web服务器</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-05-13T20:15:00+08:00">
                 Published: 2017-05-13 20:15:00
@@ -37,112 +308,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/java.html">Java</a> </p>
-</footer><!-- /.post-info --><h3>提供服务</h3>
-<div class="highlight"><pre><span></span>应用程序服务器：应用服务器，有业务逻辑
-Web服务器
-</pre></div>
-
-
-<h3>Web服务器-</h3>
-<div class="highlight"><pre><span></span>    Web服务器的基本功能就是提供Web信息浏览服务。它需支持HTTP协议、HTML文档格式及URL
-        静态HTML网页+动态网页
-                动态网页--与后台数据库进行交互，数据传递
-                动态网页除了早期的CGI外，目前主流的动态网页技术有JSP,ASP,PHP等
-            1.CGI--通用网关接口&lt;Common Gateway Interface&gt;，
-                    通过CGI建立WEB页面与脚本程序之间的联系，
-                    并且可以利用脚本程序来处理访问者输入的信息并据此作出响应
-            三大技术栈--   .NET      JSP       LAMP
-                 1.ASP即Active Server Pages，是MicroSOft公司开发的服务器端脚本环境。
-                    微软开发的一种类似超文本标识语言(HTML)、脚本(Script)与CGI(公用网关接口)的结合体，
-                    它没有提供自己专门的编程语言，而是允许用户使用许多已有的脚本语言编写ASP的应用程序
-                    产生动态网页内容的方式：
-                 2.JSP页面由HTML代码和嵌入其中的Java代码所组成
-                 3.LAMP
-        Web服务器
-            Apache---开源的Web服务器-
-            Nginx---开源的Web服务器-俄罗斯
-            IIS----Internet Information Server微软公司
-            Lighttpd--德国
-            Tomcat
-</pre></div>
-
-
-<h3>Web开发框架与部署方式</h3>
-<div class="highlight"><pre><span></span>            Python Web 开发框架
-                    Web2py
-                    Web.py
-                    Flask
-                    Django
-            Python部署方式
-                    协议
-                            CGI   即通用网关接口(Common Gateway Interface)
-                            FastCGI
-                            WSGI (Python Web Server Gateway Interface，Python Web服务器网关接口)是基于现存的CGI标准而设计的
-                            uwsgi
-                Web服务器，例如Gunicorn或uWSGI
-                            WSGI Server: Gunicorn
-                            Web Server: Nginx
-                            进程管理工具： supervisor
-
-            Java Web开发框架
-                        三大框架
-                                Spring
-                                Struts2
-                                Hibernate
-                        框架整合
-
-            Java部署
-                    在tomcat中的conf目录中，在server.xml中的，&lt;host/&gt;节点中添加
-</pre></div>
-
-
-<h3>Tomcat与Web服务器</h3>
-<div class="highlight"><pre><span></span>Tomcat是提供一个支持Servlet和JSP运行的容器。Servlet和JSP能根据实时需要，产生动态网页内容
-                    OA/ERP多是Java/JSP开发的
-                    Java EE为例，Web服务器主要是处理静态页面处理和作为 Servlet容器，解释和执行servlet/JSP,
-一般来说，大的站点都是将Tomcat与Apache的结合，
-                    Apache负责接受所有来自客户端的HTTP请求，然后将Servlets和JSP的请求转发给Tomcat来处理。
-                    Tomcat完成处理后，将响应传回给Apache，最后Apache将响应返回给客户端。
-而且为了提高性能，可以一台apache连接多台tomcat实现负载平衡
-
-缓存机制--内存缓存-内存数据库缓存
-            持久化机制--写入到数据库或者文件
-</pre></div>
-
-
-<h3>Tomcat中部署Servlet与JSP  Web应用程序</h3>
-<div class="highlight"><pre><span></span>部署环境要求-- 
-    0.0操作系统 01.JDK 环境   02. Web 服务器  03.数据库
-部署的方式以及步骤
-        1.WAR 包&lt;Web Application aRchive, Web应用程序归档文件&gt; Java Servlet规范定义的文件格式和结构
-            Tomcat提供无需重启而部署应用程序的方法，也可以解除对应用程序的部署--热部署&lt;hot deployment&gt;
-            Tomcat配置文件--server.xml有一个叫做Context的XML元素
-                                        Context XML片段文件部署--context.xml片段文件
-        2.  
-            01.Host Manager Web应用程序 或者Apache Ant自动化部署
-                    通过Web管理自己的Web应用程序
-
-            02.解包目录--用解包的webapp目录进行部署
-
-            03.war文件部署--用war文件部署web应用程序
-                1、直接放到Webapps目录下
-                    Tomcat的Webapps目录是Tomcat默认的应用目录，当服务器启动时，会加载所有这个目录下的应用。
-                    也可以将JSP程序打包成一个war包放在目录下，服务器会自动解开这个war包，并在这个目录下生成一个同名的文件夹。
-                        解包WAR文件的内容到相同文件名的路径中，去除war扩展名，然后从解包的目录中服务文件
-                        步骤：打包上传--- war 文件移动到 Tomcat 目录下的 webapps 下--重启 Tomcat以访问项目
-
-            说明
-                    注意：部署和重新加载不同
-
-        3.分布式集群部署
-                Java Servlet Container
-        4.与Apache web服务器整合
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>应用程序服务器</p>
+                <a class="readmore" href="/program/my-program-post-23.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

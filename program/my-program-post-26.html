@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>将python程序打包成exe可执行文件</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-26.html" rel="bookmark"
+           title="Permalink to 将python程序打包成exe可执行文件">将python程序打包成exe可执行文件</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:26:00+08:00">
+                Published: 2017-06-03 20:26:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->      <h2></h2>
+<div class="highlight"><pre><span></span>01.建立永久工具并分享给他人: 花费一些日常工作时间去建立一些能使自己和他人生活变得轻松的工具     
+工具的制造者，对轮子进行组合创新
+02.为你温和的代码建立个令人印象深刻和交互性强的用户界面，让你的代码通过好的UI来闪耀光辉吧。
+: 代码是我们的语言，但不是使用者的
+</pre></div>
+
+
+<h2>将python程序打包成exe可执行文件</h2>
+<div class="highlight"><pre><span></span>    python代码文件转exe方法有三种，分别是cx_freeze,py2exe，PyInstaller
+</pre></div>
+
+
+<h3>1.PyInstaller</h3>
+<div class="highlight"><pre><span></span>pip install pyinstaller
+
+&gt; cd   C:\Items\Python_Item\Packaged
+pyinstaller  countWordsFun.py
+&gt; pyinstaller --onefile  countWordsFun.py
+
+ pyinstaller --console --onefile  C:\Items\Python_Item\Packaged\countWordsFun.py
+ pyinstaller  -w  --onefile --icon=&#39;C:\Items\Python_Item\Packaged\my.ico&#39;  C:\Items\Python_Item\Packaged\countWordsFun.py
+
+
+pip3 install pyinstaller
+
+参数说明
+    -F表示打包成一个文件，-F, –onefile 打包成一个exe文件。
+    -c, –console, –nowindowed 使用控制台，无界面(默认)
+    -w, –windowed, –noconsole 使用窗口，无控制台
+
+说明
+    源文件所在目录将生成 dist 和 build 两个文件夹。
+            其中，build 目录是 pyinstaller 存储临时文件的目录，可以安全删 除。
+            最终的打包程序在 dist 内部的 dpython 目录中，目录中其他文件 是可执行文件的动态链接库。
+
+pyinstaller -h 来查看参数
+
+    参考：
+        http://www.pyinstaller.org/
+        https://pyinstaller.readthedocs.io/en/stable/
+</pre></div>
+
+
+<h3>2.cx_freeze</h3>
+<div class="highlight"><pre><span></span>安装
+    pip install cx_Freeze
+
+    查看是否安装成功
+
+cx_Freeze有三种用法：
+    使用内含的cxfreeze script：用于简单的python脚本
+    创建distutils setup script：用于稍微复杂的Python脚本，或为以后预留一定的配置
+    直接使用cx_Freeze内部相关的类和模块：用于很复杂的Python脚本，或用于扩展，嵌入
+
+打包
+    命令为：cxfreeze hello.py --target-dir dist
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>python字符串输出</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-28.html" rel="bookmark"
+           title="Permalink to python字符串输出">python字符串输出</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:39:00+08:00">
+                Published: 2017-06-03 20:39:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->      <h3>字符串是 Python 中最常用的数据类型。</h3>
+<div class="highlight"><pre><span></span><span class="x">---可以使用引号(&#39;或&quot;)来创建字符串</span>
+<span class="x">    单引号  单引号-- -- &#39;bill\&#39;s&#39;</span>
+<span class="x">    双引号---------------&quot;bill&#39;s&quot;      &quot;my \&quot;teacher\&quot;&quot;</span>
+<span class="x">    三重引号</span>
+<span class="x">-----python用反斜杠(\)转义字符</span>
+
+<span class="x">字符输出</span>
+<span class="x">    01.C语言格式化输出</span>
+<span class="x">            字符串格式控制%</span>
+<span class="x">            例如：a = &#39;this is %s %s&#39; % (&#39;an&#39;,&#39;apple&#39;)</span>
+<span class="x">    02.format 输出</span>
+<span class="x">            </span><span class="err">{</span><span class="x">}包裹name命名传递给format以命名</span>
+<span class="x">            例如： a = &#39;this is </span><span class="err">{</span><span class="x">} </span><span class="err">{</span><span class="x">}&#39;.format(&#39;apple&#39;,&#39;an&#39;)</span>
+<span class="x">    03.  </span>
+<span class="x">    r可以防止字符串在时候的时候不被转义</span>
+<span class="x">        Python的string前面加上‘r’， 是为了告诉编译器这个string是个raw string，不要转义</span>
+
+<span class="x">    Python允许你处理Unicode文本——你只需要在字符串前加上前缀u或U。例如，u&quot;This is a Unicode string.&quot;</span>
+
+
+<span class="x">类似</span>
+<span class="x">Scala提供了一种新的机制来根据数据生成字符串：字符串插值</span>
+<span class="x">    s 字符串插值器、f 插值器、raw 插值器</span>
+<span class="x">        val name=&quot;James&quot;</span>
+<span class="x">        println(s&quot;Hello,</span><span class="p">$</span><span class="nv">name</span><span class="x">&quot;)</span>
+<span class="x">    在任何字符串字面前加上 f，就可以生成简单的格式化串</span>
+<span class="x">    字符串插值目前对模式匹配语句不适用。此特性将在2.11版本中生效</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Python 3 格式化字符串的几种方法！http://www.cnblogs.com/zdnyp/p/6523721.html
+字符串插值 - http://docs.scala-lang.org/zh-cn/overviews/core/string-interpolation.html
+插值(interpolation)
+string -- 字符串常量和模板 https://changrui0608.gitbooks.io/python-3-module-of-the-week-chinese-translation/content/text/string.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

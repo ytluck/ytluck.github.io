@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Scala注释-序列化和反射</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-24.html" rel="bookmark"
+           title="Permalink to Scala注释-序列化和反射">Scala注释-序列化和反射</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:06:00+08:00">
+                Published: 2017-06-03 20:06:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <h3>1. annotations-注解</h3>
+<div class="highlight"><pre><span></span>注解说明
+    是插入到代码中以便有工具可以对它们进行处理的标签。
+    类型检查的新途径
+
+注解的级别
+        工具可以在代码级别运作，也可以处理被编译器加入了注解信息的类文件。
+注解的使用的类和语言
+    Scala中可以为类、方法、字段、局部变量和参数添加注解，与Java一样。可以同时添加多个注解，先后顺序没有影响
+        可以对Scala类使用Java注解。
+        也可以使用Scala注解，是由Scala注解特有的，通常由Scala编译器或编译器插件处理。
+Java注解和Scala注解的区别
+    Java注解并不影响编译器如何将源码翻译成字节码，仅仅往字节码中添加数据，以便外部工具可以利用它们。
+    而在Scala中，注解可以影响编译过程，比如 @BeanProperty注解
+
+常用注解说明
+        @transient注解将字段标记为瞬态的；
+                transient关键字修饰的变量不再能被序列化，一个静态变量不管是否被transient修饰，均不能被序列化
+                这个注解一般用于序列化的时候，标识某个字段不用被序列化
+        @tailrec注释---尾递归优化
+
+注释处理器   
+        使用反射机制的API
+
+类型擦除
+        原因
+            虚拟机中没有泛型，只有普通类和普通方法
+        类型擦除的关键
+                1.从泛型类型中清除类型参数的相关信息，
+                2.并且在必要的时候添加类型检查和类型转换的方法。                   
+         类型擦除的主要过程如下：
+                1.将所有的泛型参数用其最左边界（最顶级的父类型）类型替换。
+                2.移除所有的类型参数
+        类型擦除带来的问题
+                ClassCastException
+</pre></div>
+
+
+<h3>2. 序列化</h3>
+<div class="highlight"><pre><span></span>01.不需要序列化
+        不希望敏感信息被序列化-防止对象的敏感部分被序列化
+
+02.需要序列化 serialization---轻量级持久化
+     001.主要应用方面：
+            读写磁盘、网络传输的类--方便的存储/传输
+             to serialize a Scala class and save it as a file, or send it across a network.
+03.Scala 中的序列化
+        Scala中的序列化
+            trait Serializable extends Any with java.io.Serializable
+            Classes extending this trait are serializable across platforms (Java, .NET).
+        使用序列化--继承
+                extend the Serializable trait 
+            语法示例：case class Posting(postingType: Int, parentId: Option[Int], score: Int, tags: Option[String]) extends Serializable
+            scala Serializable 实际上就是一个java.io.Serializable的universal trait
+            SerialVersionUID的目的是为了检查序列化和反序列化的类是否兼容。
+                        般来说可以不显式指定SerialVersionUID
+                        需要直接使用序列化来持久化对象，如将训练好的模型存储到文件系统上，就最好指定SerialVersionUID
+        序列化以及反序列化
+                    二进制串指的是存储在内存中的一块数据
+04.使用场景说明
+        001.由于引用的sparkConf, sparkContext都是不可序列化的，
+                            且都不需要被传送到executor上运行，
+                                因此可以用 @transient表示该成员不需要被序列化
+                      @transient (private) lazy 
+                            其中 @trainsient 可以避免 overhead，lazy 可以第一次被调用时正确地初始化以避免NPE&lt;空指针异常-NullPointerException&gt;
+
+        002.可以序列化
+                broadcast, shuffle, action等操作都会使得对象被序列化。
+                    使每个被闭包捕获的变量都可序列化，可以避免异常，
+                    但是变量非常大时，容易影响性能，以及有可能造成内存泄露。
+            序列化实现
+                Protobuf、Thrift、Avro
+        不可序列化
+                    java静态成员变量不会被序列化
+                    不要在scala的object中使用var变量，如果确实需要使用var变量，请写在class中
+                Task not serializable: java.io.NotSerializableException
+                        了解哪些对象不可以被序列化。
+                        &lt;1&gt;就是使这些对象对应的类可序列化，
+                        &lt;2&gt;或者将这些对象定义在RDD操作算子的参数(匿名函数)中以取消闭包
+</pre></div>
+
+
+<h3>3. 元与反射</h3>
+<div class="highlight"><pre><span></span>    meta data                 元数据--注解 annotations
+    meta programming 元编程
+    reflect                     反射
+                编译时元编程
+                运行时元编程
+
+            编译时反射用于操纵代码
+            运行时反射主要用来--极端滞后绑定&lt;extreme  late  bind&gt;
+                        加载编译时未知的代码
+                        调整语言的语义
+    Scala中的反射
+            核心库-scala.reflect
+            第三方库：
+                    编译时反射：scala.reflect.marcos.universe
+                    运行时反射：scala.reflect.runtime.universe
+                    编译时宏
+
+            核心库
+                    scala.reflect.ClassTag ：保留被类型擦除去掉信息的工具
+                                类型擦除-在实例化参数类型的实例时，不保留类型参数的值
+                                ClassTag--一个重要用途是构造出正确的AnyRef子类型的Java数组
+</pre></div>
+
+
+<h3>4.变量</h3>
+<div class="highlight"><pre><span></span>惰性求值 lazy
+        让系统自行决定何时初始化成员的初始值，这是通过在 val 定义前面添加 lazy(懒惰），
+        也是说直到你第一次需要引用该成员是，系统才会去初始化，否则该成员就不初始化
+
+断言--断言机制
+        带一个参数 表达式 
+                assert(condition) 
+                将在condition条件不成立的时候抛出 AssertionError。
+        assert--带两个参数的表达式
+                    assert(condition, explanation) 
+                     会测试condition，并且如果条件不成立，会抛出含有指定explanation作为说明的AssertionError。
+</pre></div>
+
+
+<h3>5.循环的使用</h3>
+<div class="highlight"><pre><span></span>        <span class="m">1.</span>尽量少使用循环或者条件改变变量<span class="o">-</span>update a var using loops or conditions
+        <span class="m">2.</span>使用如下的方法
+          <span class="o">/**</span> Average the vectors <span class="o">*/</span>
+            def averageVectors<span class="p">(</span>ps<span class="o">:</span> Iterable<span class="p">[(</span>Int<span class="p">,</span> Int<span class="p">)])</span><span class="o">:</span> <span class="p">(</span>Int<span class="p">,</span> Int<span class="p">)</span> <span class="o">=</span> <span class="p">{</span>
+                val iter <span class="o">=</span> ps.iterator
+                var count <span class="o">=</span> <span class="m">0</span>
+                var comp1<span class="o">:</span> Long <span class="o">=</span> <span class="m">0</span>
+                var comp2<span class="o">:</span> Long <span class="o">=</span> <span class="m">0</span>
+                <span class="kr">while</span> <span class="p">(</span>iter.hasNext<span class="p">)</span> <span class="p">{</span>
+                    val item <span class="o">=</span> iter.next
+                    comp1 <span class="o">+=</span> item._1
+                    comp2 <span class="o">+=</span> item._2
+                    count <span class="o">+=</span> <span class="m">1</span>
+                <span class="p">}</span>
+                <span class="p">((</span>comp1 <span class="o">/</span> count<span class="p">)</span><span class="m">.</span>toInt<span class="p">,</span> <span class="p">(</span>comp2 <span class="o">/</span> count<span class="p">)</span><span class="m">.</span>toInt<span class="p">)</span>
+            <span class="p">}</span>
+
+            方式<span class="m">02.</span>
+                    不要使用：var sum <span class="o">=</span> <span class="m">0</span>
+                            <span class="kr">for</span> <span class="p">(</span>elem <span class="o">&lt;-</span> elements<span class="p">)</span> <span class="p">{</span>
+                              sum <span class="o">+=</span> elem.value
+                            <span class="p">}</span>
+                    使用：val sum <span class="o">=</span> elements.foldLeft<span class="p">(</span><span class="m">0</span><span class="p">)((</span>acc<span class="p">,</span> e<span class="p">)</span> <span class="o">=&gt;</span> acc <span class="o">+</span> e.value<span class="p">)</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>    Scala Serialization  http://www.jianshu.com/p/080f18900f62
+    spark使用总结 http://www.itnose.net/detail/6528028.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

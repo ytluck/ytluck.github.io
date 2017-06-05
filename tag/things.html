@@ -26,7 +26,227 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-24.html">Hive字符串和时间处理函数</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-25.html">Kafka原理介绍</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T20:46:00+08:00">
+                Published: 2017-06-03 20:46:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>1.1概念介绍</h3>
+<div class="highlight"><pre><span></span>Kafka 是 linkedin 用于日志处理的分布式消息队列，同时支持离线和在线日志处理。
+kafka 对消息保存时
+    根据 Topic 进行归类，
+        发送消息者成为 Producer，
+        消息接受者成为 Consumer
+    此外 kafka 集群由多个 kafka 实例组成，
+        每个实例 (server) 称为 broker。
+    无论是 kafka 集群，还是 producer 和 consumer 
+        都依赖于 zookeeper 来保证系统可用性，
+        为集群保存一些 meta 信息。
+</pre></div>
+
+
+<h3>1.2 Kafka应用场景</h3>
+<div class="highlight"><pre><span></span>1. 日志收集
+        日志收集方面，其实开源产品有很多，包括 Scribe、Apache Flume。
+        很多人使用 Kafka 代替日志聚合（log aggregation）。
+        日志聚合一般来说是从服务器上收集日志文件，然后放到一个集中的位置（文件服务器或 HDFS）进行处理。
+        然而 Kafka忽略掉文件的细节，将其更清晰地抽象成一个个日志或事件的消息流。
+        这就让 Kafka 处理过程延迟更低，更容易支持多数据源和分布式数据处理。
+        比起以日志为中心的系统比如 Scribe 或者 Flume 来说，Kafka 提供同样高效的性能和因为复制导致的更高的耐用性保证，以及更低的端到端延迟。
+2. 行为跟踪--流量跟踪
+        Kafka 的另一个应用场景是跟踪用户浏览页面、搜索及其他行为，以发布-订阅的模式实时记录到对应的 topic 里。
+        那么这些结果被订阅者拿到后，就可以做进一步的实时处理，或实时监控，或放到 Hadoop 离线数据仓库里处理。
+3. 持久性日志（commit log）
+    Kafka 可以为一种外部的持久性日志的分布式系统提供服务。
+    这种日志可以在节点间备份数据，并为故障节点数据回复提供一种重新同步的机制。
+    Kafka 中日志压缩功能为这种用法提供了条件。在这种用法中，Kafka 类似于 Apache BookKeeper 项目。
+</pre></div>
+
+
+<h3>1.3 Kafka基本概念</h3>
+<div class="highlight"><pre><span></span>    Topic：特指 Kafka 处理的消息源（feeds of messages）的不同分类。
+    Partition：Topic 物理上的分组，一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列。partition 中的每条消息都会被分配一个有序的 id（offset）。
+    Message：消息，是通信的基本单位，每个 producer 可以向一个 topic（主题）发布一些消息。
+    Producers：消息和数据生产者，向 Kafka 的一个 topic 发布消息的过程叫做 producers。
+    Consumers：消息和数据消费者，订阅 topics 并处理其发布的消息的过程叫做 consumers。
+    Broker：缓存代理，Kafka 集群中的一台或多台服务器统称为 broker。
+</pre></div>
+
+
+<h2>设计原理</h2>
+<div class="highlight"><pre><span></span>    Kafka 的设计初衷是希望作为一个统一的信息收集平台，
+    能够实时的收集反馈信息，并需要能够支撑较大的数据量，且具备良好的容错能力。
+2.1 Kafka 的 Topics/Log
+        一个Topic 可以认为是一类消息，每个 topic 将被分成多 partition (区),每个partition在存储层面是 append log 文件。
+        任何发布到此 partition 的消息都会被直接追加到 log 文件的尾部，每条消息在文件中的位置称 offset（偏移量），partition 是以文件的形式存储在文件系统中。
+        Logs 文件根据 broker 中的配置要求,保留一定时间后删除来释放磁盘空间。
+
+        Partition：
+            Topic 物理上的分组，一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列。
+            partition 中的每条消息都会被分配一个有序的 id（offset）。
+2.2　Kafka的储存策略
+            kafka以 topic 来进行消息管理，每个 topic 包含多个 partition，每个 part 对应一个逻辑 log，有多个 segment 组成。
+            每个 segment 中存储多条消息（见下图），消息 id 由其逻辑位置决定，即从消息id可直接定位到消息的存储位置，避免id到位置的额外映射。
+            broker 收到发布消息往对应 partition 的最后一个 segment 上添加该消息。
+            每个 part 在内存中对应一个index，记录每个 segment 中的第一条消息偏移。
+            发布者发到某个 topic 的 消息会被均匀的分布到多个 part 上（随机或根据用户指定的回调函数进行分布），
+                broker 收到发布消息往对应 part 的最后一个 segment 上添加 该消息，
+            当某个 segment 上的消息条数达到配置值或消息发布时间超过阈值时，segment 上的消息会被 flush 到磁盘，
+            只有 flush 到磁盘上的消息订阅者才能订阅到，segment 达到一定的大小后将不会再往该 segment 写数据，broker 会创建新的 segment。
+2.3 Kafka的消息发送的流程
+    由于 kafka broker 会持久化数据，broker 没有内存压力，因此，consumer 非常适合采取 pull 的方式消费数据 Producer 向 Kafka（push）推数据，consumer 从 kafka 拉（pull）数据。
+
+2.4 Kafka 的 Zookeeper 协调控制
+    管理 broker 与 consumer 的动态加入与离开。
+    触发负载均衡，当 broker 或 consumer 加入或离开时会触发负载均衡算法，使得一个 consumer group 内的多个 consumer 的订阅负载平衡。
+    维护消费关系及每个 partion 的消费信息
+
+    Zookeeper上的细节：
+    每个 broker 启动后会在 zookeeper 上注册一个临时的 broker registry，包含 broker 的 ip 地址和端口号，所存储的 topics 和 partitions 信息。
+    每个 consumer 启动后会在 zookeeper 上注册一个临时的 consumer registry：包含 consumer 所属的consumer group 以及订阅的 topics。
+    每个 consumer group 关 联一个临时的 owner registry 和一个持久的 offset registry。对于被订阅的每个 partition 包含一个 owner registry，
+     内容为订阅这个 partition 的 consumer id；同时包含一个 offset registry，内容为上一次订阅的 offset。
+
+    lead broker
+</pre></div>
+
+
+<h3>和Flume比较</h3>
+<div class="highlight"><pre><span></span>Kafka 是一个可持久化的分布式的消息队列，你可以有许多生产者和很多的消费者共享多个主题 Topics。   
+相比之下，Flume 是一个专用工具被设计为旨在往 HDFS，HBase 发送数据。它对 HDFS 有特殊的优化，并且集成了 Hadoop 的安全特性。   
+所以，Cloudera 建议如果数据被多个系统消费的话，使用 kafka；如果数据被设计给 Hadoop 使用，使用 Flume。
+
+Flume 和 Kafka 可以很好地结合起来使用。如果你的设计需要从 Kafka 到 Hadoop 的流数据，
+使用 Flume 代理并配置 Kafka 的 Source 读取数据也是可行的，没有必要实现自己的消费者。
+
+可以直接利用 Flume 与 HDFS 及 HBase 的结合的所有好处。
+你可以使用 Cloudera Manager 对消费者的监控，并且你甚至可以添加拦截器进行一些流处理。
+Flume 和 Kafka 可以结合起来使用。通常会使用 Flume + Kafka 的方式。
+其实如果为了利用 Flume 已有的写 HDFS 功能，也可以使用 Kafka + Flume 的方式。
+</pre></div>
+
+
+<h2>Kafka的使用</h2>
+<h3>1.使用Kafka步骤</h3>
+<div class="highlight"><pre><span></span>任务：大数据开发，需要进行大量日志传输--数据传输的事务
+        如何使用 scala编写生产者消费者并实践操作
+技术：
+    01.消息队列技术
+        点对点通讯--一对一、一对多、多对多、多对一等多种配置方式，支持树状、网状等多种拓扑结构
+        多点广播
+        发布/订阅 (Publish/Subscribe) 模式    
+                    消息按照特定的主题甚至内容进行分发，用户或应用程序可以根据主题或内容接收到所需要的消息
+                    发送者和接收者之间的耦合关系变得更为松散。Kafka是一种分布式的发布/订阅消息系统
+                    生产者负责产生消息，在中间加入持久化层——broker,生产者把数据存放在broker中，消费者从broker中取数据
+
+    02.数据来源(sources)和多个数据目的地
+            Kafka将消息以topic为单位进行归纳
+            Kafka提供了Java客户端，并且对多种语言都提供了支持
+            可靠-------有三种方式
+                            At least once。至少一次。消息绝不会丢失，但有可能重新发送
+                            At most once。最多一次。消息可能丢失，但永远不会重发。通过设置Producer异步提交可以实现
+                             Exactly once。传递一次且仅一次。要求利用外部存储系统配合Kafka的offset来保证。
+            高可用----kafka引入replication和leader机制来实现
+            高吞吐量---依赖于OS文件系统的页缓存、sendfile技术和线性读写磁盘--磁盘顺序写---消息压缩
+场景：
+        -再牛逼的语法解决不了傻逼的业务和逻辑需求
+            主要使用场景是处理网站活动日志
+</pre></div>
+
+
+<h3>2.案例式--使用说明</h3>
+<div class="highlight"><pre><span></span>    前提条件--zookeeper 和kafka都启动了
+            start zookeeper
+            start kafka with default configuration
+
+    01.创建一个主题
+        create a topic---名为test_topic的topic，有10个分区，每个分区需分配3个副本
+             bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 10 --topic test_topic
+
+    02.打包程序--打包程序
+        package this example
+
+    //先运行kafkaProducer ，再运行kafkaConsumer，即可得到生产者的数据
+    03.运行生产者
+            Run the Producer
+                java -cp kafka_example-0.1.0-SNAPSHOT.jar com.colobu.kafka.ScalaProducerExample 10000 test_topic localhost:9092
+    04.运行消费者
+            Run the Consumer
+                java -cp kafka_example-0.1.0-SNAPSHOT.jar com.colobu.kafka.ScalaConsumerExample localhost:9092 group1 test_topic 10 0
+</pre></div>
+
+
+<h3>3.进一步深入</h3>
+<div class="highlight"><pre><span></span>    01.创建主题说明：
+                参数说明：
+                        partitions分区数
+                        replication-factor副本
+                过程说明：
+                        后台逻辑会监听zookeeper下对应的目录节点，
+                        一旦发起topic创建命令，该命令会创建新的数据节点从而触发后台的创建逻辑。
+                        ：1. 确定分区副本的分配方案(就是每个分区的副本都分配到哪些broker上)；
+                          2. 创建zookeeper节点，把这个方案写入/brokers/topics/&lt;topic&gt;节点下
+                          Kafka的controller负责提供的
+                查看bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic test_topic
+
+                Topic。是划分Message的逻辑概念
+                Producer发送消息到达Broker后，消息按照Topic提交到Partition
+
+    02.生产者
+            数据输入：
+
+            三种流程
+                    同步发送流程
+                    异步发送流程
+                    更新元信息流程
+    03.消费者--consumer
+            消费者可以使用相同的 group.id 加入群组
+            一个组的最大并行度是组中的消费者数量←不是分区。
+            Kafka将主题的分区分配给组中的使用者，以便每个分区仅由组中的一个使用者使用。
+            Kafka保证消息只能被组中的一个消费者读取。
+            消费者可以按照消息存储在日志中的顺序查看消息
+
+            producer将消息推送到broker，consumer从broker拉取消息
+            consumer指定消息在日志中的偏移量（offset），就可以消费从这个位置开始的消息。
+            customer拥有了offset的控制权，可以向后回滚去重新消费之前的消息
+        数据输出：
+            消费者拿到后，就可以做进一步的实时处理，或实时监控，或放到 Hadoop 离线数据仓库里处理
+</pre></div>
+
+
+<h3>4.方案</h3>
+<div class="highlight"><pre><span></span>    1.   Kafka -&gt; Flume –&gt; Hadoop Hdfs
+    2.   Kafka -&gt; Kafka-connect-hdfs -&gt; Hadoop Hdfs
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Kafka如何创建topic？ http://www.cnblogs.com/huxi2b/p/5923252.html
+Kafka学习整理八(topic管理) http://blog.csdn.net/LOUISLIAOXH/article/details/51597173
+kafka生产者原理详解 http://kaimingwan.com/post/kafka/kafkasheng-chan-zhe-yuan-li-xiang-jie
+Kafka学习（2）——理解Kafka http://www.2cto.com/database/201611/561486.html
+Kafka快速上手教程  https://www.shiyanlou.com/courses/785/labs/2657/document
+apache kafka系列之源码分析走读-kafka内部模块分析 http://blog.csdn.net/lizhitao/article/details/37911993
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-24.html" rel="bookmark"
+                           title="Permalink to Hive字符串和时间处理函数">Hive字符串和时间处理函数</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-05-01T20:46:00+08:00">
                 Published: 2017-05-01 20:46:00
@@ -37,342 +257,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>Hive表的说明</h3>
-<div class="highlight"><pre><span></span>创建表
-        若创建内部表时，会将数据移动到数据仓库指向的路径；
-        若创建外部表，仅记录数据所在的路径，不对数据的位置做任何改变。 
-        table    external table
-删除表
-        内部表的元数据和数据会被一起删除
-        外部表只删除元数据，不删除数据
-</pre></div>
-
-
-<h3>计算实际用例</h3>
-<div class="highlight"><pre><span></span><span class="nt">show</span> <span class="nt">create</span> <span class="nt">table</span> <span class="nt">test_table</span><span class="o">;</span>
-<span class="nt">select</span>  <span class="nt">count</span><span class="o">(*)</span> <span class="nt">from</span> <span class="nt">test_table</span><span class="o">;</span>
-<span class="nt">select</span> <span class="o">*</span> <span class="nt">from</span> <span class="nt">test_table</span><span class="o">;</span>
-<span class="nt">select</span>  <span class="nt">userno</span><span class="o">,</span><span class="nt">printtime</span> <span class="nt">from</span> <span class="nt">test_table</span>  <span class="nt">limit</span> <span class="nt">10</span> <span class="o">;</span>
-<span class="nt">select</span>  <span class="nt">userno</span><span class="o">,</span><span class="nt">printtime</span> <span class="nt">from</span> <span class="nt">test_table</span><span class="o">;</span>
-<span class="err">##即</span><span class="nt">1970-1-1</span> <span class="nt">8</span><span class="nd">:00</span><span class="err">至今的秒，可以用</span><span class="nt">from_unixtime</span><span class="o">()</span><span class="err">转为时间，而</span><span class="nt">13</span><span class="err">位的所谓毫秒的是不可以的</span>
-<span class="nt">select</span> <span class="nt">userno</span><span class="o">,</span> <span class="nt">from_unixtime</span><span class="o">(</span> <span class="nt">bigint</span><span class="o">(</span><span class="nt">printtime</span><span class="o">),</span> <span class="s1">&#39;yyyy-MM-dd&#39;</span> <span class="o">)</span>  <span class="nt">from</span> <span class="nt">test_table</span> <span class="nt">limit</span> <span class="nt">10</span><span class="o">;</span>
-<span class="nt">select</span> <span class="nt">userno</span><span class="o">,</span> <span class="nt">from_unixtime</span><span class="o">(</span> <span class="nt">bigint</span><span class="o">(</span><span class="nt">printtime</span><span class="o">),</span> <span class="s1">&#39;yyyy-MM-dd HH:mm:ss&#39;</span> <span class="o">)</span> <span class="nt">from</span> <span class="nt">test_table</span> <span class="nt">limit</span> <span class="nt">10</span><span class="o">;</span>
-<span class="nt">select</span> <span class="nt">userno</span><span class="o">,</span>  <span class="nt">substr</span><span class="o">(</span><span class="nt">printtime</span><span class="o">,</span> <span class="nt">1</span><span class="o">,</span> <span class="nt">10</span><span class="o">)</span>  <span class="nt">from</span> <span class="nt">test_table</span> <span class="nt">limit</span> <span class="nt">10</span><span class="o">;</span>
-<span class="nt">select</span> <span class="nt">userno</span><span class="o">,</span> <span class="nt">from_unixtime</span><span class="o">(</span> <span class="nt">bigint</span><span class="o">(</span><span class="nt">substr</span><span class="o">(</span><span class="nt">printtime</span><span class="o">,</span> <span class="nt">1</span><span class="o">,</span> <span class="nt">10</span><span class="o">)),</span> <span class="s1">&#39;yyyy-MM-dd&#39;</span> <span class="o">)</span> <span class="nt">from</span> <span class="nt">test_table</span> <span class="nt">limit</span> <span class="nt">10</span><span class="o">;</span>    
-<span class="o">//</span><span class="err">带分隔符字符串连接函数：</span><span class="nt">concat_ws</span>
-<span class="nt">select</span>  <span class="nt">userno</span><span class="o">,</span> <span class="nt">concat</span><span class="o">(</span><span class="s1">&#39;1&#39;</span><span class="o">,</span><span class="nt">printtime</span><span class="o">)</span>  <span class="nt">from</span> <span class="nt">test_table</span> <span class="nt">limit</span> <span class="nt">10</span><span class="o">;</span>
-<span class="nt">select</span>  <span class="nt">userno</span><span class="o">,</span><span class="nt">count</span><span class="o">(</span><span class="nt">distinct</span><span class="o">(</span><span class="nt">from_unixtime</span><span class="o">(</span> <span class="nt">bigint</span><span class="o">(</span><span class="nt">substr</span><span class="o">(</span><span class="nt">printtime</span><span class="o">,</span> <span class="nt">1</span><span class="o">,</span> <span class="nt">10</span><span class="o">)),</span> <span class="s1">&#39;yyyy-MM-dd&#39;</span> <span class="o">)))</span> <span class="nt">from</span> <span class="nt">test_table</span> <span class="nt">group</span> <span class="nt">by</span> <span class="nt">userno</span> <span class="nt">limit</span> <span class="nt">100</span> <span class="o">;</span>
-</pre></div>
-
-
-<h3>字符串</h3>
-<div class="highlight"><pre><span></span><span class="nt">1</span><span class="o">.</span> <span class="err">字符串长度函数：</span><span class="nt">length</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">length</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">int</span>
-    <span class="err">说明：返回字符串</span><span class="nt">A</span><span class="err">的长度</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">length</span><span class="o">(</span><span class="s1">&#39;abcedfg&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-            <span class="nt">7</span>
-<span class="nt">2</span><span class="o">.</span> <span class="err">字符串反转函数：</span><span class="nt">reverse</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">reverse</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回字符串</span><span class="nt">A</span><span class="err">的反转结果</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">reverse</span><span class="o">(</span><span class="nt">abcedfg</span><span class="err">’</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">gfdecba</span>
-<span class="nt">3</span><span class="o">.</span> <span class="err">字符串连接函数：</span><span class="nt">concat</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">concat</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">B</span><span class="err">…</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回输入字符串连接后的结果，支持随意个输入字符串</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">concat</span><span class="o">(</span><span class="err">‘</span><span class="nt">abc</span><span class="err">’</span><span class="o">,</span><span class="s1">&#39;def’,&#39;</span><span class="nt">gh</span><span class="err">’</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abcdefgh</span>
-<span class="nt">4</span><span class="o">.</span> <span class="err">带分隔符字符串连接函数：</span><span class="nt">concat_ws</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">concat_ws</span><span class="o">(</span><span class="nt">string</span> <span class="nt">SEP</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">B</span><span class="err">…</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回输入字符串连接后的结果。</span><span class="nt">SEP</span><span class="err">表示各个字符串间的分隔符</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">concat_ws</span><span class="o">(</span><span class="s1">&#39;,&#39;</span><span class="o">,</span><span class="s1">&#39;abc&#39;</span><span class="o">,</span><span class="s1">&#39;def&#39;</span><span class="o">,</span><span class="s1">&#39;gh&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abc</span><span class="o">,</span><span class="nt">def</span><span class="o">,</span><span class="nt">gh</span>
-<span class="nt">5</span><span class="o">.</span> <span class="err">字符串截取函数：</span><span class="nt">substr</span><span class="o">,</span><span class="nt">substring</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">substr</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">start</span><span class="o">),</span><span class="nt">substring</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">start</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回字符串</span><span class="nt">A</span><span class="err">从</span><span class="nt">start</span><span class="err">位置到结尾的字符串</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">substr</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">,</span><span class="nt">3</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">cde</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">substring</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">,</span><span class="nt">3</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">cde</span>
-    <span class="nt">hive</span><span class="o">&gt;</span>  <span class="nt">selectsubstr</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">,</span><span class="nt">-1</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>  <span class="err">（和</span><span class="nt">ORACLE</span><span class="err">同样）</span>
-    <span class="nt">e</span>
-<span class="nt">6</span><span class="o">.</span> <span class="err">字符串截取函数：</span><span class="nt">substr</span><span class="o">,</span><span class="nt">substring</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">substr</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">start</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">len</span><span class="o">),</span><span class="nt">substring</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">intstart</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">len</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回字符串</span><span class="nt">A</span><span class="err">从</span><span class="nt">start</span><span class="err">位置開始，长度为</span><span class="nt">len</span><span class="err">的字符串</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">substr</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">,</span><span class="nt">3</span><span class="o">,</span><span class="nt">2</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">cd</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">substring</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">,</span><span class="nt">3</span><span class="o">,</span><span class="nt">2</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">cd</span>
-    <span class="nt">hive</span><span class="o">&gt;</span><span class="nt">select</span> <span class="nt">substring</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">,</span><span class="nt">-2</span><span class="o">,</span><span class="nt">2</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">de</span>
-<span class="nt">7</span><span class="o">.</span> <span class="err">字符串转大写函数：</span><span class="nt">upper</span><span class="o">,</span><span class="nt">ucase</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">upper</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span> <span class="nt">ucase</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回字符串</span><span class="nt">A</span><span class="err">的大写格式</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">upper</span><span class="o">(</span><span class="s1">&#39;abSEd&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">ABSED</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">ucase</span><span class="o">(</span><span class="s1">&#39;abSEd&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">ABSED</span>
-<span class="nt">8</span><span class="o">.</span> <span class="err">字符串转小写函数：</span><span class="nt">lower</span><span class="o">,</span><span class="nt">lcase</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">lower</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span> <span class="nt">lcase</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回字符串</span><span class="nt">A</span><span class="err">的小写格式</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">lower</span><span class="o">(</span><span class="s1">&#39;abSEd&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">absed</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">lcase</span><span class="o">(</span><span class="s1">&#39;abSEd&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">absed</span>
-<span class="nt">9</span><span class="o">.</span> <span class="err">去空格函数：</span><span class="nt">trim</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">trim</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：去除字符串两边的空格</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">trim</span><span class="o">(</span><span class="s1">&#39; abc &#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abc</span>
-<span class="nt">10</span><span class="o">.</span> <span class="err">左边去空格函数：</span><span class="nt">ltrim</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">ltrim</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：去除字符串左边的空格</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">ltrim</span><span class="o">(</span><span class="s1">&#39; abc &#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abc</span>
-<span class="nt">11</span><span class="o">.</span> <span class="err">右边去空格函数：</span><span class="nt">rtrim</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">rtrim</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：去除字符串右边的空格</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">rtrim</span><span class="o">(</span><span class="s1">&#39; abc &#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abc</span>
-<span class="nt">12</span><span class="o">.</span> <span class="err">正则表达式替换函数：</span><span class="nt">regexp_replace</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">regexp_replace</span><span class="o">(</span><span class="nt">string</span> <span class="nt">A</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">B</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">C</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：将字符串</span><span class="nt">A</span><span class="err">中的符合</span><span class="nt">java</span><span class="err">正则表达式</span><span class="nt">B</span><span class="err">的部分替换为</span><span class="nt">C</span><span class="err">。</span>
-    <span class="err">注意，在有些情况下要使用转义字符</span><span class="o">,</span><span class="err">类似</span><span class="nt">oracle</span><span class="err">中的</span><span class="nt">regexp_replace</span><span class="err">函数。</span>
-
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">regexp_replace</span><span class="o">(</span><span class="s1">&#39;foobar&#39;</span><span class="o">,</span> <span class="s1">&#39;oo|ar&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">fb</span>
-<span class="nt">13</span><span class="o">.</span> <span class="err">正则表达式解析函数：</span><span class="nt">regexp_extract</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">regexp_extract</span><span class="o">(</span><span class="nt">string</span> <span class="nt">subject</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">pattern</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">index</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：将字符串</span><span class="nt">subject</span><span class="err">依照</span><span class="nt">pattern</span><span class="err">正则表达式的规则拆分。返回</span><span class="nt">index</span><span class="err">指定的字符。</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">regexp_extract</span><span class="o">(</span><span class="s1">&#39;foothebar&#39;</span><span class="o">,</span> <span class="s1">&#39;foo(.*?)(bar)&#39;</span><span class="o">,</span> <span class="nt">1</span><span class="o">)</span> <span class="nt">fromlxw_dual</span><span class="o">;</span>
-    <span class="nt">the</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">regexp_extract</span><span class="o">(</span><span class="s1">&#39;foothebar&#39;</span><span class="o">,</span> <span class="s1">&#39;foo(.*?)(bar)&#39;</span><span class="o">,</span> <span class="nt">2</span><span class="o">)</span> <span class="nt">fromlxw_dual</span><span class="o">;</span>
-    <span class="nt">bar</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">regexp_extract</span><span class="o">(</span><span class="s1">&#39;foothebar&#39;</span><span class="o">,</span> <span class="s1">&#39;foo(.*?</span>
-<span class="s1">    )(bar)&#39;</span><span class="o">,</span> <span class="nt">0</span><span class="o">)</span> <span class="nt">fromlxw_dual</span><span class="o">;</span>   
-    <span class="nt">foothebar</span>
-    <span class="err">注意，在有些情况下要使用转义字符，以下的等号要用双竖线转义。这是</span><span class="nt">java</span><span class="err">正则表达式的规则。</span>
-    <span class="nt">select</span> <span class="nt">data_field</span><span class="o">,</span>
-         <span class="nt">regexp_extract</span><span class="o">(</span><span class="nt">data_field</span><span class="o">,</span><span class="s1">&#39;.*?bgStart\\=(</span><span class="cp">[</span><span class="p">^</span><span class="o">&amp;</span><span class="cp">]</span><span class="s1">+)&#39;</span><span class="o">,</span><span class="nt">1</span><span class="o">)</span> <span class="nt">as</span> <span class="nt">aaa</span><span class="o">,</span>
-         <span class="nt">regexp_extract</span><span class="o">(</span><span class="nt">data_field</span><span class="o">,</span><span class="s1">&#39;.*?contentLoaded_headStart\\=(</span><span class="cp">[</span><span class="p">^</span><span class="o">&amp;</span><span class="cp">]</span><span class="s1">+)&#39;</span><span class="o">,</span><span class="nt">1</span><span class="o">)</span> <span class="nt">as</span> <span class="nt">bbb</span><span class="o">,</span>
-         <span class="nt">regexp_extract</span><span class="o">(</span><span class="nt">data_field</span><span class="o">,</span><span class="s1">&#39;.*?</span>
-<span class="s1">    AppLoad2Req\\=(</span><span class="cp">[</span><span class="p">^</span><span class="o">&amp;</span><span class="cp">]</span><span class="s1">+)&#39;</span><span class="o">,</span><span class="nt">1</span><span class="o">)</span> <span class="nt">as</span> <span class="nt">ccc</span>
-
-         <span class="nt">from</span> <span class="nt">pt_nginx_loginlog_st</span>
-         <span class="nt">where</span> <span class="nt">pt</span> <span class="o">=</span> <span class="s1">&#39;2012-03-26&#39;</span><span class="nt">limit</span> <span class="nt">2</span><span class="o">;</span>
-    <span class="nt">14</span><span class="o">.</span> <span class="nt">URL</span><span class="err">解析函数：</span><span class="nt">parse_url</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">parse_url</span><span class="o">(</span><span class="nt">string</span> <span class="nt">urlString</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">partToExtract</span> <span class="cp">[</span><span class="p">,</span> <span class="nx">stringkeyToExtract</span><span class="cp">]</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回</span><span class="nt">URL</span><span class="err">中指定的部分。</span><span class="nt">partToExtract</span><span class="err">的有效值为：</span><span class="nt">HOST</span><span class="o">,</span> <span class="nt">PATH</span><span class="o">,</span> <span class="nt">QUERY</span><span class="o">,</span> <span class="nt">REF</span><span class="o">,</span> <span class="nt">PROTOCOL</span><span class="o">,</span> <span class="nt">AUTHORITY</span><span class="o">,</span> <span class="nt">FILE</span><span class="o">,</span> <span class="nt">and</span> <span class="nt">USERINFO</span><span class="o">.</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">selectparse_url</span><span class="o">(</span><span class="s1">&#39;http://facebook.com/path1/p.php?k1=v1&amp;k2=v2#Ref1&#39;</span><span class="o">,</span> <span class="s1">&#39;HOST&#39;</span><span class="o">)</span> <span class="nt">fromlxw_dual</span><span class="o">;</span>
-    <span class="nt">facebook</span><span class="nc">.com</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">selectparse_url</span><span class="o">(</span><span class="s1">&#39;http://facebook.com/path1/p.php?k1=v1&amp;k2=v2#Ref1&#39;</span><span class="o">,</span> <span class="s1">&#39;QUERY&#39;</span><span class="o">,</span><span class="s1">&#39;k1&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">v1</span>
-    <span class="nt">15</span><span class="o">.</span> <span class="nt">json</span><span class="err">解析函数：</span><span class="nt">get_json_object</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">get_json_object</span><span class="o">(</span><span class="nt">string</span> <span class="nt">json_string</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">path</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：解析</span><span class="nt">json</span><span class="err">的字符串</span><span class="nt">json_string</span><span class="o">,</span><span class="err">返回</span><span class="nt">path</span><span class="err">指定的内容。假设输入的</span><span class="nt">json</span><span class="err">字符串无效，那么返回</span><span class="nt">NULL</span><span class="err">。</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">get_json_object</span><span class="o">(</span><span class="s1">&#39;{&quot;store&quot;:</span>
-<span class="s1">    &gt;  {&quot;fruit&quot;:\</span><span class="cp">[</span><span class="p">{</span><span class="s2">&quot;weight&quot;</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;apple&quot;</span><span class="p">},{</span><span class="s2">&quot;weight&quot;</span><span class="p">:</span><span class="mi">9</span><span class="p">,</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;pear&quot;</span><span class="p">}</span><span class="cp">]</span><span class="s1">,</span>
-<span class="s1">    &gt;   &quot;bicycle&quot;:{&quot;price&quot;:19.95,&quot;color&quot;:&quot;red&quot;}</span>
-<span class="s1">    &gt;   },</span>
-<span class="s1">    &gt; &quot;email&quot;:&quot;amy@only_for_json_udf_test.net&quot;,</span>
-<span class="s1">    &gt;  &quot;owner&quot;:&quot;amy&quot;</span>
-<span class="s1">    &gt; }</span>
-<span class="s1">    &gt; &#39;</span><span class="o">,</span><span class="s1">&#39;$.owner&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">amy</span>
-    <span class="nt">16</span><span class="o">.</span> <span class="err">空格字符串函数：</span><span class="nt">space</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">space</span><span class="o">(</span><span class="nt">int</span> <span class="nt">n</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回长度为</span><span class="nt">n</span><span class="err">的字符串</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">space</span><span class="o">(</span><span class="nt">10</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">length</span><span class="o">(</span><span class="nt">space</span><span class="o">(</span><span class="nt">10</span><span class="o">))</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">10</span>
-    <span class="nt">17</span><span class="o">.</span> <span class="err">反复字符串函数：</span><span class="nt">repeat</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">repeat</span><span class="o">(</span><span class="nt">string</span> <span class="nt">str</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">n</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：返回反复</span><span class="nt">n</span><span class="err">次后的</span><span class="nt">str</span><span class="err">字符串</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">repeat</span><span class="o">(</span><span class="s1">&#39;abc&#39;</span><span class="o">,</span><span class="nt">5</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abcabcabcabcabc</span>
-    <span class="nt">18</span><span class="o">.</span> <span class="err">首字符</span><span class="nt">ascii</span><span class="err">函数：</span><span class="nt">ascii</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">ascii</span><span class="o">(</span><span class="nt">string</span> <span class="nt">str</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">int</span>
-    <span class="err">说明：返回字符串</span><span class="nt">str</span><span class="err">第一个字符的</span><span class="nt">ascii</span><span class="err">码</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">ascii</span><span class="o">(</span><span class="s1">&#39;abcde&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">97</span>
-    <span class="nt">19</span><span class="o">.</span> <span class="err">左补足函数：</span><span class="nt">lpad</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">lpad</span><span class="o">(</span><span class="nt">string</span> <span class="nt">str</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">len</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">pad</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：将</span><span class="nt">str</span><span class="err">进行用</span><span class="nt">pad</span><span class="err">进行左补足到</span><span class="nt">len</span><span class="err">位</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">lpad</span><span class="o">(</span><span class="s1">&#39;abc&#39;</span><span class="o">,</span><span class="nt">10</span><span class="o">,</span><span class="s1">&#39;td&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">tdtdtdtabc</span>
-    <span class="err">注意：与</span><span class="nt">GP</span><span class="err">，</span><span class="nt">ORACLE</span><span class="err">不同，</span><span class="nt">pad</span> <span class="err">不能默认</span>
-    <span class="nt">20</span><span class="o">.</span> <span class="err">右补足函数：</span><span class="nt">rpad</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">rpad</span><span class="o">(</span><span class="nt">string</span> <span class="nt">str</span><span class="o">,</span> <span class="nt">int</span> <span class="nt">len</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">pad</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">string</span>
-    <span class="err">说明：将</span><span class="nt">str</span><span class="err">进行用</span><span class="nt">pad</span><span class="err">进行右补足到</span><span class="nt">len</span><span class="err">位</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">rpad</span><span class="o">(</span><span class="s1">&#39;abc&#39;</span><span class="o">,</span><span class="nt">10</span><span class="o">,</span><span class="s1">&#39;td&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">abctdtdtdt</span>
-    <span class="nt">21</span><span class="o">.</span> <span class="err">切割字符串函数</span><span class="o">:</span> <span class="nt">split</span>
-    <span class="err">语法</span><span class="o">:</span>  <span class="nt">split</span><span class="o">(</span><span class="nt">string</span> <span class="nt">str</span><span class="o">,</span> <span class="nt">stringpat</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span>  <span class="nt">array</span>
-    <span class="err">说明</span><span class="o">:</span> <span class="err">依照</span><span class="nt">pat</span><span class="err">字符串切割</span><span class="nt">str</span><span class="err">，会返回切割后的字符串数组</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">split</span><span class="o">(</span><span class="s1">&#39;abtcdtef&#39;</span><span class="o">,</span><span class="s1">&#39;t&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="cp">[</span><span class="s2">&quot;ab&quot;</span><span class="p">,</span><span class="s2">&quot;cd&quot;</span><span class="p">,</span><span class="s2">&quot;ef&quot;</span><span class="cp">]</span>
-    <span class="nt">22</span><span class="o">.</span> <span class="err">集合查找函数</span><span class="nd">:find_in_set</span>
-    <span class="err">语法</span><span class="o">:</span> <span class="nt">find_in_set</span><span class="o">(</span><span class="nt">string</span> <span class="nt">str</span><span class="o">,</span> <span class="nt">string</span> <span class="nt">strList</span><span class="o">)</span>
-    <span class="err">返回值</span><span class="o">:</span> <span class="nt">int</span>
-    <span class="err">说明</span><span class="o">:</span> <span class="err">返回</span><span class="nt">str</span><span class="err">在</span><span class="nt">strlist</span><span class="err">第一次出现的位置。</span><span class="nt">strlist</span><span class="err">是用逗号切割的字符串。假设没有找该</span><span class="nt">str</span><span class="err">字符，则返回</span><span class="nt">0</span>
-    <span class="err">举例：</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">find_in_set</span><span class="o">(</span><span class="s1">&#39;ab&#39;</span><span class="o">,</span><span class="s1">&#39;ef,ab,de&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-    <span class="nt">2</span>
-    <span class="nt">hive</span><span class="o">&gt;</span> <span class="nt">select</span> <span class="nt">find_in_set</span><span class="o">(</span><span class="s1">&#39;at&#39;</span><span class="o">,</span><span class="s1">&#39;ef,ab,de&#39;</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">lxw_dual</span><span class="o">;</span>
-</pre></div>
-
-
-<h3>时间处理函数</h3>
-<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">.</span><span class="err">日期函数</span><span class="n">UNIX</span><span class="err">时间戳转日期函数</span><span class="p">:</span> <span class="n">from_unixtime</span><span class="err">语法</span><span class="p">:</span><span class="n">from_unixtime</span><span class="p">(</span><span class="n">bigint</span> <span class="n">unixtime</span><span class="p">[,</span> <span class="n">stringformat</span><span class="p">])</span> 
-    <span class="err">返回值</span><span class="p">:</span> <span class="n">string</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">转化</span><span class="n">UNIX</span><span class="err">时间戳（从</span><span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">0100</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span> <span class="n">UTC</span><span class="err">到指定时间的秒数）到当前时区的时间格式</span>
-            <span class="err">注意不同时区是否有</span><span class="o">--</span><span class="err">从</span><span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span> <span class="mi">08</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span> <span class="n">UTC</span><span class="err">到指定时间的秒数？</span>
-    <span class="err">举例：</span>
-    <span class="n">Hive</span><span class="o">&gt;</span> <span class="nb">select</span> <span class="n">from_unixtime</span><span class="p">(</span><span class="mi">1491019212</span><span class="p">,</span><span class="s">&#39;yyyyMMdd&#39;</span><span class="p">)</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">20170401</span>    
-<span class="mi">2</span><span class="o">.</span><span class="err">获取当前</span><span class="n">UNIX</span><span class="err">时间戳函数</span><span class="p">:</span> <span class="n">unix_timestamp</span><span class="err">语法</span><span class="p">:</span>   <span class="n">unix_timestamp</span><span class="p">()</span> 
-    <span class="err">返回值</span><span class="p">:</span>   <span class="n">bigint</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">获得当前时区的</span><span class="n">UNIX</span><span class="err">时间戳</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">unix_timestamp</span><span class="p">()</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">1491019212</span>      
-<span class="mi">3</span><span class="o">.</span><span class="err">日期转</span><span class="n">UNIX</span><span class="err">时间戳函数</span><span class="p">:</span> <span class="n">unix_timestamp</span><span class="err">语法</span><span class="p">:</span><span class="n">unix_timestamp</span><span class="p">(</span><span class="n">string</span> <span class="n">date</span><span class="p">)</span> 
-    <span class="err">返回值</span><span class="p">:</span>   <span class="n">bigint</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">转换格式为“</span><span class="n">yyyy</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">dd</span> <span class="n">HH:mm:ss</span><span class="err">“的日期到</span><span class="n">UNIX</span><span class="err">时间戳。如果转化失败，则返回</span><span class="mi">0</span><span class="err">。</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">unix_timestamp</span><span class="p">(</span><span class="s">&#39;2017-04-07 12:01:06&#39;</span><span class="p">)</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">1491537666</span>      
-<span class="mi">4</span><span class="o">.</span><span class="err">指定格式日期转</span><span class="n">UNIX</span><span class="err">时间戳函数</span><span class="p">:</span> <span class="n">unix_timestamp</span><span class="err">语法</span><span class="p">:</span>   <span class="n">unix_timestamp</span><span class="p">(</span><span class="n">string</span> <span class="n">date</span><span class="p">,</span><span class="n">string</span> <span class="n">pattern</span><span class="p">)</span> 
-    <span class="err">返回值</span><span class="p">:</span>   <span class="n">bigint</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">转换</span><span class="n">pattern</span><span class="err">格式的日期到</span><span class="n">UNIX</span><span class="err">时间戳。如果转化失败，则返回</span><span class="mi">0</span><span class="err">。</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">unix_timestamp</span><span class="p">(</span><span class="s">&#39;2017-04-07 12:01:06&#39;</span><span class="p">,</span><span class="s">&#39;yyyyMMddHH:mm:ss&#39;</span><span class="p">)</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">1491537666</span>      
-<span class="mi">5</span><span class="o">.</span><span class="err">日期时间转日期函数</span><span class="p">:</span> <span class="n">to_date</span><span class="err">语法</span><span class="p">:</span>   <span class="n">to_date</span><span class="p">(</span><span class="n">string</span> <span class="n">timestamp</span><span class="p">)</span> 
-    <span class="err">返回值</span><span class="p">:</span>   <span class="n">string</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">返回日期时间字段中的日期部分。</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">to_date</span><span class="p">(</span><span class="s">&#39;2017-04-07 12:01:06) from dual;</span>
-<span class="s">    2017-04-07      </span>
-<span class="s">6.日期转年函数: year语法:   year(string date) </span>
-<span class="s">    返回值: int</span>
-<span class="s">    说明: 返回日期中的年。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select year(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span> <span class="mi">12</span><span class="p">:</span><span class="mo">01</span><span class="p">:</span><span class="mo">06</span><span class="p">)</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">2011</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">year</span><span class="p">(</span><span class="s">&#39;2017-04-07&#39;</span><span class="p">)</span> <span class="n">fromdual</span><span class="p">;</span>
-    <span class="mi">2017</span>        
-<span class="mi">7</span><span class="o">.</span><span class="err">日期转月函数</span><span class="p">:</span> <span class="n">month</span><span class="err">语法</span><span class="p">:</span> <span class="n">month</span>   <span class="p">(</span><span class="n">string</span> <span class="n">date</span><span class="p">)</span> 
-    <span class="err">返回值</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">返回日期中的月份。</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">month</span><span class="p">(</span><span class="s">&#39;2017-04-07 12:01:06) from dual;</span>
-<span class="s">    12</span>
-<span class="s">    hive&gt;   select month(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">08</span><span class="s">&#39;) fromdual;</span>
-<span class="s">    8       </span>
-<span class="s">8.日期转天函数: day语法: day   (string date) </span>
-<span class="s">    返回值: int</span>
-<span class="s">    说明: 返回日期中的天。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select day(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span> <span class="mi">12</span><span class="p">:</span><span class="mo">01</span><span class="p">:</span><span class="mo">06</span><span class="p">)</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">8</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">day</span><span class="p">(</span><span class="s">&#39;2017-12-24&#39;</span><span class="p">)</span> <span class="n">fromdual</span><span class="p">;</span>
-    <span class="mi">24</span>      
-<span class="mi">9</span><span class="o">.</span><span class="err">日期转小时函数</span><span class="p">:</span> <span class="n">hour</span><span class="err">语法</span><span class="p">:</span> <span class="n">hour</span>   <span class="p">(</span><span class="n">string</span> <span class="n">date</span><span class="p">)</span> 
-    <span class="err">返回值</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">返回日期中的小时。</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">hour</span><span class="p">(</span><span class="s">&#39;2017-04-07 12:01:06) from dual;</span>
-<span class="s">    12      </span>
-<span class="s">10.日期转分钟函数: minute语法: minute   (string date) </span>
-<span class="s">    返回值: int</span>
-<span class="s">    说明: 返回日期中的分钟。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select minute(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span> <span class="mi">12</span><span class="p">:</span><span class="mo">01</span><span class="p">:</span><span class="mo">06</span><span class="p">)</span> <span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">1</span>       
-<span class="mi">11</span><span class="o">.</span><span class="err">日期转秒函数</span><span class="p">:</span> <span class="n">second</span><span class="err">语法</span><span class="p">:</span> <span class="n">second</span>   <span class="p">(</span><span class="n">string</span> <span class="n">date</span><span class="p">)</span> 
-    <span class="err">返回值</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="err">说明</span><span class="p">:</span> <span class="err">返回日期中的秒。</span>
-    <span class="err">举例：</span>
-    <span class="n">hive</span><span class="o">&gt;</span>   <span class="nb">select</span> <span class="n">second</span><span class="p">(</span><span class="s">&#39;2017-04-07 12:01:06) from dual;</span>
-<span class="s">    6       </span>
-<span class="s">12.日期转周函数: weekofyear语法:   weekofyear (string date) </span>
-<span class="s">    返回值: int</span>
-<span class="s">    说明: 返回日期在当前的周数。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select weekofyear(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span> <span class="mi">12</span><span class="p">:</span><span class="mo">01</span><span class="p">:</span><span class="mo">06</span><span class="s">&#39;) from dual;</span>
-<span class="s">    14  </span>
-<span class="s">13.日期比较函数: datediff语法:   datediff(string enddate,string startdate) </span>
-<span class="s">    返回值: int</span>
-<span class="s">    说明: 返回结束日期减去开始日期的天数。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select datediff(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span><span class="s">&#39;,&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">09</span><span class="s">&#39;)from dual;</span>
-<span class="s">    29      </span>
-<span class="s">14.日期增加函数: date_add语法:   date_add(string startdate, intdays) </span>
-<span class="s">    返回值: string</span>
-<span class="s">    说明: 返回开始日期startdate增加days天后的日期。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select date_add(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span><span class="s">&#39;,10)from dual;</span>
-<span class="s">    2017-04-17      </span>
-<span class="s">15.日期减少函数: date_sub语法:   date_sub (string startdate,int days) </span>
-<span class="s">    返回值: string</span>
-<span class="s">    说明: 返回开始日期startdate减少days天后的日期。</span>
-<span class="s">    举例：</span>
-<span class="s">    hive&gt;   select date_sub(&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">07</span><span class="err">&#39;</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span><span class="n">from</span> <span class="n">dual</span><span class="p">;</span>
-    <span class="mi">2017</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">28</span>
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>hive中的udf时间函数用法 http://blog.csdn.net/jiedushi/article/details/7401569
-hive字符串函数       http://www.cnblogs.com/blfshiye/p/5041125.html
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>String&amp;Time_Calendar</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-24.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
