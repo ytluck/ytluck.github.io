@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言实现SQL的Join功能</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-22.html" rel="bookmark"
+           title="Permalink to R语言实现SQL的Join功能">R语言实现SQL的Join功能</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-22T21:29:00+08:00">
+                Published: 2017-06-22 21:29:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h2>R语言实现SQL中的联结</h2>
+<div class="highlight"><pre><span></span><span class="c1">##在Windows环境下运行</span>
+<span class="kp">rm</span><span class="p">(</span><span class="kt">list</span><span class="o">=</span><span class="kp">ls</span><span class="p">())</span>
+<span class="kp">getwd</span><span class="p">()</span>
+<span class="kp">setwd</span><span class="p">(</span><span class="s">&quot;F:\\Data&quot;</span><span class="p">)</span>
+
+<span class="c1">##读取数据-检查变量--注意数据中是否会出现#，以及fill的使用与否</span>
+ studentData <span class="o">&lt;-</span> read.table<span class="p">(</span>file<span class="o">=</span> <span class="s">&quot;F:\\Data\\student.txt&quot;</span> <span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span> stringsAsFactors<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+ classData <span class="o">&lt;-</span> read.table<span class="p">(</span>file<span class="o">=</span> <span class="s">&quot;F:\\Data\\class.txt&quot;</span> <span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span> stringsAsFactors<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+
+ str<span class="p">(</span>studentData <span class="p">)</span>
+ str<span class="p">(</span>classData <span class="p">)</span>
+<span class="c1">##去除科学计数法</span>
+ studentData<span class="o">$</span>V1 <span class="o">&lt;-</span>  <span class="kp">format</span><span class="p">(</span>studentData<span class="o">$</span>V1<span class="p">,</span>scientific<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+ classData<span class="o">$</span>V1 <span class="o">&lt;-</span>    <span class="kp">format</span><span class="p">(</span>classData<span class="o">$</span>V1<span class="p">,</span>scientific<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+
+<span class="c1">##在连接之前，估算可能的数据边界</span>
+<span class="c1">##自身有没有重复</span>
+    <span class="kp">length</span><span class="p">(</span><span class="kp">unique</span><span class="p">(</span>studentData<span class="o">$</span>V1<span class="p">))</span>
+    <span class="kp">length</span><span class="p">(</span><span class="kp">unique</span><span class="p">(</span>classData<span class="o">$</span>V1<span class="p">))</span>
+
+<span class="c1">##两个连接的数据的相互差集和交集</span>
+ data01 <span class="o">&lt;-</span>  <span class="kp">setdiff</span><span class="p">(</span><span class="kp">as.vector</span><span class="p">(</span><span class="kp">as.matrix</span><span class="p">(</span>studentData<span class="o">$</span>V1<span class="p">)),</span><span class="kp">as.vector</span><span class="p">(</span><span class="kp">as.matrix</span><span class="p">(</span>classData<span class="o">$</span>V1<span class="p">))</span> <span class="p">)</span>
+ str<span class="p">(</span>data01<span class="p">)</span>
+ data02 <span class="o">&lt;-</span>  <span class="kp">setdiff</span><span class="p">(</span><span class="kp">as.vector</span><span class="p">(</span><span class="kp">as.matrix</span><span class="p">(</span>classData<span class="o">$</span>V1<span class="p">)),</span><span class="kp">as.vector</span><span class="p">(</span><span class="kp">as.matrix</span><span class="p">(</span>studentData<span class="o">$</span>V1<span class="p">))</span> <span class="p">)</span>
+ str<span class="p">(</span>data02<span class="p">)</span>
+
+ allData <span class="o">&lt;-</span>  <span class="kp">intersect</span><span class="p">(</span><span class="kp">as.vector</span><span class="p">(</span><span class="kp">as.matrix</span><span class="p">(</span>classData<span class="o">$</span>V1<span class="p">)),</span><span class="kp">as.vector</span><span class="p">(</span><span class="kp">as.matrix</span><span class="p">(</span>studentData<span class="o">$</span>V1<span class="p">))</span> <span class="p">)</span>
+ str<span class="p">(</span>allData <span class="p">)</span>
+
+<span class="c1">##连接</span>
+<span class="c1">##如果要实现类似sql里面的inner join 功能，则用代码</span>
+    m1 <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>studentData<span class="p">,</span> classData<span class="p">,</span> by.x <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span> by.y <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">)</span>
+str<span class="p">(</span>m1<span class="p">)</span>
+<span class="c1">##如果要实现left join功能则用代码</span>
+m2 <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>studentData<span class="p">,</span> classData<span class="p">,</span> by.x <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span> by.y <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span>all.x<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="c1">##right join功能代码</span>
+m3 <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>studentData<span class="p">,</span> classData<span class="p">,</span> by.x <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span> by.y <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span>all.y<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="c1">##all join功能代码</span>
+m4 <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>studentData<span class="p">,</span> classData<span class="p">,</span> by.x <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span> by.y <span class="o">=</span> <span class="s">&quot;V1&quot;</span><span class="p">,</span>all<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>R语言merge函数总结 http://bbs.pinggu.org/thread-3234639-1-1.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

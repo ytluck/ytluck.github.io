@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Linux下常用命令</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-06.html" rel="bookmark"
+           title="Permalink to Linux下常用命令">Linux下常用命令</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-22T22:04:00+08:00">
+                Published: 2017-06-22 22:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>心得</h3>
+<div class="highlight"><pre><span></span>Make simple things simple, complex things possible!
+</pre></div>
+
+
+<h3>1.Linux下命令形式</h3>
+<div class="highlight"><pre><span></span>01.三种使用的语法格式
+        UNIX 风格，选项可以组合在一起，并且选项前必须有“-”连字符
+        BSD 风格，选项可以组合在一起，但是选项前不能有“-”连字符
+        GNU 风格的长选项，选项前有两个“-”连字符
+
+        选项--长选项&lt;两个“-”连字符后面加完整的单词&gt;，短选项&lt;选项前有一个“-”连字符 后面加单个字符&gt;
+        长选项不能组合使用
+        可选项，必选项，多选一，参数之间是否有空格
+        &lt;&gt; : 必须提供  ，a|b : 二选一,或多选一 ， [ ] :可省略之内容
+02.Linux中的变量
+</pre></div>
+
+
+<h3>2.基本查看命令</h3>
+<div class="highlight"><pre><span></span><span class="x">基本设置</span>
+<span class="x">            CPU                                 mpstat   cat /proc/cpuinfo</span>
+<span class="x">            内存                                  free    cat  /proc/memoinfo</span>
+<span class="x">            硬盘                                  df -k</span>
+<span class="x">            内核                                  cat /proc/version</span>
+<span class="x">            用户                                  uname -a</span>
+<span class="x">            文件权限                            chmod   su  sudo</span>
+<span class="x">            查看当前使用的bash     cat /etc/shells       echo </span><span class="p">$</span><span class="nv">SHELL</span><span class="x"></span>
+<span class="x">            网络查看</span>
+<span class="x">                                ifconfig            ifup  ifdown</span>
+<span class="x">                                netstat</span>
+<span class="x">                                ip</span>
+<span class="x">                                host</span>
+<span class="x">                                ping</span>
+<span class="x">                                cat /etc/hosts</span>
+<span class="x">                                traceroute           route</span>
+<span class="x">            文件查看：           cat   head   tail  wc   less  more   find</span>
+<span class="x">            文本编辑器：      vim    退出:q    :q!    保存后退出:wq</span>
+<span class="x">            定时任务                crontab      cat /etc/crontab</span>
+<span class="x">            配置文件生效      source /etc/profile</span>
+<span class="x">            帮助：                 help   man  type</span>
+</pre></div>
+
+
+<h3>3.查看程序状态</h3>
+<div class="highlight"><pre><span></span>服务
+            service     --status-all
+            chkconfig --list 
+            chkconfig                   命令主要用来更新（启动或停止）和查询系统服务的运行级信息
+
+进程
+            ps aux  |grep oracle
+            ps -ef | grep tnslsnr       
+            pstree   --tree of processes
+            top
+            kill
+
+程序登录
+        命令行登录
+        图形界面登录
+</pre></div>
+
+
+<h3>4.下载安装程序常用命令</h3>
+<div class="highlight"><pre><span></span>    源码安装
+            wget
+            tar     gzip   unzip
+            cd   pwd
+            ls   mkdir  cp   mv
+            chmod
+            configure
+            make
+            make install
+
+        二进制文件安装
+                yum
+                或者rpm
+
+                apt-get
+                或者
+
+    shift + ctrl + T
+    127.0.0.0
+    192.169.1.1
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

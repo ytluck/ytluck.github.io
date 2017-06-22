@@ -26,7 +26,115 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/os/my-super-os-post-05.html">Shell脚本的执行和Linux安全策略</a></h1>
+                    <h1 class="entry-title"><a href="/os/my-super-os-post-06.html">Linux下常用命令</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-06-22T22:04:00+08:00">
+                Published: 2017-06-22 22:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>心得</h3>
+<div class="highlight"><pre><span></span>Make simple things simple, complex things possible!
+</pre></div>
+
+
+<h3>1.Linux下命令形式</h3>
+<div class="highlight"><pre><span></span>01.三种使用的语法格式
+        UNIX 风格，选项可以组合在一起，并且选项前必须有“-”连字符
+        BSD 风格，选项可以组合在一起，但是选项前不能有“-”连字符
+        GNU 风格的长选项，选项前有两个“-”连字符
+
+        选项--长选项&lt;两个“-”连字符后面加完整的单词&gt;，短选项&lt;选项前有一个“-”连字符 后面加单个字符&gt;
+        长选项不能组合使用
+        可选项，必选项，多选一，参数之间是否有空格
+        &lt;&gt; : 必须提供  ，a|b : 二选一,或多选一 ， [ ] :可省略之内容
+02.Linux中的变量
+</pre></div>
+
+
+<h3>2.基本查看命令</h3>
+<div class="highlight"><pre><span></span><span class="x">基本设置</span>
+<span class="x">            CPU                                 mpstat   cat /proc/cpuinfo</span>
+<span class="x">            内存                                  free    cat  /proc/memoinfo</span>
+<span class="x">            硬盘                                  df -k</span>
+<span class="x">            内核                                  cat /proc/version</span>
+<span class="x">            用户                                  uname -a</span>
+<span class="x">            文件权限                            chmod   su  sudo</span>
+<span class="x">            查看当前使用的bash     cat /etc/shells       echo </span><span class="p">$</span><span class="nv">SHELL</span><span class="x"></span>
+<span class="x">            网络查看</span>
+<span class="x">                                ifconfig            ifup  ifdown</span>
+<span class="x">                                netstat</span>
+<span class="x">                                ip</span>
+<span class="x">                                host</span>
+<span class="x">                                ping</span>
+<span class="x">                                cat /etc/hosts</span>
+<span class="x">                                traceroute           route</span>
+<span class="x">            文件查看：           cat   head   tail  wc   less  more   find</span>
+<span class="x">            文本编辑器：      vim    退出:q    :q!    保存后退出:wq</span>
+<span class="x">            定时任务                crontab      cat /etc/crontab</span>
+<span class="x">            配置文件生效      source /etc/profile</span>
+<span class="x">            帮助：                 help   man  type</span>
+</pre></div>
+
+
+<h3>3.查看程序状态</h3>
+<div class="highlight"><pre><span></span>服务
+            service     --status-all
+            chkconfig --list 
+            chkconfig                   命令主要用来更新（启动或停止）和查询系统服务的运行级信息
+
+进程
+            ps aux  |grep oracle
+            ps -ef | grep tnslsnr       
+            pstree   --tree of processes
+            top
+            kill
+
+程序登录
+        命令行登录
+        图形界面登录
+</pre></div>
+
+
+<h3>4.下载安装程序常用命令</h3>
+<div class="highlight"><pre><span></span>    源码安装
+            wget
+            tar     gzip   unzip
+            cd   pwd
+            ls   mkdir  cp   mv
+            chmod
+            configure
+            make
+            make install
+
+        二进制文件安装
+                yum
+                或者rpm
+
+                apt-get
+                或者
+
+    shift + ctrl + T
+    127.0.0.0
+    192.169.1.1
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/os/my-super-os-post-05.html" rel="bookmark"
+                           title="Permalink to Shell脚本的执行和Linux安全策略">Shell脚本的执行和Linux安全策略</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-02-18T22:04:00+08:00">
                 Published: 2017-02-18 22:04:00
@@ -37,75 +145,11 @@
         </address>
 <p>In <a href="/os/index.html">OS</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>在运行shell脚本时候，有三种方式来调用外部的脚本，</h3>
-<div class="highlight"><pre><span></span>exec（exec script.sh）、source（source script.sh）、fork（./script.sh）
-</pre></div>
-
-
-<h3>1、exec（exec /home/script.sh）：</h3>
-<div class="highlight"><pre><span></span>使用exec来调用脚本，被执行的脚本会继承当前shell的环境变量。
-但事实上exec产生了新的进程，他会把主shell的进程资源占用并替换脚本内容，继承了原主shell的PID号，
-即原主shell剩下的内容不会执行。-
-</pre></div>
-
-
-<h3>2、source（source /home/script.sh）</h3>
-<div class="highlight"><pre><span></span>使用source或者“.”来调用外部脚本，不会产生新的进程，继承当前shell环境变量，
-而且被调用的脚本运行结束后，它拥有的环境变量和声明变量会被当前shell保留，   
-类似将调用脚本的内容复制过来直接执行。执行完毕后原主shell继续运行。
-</pre></div>
-
-
-<h3>3、fork（/home/script.sh）</h3>
-<div class="highlight"><pre><span></span> 直接运行脚本，会以当前shell为父进程，产生新的进程，并且继承主脚本的环境变量和声明变量。
-执行完毕后，主脚本不会保留其环境变量和声明变量。
-</pre></div>
-
-
-<h2>Linux系统的安全策略</h2>
-<h3>安全策略一</h3>
-<div class="highlight"><pre><span></span>用户-用户组-文件权限
-    文件的所有者
-</pre></div>
-
-
-<h3>安全策略二</h3>
-<div class="highlight"><pre><span></span>  DAC
-     自主访问控制&lt;Discretionary Access Control,DAC&gt;.依据进程的所有者与文件资源的rwx权限决定有无访问权限。
-     文件系统的rwx 
-    MAC
-    委托访问控制&lt;Mandatory Access Control&gt;，针对特定的进程和特定的文件资源进行权限控制。
-SElinux &lt;Security Enhanced Linux&gt;
-Subject、Object、Policy、Security context
-SELinux是在进行程序、文件等权限设置依据的一个内核模块。控制的subject&lt;主体&gt;是进程。目标则是该进程能否读取文件资源。会对某些服务
-制定基本的安全性策略。主体与目标的安全上下文一致才能顺利访问。安全上下文的类型，重设安全上下文的命令有restorecon 以及chcon,若要
-管理默认的SELinux布尔值，可使用getsebool和setsebool.
-SELinux三种模式： enforcing、permissive、disabled。三种模式，强制模式，许可模式以及关闭。其中策略有targeted和strict两种。
-
-安全上下文主要用冒号分为三个字段 Identify:Role:type
-        Identity:root system_u user_u
-        Role    ： object_r system_r
-        Type    : 
-  domain 需要与 Type 搭配才能顺利读取文件资源。
- 确定内核中selinux
-重置安全上下文  chcon -R
-    &lt;1&gt;查看SELinux当前状态：  getenforce 以及  sestatus
-
-APPArmor&lt;Application Armor&gt;  AppArmor通过一个配置文件（即profile）来指定一个应用程序的相关权限。AppArmor support was first introduced in Ubuntu 7.04, 
-and is turned on by default in Ubuntu 7.10 and late.Apparmor使用内核标准安全文件系统机制（/sys/kernel/security）来加载和监控profiles文件。
-而虚拟文件/sys/kernel/security/apparmor/profiles里记录了当前加载的profiles文件。
-    &lt;1&gt;查看当前AppArmor的状态：在Ubuntu下通过命令sudo apparmor_status可以。 
-    pparmor的启动、停止等操作的相关命令如下：
-        Start : sudo /etc/init.d/apparmor start
-        Stop : sudo /etc/init.d/apparmor stop
-        reload: sudo /etc/init.d/apparmor reload
-        Show status: sudo /etc/init.d/apparmor status
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>exec-source-fork
+关于shell</p>
+                <a class="readmore" href="/os/my-super-os-post-05.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

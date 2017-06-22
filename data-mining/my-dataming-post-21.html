@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Excel使用理念和基本概念</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-21.html" rel="bookmark"
+           title="Permalink to Excel使用理念和基本概念">Excel使用理念和基本概念</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-22T21:20:00+08:00">
+                Published: 2017-06-22 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <h3>使用原因</h3>
+<div class="highlight"><pre><span></span>平时在数据分析中，通常会使用程序来进行数据分析，只是有时候数据量小，
+写程序的功夫使用Excel早就出结果了，而且大多只是临时的一些数据汇总
+想想还是用一下Excel吧。毕竟What yousee is What you get。
+</pre></div>
+
+
+<h2>Excel使用规则</h2>
+<div class="highlight"><pre><span></span>使用表--记录数据、分析数据
+            分类汇总表、源数据表、参数表
+                分类汇总表：汇总记录结果
+                                    分类：一维汇总表
+                                    实现方法：数据透视表，函数，菜单功能实现
+                                            数据透视表显示定位位置在新建工作表中--汇总表与源数据表的同步问题--使用数据刷新功能
+                源数据表：类似于R语言中的数据框--长数据类型
+                                    缺失数据处理
+                参数表：提现数据背景以及数据
+说明：
+        由分类汇总表到源数据表： 海选字段--合并字段--转换字段-用字段讲故事-增加字段
+        国营中数据控制--源数据表不给，给的是各个汇总表，对汇总表进行再次汇总
+        判定数据所属类型---设置分类汇总样式--设置数据冠梁
+</pre></div>
+
+
+<h3>Excel各个名称</h3>
+<div class="highlight"><pre><span></span>  工作簿       file/name.xlsx
+  工作表       sheet
+                        sheetIndex 在工作簿中表示的表索引的数字
+                        sheetName 工作簿中表示的表索引的名称
+  行-列-单元格
+                rowIndex/colIndex 为空则提取所有行/列数据
+                startRow/endRow指定要开始/结束读取数据的行数 
+                header T or F,指定读取表格的第一行是否包含变量名称
+
+操作--
+    新工作簿中的工作表数目
+    双引号标识字符
+    名称框  + 函数输入框
+</pre></div>
+
+
+<h3>Excel常见操作</h3>
+<div class="highlight"><pre><span></span>    1.常用操作
+        选中，跳转
+        查找--引用--对比VLOOKUP
+        筛选--排序--加减乘除
+        分组
+        表中的填写顺序--行和列--考虑填表流程和工作流程 put yourself into others&#39; shoes
+
+    2.公式的使用
+    公式使用--&quot;=&quot; 符号作为单元格起始符号，则为公式
+        绝对引用和相对引用：
+            相对引用、绝对引用和混合引用是指在公式中使用单元格或单元格区域的地址时，
+            当将公式向旁边复制时，地址是如何变化的
+            加入【$】这个符号，就变成了绝对引用
+    函数名称--参数说明--预览结果
+            任务描述--确定函数类别
+    使用面板--或者--直接在单元格中编辑
+
+    3.快捷键
+    最后一行  Ctr     -----&gt;
+    单元格中换行 Alt + Enter
+    = 函数名 然后 Ctr+A 调用函数参数对话框面板
+</pre></div>
+
+
+<h3>交互</h3>
+<div class="highlight"><pre><span></span>    word和Excel交互---邮件合并
+
+    Excel有2003版本的，数据量  ，2007以后的版本，数据量1024*1024=1048576行
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>《你早该这么玩Excel》
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
