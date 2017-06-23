@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言ggplot2绘图模板和理论</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-23.html" rel="bookmark"
+           title="Permalink to R语言ggplot2绘图模板和理论">R语言ggplot2绘图模板和理论</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-23T21:09:00+08:00">
+                Published: 2017-06-23 21:09:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>ggplot2会有一些常用的功能，在绘制图形的时候，了解了基本的结构，然后对细节不断的积累，从而在数据的可视化上有一些进步。
+常用的功能也做了一些总结
+这段代码是2015年的时候写的，一直也没做什么修改，添加一些内容整理成以后的模板参考
+</pre></div>
+
+
+<h2>ggplot绘图模板代码</h2>
+<div class="highlight"><pre><span></span><span class="c1">##清除工作空间的变量，注意共享代码不要带有这条命令</span>
+<span class="kp">rm</span><span class="p">(</span><span class="kt">list</span><span class="o">=</span><span class="kp">ls</span><span class="p">())</span>
+<span class="c1">##加载绘图包</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<span class="c1">##查看当前路径，并设置工作路径</span>
+  <span class="kp">getwd</span><span class="p">();</span>
+  <span class="kp">setwd</span><span class="p">(</span><span class="s">&quot;E:/DATA2&quot;</span><span class="p">);</span>
+  <span class="kp">getwd</span><span class="p">();</span>
+<span class="c1">##查看当前工作空间的变量</span>
+<span class="kp">ls</span><span class="p">();</span>
+
+<span class="c1">##数据--数据属性以及数据框的变换</span>
+<span class="c1">## 读入数据，如果不在当前工作环境下，要添加数据所在的具体路径</span>
+  Data01 <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;type01.txt&quot;</span><span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span>header<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+  Data02 <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;type02.txt&quot;</span><span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span>header<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>stringsAsFactors<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+
+<span class="c1">##做基本图--interaction___geom_point()、</span>
+  p1 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Data01<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span>Type<span class="p">,</span>y<span class="o">=</span>numbers<span class="p">,</span>fill<span class="o">=</span>Type<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span>
+  p2 <span class="o">&lt;-</span> ggplot<span class="p">(</span>Data02<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span>relation<span class="p">,</span>y<span class="o">=</span>PATEnumber<span class="p">,</span>fill<span class="o">=</span>type<span class="p">))</span><span class="o">+</span>geom_bar<span class="p">(</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">,</span>width<span class="o">=</span><span class="m">0.69</span><span class="p">,</span>position<span class="o">=</span>position_dodge<span class="p">(</span><span class="m">0.7</span><span class="p">))</span>
+   p2 <span class="o">&lt;-</span> ggplot<span class="p">(</span>AllData<span class="p">,</span>aes<span class="p">(</span>x<span class="o">=</span>Week<span class="p">,</span>y<span class="o">=</span>les<span class="p">,</span>group <span class="o">=</span>year<span class="p">,</span>color<span class="o">=</span><span class="kp">as.factor</span><span class="p">(</span>year<span class="p">)))</span><span class="o">+</span>geom_line<span class="p">()</span>
+
+
+<span class="c1">##添加文本注释</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>annotate<span class="p">(</span><span class="s">&quot;text&quot;</span><span class="p">,</span>x<span class="o">=</span><span class="m">3</span><span class="p">,</span>y<span class="o">=</span><span class="m">4</span><span class="p">,</span>label<span class="o">=</span><span class="s">&quot;group 1&quot;</span><span class="p">)</span>
+
+<span class="c1">###设置图片的字体族、字体大小、颜色，对齐方式、旋转角度</span>
+<span class="c1">##在Windows下的字体族添加到R语言中，如果采用R自带的字体族可以直接用，这条命名可以注释掉</span>
+ windowsFonts<span class="p">(</span>roman<span class="o">=</span>windowsFont<span class="p">(</span><span class="s">&quot;Times New Roman&quot;</span><span class="p">))</span>
+
+<span class="c1">##标题----添加图片标题并设置标题</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>ggtitle<span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">)</span><span class="o">+</span>theme<span class="p">(</span>plot.title<span class="o">=</span>element_text<span class="p">(</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">))</span>
+ <span class="c1">##图形主标题main</span>
+
+<span class="c1">##坐标轴---添加坐标轴标签</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>xlab<span class="p">(</span><span class="s">&quot;Poly(A) sites types&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;Numbers of poly(A) sites&quot;</span><span class="p">)</span>       
+<span class="c1">##坐标轴---修改坐标刻度标签的项目顺序以及标签</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>scale_fill_discrete<span class="p">(</span>limits<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;TR&quot;</span><span class="p">,</span><span class="s">&quot;5UR&quot;</span><span class="p">,</span><span class="s">&quot;CS&quot;</span><span class="p">,</span><span class="s">&quot;inter&quot;</span><span class="p">,</span><span class="s">&quot;ter&quot;</span><span class="p">,</span><span class="s">&quot;intn&quot;</span><span class="p">),</span>labels<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;UTR&quot;</span><span class="p">,</span><span class="s">&quot;5UR&quot;</span><span class="p">,</span><span class="s">&quot;CS&quot;</span><span class="p">,</span><span class="s">&quot;inter&quot;</span><span class="p">,</span><span class="s">&quot;ter&quot;</span><span class="p">,</span><span class="s">&quot;intn&quot;</span><span class="p">))</span>
+<span class="c1">##坐标轴---设置坐标刻度标签的字体大小等外观</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>axis.text.x<span class="o">=</span>element_text<span class="p">(</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">,</span>angle<span class="o">=</span><span class="m">30</span><span class="p">,</span>hjust<span class="o">=</span><span class="m">0.5</span><span class="p">,</span>vjust<span class="o">=</span><span class="m">1</span><span class="p">))</span>
+ <span class="c1">#p1 &lt;- p1+theme(axis.text.x=element_blank())</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>axis.text.y<span class="o">=</span>element_text<span class="p">(</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">))</span>
+<span class="c1">##坐标轴---设置坐标轴标签文本的外观</span>
+ <span class="c1">#p1 &lt;- p1+theme(axis.title.x=element_text(family=&quot;roman&quot;,face=&quot;bold&quot;,colour=&quot;black&quot;,size=14))</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>axis.title.x<span class="o">=</span>element_blank<span class="p">())</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>axis.title.y<span class="o">=</span>element_text<span class="p">(</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">))</span>
+
+<span class="c1">##图例--修改图例的标签以及位置</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>labs<span class="p">(</span>fill<span class="o">=</span><span class="s">&quot;Types&quot;</span><span class="p">)</span>
+ <span class="c1">#p1 &lt;- p1+theme(legend.position=c(0.9,0.8),legend.background=element_rect(fill=&quot;white&quot;,colour=&quot;black&quot;))</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>legend.position<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0.88</span><span class="p">,</span><span class="m">0.8</span><span class="p">))</span>
+<span class="c1">##图例--设置图例标签和图例标题字体，大小等</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>legend.title<span class="o">=</span>element_text<span class="p">(</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">))</span>
+  p1 <span class="o">&lt;-</span> p1<span class="o">+</span>theme<span class="p">(</span>legend.text<span class="o">=</span>element_text<span class="p">(</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold.italic&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">12</span><span class="p">))</span>
+
+<span class="c1">##注解--添加独立的图形元素和文本元素</span>
+<span class="c1"># 添加文本注解---文本类几何对象</span>
+p1 <span class="o">&lt;-</span> p1<span class="o">+</span>annotate<span class="p">(</span><span class="s">&quot;text&quot;</span><span class="p">,</span>x<span class="o">=-</span><span class="kc">Inf</span><span class="p">,</span>y<span class="o">=</span><span class="kc">Inf</span><span class="p">,</span>label<span class="o">=</span><span class="s">&quot;A&quot;</span><span class="p">,</span>hjust<span class="o">=</span><span class="m">-.2</span><span class="p">,</span>vjust<span class="o">=</span><span class="m">2</span><span class="p">,</span>family<span class="o">=</span><span class="s">&quot;roman&quot;</span><span class="p">,</span>face<span class="o">=</span><span class="s">&quot;bold&quot;</span><span class="p">,</span>colour<span class="o">=</span><span class="s">&quot;black&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">)</span>
+<span class="c1">##添加直线</span>
+    geom_hline<span class="p">(</span>yintercept<span class="o">=</span><span class="m">60</span><span class="p">)</span><span class="o">+</span>geom_vline<span class="p">(</span>xintercept<span class="o">=</span><span class="m">14</span><span class="p">)</span>
+<span class="c1">##添加箭头灯</span>
+<span class="kn">library</span><span class="p">(</span>grid<span class="p">)</span>
+p1 <span class="o">&lt;-</span> p1<span class="o">+</span>annotate<span class="p">(</span><span class="s">&quot;segment&quot;</span><span class="p">,</span>x<span class="o">=</span><span class="m">1</span><span class="p">,</span>xend<span class="o">=</span><span class="m">2</span><span class="p">,</span>y<span class="o">=</span><span class="m">2</span><span class="p">,</span>yend<span class="o">=</span><span class="m">8</span><span class="p">,</span>size<span class="o">=</span><span class="m">14</span><span class="p">)</span>
+
+<span class="c1">##配色--几何对象的颜色--分为映射和设置两种类型，边界色和填充色</span>
+<span class="c1">##离散型变量和连续型变量所对应的调色板</span>
+ p1<span class="o">+</span>scale_fill_grey<span class="p">()</span>
+<span class="c1">##使用自定义调色板</span>
+sf_palette <span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;#0072B2&quot;</span><span class="p">,</span><span class="s">&quot;#56B4E9&quot;</span><span class="p">,</span><span class="s">&quot;#999999&quot;</span><span class="p">,</span><span class="s">&quot;#0185D2&quot;</span><span class="p">,</span><span class="s">&quot;#009E73&quot;</span><span class="p">)</span>
+p1<span class="o">+</span>scale_fill_manual<span class="p">(</span>values<span class="o">=</span>sf_palette<span class="p">)</span>
+<span class="c1">##使用已配置好的色板</span>
+<span class="kn">library</span><span class="p">(</span>RColorBrewer<span class="p">)</span>
+p1<span class="o">+</span>scale_fill_brewer<span class="p">(</span>palette<span class="o">=</span><span class="s">&quot;Accent&quot;</span><span class="p">)</span>
+
+<span class="c1">##分面</span>
+<span class="c1">##facet_grid 网格型</span>
+<span class="c1">##facet_wrap 封装型</span>
+
+<span class="c1">###把两幅图放在一个页面上</span>
+<span class="c1">##加载grid包</span>
+   <span class="kn">library</span><span class="p">(</span>grid<span class="p">)</span>
+<span class="c1">##清除当前设备或移动到新的page</span>
+  grid.newpage<span class="p">()</span>
+<span class="c1">##用viewport创建视图窗口，并用grid.layout创建布局，同时把布局给视窗</span>
+  VP <span class="o">&lt;-</span> viewport<span class="p">(</span>layout <span class="o">=</span> grid.layout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">))</span>
+<span class="c1">##用pushViewport()命令锁定该图层，使之成为目标区域</span>
+  pushViewport<span class="p">(</span>VP<span class="p">)</span>
+<span class="c1">##创建布局函数,函数参数是放置图形的位置</span>
+  vplayout <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span> viewport<span class="p">(</span>layout.pos.row <span class="o">=</span> x<span class="p">,</span> layout.pos.col <span class="o">=</span> y<span class="p">)</span>
+<span class="c1">##绘图</span>
+  <span class="kp">print</span><span class="p">(</span>p1<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+  <span class="kp">print</span><span class="p">(</span>p2<span class="p">,</span> vp <span class="o">=</span> vplayout<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">))</span>
+
+<span class="c1">##矢量型-位图</span>
+<span class="c1">###保存图形的位置path，名称以及格式，分辨率dpi&lt;对于位图&gt;，输出尺寸width height</span>
+<span class="c1">##存一幅图--存两幅图打开基于磁盘的图形设备pdf() png()--关闭图形设备dev.off()</span>
+   <span class="c1">#ggsave(&quot;E:/Data/myplot.tiff&quot;,dpi=300,width=8,height=8,unit=&quot;cm&quot;)</span>
+   <span class="c1">#ggsave(&quot;E:/Data/polyA-TE/TE_polya.tiff&quot;,dpi=300,width=3.5,height=3)</span>
+</pre></div>
+
+
+<h2>理论</h2>
+<div class="highlight"><pre><span></span>数据data--mapping映射--scale标度&lt;水平位置 竖直位置和颜色&gt;
+1.几何对象 --geom  几何对象描述 应该用什么对象来对数据进行展示，
+        有些几何对象关联了相应的统计变换
+        图形属性--颜色，大小形状等
+        tile geom  中心位置，长。狂
+        rect geom  xmin xmax ymin ymax
+        位置变换 stacking 堆叠、dodging 并列、filling填充
+2.图形属性--aes--包括颜色形状大小等的一个映射
+3.统计变换--stats  identity不做任何调整 
+4.坐标系--coord-笛卡尔型坐标系--以及其他坐标系
+        coord_trans()--coord_map()--coord_polar()
+5.scale--变换--训练--映射  transformation training mapping --默认的标度
+    --类型---《位置标度-颜色标度-手动离散标度--同一型标度
+    ---命名方案scale开头_图形属性_标度名称
+    位置标度--xlim ylim -
+        -连续型标度scale_x_continuous、scale_y_continuous scale_x_log10
+        scale_x_date()
+    颜色标度&gt;hue色相--chromatic彩度-luminance明度
+        scale_fill_brewwer()、scale_colour_hue()
+        scale_colour_gradient()
+    手动离散标度--breaks  limits   scale_linetype()   
+6.分面-facet
+7.图层  +
+分组--在一张图中绘制多个图形--同一图层
+8.注解 ----逐个添加  批量添加
+9--主题系统--控制着所有非数据展示功能--主题系统对细节进行渲染theme_set()  theme_get() 得到当前主题设置
+    --内置主题--theme_gray() theme_bw()  
+    --修改内置主题的某些元素函数--四种基础类型 文本text、blank()空白、lines线条、rectangles矩形
+        axist.text&lt;axist.text.x&gt;  axis.title strip.text
+    使用其他主题
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>R Graphics Cookbook  --R数据可视化手册
+ggplot2.Elegant Graphics for Data Analysis--ggplot2 数据分析与图形艺术
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
