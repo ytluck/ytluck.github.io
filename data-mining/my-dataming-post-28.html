@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python将Excel变为CSV</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-28.html" rel="bookmark"
+           title="Permalink to Python将Excel变为CSV">Python将Excel变为CSV</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-07-09T21:20:00+08:00">
+                Published: 2017-07-09 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Excel在实际的数据处理中，使用的不多，但是在数据分析中，却常常作为一个基本工具使用。
+为了有效的和使用这个工具的人交流，了解一些这个工具的注意点，同时将这个格式转化为自己常用的数据格式是很有必要的
+</pre></div>
+
+
+<h3>1.Excel处理文件--需要注意的地方</h3>
+<div class="highlight"><pre><span></span>Excel常常用来处理的文件格式有.xls，.xlsx，csv
+1.数据量
+    1.如果文件的后缀名为*.xls，那么它最多就是65536行
+　2.如果文件的后缀名为.xlsx，那么它最多就是1048576行
+    从Excel2007开始最大行是1048576==1024*1024===  FFFFF+1
+
+2.跨平台特性
+ 01.科学计数法
+    原因：EXCEl默认常规单元格式，输入或导入11位以上的数字，
+        不仅仅显示科学计数法，还会在15位后面的数字补0，导致存储丢失。
+　　文本TXT文件或CSV文件中包含15位以上的数字，直接使用的EXCEL打开同样会出现科学计数法15位后补0
+    解决办法：
+        csv文件用文本编辑器打开，比如自带的记事本
+        或者自文本导入Excel，分列选文本格式&lt;先打开Excel，然后使用文本导入
+            1.新建一个excel，打开
+            2.数据-》自文本           
+            3.选择需要打开的csv文件      
+            4.分隔符号-》空格（可以使它们不是一列显示）-》文本（这个就是确定是不是科学计数法显示）-》完成
+02.出现乱码
+    文件的编码方式--常见于处理中文的编码时出现
+
+3.安全性
+        备份和保密
+</pre></div>
+
+
+<h3>2.将Excel文件变为CVS格式--然后使用R语言读取csv格式</h3>
+<div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">xlrd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="c1"># use the python 2.7</span>
+<span class="c1"># # filename = raw_input(&#39;Enter file name: &#39;)</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;D:/Data/test.xlsx&quot;</span>
+<span class="n">LocalFile</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;gbk&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;文件是&quot;</span><span class="o">+</span> <span class="n">LocalFile</span><span class="p">)</span>
+<span class="c1"># outDir = raw_input(&#39;Enter outFile dir: &#39;)</span>
+<span class="c1"># os.chdir(outDir) #更改当前的工作目录</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;D:/Data/Temp&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;当前工作路径&quot;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="c1"># 获取当前的工作目录</span>
+
+<span class="c1"># 计算excel表格中sheet的个数</span>
+<span class="n">excelData</span> <span class="o">=</span> <span class="n">xlrd</span><span class="o">.</span><span class="n">open_workbook</span><span class="p">(</span><span class="n">LocalFile</span><span class="p">)</span>
+<span class="n">countNum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">excelData</span><span class="o">.</span><span class="n">sheets</span><span class="p">())</span>
+
+<span class="c1"># 读取Excel中的工作表，并将工作表分别存储为csv格式</span>
+<span class="c1"># 读取Excel文件--分别存储</span>
+<span class="c1">##读取的列数</span>
+<span class="n">toReadCol</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">countNum</span><span class="p">):</span>
+    <span class="c1"># # 读入前是Excel存储格式-内部形式，使用读入的函数是read_excel，读入之后变为pandas的DataFrame对象</span>
+    <span class="n">data_each</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">LocalFile</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>  <span class="c1"># 读取Excel文件</span>
+    <span class="n">data_each_back</span> <span class="o">=</span> <span class="n">data_each</span><span class="p">[</span><span class="n">data_each</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">toReadCol</span><span class="p">]]</span>
+    <span class="c1"># 保存的文件名</span>
+    <span class="n">outFile</span> <span class="o">=</span> <span class="s2">&quot;outFile&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.csv&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">outFile</span><span class="p">)</span>
+    <span class="n">data_each_back</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;GBK&quot;</span><span class="p">)</span>
+
+<span class="c1"># #读取Excel--联合</span>
+<span class="c1"># 逐个读取每个sheet,并进行合并</span>
+<span class="n">data_sum</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">LocalFile</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>  <span class="c1"># 读取Excel文件</span>
+<span class="n">col1</span> <span class="o">=</span> <span class="n">data_sum</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span>     <span class="c1"># 按照列索引-提取列</span>
+ <span class="c1"># 按照列名-列，这个在py2有乱码的可能</span>
+<span class="n">data_sum</span> <span class="o">=</span> <span class="n">data_sum</span><span class="p">[</span><span class="n">col1</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">countNum</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">data1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">LocalFile</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>  <span class="c1"># 读取Excel文件</span>
+    <span class="n">data_sum</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data_sum</span><span class="p">,</span> <span class="n">data1</span><span class="p">[</span><span class="n">col1</span><span class="p">]])</span>
+
+<span class="n">data_sum</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;AllComData.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;GBK&quot;</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Success&quot;</span><span class="p">)</span>
+<span class="c1">#os.system(&quot;pause&quot;)</span>
+
+
+<span class="c1"># # 打包成可执行文件</span>
+<span class="c1"># # # pyinstaller --console --onefile  D:\Data\ReadExcel2csv.py</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>python操作Excel读写--使用xlrd http://www.cnblogs.com/lhj588/archive/2012/01/06/2314181.html
+https://pypi.python.org/pypi/xlrd
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

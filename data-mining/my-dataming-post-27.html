@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>SQL内容小结</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-27.html" rel="bookmark"
+           title="Permalink to SQL内容小结">SQL内容小结</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-07-15T22:20:00+08:00">
+                Published: 2017-07-15 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>SQL一些常见的问题，这些就是坑，填坑的目的是以后不要再进坑。
+</pre></div>
+
+
+<h3>01. SQL的执行顺序和语法顺序</h3>
+<div class="highlight"><pre><span></span>    语法顺序：
+        1.查询中用到的关键词主要包含六个，并且他们的顺序依次为 
+            select--from--where--group by--having--order by 
+        MySQL代码--执行顺序：
+                    from... where...group by... having.... select ... order by...
+        hive 语句执行顺序-大致顺序
+                    from... where.... select...group by... having ... order by..
+                hive语句和mysql都可以通过explain查看执行计划，这样就可以查看执行顺
+</pre></div>
+
+
+<h3>02. MySQL的group by</h3>
+<div class="highlight"><pre><span></span>对于group by在mysql中的使用和Oracle的差异性很大，准确的说不光和oracle和别的数据库差异性一样，这些有点不太遵循标准SQL。
+我们知道常规的 sql，对于group by来说一定要结合聚合函数，而且选择的字段除了聚合函数外，还必须在group by中出现，否则报错，
+但是在mysql中扩展了这样的功能
+    首先对于不加聚合函数的sql来说，它的功能结合了limit来得出结果，仔细想想的时候有点Oracle分析函数的味道，limit的时候得到的并不是 最大最小的值，
+    而是某一下group by结果集中第一行，也就是刚才说的相当与先group by， 然后在每个group by下面进行limit 1。
+</pre></div>
+
+
+<h3>03. SQL中的数据类型以及数据类型的转换</h3>
+<div class="highlight"><pre><span></span>    Cast(字段名 as 转换的类型 )，其中类型可以为：
+    CHAR[(N)] 字符型 
+    DATE  日期型
+    DATETIME  日期和时间型
+    DECIMAL  float型
+    SIGNED  int
+    TIME  时间型
+Hive中
+    Hive也包括隐式转换（implicit conversions）和显式转换（explicitly conversions）。
+        SMALLINT类型的数据将会被隐式转换地转换为INT类型，任何整数类型都可以隐式地转换成一个范围更大的类型。
+        TINYINT,SMALLINT,INT,BIGINT,FLOAT和STRING都可以隐式地转换成DOUBLE；
+        是的你没看出，STRING也可以隐式地转换成DOUBLE！
+        但是你要记住，BOOLEAN类型不能转换为其他任何数据类型！
+    02.
+        如果将浮点型的数据转换成int类型的，内部操作是通过round()或者floor()函数来实现的，而不是通过cast实现
+        对于Date类型的数据，只能在Date、Timestamp以及String之间进行转换
+        • 指定精度取整函数 : round
+            语法: round(double a, int d)  返回值: DOUBLE 说明: 返回指定精度d的double类型
+         • 向上取整函数 : ceiling 
+            语法: ceiling(double a) 返回值: BIGINT 说明: 与ceil功能相同
+        •正取余函数 : pmod
+            语法: pmod(int a, int b),pmod(double a, double b) 返回值: int double 说明: 返回正的a除以b的余数
+        最小值统计函数 : min       语法: min(col)    返回值: double 说明: 统计结果集中col字段的最小值
+
+Hive 以及Mysql中,以下命令得到的结果是不一样的，所以对一定要明确数据的类型！！
+      01. max  min   !!!***!!!
+                select &#39;800&#39;  &gt; &#39;1000&#39;  ;
+                select cast(&#39;800&#39; as  SIGNED ) &gt; cast(&#39;1000&#39; as SIGNED ) ;
+                ##计算学生的课程数以及最大分数和最小分数等
+                select  a.student,count( a.class), sum(a.score), min(a.score), max(a.score ), round(avg(a.score),3),  round(stddev(a.score),3)
+
+        2. count(1) and count(字段)
+        count
+        count(1)统计的是结果集的总条数，
+        count(字段名)统计的是该字段值不为null的总条数
+        两者的主要区别是
+            （1） count(1) 会统计表中的所有的记录数，包含字段为null 的记录
+            （2）count(字段) 会统计该字段在表中出现的次数，许罗字段为null 的情况。即不统计字段为null 的记录。
+    sum
+            sum的时候null值就过滤了
+</pre></div>
+
+
+<h3>04. Oracle中的一些概念</h3>
+<div class="highlight"><pre><span></span>1.伪列
+    Oracle系统为了实现完整的关系数据库功能，
+    系统专门提供了一组称为伪列（Pseudocolumn）的数据库列，
+    这些列不是在建立对象时由我们完成的，而是在我们建立时由Oracle完成的
+
+        rowid 记录的唯一标识 
+        rownum 限制查询结果集的数量--
+                                            ROWNUM是对结果集加的一个伪列，
+                                            即先查到结果集之后再加上去的一个列 (强调：先要有结果集)
+                                            代表查询返回的行的编号
+                                            rownum不支持&gt;,&gt;=,=,between...and，而都用&lt;
+        level   ---查询数据所对应的级
+
+        oracle的伪表----dual 
+    02. connect by level &lt;=
+        产生连续的值
+</pre></div>
+
+
+<h3>05. Hive表的创建</h3>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="n">SerDe</span><span class="err">是</span><span class="n">Serialize</span><span class="o">/</span><span class="n">Deserilize</span><span class="err">的简称，目的是用于序列化和反序列化</span>
+<span class="mf">02.</span><span class="n">hive</span><span class="err">中的</span><span class="nb">NULL</span><span class="p">(</span><span class="n">hive</span><span class="err">空值处理</span><span class="p">)</span><span class="o">----</span><span class="nb">NULL</span><span class="err">转化为空字符串</span><span class="o">--</span><span class="err">通过</span><span class="n">ROW</span> <span class="n">FORMAT</span> <span class="n">DELIMITED</span> <span class="nb">NULL</span> <span class="n">DEFINED</span> <span class="n">AS</span> <span class="err">&#39;&#39;</span> 
+    <span class="err">如果没有指定</span> <span class="n">ROW</span> <span class="n">FORMAT</span> <span class="err">或者</span> <span class="n">ROW</span> <span class="n">FORMAT</span> <span class="n">DELIMITED</span><span class="err">，将会使用自带的</span> <span class="n">SerDe</span>
+    <span class="err">行格式限定</span>
+    <span class="p">[</span><span class="n">ROW</span> <span class="n">FORMAT</span> <span class="n">row_format</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">STORED</span> <span class="n">AS</span> <span class="n">file_format</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">LOCATION</span> <span class="n">hdfs_path</span><span class="p">]</span>
+    <span class="n">HIVE</span><span class="err">表中默认将</span><span class="nb">NULL</span><span class="err">存为\</span><span class="n">N</span><span class="err">，文件中存储大量\</span><span class="n">N</span><span class="err">，</span> <span class="err">这样造成浪费大量空间，</span><span class="nb">NULL</span><span class="err">转化为空字符串</span>
+
+     <span class="n">FIELDS</span> <span class="n">TERMINATED</span> <span class="n">BY</span>  <span class="sc">&#39;\t&#39;</span>  <span class="c1">//声明文件分隔符</span>
+<span class="mf">03.</span><span class="err">存储格式</span>
+    <span class="n">STORED</span> <span class="n">AS</span>
+        <span class="o">|</span><span class="n">TEXTFILE</span>
+        <span class="o">|</span> <span class="n">PARQUET</span>
+        <span class="o">|</span> <span class="n">RCFILE</span>  
+        <span class="o">|</span><span class="n">SEQUENCEFILE</span>
+        <span class="o">|</span> <span class="n">INPUTFORMAT</span> <span class="n">input_format_classname</span> <span class="n">OUTPUTFORMAT</span>  <span class="n">output_format_classname</span>
+    <span class="err">例如：</span>
+        <span class="n">STORED</span> <span class="n">AS</span> <span class="n">INPUTFORMAT</span> 
+        <span class="err">&#39;</span><span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">TextInputFormat</span><span class="err">&#39;</span> 
+        <span class="n">OUTPUTFORMAT</span> 
+        <span class="err">&#39;</span><span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">hive</span><span class="p">.</span><span class="n">ql</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">HiveIgnoreKeyTextOutputFormat</span><span class="err">&#39;</span>
+    <span class="mf">04.</span> <span class="n">LOCATION</span> <span class="err">指定数据文件存放的地址，须是一个路径</span> <span class="err">，不能指定单独的数据文件</span>
+</pre></div>
+
+
+<h3>06. SQL规范小结</h3>
+<div class="highlight"><pre><span></span>1.层级清楚
+    采用将SQL结构化表达
+2.对表别名采取嵌套的方式的命名
+    示例：
+        第一层级：t1  t2
+                第二层级：tt1  tt2
+3.涉及引号的，使用单引号
+4.注释说明的字段要和命令中的字段一一对应
+5.恰当的使用字段的数据类型
+6.注意小于等于号这些比较符号的使用      
+2.SQL思路以及数据验证
+        对数据量有个预估，第一次得到的数据量，和最终想要得到的数据量之间的关系。
+                明确最终想要什么，然后不断调整思路
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span> hive高阶1--sql和hive语句执行顺序、explain查看执行计划、group by生成MR http://blog.csdn.net/longshenlmj/article/details/51569892
+mysql中group by的时候字段不加聚合函数和distinct的情况 http://blog.csdn.net/wxwzy738/article/details/20636563
+Count(*), Count(1) 和Count(字段)的区别： http://blog.csdn.net/fang_fang_2008/article/details/40422537
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

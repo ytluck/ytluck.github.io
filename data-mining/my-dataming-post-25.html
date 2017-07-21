@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言处理时间的一些总结</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-25.html" rel="bookmark"
+           title="Permalink to R语言处理时间的一些总结">R语言处理时间的一些总结</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-07-18T21:20:00+08:00">
+                Published: 2017-07-18 21:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>R语言处理时间有基本包和时间处理的函数包
+介绍时间处理的包lubridate的内容，然后介绍基本包的内容
+</pre></div>
+
+
+<h5>时间处理函数</h5>
+<div class="highlight"><pre><span></span>#时间处理的包lubridate
+library(lubridate)
+</pre></div>
+
+
+<h3>时间变换</h3>
+<div class="highlight"><pre><span></span>###strptime---将字符串变为时间
+###strftime---将字符串变为&quot;POSIXlt&quot;
+</pre></div>
+
+
+<h3>时点类函数</h3>
+<div class="highlight"><pre><span></span>它包括了解析、抽取、修改time instants<span class="o">--</span>年月日周数，获取时间
+    <span class="kp">Sys.timezone</span><span class="p">()</span>
+    <span class="kp">Sys.time</span><span class="p">()</span>
+    <span class="kp">Sys.getlocale</span><span class="p">()</span>
+提取函数
+      timedat <span class="o">&lt;-</span> ymd<span class="p">(</span><span class="s">&#39;2016-06-08&#39;</span><span class="p">)</span>
+      year<span class="p">(</span>timedat<span class="p">)</span>
+      month<span class="p">(</span>timedat<span class="p">)</span>
+      day<span class="p">(</span>timedat<span class="p">)</span>
+      wday<span class="p">(</span>timedat<span class="p">,</span>label<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+      wday<span class="p">(</span>timedat<span class="p">)</span>
+<span class="c1">##所在周数</span>
+    week<span class="p">(</span>ymd<span class="p">(</span>timedat<span class="p">))</span>
+<span class="c1">##第几周 距离元旦多少天 一个月最大的天数  时区</span>
+    week<span class="p">(</span>timedat<span class="p">)</span>
+    yday<span class="p">(</span>timedat<span class="p">)</span>
+    days_in_month<span class="p">(</span>timedat<span class="p">)</span>
+    tz<span class="p">(</span>timedat<span class="p">)</span>
+</pre></div>
+
+
+<h3>时段类函数time spans</h3>
+<div class="highlight"><pre><span></span>interval(timedat,now())
+wday(ymd(&#39;2016-04-14&#39;))
+week(ymd(&#39;2016-04-14&#39;))
+</pre></div>
+
+
+<h3>时间的一些函数</h3>
+<div class="highlight"><pre><span></span>        <span class="s s-Atom">##把周一算作是第一天，</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span> <span class="s s-Atom">或者</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">]</span>
+        <span class="nf">ifelse</span><span class="p">(</span><span class="nf">wday</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-14&#39;</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="nf">wday</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-14&#39;</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="nf">ifelse</span><span class="p">(</span><span class="nf">wday</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-14&#39;</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="nf">wday</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-14&#39;</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="s s-Atom">##定义新函数DayOfWeek</span>
+        <span class="s s-Atom">###函数功能-返回输入日期字符串同一周的7天的日期</span>
+    <span class="nv">DayOfWeek</span> <span class="s s-Atom">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="s s-Atom">dayString</span><span class="p">){</span>
+        <span class="s s-Atom">##对输入的检查-异常处理--输入需是日期的字符串</span><span class="o">-</span><span class="s s-Atom">ymd格式</span>
+        <span class="nf">if</span><span class="p">(!</span> <span class="o">is</span><span class="p">.</span><span class="nf">character</span><span class="p">(</span><span class="s s-Atom">dayString</span><span class="p">)){</span>                          
+            <span class="nf">cat</span><span class="p">(</span><span class="s2">&quot;the input data should be character!\n&quot;</span><span class="p">)</span> 
+        <span class="p">}</span>
+        <span class="s s-Atom">##将星期的开始日期设置为周一</span>
+        <span class="nv">TransDay</span> <span class="s s-Atom">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="nf">wday</span><span class="p">(</span><span class="s s-Atom">dayString</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="nf">wday</span><span class="p">(</span><span class="s s-Atom">dayString</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="s s-Atom">##lastDayOfWeek</span> <span class="s s-Atom">&lt;-</span>  <span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">dayString</span><span class="p">)</span><span class="o">-</span><span class="nv">TransDay</span><span class="o">+</span><span class="mi">8</span>
+        <span class="s s-Atom">##lastDayOfWeek</span><span class="o">+</span><span class="nf">days</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">:-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="s s-Atom">##获取日期所在的周数中的星期一的日期</span>
+        <span class="s s-Atom">firstDayOfWeek</span> <span class="s s-Atom">&lt;-</span> <span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">dayString</span><span class="p">)</span><span class="o">-</span><span class="nv">TransDay</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="s s-Atom">##和日期在同一周的7天的日期</span>
+        <span class="s s-Atom">firstDayOfWeek</span><span class="o">+</span><span class="nf">days</span><span class="p">(</span><span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">6</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nf">month</span><span class="p">(</span><span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-17&#39;</span><span class="p">))</span>
+    <span class="nf">week</span><span class="p">(</span><span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-17&#39;</span><span class="p">))</span>         
+    <span class="nv">DayOfWeek</span><span class="p">(</span><span class="s s-Atom">&#39;2016-04-17&#39;</span><span class="p">)</span>
+    <span class="nf">week</span><span class="p">(</span><span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">&#39;2016-01-01&#39;</span><span class="p">))</span> 
+    <span class="nf">week</span><span class="p">(</span><span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">&#39;2016-01-01&#39;</span><span class="p">))</span>
+    <span class="s s-Atom">##计算第几周的所在日期---可能含有误差--默认元旦是一年的第一周，不知道这个准确与否</span>
+        <span class="nv">WeekFunc</span> <span class="s s-Atom">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="s s-Atom">year</span><span class="p">,</span><span class="s s-Atom">weekth</span><span class="p">){</span>
+            <span class="s s-Atom">#</span><span class="nf">if</span><span class="p">(!</span> <span class="o">is</span><span class="p">.</span><span class="nf">character</span><span class="p">(</span><span class="s s-Atom">year</span><span class="p">)){</span>                          
+            <span class="s s-Atom">#</span><span class="nf">cat</span><span class="p">(</span><span class="s2">&quot;the input data should be year!\n&quot;</span><span class="p">)</span> 
+            <span class="s s-Atom">#</span> <span class="p">}</span>
+            <span class="s s-Atom">year</span> <span class="s s-Atom">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s s-Atom">year</span><span class="p">,</span><span class="s2">&quot;01-01&quot;</span><span class="p">,</span><span class="s s-Atom">sep=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+            <span class="s s-Atom">time</span> <span class="s s-Atom">&lt;-</span> <span class="nf">ymd</span><span class="p">(</span><span class="s s-Atom">year</span><span class="p">)</span><span class="o">+</span><span class="nf">ddays</span><span class="p">(</span> <span class="mi">7</span><span class="o">*</span><span class="s s-Atom">weekth</span><span class="p">)</span>
+            <span class="s s-Atom">time</span>    
+        <span class="p">}</span>
+        <span class="nv">DayofWeek</span> <span class="s s-Atom">&lt;-</span> <span class="s s-Atom">as</span><span class="p">.</span><span class="nf">character</span><span class="p">(</span><span class="nv">WeekFunc</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span><span class="mi">24</span><span class="p">))</span>
+        <span class="nv">DayOfWeek</span><span class="p">(</span><span class="nv">DayofWeek</span> <span class="p">)</span>       
+        <span class="nv">DayofWeek</span> <span class="s s-Atom">&lt;-</span> <span class="s s-Atom">as</span><span class="p">.</span><span class="nf">character</span><span class="p">(</span><span class="nv">WeekFunc</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span><span class="mi">24</span><span class="p">))</span>
+        <span class="nv">DayOfWeek</span><span class="p">(</span><span class="nv">DayofWeek</span> <span class="p">)</span>
+</pre></div>
+
+
+<h3>计算学生入学时间</h3>
+<div class="highlight"><pre><span></span>    <span class="kp">Sys.time</span><span class="p">()</span>
+    timeString  <span class="o">&lt;-</span>  <span class="kp">substr</span><span class="p">(</span><span class="kp">Sys.time</span><span class="p">(),</span><span class="m">1</span><span class="p">,</span><span class="m">10</span><span class="p">)</span>
+    TimeDat <span class="o">&lt;-</span> <span class="kp">as.Date</span><span class="p">(</span>timeString<span class="p">,</span>format<span class="o">=</span><span class="s">&quot;%Y-%m-%d&quot;</span><span class="p">)</span>
+<span class="c1">##入学的时间</span>
+    entranceString <span class="o">&lt;-</span> <span class="kp">substr</span><span class="p">(</span>Grade<span class="o">$</span>studentID<span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">12</span><span class="p">)</span>
+    entranceTime <span class="o">&lt;-</span> <span class="kp">as.Date</span><span class="p">(</span>entranceString <span class="p">,</span>format<span class="o">=</span><span class="s">&quot;%Y%m%d&quot;</span><span class="p">)</span>
+<span class="c1">##入学时间距今天的天数</span>
+    interTime <span class="o">&lt;-</span> <span class="kp">difftime</span><span class="p">(</span>TimeDat <span class="p">,</span> entranceTime <span class="p">,</span>units <span class="o">=</span><span class="s">&quot;days&quot;</span> <span class="p">)</span>
+<span class="c1">##将时间转换为数值</span>
+    <span class="kp">as.numeric</span><span class="p">(</span>interTime <span class="p">)</span>
+</pre></div>
+
+
+<h3>基本包的时间处理</h3>
+<div class="highlight"><pre><span></span>    时间类型：
+            日期时间类--时钟时间类--日历日期
+            Date类
+            POSIXct类
+            POSIXlt类
+    时间转换
+            as.Date   as.POSIXct, as.POSIXlt
+            字符转换为Date对象--需要提供参考的format  as.Date()
+            日期为字符串 as.character()   或者format
+            ISOdate()
+            as.POSIXlt()    year   mon  mday  wday  yday  hour   min sec
+    操作：
+            创建日期序列
+                seq(from=  , to= , by=)
+##其他包
+    在考虑使用哪个类的时候，选择支持你的应用的最不复杂的类。
+    对于包的选择，则选择适用工作精度要求的。   
+    除了lubridate包还有timeDate包--对日期功能要求比较严苛的话，可以考虑使用这个包
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>R语言经典实例
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

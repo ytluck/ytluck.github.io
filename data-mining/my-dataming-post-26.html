@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言塑形</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-26.html" rel="bookmark"
+           title="Permalink to R语言塑形">R语言塑形</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-07-08T22:20:00+08:00">
+                Published: 2017-07-08 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>业务问题到数据问题--发现问题
+数据提取
+数据整合
+数据分析
+数据可视化  数据产品
+数据结论到业务解决方案功能--解决问题
+本次实现：对数据进行格式变换
+</pre></div>
+
+
+<h3>读入数据</h3>
+<div class="highlight"><pre><span></span>TestData <span class="o">&lt;-</span> read.table<span class="p">(</span>file<span class="o">=</span> <span class="s">&quot;C:/Users/Desktop/Data/TestData.txt&quot;</span> <span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span> stringsAsFactors<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+<span class="c1">##给每列加上列名</span>
+<span class="kp">colnames</span><span class="p">(</span>TestData <span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Name&quot;</span><span class="p">,</span><span class="s">&quot;Date&quot;</span><span class="p">)</span>
+<span class="c1">##去除科学计数法</span>
+TestData<span class="o">$</span>Name<span class="o">&lt;-</span>  <span class="kp">format</span><span class="p">(</span>TestData<span class="o">$</span>Name<span class="p">,</span>scientific<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+<span class="c1">##base包apply族函数是R语言中很有特色的一类函数，包括了apply、sapply、lapply、tapply、aggregate等等</span>
+</pre></div>
+
+
+<h3>加载数据塑形-package----reshape2</h3>
+<div class="highlight"><pre><span></span>library(reshape2)
+###数据框的-长-宽数据变换
+##value.var
+  ##dcast(TestData,Name~Date)
+#数据由宽边为长
+##id variable 标识变量 表示哪些值是在描述同一独享
+##measure variable 度量变量
+###--id.vars        
+####--measure.vars
+  ###--variable.name=   value.name=
+## melt()
+</pre></div>
+
+
+<h3>数据塑形-package-plyr</h3>
+<div class="highlight"><pre><span></span><span class="c1">#类似于数据透视表</span>
+<span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
+<span class="c1">#       arrary  data.frame  list        discarded</span>
+<span class="c1">#arrary aaply       adply       alply       a_ply</span>
+<span class="c1">#data.frame daply       ddply       dlply       d_ply</span>
+<span class="c1">#list       laply       ldply       llply       l_ply</span>
+<span class="c1">#所有的函数具有xyply的形式，其中x表示数据数据类型，y表示输出数据类型，而_表示丢弃。_则表示没有输出</span>
+<span class="c1">##install.pacckages(&quot;plyr&quot;)</span>
+<span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
+<span class="c1">##将数据框按照Name分组并转换成列表</span>
+midT <span class="o">&lt;-</span> dlply<span class="p">(</span>TestData<span class="p">,</span><span class="o">~</span>Name<span class="p">)</span>
+<span class="c1">##对列表进行处理</span>
+transTo <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>List<span class="p">){</span>
+    Data <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>List <span class="p">)</span>
+    <span class="c1">##没有的数据会用NA代替，c()</span>
+    LastDat <span class="o">=</span> <span class="kp">as.data.frame</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>Data<span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="m">1</span><span class="p">],</span>Data<span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">],</span>Data<span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="m">2</span><span class="p">],</span>Data<span class="p">[</span><span class="m">3</span><span class="p">,</span><span class="m">2</span><span class="p">]),</span>stringsAsFactors<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="c1">##将列表转换为数据框--2:5是数据，第一列是名称</span>
+ wantedData <span class="o">&lt;-</span> ldply<span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>midT <span class="p">,</span>transTo<span class="p">))[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">]</span>
+
+ <span class="c1">##将NA替换为0 </span>
+  replaceNA <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>dat<span class="p">){</span>
+    dat<span class="p">[</span><span class="kp">is.na</span><span class="p">(</span>dat<span class="p">)]</span> <span class="o">&lt;-</span> <span class="m">0</span> 
+    dat
+    <span class="p">}</span>
+ resData <span class="o">&lt;-</span> <span class="kp">apply</span><span class="p">(</span>wantedData <span class="p">,</span><span class="m">2</span><span class="p">,</span>replaceNA <span class="p">)</span>
+ <span class="c1">##将dat[dat==0] &lt;- NA</span>
+write.table<span class="p">(</span>resData<span class="p">,</span> file <span class="o">=</span>outputFile<span class="p">,</span> append <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> quote <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> sep <span class="o">=</span> <span class="s">&quot;,&quot;</span><span class="p">,</span> row.names <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> col.names <span class="o">=</span> <span class="kc">FALSE</span> <span class="p">)</span>
+
+
+<span class="c1">##转换为列表--将列表中的每一个元素进行函数处理</span>
+<span class="c1">## R语言中列表各组件的名称叫做标签(tags)</span>
+partData <span class="o">&lt;-</span>  <span class="kp">head</span><span class="p">(</span>TestData<span class="p">,</span><span class="m">18</span><span class="p">)</span>
+midtemp <span class="o">&lt;-</span> dlply<span class="p">(</span>partData <span class="p">,</span><span class="o">~</span>Name<span class="p">)</span>
+<span class="c1">##单方括号 提取其中元素作为列表</span>
+str<span class="p">(</span>midtemp<span class="p">[</span><span class="m">2</span><span class="p">])</span>
+str<span class="p">(</span>midtemp<span class="p">[</span><span class="m">3</span><span class="p">])</span>
+<span class="kp">attributes</span><span class="p">(</span>midtemp<span class="p">[</span><span class="m">3</span><span class="p">])</span>
+midtemp<span class="p">[</span><span class="m">3</span><span class="p">]</span>
+<span class="kp">names</span><span class="p">(</span>midtemp<span class="p">[</span><span class="m">3</span><span class="p">])</span>
+<span class="c1">##专门用于计算列表list的长度--length得到的是list的个数，lengths是得到每个list下的个数</span>
+   <span class="kp">as.integer</span><span class="p">(</span>lengths<span class="p">(</span>midtemp<span class="p">[</span><span class="m">3</span><span class="p">]))</span>
+<span class="c1">## data.frame( oneName =character(N), Date01 =character(N), Date02 = character(N),Date03 = character(N))</span>
+<span class="c1">##提取其中元素作为数据框</span>
+tep  <span class="o">&lt;-</span> midtemp<span class="p">[[</span><span class="m">1</span><span class="p">]]</span>
+<span class="kp">names</span><span class="p">(</span>tep<span class="p">)</span>
+rbind.fill<span class="p">(</span>midtemp<span class="p">)</span>
+<span class="c1">##数据框到列表-根据列来转化</span>
+<span class="c1">##as.list(partData )</span>
+</pre></div>
+
+
+<h3>加载数据塑形-package--dplyr</h3>
+<div class="highlight"><pre><span></span><span class="c1">##显示更友好的 tbl_df 类型</span>
+<span class="c1">##dplyr包预处理时建议使用tbl_df()或tbl_cube()或tbl_sql()函数将原数据转换为tbl对象</span>
+<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+<span class="c1">#筛选: filter()</span>
+<span class="c1">#排列: arrange()</span>
+<span class="c1">#选择: select()</span>
+<span class="c1">#变形: mutate()</span>
+<span class="c1">#汇总: summarise()</span>
+<span class="c1">#分组: group_by()</span>
+<span class="c1">##分组-然后提取分组中的数据放到某一列</span>
+<span class="c1">##数据集通过 group_by() 添加了分组信息后,mutate(), arrange() 和 summarise() 函数会自动对这些 tbl 类数据执行分组操作</span>
+dataT <span class="o">&lt;-</span> tbl_df<span class="p">(</span>TestData<span class="p">)</span>
+planes <span class="o">&lt;-</span> group_by<span class="p">(</span>dataT<span class="p">,</span> Name<span class="p">)</span>  
+summarise<span class="p">(</span>planes<span class="p">,</span>  count <span class="o">=</span> n<span class="p">()</span> <span class="p">)</span>
+<span class="c1">##类似于SQL中的连接功能</span>
+inner_join<span class="p">(</span>x<span class="p">,</span> y<span class="p">,</span> by <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> copy <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> suffix <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;.x&quot;</span><span class="p">,</span> <span class="s">&quot;.y&quot;</span><span class="p">),</span> <span class="kc">...</span><span class="p">)</span>
+left_join<span class="p">(</span>x<span class="p">,</span> y<span class="p">,</span> by <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> copy <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> suffix <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;.x&quot;</span><span class="p">,</span> <span class="s">&quot;.y&quot;</span><span class="p">),</span> <span class="kc">...</span><span class="p">)</span>
+right_join<span class="p">(</span>x<span class="p">,</span> y<span class="p">,</span> by <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> copy <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> suffix <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;.x&quot;</span><span class="p">,</span> <span class="s">&quot;.y&quot;</span><span class="p">),</span> <span class="kc">...</span><span class="p">)</span>
+full_join<span class="p">(</span>x<span class="p">,</span> y<span class="p">,</span> by <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> copy <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> suffix <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;.x&quot;</span><span class="p">,</span> <span class="s">&quot;.y&quot;</span><span class="p">),</span> <span class="kc">...</span><span class="p">)</span>
+semi_join<span class="p">(</span>x<span class="p">,</span> y<span class="p">,</span> by <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> copy <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+anti_join<span class="p">(</span>x<span class="p">,</span> y<span class="p">,</span> by <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> copy <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+distinct
+</pre></div>
+
+
+<h2>加载数据塑形-package--tidyr</h2>
+<div class="highlight"><pre><span></span>#gather—宽数据转为长数据；
+#spread—长数据转为宽数据；
+#unit—多列合并为一列；
+#separate—将一列分离为多列；
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>R语言经典实例
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
