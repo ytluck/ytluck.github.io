@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Linux中shell变量以及查找和帮助命令</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-08.html" rel="bookmark"
+           title="Permalink to Linux中shell变量以及查找和帮助命令">Linux中shell变量以及查找和帮助命令</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-08-06T21:06:00+08:00">
+                Published: 2017-08-06 21:06:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Linux中shell变量的定义、赋值、调用等
+Linux中查找文件位置 查看命令说明，命令的查看方式。
+通过对这些命令的掌握来查看更多信息
+</pre></div>
+
+
+<h3>Linux中 bash</h3>
+<div class="highlight"><pre><span></span>cat /etc/shells 
+bash shell 内置测命令 type 寻找执行文件 
+变量
+    变量显示 echo
+    单引号和双引号的不同--单引号一般字符
+export 使变量变为环境变量
+</pre></div>
+
+
+<h3>Linux中 Shell中变量-包括普通变量和环境变量</h3>
+<div class="highlight"><pre><span></span>0.定义变量时候的规则
+        1. 设定变量的格式为”a=b”，其中a为变量名，b为变量的内容，等号两边不能有空格；
+        2. 变量名只能由英、数字以及下划线组成，而且不能以数字开头；
+        3. 当变量内容带有特殊字符（如空格）时，需要加上单引号；如果包含$符号，可以直接定义，不用加单引号
+        4.如果变量内容里面需要带单引号，那么就需要在内容外面加上双引号。
+        5. 单引号可以让特殊字符变成普通字符
+1.变量名=变量值 ， 注意=左右不能有空格，
+    环境变量
+        查看环境变量  env   export
+    变量的有效范围--全局变量、局部变量
+2.将执行结果赋予变量的方式有两种
+        01.将命令放入$()
+        02. 使用` `符号包住执行的命令&lt;反单引号&gt;
+3.调用变量 使用$变量名
+    ##变量名外面的花括号是可选的，加不加都行，
+    ##加花括号是为了帮助解释器识别变量的边界,推荐加上花括号
+</pre></div>
+
+
+<h3>Linux中查找</h3>
+<div class="highlight"><pre><span></span><span class="x">which       查看可执行文件的位置 </span>
+<span class="x">whereis    查看文件的位置 </span>
+<span class="x">locate       配合数据库查看文件位置 </span>
+<span class="x">find          实际搜寻硬盘查询文件名称 (find也可以根据文件大小-size 时间-atime 正则表达式-regex)</span>
+<span class="x">which</span>
+
+<span class="x">which(选项)(参数)</span>
+<span class="x">    -n&lt;文件名长度&gt;：制定文件名长度，指定的长度必须大于或等于所有文件中最长的文件名；</span>
+<span class="x">     -p&lt;文件名长度&gt;：与-n参数相同，但此处的&lt;文件名长度&gt;包含了文件的路径； </span>
+<span class="x">    -w：指定输出时栏位的宽度； </span>
+<span class="x">    -V：显示版本信息。</span>
+
+<span class="x">find命令的格式： find  [-path ..] -options [-print -exec -ok]</span>
+<span class="x">  path：要查找的目录路径。</span>
+<span class="x">        ~ 表示</span><span class="p">$</span><span class="nv">HOME</span><span class="x">目录</span>
+<span class="x">        . 表示当前目录</span>
+<span class="x">        / 表示根目录</span>
+<span class="x">  options常用的有下选项：</span>
+<span class="x">    -name 按照名字查找</span>
+<span class="x">    -perm 安装权限查找</span>
+<span class="x">    -prune 不再当前指定的目录下查找</span>
+<span class="x">    -user 文件属主来查找</span>
+<span class="x">    -group 所属组来查找</span>
+<span class="x">    -nogroup 查找无有效所属组的文件</span>
+<span class="x">    -nouser 查找无有效属主的文件</span>
+<span class="x">    -type 按照文件类型查找</span>
+<span class="x">-print ：表示将结果输出到标准输出</span>
+<span class="x">-exec ：对匹配的文件执行该参数所给出的shell命令。形式为 command  </span><span class="err">{</span><span class="x">} \; ，注意</span><span class="err">{</span><span class="x">}与\; 之间有空格</span>
+<span class="x">-ok ：与-exec作用相同，区别在于，在执行命令之前，都会给出提示，让用户确认是否执行</span>
+<span class="x">    find . -name  data.txt</span>
+</pre></div>
+
+
+<h3>Linux帮助命令</h3>
+<div class="highlight"><pre><span></span>    在linux系统中有存储位置的命令为外部命令&lt;非bash所提供的命令&gt;；
+    没有存储位置的为内部命令，可以理解为内部命令嵌入在linux的shell中，所以看不到。
+type来判断到底为内部命令还是内部命令。whatis查看一下该命令在man帮助文档中的入口
+四个帮助命令
+    help
+    --help
+    info
+    man
+其中
+    help 只能用于显示内嵌命令的相关信息，
+    外部命令用man和info（Type命令可以区分命令的类型），并且
+        大多数外部命令都可以使用--help来获取帮助，如果这个命令没有--help选项，则会显示简单的命令 格式 
+    具体
+        help -d   date  ：显示简短描述
+        help  -s  date ：显示date用法的简介
+        help  -m date  ：显示较详细的使用方法
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Linux获得命令帮助(学习笔记五) http://www.cnblogs.com/liunanjava/p/4296164.html
+鸟哥的Linux私房菜-基础学习篇
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

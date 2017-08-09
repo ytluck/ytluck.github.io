@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Linux中关于时间的操作</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-07.html" rel="bookmark"
+           title="Permalink to Linux中关于时间的操作">Linux中关于时间的操作</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-08-05T21:04:00+08:00">
+                Published: 2017-08-05 21:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>时间所对应的概念
+    时区
+    夏令时：日光节约时间
+    国际日期变更线
+    Linux计时方式 ：从1970年1月1日 开始计算总秒数 1970年1月1日0时0分0秒起流逝的秒数
+</pre></div>
+
+
+<h3>计算机网络中的时间</h3>
+<div class="highlight"><pre><span></span>自动校时
+        计算机硬件时钟--内部记录时间的BIOS&lt;CMOS&gt;
+        计算机系统的时间：--计算机软件时钟
+                主机时间同步化 Synchronize
+                    NTP--Network Time Protocol 网络时间协议
+                    DTSS -- Digital Time Synchronization Protocol
+                主机时间+计算传送的延迟误差
+手动校时            
+            计算机硬件： hwclock
+            计算机软件： date
+                修改命令  date -s &quot;2017-07-01 07:01:00&quot;
+获取日历
+    cal
+    时间戳有到秒以及毫秒的，到秒的有10位，到毫秒有的有13位。
+    一般UNIX是记录到秒的。如果有13位的时间戳，记得转换
+</pre></div>
+
+
+<h3>Linux 中命令-date</h3>
+<div class="highlight"><pre><span></span><span class="mf">1.</span> <span class="err">语法：</span> <span class="n">date</span><span class="p">(</span><span class="err">选项</span><span class="p">)(</span><span class="err">参数</span><span class="p">)</span>
+    <span class="err">选项</span>
+        <span class="o">-</span><span class="n">d</span><span class="o">&lt;</span><span class="err">字符串</span><span class="o">&gt;</span><span class="err">显示字符串所指的日期与时间；</span> 
+        <span class="o">-</span><span class="n">s</span><span class="o">&lt;</span><span class="err">字符串</span><span class="o">&gt;</span><span class="err">：根据字符串来设置日期与时间；</span>
+         <span class="o">-</span><span class="n">u</span><span class="err">：显示</span><span class="n">GMT</span><span class="err">；</span>
+         <span class="o">--</span><span class="n">help</span><span class="err">：在线帮助；</span>
+        <span class="o">--</span><span class="n">version</span><span class="err">：显示版本信息。</span> 
+    <span class="err">参数</span> <span class="o">&lt;+</span><span class="err">时间日期格式</span><span class="o">&gt;</span><span class="err">：指定显示时使用的日期时间格式。</span>
+
+    <span class="n">GNU</span> <span class="n">date</span> <span class="err">的日期加减运算是支持自然语言的</span>
+    <span class="o">-</span><span class="n">d</span> <span class="err">主要有三种指令：</span>
+            <span class="n">last</span><span class="o">/</span><span class="n">next</span><span class="err">指令</span>  <span class="n">ago</span><span class="err">指令</span> <span class="err">负数指令</span>
+<span class="mf">2.</span><span class="err">时间格式变换</span>
+    <span class="err">从时间戳变为日期格式</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="mi">@0</span>            <span class="c1">//当时间戳为0的时候，可以看到时间为 1970年08:00:00</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">@1498863660</span><span class="err">&#39;</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">@1498863660</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="mi">@1498863660</span>   <span class="o">+</span><span class="s">&quot;%Y-%m-%d %H:%M:%S&quot;</span>
+    <span class="err">从时间戳变为日期</span>
+        <span class="n">shell</span><span class="err">将时间字符串与时间戳互转</span><span class="o">--+%</span><span class="n">s</span><span class="err">表示输出时间戳</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;$( date &quot;</span><span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span> <span class="o">%</span><span class="nl">H</span><span class="p">:</span><span class="o">%</span><span class="nl">M</span><span class="p">:</span><span class="o">%</span><span class="n">S</span><span class="s">&quot;)&quot;</span> <span class="o">+%</span><span class="n">s</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="n">last</span><span class="o">-</span><span class="n">day</span> <span class="o">+%</span><span class="n">s</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mo">01</span> <span class="mi">22</span><span class="o">:</span><span class="mi">14</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">s</span>
+    <span class="err">日期格式变换</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;2017-07-01&quot;</span> <span class="o">+</span><span class="s">&quot;%Y/%m/%d %H:%M:%S&quot;</span>                   
+<span class="mf">3.</span><span class="err">今天日期</span><span class="o">--</span><span class="err">注意中间有空格</span>
+    <span class="cp">#对应昨天日期</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>   <span class="n">last</span><span class="o">-</span><span class="n">day</span>    <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="err">&#39;</span><span class="n">last</span> <span class="n">day</span><span class="err">&#39;</span>   <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
+    <span class="cp">#对应周的周一</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="err">&#39;</span><span class="n">last</span> <span class="n">monday</span><span class="err">&#39;</span> <span class="o">+</span><span class="s">&quot;%Y-%m-%d&quot;</span>
+        <span class="cp">#下周周一</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="err">&#39;</span><span class="n">next</span> <span class="n">monday</span><span class="err">&#39;</span> <span class="o">+</span><span class="s">&quot;%Y-%m-%d&quot;</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;last sunday&quot;</span> <span class="o">+</span><span class="s">&quot;%Y%m%d</span>
+        <span class="n">date</span> <span class="o">+%</span><span class="n">w</span>   <span class="err">#获得当天是星期几</span> 
+    <span class="err">#今天本日期对应的月初日期</span>   
+        <span class="n">date</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m01</span>
+        <span class="n">date</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-</span><span class="mo">01</span>
+    <span class="cp">#今天对应的上个月月初</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">1</span> <span class="n">month</span> <span class="n">ago</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m01</span>
+    <span class="cp">#本月月初</span>
+        <span class="n">v_lm</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m01</span><span class="err">`</span>
+    <span class="cp">#上个月月末</span>
+        <span class="n">v_lm_rq</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;${v_lm} last day&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="err">`</span>
+        <span class="n">echo</span> <span class="err">$</span><span class="p">{</span><span class="n">v_lm_rq</span><span class="p">}</span>
+
+<span class="mf">4.</span><span class="err">昨天</span><span class="o">-</span><span class="err">特定日期所对应的各个时间</span>
+                <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
+                <span class="n">yestD</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="err">`</span>
+                <span class="n">echo</span> <span class="err">$</span><span class="p">{</span><span class="n">yestD</span><span class="p">}</span>               
+    <span class="err">#昨天日期对应的月初日期</span>
+                <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">1</span> <span class="n">day</span>  <span class="n">ago</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-</span><span class="mo">01</span>
+    <span class="cp">#昨天日期的周一</span>
+        <span class="cp">#写法01.昨天日期</span>
+                <span class="n">v_yesterday</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="err">`</span>
+                <span class="cp">#昨天日期对应的周一的日期</span>
+                <span class="n">v_lm_week</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;${v_yesterday} last monday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span><span class="err">`</span>
+                <span class="n">echo</span> <span class="err">$</span><span class="p">{</span><span class="n">v_lm_week</span><span class="p">}</span>
+
+        <span class="cp">#写法02.将当前日期赋值给DATE变量</span>
+                <span class="n">DATEA</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">date</span>  <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;${DATEA} last monday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
+        <span class="cp">#写法03</span>
+            <span class="cp">#date -d &quot; $(date  -d &quot;yesterday&quot; +%Y%m%d)  last monday&quot; +%Y-%m-%d</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Linux shell 获取上上月月末日期  http://www.cnblogs.com/valinfo/p/7099335.html
+date命令 http://man.linuxde.net/date
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>不同语言的字符串定义和使用</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-30.html" rel="bookmark"
+           title="Permalink to 不同语言的字符串定义和使用">不同语言的字符串定义和使用</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T09:02:00+08:00">
+                Published: 2017-01-08 09:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>0.说明</h3>
+<div class="highlight"><pre><span></span>字符和字符串在操作中极为常见，在数据分析中，文本分析等也和字符以及字符串息息相关。
+对字符串数据结构以及字符串在不同语言中的变现形式进行总结和归纳
+</pre></div>
+
+
+<h3>1.介绍字符和字符串的基本概念</h3>
+<div class="highlight"><pre><span></span>    在了解不同语言针对字符串的不同操作时，对于语言整体特性也要进行一定的了解
+    因为语言设计的特性，必然会影响对字符串的操作。
+            语言特性--动态和静态等
+01.基本字符集的选择--编码字符集以及字符序列
+     字符集
+            ASCII码
+            Unicode码
+      字符序
+            字典序
+02.字符串的定义
+        可变数据类型 和 不可变数据类型
+        存储结构：存储大小是否固定
+                        固定
+                        随着硬件架构的变化而变化
+03.字符和字符串的表示
+        有字符没有字符串：字符串是字符的集合
+        有字符串没有字符：字符作为长度为1的字符串
+        都有：
+04.字符串的结束
+    方式一：使用一个特殊编码表示串的结束-需要保证该编码不代表任何字符，如C语言
+    方式二：使用一个转么的数据域记录字符串的长度
+05.字符串的遍历和检索
+        遍历的方式
+        子串匹配
+                基本的匹配内容
+                通配符
+                正则表达式
+06.字符串库的创建
+        提供扩展的字符串库
+</pre></div>
+
+
+<h2>2.各个语言中字符串</h2>
+<h3>C语言中字符串</h3>
+<div class="highlight"><pre><span></span> 在C语言中，利用单引号表示字符，双引号表示字符串。有独立的字符类型
+         字符串是指一串以NUL字节结尾的零个或多个字符。
+        因为字符串通常存储在字符数组中，所以c语言中不存在字符串类型。C规定以字符&#39;\0&#39;作为字符串结束标志
+        用一个字符型数组来存放一个字符串,数组中每一个元素存放一个字符
+定义
+        定义
+                初始化=定义+赋值； 定义-赋值
+        初始化
+            (1)用字符数组存放一个字符串
+                    逐个赋值: char c[10]={&#39;I&#39;, &#39; &#39;, &#39;a&#39;, &#39;m&#39;, &#39; &#39;, &#39;h&#39;, &#39;a&#39;, &#39;p&#39;, &#39;p&#39;, &#39;y&#39;};
+                    用字符串常量来初始化字符数组  char c[]=&quot;I am happy&quot;
+            (2)用字符指针指向一个字符串： char* str=&quot;I love China&quot;;等价于char* a;  a=&quot;I love China&quot;;
+        赋值
+            对字符数组只能对各个元素赋值
+字符串操作
+        长度
+        遍历
+            ：根据字符串的结束标志，来作为遍历的终止条件
+        匹配
+</pre></div>
+
+
+<h3>Java和Scala中字符串</h3>
+<div class="highlight"><pre><span></span>Java字符--有确定的存储空间大小--可移植性较好
+    自动包装功能 ：自动将基本类型转换为包装器类型
+        基本类型                        包装器
+            char                            Character
+Java确保数组会被初始化而且不能在其范围之外被访问---范围检查功能
+Java中String类
+        String对象不可变类
+        StringBuilder
+        StringBuffer类   
+Scala字符：
+    基本数据类型  
+        值类型都是对象
+            Char类型 --使用单引号将字符包裹起来  
+            String类型--使用双引号将字符串包裹起来--有双引号的要使用转义字符，原样输出--采用三对双引号
+ 字符串的隐式转换
+    不可变的字符串隐式转化为序列--进而支持所有序列操作--StringOps  或者WrappedString
+    StringBuilder
+</pre></div>
+
+
+<h3>Python中字符串</h3>
+<div class="highlight"><pre><span></span>字符串类型--Python提供的数据类型之一，一种集合类型，定义为字符序列，字符串类型是不可变的。
+    没有独立的字符类型
+    字符串构造：
+            使用字符串构造函数 str
+            使用符号--使用单引号或者双引号括起来：在Python中双引号和单引号的使用规则
+    字符串类型
+            显示字符
+            非显示字符串--制表符和回车符
+            转义字符---、描述符--、通配符--、运算符--
+    字符串的使用
+            索引运算符：使用方括号，可从开始或末端。注意不要超出字符串范围
+                        &quot;Hello,world&quot;[0],&quot;Hello,world&quot;[-1]
+            分片-引用子序列，采用左闭右开[ )，例如&quot;Hello,world&quot;[1:6],&quot;Hello,world&quot;[:6],&quot;Hello,world&quot;[1:]
+                                        步长型 : :
+    字符串常用函数与方法和方法链
+            type 进行类型检查
+            连接+  和重复*
+            len
+    字符串输出
+            格式化输出--宽度描述符
+    字符串与控制语句
+            遍历--提供了 enumerate迭代器--提供索引和字符本身
+Python中的字符串有两种数据类型：str类型和unicode类型。  
+str类型采用的ASCII编码，也就是说它无法表示中文。  
+unicode类型采用unicode编码，能够表示任意字符，包括中文及其它语言。字符串的地方加前缀u，表示为unicode类型
+并且python中不存在像c语言中的char类型，就算是单个字符也是字符串类型。
+字符串默认采用的ASCII编码，如果要显示声明为unicode类型的话，需要在字符串前面加上&#39;u&#39;或者&#39;U
+字符的编码:ASCII、Unicode和UTF-8三种编码
+unicode对象转变为字节串，称之为对该字符串进行编码
+</pre></div>
+
+
+<h3>Shell中字符串</h3>
+<div class="highlight"><pre><span></span>    字符串是shell编程中最常用最有用的的数据类型，字符串可以用单引号，也可以用双引号，也可以两者都不用
+      使用方式
+                1.shell内置一系列操作符号
+                2.使用awk,sed  expr等
+        字符串和字符串变量
+        索引和分片
+                    方法01.利用 expr index来求索引
+                    方法02.利用awk和列号来获取指定索引的值
+        字符串长度
+                    方法1.通过echo <span class="cp">${</span><span class="c1">#string</span><span class="cp">}</span>的方式（注意：这里的string是该字符串的变量名）
+                            name=Alex
+                            echo <span class="cp">${</span><span class="c1">#name</span><span class="cp">}</span>
+                    方法2: 使用expr length可以获取string的长度
+                                expr length string
+                    方法3：使用wc 或者awk等方式
+         分割
+         匹配
+         字符转换命令： 
+         expr：计算字符串的长度、索引命令功能
+</pre></div>
+
+
+<h3>R 语言中字符串</h3>
+<div class="highlight"><pre><span></span>    数据类型--字符型
+    对象类型--                  
+    字符型常见操作
+            nchar()  返回字符串的长度
+            substr() 提取子串
+            sub()   替换子串
+            outer() 生成字符串所有成对组合
+            paste() 拼接字符串
+            strsplit( ) 切割字符串
+            as.character() 数据类型转换
+    正则表达式
+</pre></div>
+
+
+<h3>SQL中字符串</h3>
+<div class="highlight"><pre><span></span>Hive
+    数据类型：
+        char varchar
+    定义--在数据表创建或者更新时
+    数据类型查看
+        查看表的结构
+            DESC tableName；
+    函数操作
+        字符串长度函数：length
+        字符串连接函数：concat
+        带分隔符字符串连接函数：concat_ws           
+         集合查找函数 find_in_set(string str, string strList)
+         分割字符串函数: split
+         分割转多行：
+        lateral view用于和split, explode等UDTF一起使用，它能够将一行数据拆成多行数据，
+        在此基础上可以对拆分后的数据进行聚合。
+        lateral view首先为原始表的每行调用UDTF，UTDF会把一行拆分成一或者多行，
+        lateral view再把结果组合，产生一个支持别名表的虚拟表
+         其中字段不需要添加别名：
+            例如：
+            select t1.employee,name
+            from test t1  LATERAL VIEW explode( split(t1.englishname,&quot;.&quot;)) tmp as name ;
+MySQL
+        CHAR , varchar
+        tinytext , text
+        blob
+Oracle
+    字符串内单引号---把一个单引号换成两个单引号
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>    linux shell 字符串操作（长度，查找，替换）详解 http://www.cnblogs.com/chengmo/archive/2010/10/02/1841355.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>不同语言的字符串正则表达式</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-31.html" rel="bookmark"
+           title="Permalink to 不同语言的字符串正则表达式">不同语言的字符串正则表达式</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-08T09:02:00+08:00">
+                Published: 2017-01-08 09:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>字符串的处理</h3>
+<div class="highlight"><pre><span></span>涉及字符串形式的处理，未涉及字符串的意义
+一般的字符串匹配
+        某个特定的字符串--一个模式串
+某种形式的字符串匹配--一组模式串
+    通配符和正则表达式 *  ?
+                通配符(wildcard)，通配符可以用*来匹配任意字符
+                使用场景：通配符多用在文件名上，比如查找find，ls，cp
+    正则表达式&lt;Regular Expression&gt;
+            字符串匹配模式：复杂的字符串搜寻、替换工作，
+                    无法用简单的方式(类似借助标准库函数)达成
+            正则表达式，*只匹配任意长度的前面的字符
+</pre></div>
+
+
+<h3>1.正则表达式构成</h3>
+<div class="highlight"><pre><span></span>1.正则表达式
+        字符簇--匹配规则&lt;元字符 分枝条件&gt;--匹配结果
+                    贪婪与懒惰
+2.元字符 metacharacter
+        位置：定位符
+            ^ 和 $ 分别指字符串的开始与结束，\b 描述单词的前或后边界，\B 表示非单词边界。
+
+        数量：限定符：
+                要出现多少次才能满足匹配。有 * 或 + 或 ? 或 {n} 或 {n,} 或 {n,m} 共6种。
+                *  + 和 ? 限定符都是贪婪的
+                -----数量词的贪婪模式与非贪婪模式
+
+        字符类和数字类 以及反义&lt;包括以及排除&gt;
+        [ ]
+
+        注意：不能将限定符与定位符一起使用
+3.转义字符--反斜杠问题
+        使用\来取消这些字符的特殊意义
+        脱离元字符属性
+4.括号
+    圆括号()是组
+    方括号是单个匹配  字符集/排除字符集/命名字符集，[]是定义匹配的字符范围
+</pre></div>
+
+
+<h3>2.正则表达式类型</h3>
+<div class="highlight"><pre><span></span>1.流派flavor：正则引擎
+是否区分大小写
+    比较NFA与DFA
+词法分析器的任务就是将字符流转换成词法记号流
+有穷自动机分为两类，即
+        不确定的有穷自动机NFA
+        确定的有穷自动机DFA
+场景：文本处理
+断言  捕获
+
+2.具体
+    01、基本的正则表达式（Basic Regular Expression 又叫 Basic RegEx  简称 BREs）
+    02、扩展的正则表达式（Extended Regular Expression 又叫 Extended RegEx 简称 EREs）
+    03、Perl 的正则表达式（Perl Regular Expression 又叫 Perl RegEx 简称 PREs）
+    DFA ：awk  mysql
+    传统型NFA Python sed vi
+    POSIX NFA：
+    DFA/NFA 混合 awk  grep egrep
+3.解决问题逻辑
+    必须出现
+    可能出现
+    不能出现
+    常见操作：
+        提取--替换--切分
+        验证
+</pre></div>
+
+
+<h3>3.各种语言的正则表达式</h3>
+<div class="highlight"><pre><span></span><span class="err">正则表达式</span><span class="p">(</span><span class="n">regular</span> <span class="n">expression</span><span class="p">)</span><span class="err">描述了一种字符串匹配的模式（</span><span class="n">pattern</span><span class="err">）</span>
+<span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="err">实现哪些功能：查找，替换，分割</span>
+<span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="err">具体实现方式：</span> <span class="err">各种语言的方式</span><span class="o">--</span><span class="err">如何创建正则表达式</span>  
+<span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="err">多个模式如何构造在一起</span>
+    <span class="err">组合方式：或</span> <span class="err">的关系</span> <span class="err">使用</span> <span class="o">|</span>  
+        <span class="err">子表达式</span>                        
+    <span class="err">原生字符串</span> <span class="err">和特殊字符串</span>
+
+<span class="n">C</span><span class="err">语言</span>
+    <span class="n">C</span><span class="err">语言本身不具备</span><span class="n">RE</span><span class="err">特性，但是有很多库，在</span><span class="n">Linux</span><span class="err">下你可以很方便的使用</span><span class="n">regex</span><span class="o">.</span><span class="n">h</span><span class="err">提供的库</span>
+
+<span class="n">Java</span><span class="o">--</span><span class="n">Java</span><span class="err">中使用正则表达式方式</span> <span class="err">有两种</span>
+    <span class="mf">01.</span><span class="n">String</span><span class="err">类自带的正则表达式工具</span><span class="o">-</span>
+                    <span class="o">-</span><span class="n">split</span><span class="p">()</span>  <span class="err">以正则表达式对字符串进行分割</span> 
+    <span class="mf">02.</span><span class="err">包</span><span class="o">-</span><span class="n">regex</span>
+        <span class="kn">import</span> <span class="nn">java.util.regex</span>
+            <span class="n">Pattern</span><span class="err">类</span>
+            <span class="err">生成</span><span class="n">Matcher</span><span class="err">对象</span>
+<span class="n">Scala</span>
+        <span class="o">-</span><span class="n">split</span><span class="p">()</span>  <span class="err">以正则表达式对字符串进行分割</span>
+        <span class="err">以字符为分割符进行分割</span><span class="o">--</span><span class="err">对</span><span class="n">Java</span><span class="err">中的</span><span class="n">split</span><span class="err">添加了重载的方法</span>
+                    <span class="n">var</span> <span class="n">s</span> <span class="o">=</span><span class="s2">&quot;this. Iam.hello&quot;</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.&quot;</span><span class="p">)</span>  <span class="err">以正则表达式对字符串进行分割，得到一个分割后的字符串数组</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;l&quot;</span><span class="p">)</span>  <span class="err">以字符为分割符进行分割</span><span class="o">-</span><span class="err">遇到特殊元字符</span> <span class="err">记得转义</span>
+
+<span class="n">Shell</span>
+        <span class="err">切分字符串</span><span class="o">--</span> <span class="n">cut</span>
+        <span class="err">工具</span>
+            <span class="n">sed</span><span class="err">工具，</span><span class="n">sed</span><span class="err">本身也是一个管道命令，常用于一行</span>
+            <span class="n">awk</span><span class="err">工具</span>
+            <span class="n">grep</span>
+            <span class="err">扩展型正则</span> <span class="n">egrep</span>
+
+<span class="n">Python</span><span class="o">--</span><span class="err">采用面向对象式的方式</span>
+    <span class="n">Python</span><span class="err">语言中的正则表大会</span> <span class="err">标准包</span><span class="n">re</span><span class="err">提供</span>
+        <span class="mf">01.</span><span class="err">提供了一个正则表达式引擎接口，它允许我们将正则表达式编译成模式对象，</span>
+                <span class="err">然后通过这些模式对象执行模式匹配搜索和字符串分割、子串替换等操</span>
+        <span class="mf">02.</span><span class="err">字符串</span><span class="o">--</span><span class="n">raw</span> <span class="n">string</span> <span class="err">原始字符串，在普通字符串文字前加</span><span class="n">r</span> <span class="err">或者</span><span class="n">R</span><span class="err">前缀</span>
+            <span class="err">单引号和双引号前的反斜杠</span>
+        <span class="err">假如你需要匹配文本中的字符”</span>\<span class="err">”，</span>
+            <span class="err">方式</span><span class="mf">01.</span> <span class="err">使用编程语言表示的正则表达式里将需要</span><span class="mi">4</span><span class="err">个反斜杠”</span>\\\\<span class="err">”</span>
+            <span class="err">方式</span><span class="mf">02.</span><span class="err">使用原生字符串</span>
+        <span class="err">匹配迭代器</span><span class="o">--</span><span class="err">区分大小写</span>
+          <span class="mf">03.</span> <span class="err">正则表达式对象</span><span class="o">--</span><span class="n">re</span><span class="err">模块的</span><span class="nb">compile</span><span class="p">()</span><span class="err">函数编译得到</span>
+                <span class="err">正则表达式匹配对象</span>   <span class="o">-----</span><span class="err">调用正则表达式对象的</span><span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">()</span><span class="err">、</span><span class="n">regex</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">()</span><span class="err">和</span><span class="n">regex</span><span class="o">.</span><span class="n">search</span><span class="p">()</span><span class="err">得到的结果就是</span>
+
+        <span class="err">方式一：使用步骤</span>
+            <span class="mf">0.</span> <span class="err">引用到程序中</span>
+            <span class="mf">01.</span><span class="err">生成字符串表达式对象</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">complie</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="mf">02.</span><span class="err">检索</span><span class="o">--</span><span class="err">匹配</span><span class="o">--</span><span class="err">分割等</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">()</span> <span class="err">、</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">()</span> <span class="err">、</span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="err">、</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">()</span>
+            <span class="err">案例：</span>
+                <span class="kn">import</span> <span class="nn">re</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s2">r&quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;hello world&lt;h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="c1">#这段是你要匹配的文本</span>
+                <span class="n">p1</span> <span class="o">=</span> <span class="s2">r&quot;(?&lt;=&lt;h1&gt;).+?(?=&lt;h1&gt;)&quot;</span><span class="c1">#这是我们写的正则表达式规则，你现在可以不理解啥意思</span>
+                <span class="n">pattern1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span><span class="c1">#我们在编译这段正则表达式</span>
+
+                <span class="n">matcher1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern1</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="c1">#在源文本中搜索符合正则表达式的部分</span>
+                <span class="k">print</span> <span class="n">matcher1</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="c1">#打印出来</span>
+        <span class="err">方式二：</span>
+                <span class="n">pattern1</span><span class="o">.</span><span class="n">search</span><span class="p">()</span> <span class="n">pattern1</span><span class="o">.</span><span class="n">match</span><span class="p">()</span> <span class="n">pattern1</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="n">pattern1</span><span class="o">.</span><span class="n">sub</span><span class="p">()</span>
+
+<span class="n">R</span><span class="err">语言</span>
+    <span class="err">使用字符串操作函数</span>
+        <span class="err">字符串匹配：</span><span class="n">grep</span><span class="p">()</span>   <span class="n">gerpl</span><span class="p">()</span>
+                    <span class="n">grep</span><span class="p">()</span><span class="err">负责搜索给定字符串对象中特定表达式</span> <span class="err">，并返回其位置索引。</span>
+                    <span class="n">grepl</span><span class="p">()</span><span class="err">函数与之类似，但其后面的</span><span class="s2">&quot;l&quot;</span><span class="err">则意味着返回的将是逻辑值。</span>
+                <span class="n">regexpr</span><span class="err">、</span><span class="n">gregexpr</span><span class="err">和</span><span class="n">regexec</span>
+                    <span class="err">这三个函数返回的结果包含了匹配的具体位置和字符串长度信息，</span>
+                    <span class="err">可以用于字符串的提取操作</span>
+        <span class="err">字符串替代</span>   <span class="err">：</span><span class="n">sub</span><span class="p">()</span>  <span class="n">gsub</span><span class="p">(</span> <span class="p">)</span>
+                       <span class="n">gsub</span><span class="p">()</span><span class="err">负责搜索字符串的特定表达式，并用新的内容加以替代。</span>
+                         <span class="n">sub</span><span class="p">()</span><span class="err">函数是类似的，但只替代第一个发现结果。</span>
+        <span class="err">字符串分割：</span><span class="n">strsplit</span><span class="p">()</span>
+        <span class="err">字符串粘合：</span><span class="n">paste</span><span class="p">()</span><span class="err">负责将若干个字符串相连结，返回成单独的字符串</span>
+        <span class="err">字符串截取：</span><span class="n">substr</span><span class="p">()</span><span class="err">能对给定的字符串对象取出子</span>
+                <span class="n">substr</span><span class="err">返回的字串个数等于第一个参数的长度</span>
+                <span class="err">而</span><span class="n">substring</span><span class="err">返回字串个数等于三个参数中最长向量长度，短向量循环使用</span>
+    <span class="mf">01.</span> <span class="err">参数设置</span><span class="o">--</span><span class="err">设置为正则表达式</span>  <span class="n">fixed</span><span class="o">=</span><span class="n">FALSE</span>
+    <span class="mf">02.</span><span class="err">对</span> <span class="err">点号脱离元字符属性</span><span class="p">,</span> <span class="err">同时反斜杠本身也是元字符属性</span>
+                    \\<span class="o">.</span>
+                    <span class="err">例如：</span> <span class="n">grep</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="s2">&quot;f.g&quot;</span><span class="p">))</span>
+            <span class="n">strsplit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">perl</span><span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">useBytes</span><span class="o">=</span> <span class="n">F</span><span class="p">)</span>
+    <span class="mf">03.</span> <span class="c1">##普通字符串</span>
+                    <span class="n">strsplit</span><span class="p">(</span><span class="s2">&quot;f.g&quot;</span><span class="p">,</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="n">fixed</span><span class="o">=</span><span class="n">T</span><span class="p">)</span>
+            <span class="c1">##正则表达式功能</span>
+                    <span class="n">strsplit</span><span class="p">(</span><span class="s2">&quot;f.g&quot;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.&quot;</span><span class="p">,</span><span class="n">fixed</span><span class="o">=</span><span class="n">F</span><span class="p">)</span>               
+            <span class="n">split</span><span class="o">--</span><span class="err">分组因子，用于分组</span>
+
+<span class="n">SQL</span>
+    <span class="err">模糊匹配</span><span class="o">--</span><span class="err">正则表达式</span>
+    <span class="n">Oracle</span>
+        <span class="n">regexp_substr</span> <span class="err">函数使用正则表达式来指定返回串的起点和终点</span>
+        <span class="n">regexp_instr</span>
+        <span class="n">regexp_replace</span>
+        <span class="n">regexp_like</span>
+    <span class="n">MySQL</span>
+        <span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="n">MySQL</span><span class="err">用</span><span class="n">WHERE</span><span class="err">子句对正则表达式提供了初步的支持</span>
+            <span class="n">SELECT</span> <span class="n">prod_name</span>
+            <span class="n">FROM</span> <span class="n">products</span>
+            <span class="n">WHERE</span> <span class="n">prod_name</span> <span class="n">REGEXP</span> <span class="s1">&#39;1000&#39;</span>
+            <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">prod_name</span><span class="p">;</span>
+    <span class="n">Hive</span>
+    <span class="mf">01.</span><span class="n">split</span><span class="p">()</span> <span class="n">split</span><span class="err">的第二个参数是一个</span><span class="n">regex</span><span class="err">，而‘?’有特殊的意义因此需要被转义。</span>
+    <span class="mf">02.</span> <span class="err">正则表达式替换函数：</span><span class="n">regexp_replace</span>
+            <span class="err">语法</span><span class="p">:</span> <span class="n">regexp_replace</span><span class="p">(</span><span class="n">string</span> <span class="n">A</span><span class="p">,</span> <span class="n">string</span> <span class="n">B</span><span class="p">,</span> <span class="n">string</span> <span class="n">C</span><span class="p">)</span>
+            <span class="err">返回值</span><span class="p">:</span> <span class="n">string</span>
+            <span class="err">说明：将字符串</span><span class="n">A</span><span class="err">中的</span> <span class="err">符合</span><span class="n">java</span><span class="err">正则表达式</span><span class="n">B</span> <span class="err">的部分替换为</span><span class="n">C</span><span class="err">。</span>
+            <span class="err">注意，在有些情况下要使用转义字符</span><span class="p">,</span><span class="err">类似</span><span class="n">oracle</span><span class="err">中的</span><span class="n">regexp_replace</span><span class="err">函数。</span>        
+            <span class="err">举例：</span>
+            <span class="n">hive</span><span class="o">&gt;</span> <span class="n">select</span> <span class="n">regexp_replace</span><span class="p">(</span><span class="s1">&#39;foobar&#39;</span><span class="p">,</span> <span class="s1">&#39;oo|ar&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">lxw_dual</span><span class="p">;</span>
+            <span class="n">fb</span>
+
+         <span class="err">正则表达式解析函数：</span><span class="n">regexp_extract</span>
+            <span class="err">语法</span><span class="p">:</span> <span class="n">regexp_extract</span><span class="p">(</span><span class="n">string</span> <span class="n">subject</span><span class="p">,</span> <span class="n">string</span> <span class="n">pattern</span><span class="p">,</span> <span class="nb">int</span> <span class="n">index</span><span class="p">)</span>
+            <span class="err">返回值</span><span class="p">:</span> <span class="n">string</span>
+            <span class="err">说明：将字符串</span><span class="n">subject</span><span class="err">依照</span><span class="n">pattern</span><span class="err">正则表达式的规则拆分。返回</span><span class="n">index</span><span class="err">指定的字符。</span>
+            <span class="err">举例：</span>
+</pre></div>
+
+
+<h3>附录</h3>
+<div class="highlight"><pre><span></span>1.编译器设计原理--
+    本地编译器--交叉编译器
+    编译器进行语法分析--语义分析-目标文件-链接器
+    分析程序生成器（Parser Generator）
+    汇编编写第一个--然后迭代生成
+2.Latex：生成复杂表格和数学公式和排版
+    它的格式化引擎 TeX
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>精通正则表达式
+正则指引
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

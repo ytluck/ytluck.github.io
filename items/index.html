@@ -26,7 +26,114 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/items/my-item-post-15.html">Python的Web网络编程</a></h1>
+                    <h1 class="entry-title"><a href="/items/my-items-post-17.html">Python获取第三方空间API数据</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T22:02:00+08:00">
+                Published: 2017-05-14 22:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/api.html">API</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>从第三方地图服务商中获取数据，以及将数据展现在这些地图上，
+ 数据分析以及可视化法，
+     第一：获取数据
+     第二：展现数据
+     第三：提供LBS服务--位置服务（LBS，Location Based Services）又称定位服务
+    &lt;1&gt; 地名地址空间化 通过搜索关键字，返回相关POI信息，包括坐标 经纬度
+    &lt;2&gt; 取行业所在的空间位置信息
+</pre></div>
+
+
+<h3>基本概念：</h3>
+<div class="highlight"><pre><span></span>常用概念：
+    结构化地址
+    location
+    POI： POI是“Point of Interest”的缩写,可以翻译成“信息点”,
+                每个POI包含四方面信息,名称、类别、经度纬度、附近的酒店饭店商铺等信息
+                也称作导航地图信息。
+                电子地图上一般用气泡图标来表示POI，POI名称有汉字和拼音两种版本
+    AOI （area of interest），即信息面，也叫兴趣面。指的是地图数据中的区域状的地理实体
+
+    radius  查询POI的半径范围  取值范围：0~3000,单位：米
+LBS中的数据所涉及部分
+    涉及的数据主要包括基础地理信息数据&lt;地理信息数据库&gt;、
+                                系统管理数据  
+                                兴趣点数据
+各家地图服务商使用的坐标并不相同。目前主要有如下三种坐标系：
+        大地坐标（WGS84坐标系）：国际上通用的坐标系。设备一般包含GPS芯片或者北斗芯片获取的经纬度为WGS84地理坐标系, 
+                                                        谷歌地图采用的是WGS84地理坐标系（中国范围除外）。
+        火星坐标（GCJ02坐标系）：是由中国国家测绘局制订的地理信息系统的坐标系统。由WGS84坐标系经加密后的坐标系。
+                                                            高德地图 、谷歌中国地图和搜搜中国地图采用的是GCJ02地理坐标系。
+        百度坐标（BD09坐标系）：GCJ02坐标系经加密后的坐标系。
+</pre></div>
+
+
+<h3>基本的代码--基于高德地图</h3>
+<div class="highlight"><pre><span></span><span class="o">--</span><span class="n">Python</span><span class="err">中的库以及高德地图中的</span><span class="n">ak</span><span class="o">-</span><span class="err">需要进行申请</span>
+<span class="c1"># -*- coding:utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">def</span> <span class="nf">getcode</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">wantcity</span><span class="p">,</span> <span class="n">wantpage</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># 允许你使用 params 关键字参数，以一个字典来提供这些参数search</span>
+    <span class="c1"># ak类型 - Web服务</span>
+    <span class="n">ak</span> <span class="o">=</span> <span class="s1">&#39;*********************&#39;</span>
+    <span class="c1"># (keywords和types两者至少必选其一)</span>
+    <span class="c1"># offset 每页记录数据</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">ak</span><span class="p">,</span> <span class="s1">&#39;keywords&#39;</span><span class="p">:</span> <span class="n">search</span><span class="p">,</span> <span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;city&#39;</span><span class="p">:</span> <span class="n">wantcity</span><span class="p">,</span> <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">wantpage</span><span class="p">}</span>
+    <span class="c1"># API类型 -- 搜索API --查询POI信息</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;http://restapi.amap.com/v3/place/text&#39;</span>
+    <span class="c1"># http://restapi.amap.com/v3/place/around?parameters 周边搜索API服务地址</span>
+    <span class="n">responese</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="c1">#print responese.url</span>
+    <span class="c1"># 访问请求响应体</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">responese</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="c1"># 检测响应状态码:</span>
+    <span class="c1">#print(&#39;状态码是 : &#39; + str(responese.status_code))</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">responese</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="c1"># geocodes  地理编码信息列表  结果对象列表，包括下述字段 搜索POI信息列表</span>
+    <span class="c1">#print(answer)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>    <span class="c1">#if not answer[&#39;status&#39;] else None</span>
+
+
+<span class="err">出现的问题</span>   
+    <span class="n">geocodes</span>  <span class="err">地理编码信息列表</span>  <span class="err">结果对象列表，包括下述字段</span> <span class="n">location</span> <span class="err">坐标点</span> <span class="err">经度，纬度</span>
+    <span class="n">citycode</span> <span class="err">城市编码</span>
+    <span class="p">{</span><span class="s2">&quot;info&quot;</span><span class="p">:</span><span class="s2">&quot;USERKEY_PLAT_NOMATCH&quot;</span><span class="p">,</span><span class="s2">&quot;infocode&quot;</span><span class="p">:</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;0&quot;</span><span class="p">,</span><span class="s2">&quot;sec_code_debug&quot;</span><span class="p">:</span><span class="s2">&quot;********&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;**********&quot;</span><span class="p">,</span><span class="s2">&quot;sec_code&quot;</span><span class="p">:</span><span class="s2">&quot;********&quot;</span><span class="p">}</span>   
+    <span class="err">确认方式：查看状态码以及返回的信息</span>
+    <span class="err">解决</span>
+        <span class="err">出现问题：</span> <span class="n">key</span><span class="err">不匹配</span> <span class="err">，请求中使用的</span><span class="n">key</span><span class="err">与绑定平台不符，例如：开发者申请的是</span><span class="n">js</span> <span class="n">api</span><span class="err">的</span><span class="n">key</span><span class="err">，却用来调</span><span class="n">web</span><span class="err">服务接口</span>
+            <span class="c1">##JSON返回的信息如下</span>
+            <span class="p">{</span><span class="s1">u&#39;info&#39;</span><span class="p">:</span> <span class="s1">u&#39;USERKEY_PLAT_NOMATCH&#39;</span><span class="p">,</span> <span class="s1">u&#39;status&#39;</span><span class="p">:</span> <span class="s1">u&#39;0&#39;</span><span class="p">,</span> <span class="s1">u&#39;infocode&#39;</span><span class="p">:</span> <span class="s1">u&#39;&#39;</span><span class="p">,</span><span class="err">……</span><span class="p">}</span>
+        <span class="err">解决方式：新申请了对应服务的</span><span class="n">key</span><span class="err">，换上即可</span><span class="o">-</span>
+    <span class="err">总结：</span><span class="o">-</span> <span class="err">了解每个参数的作用并进行修改以获取需要的效果</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>高德Web服务API简介 http://lbs.amap.com/api/webservice/summary/
+高德地图 地理/逆地理编码 http://lbs.amap.com/api/webservice/guide/api/georegeo
+高德地图api实现地址和经纬度的转换(python)  http://www.cnblogs.com/xautxuqiang/p/6241561.html
+Python计算地图上两点经纬度间的距离 http://blog.csdn.net/vernice/article/details/46581361
+Python和高德开放平台——地名地址空间化及采集POI信息 https://baijiahao.baidu.com/s?id=1564102482149360&amp;wfr=spider&amp;for=pc
+Python方法获取百度地图数据示例源码 http://www.iplaypy.com/code/scripts-shell/ss2298.html
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-15.html" rel="bookmark"
+                           title="Permalink to Python的Web网络编程">Python的Web网络编程</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-05-14T21:54:00+08:00">
                 Published: 2017-05-14 21:54:00
@@ -37,64 +144,10 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/api.html">API</a> </p>
-</footer><!-- /.post-info --><h4>手动</h4>
-<div class="highlight"><pre><span></span>    0.人工打开--然后复制保存
-</pre></div>
-
-
-<h4>使用现有工具</h4>
-<div class="highlight"><pre><span></span>    1.1使用浏览器以及对应插件
-            httpfox--监控浏览器执行htt请求和响应
-    1.2使用整站下载工具
-            Teleport Ultra
-</pre></div>
-
-
-<h4>使用Python库</h4>
-<div class="highlight"><pre><span></span>    <span class="mf">2.</span><span class="err">使用</span><span class="n">urllib2</span><span class="err">以及</span><span class="n">urllib</span>  <span class="o">----</span><span class="err">如外的可能使用</span><span class="o">&lt;</span><span class="n">cookielib</span><span class="o">&gt;</span>
-            <span class="n">urllib2</span><span class="err">库里面的</span><span class="n">urlopen</span><span class="err">方法，传入一个</span><span class="n">URL</span><span class="err">，</span><span class="n">data</span><span class="err">默认为空</span><span class="bp">None</span><span class="err">，返回一个</span><span class="n">response</span><span class="err">对象，返回信息便保存在这里面</span>
-                <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
-            <span class="err">例子</span>
-                <span class="p">:</span>
-                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
-                <span class="k">print</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            <span class="err">构造</span><span class="n">Request</span><span class="err">类</span><span class="o">-</span><span class="err">参数可以传入一个</span><span class="n">request</span><span class="err">请求</span><span class="p">,</span><span class="err">它其实就是一个</span><span class="n">Request</span><span class="err">类的实例</span>
-                <span class="kn">import</span> <span class="nn">urllib2</span>
-                <span class="n">request</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
-                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-                <span class="k">print</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-    <span class="mf">3.</span><span class="err">使用</span><span class="n">Requests</span>
-            <span class="c1">#-*- coding:utf-8 -*-</span>
-            <span class="kn">import</span> <span class="nn">requests</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://www.baidu.com&#39;</span>
-            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;key1&#39;</span><span class="p">:</span> <span class="s1">&#39;value1&#39;</span><span class="p">,</span> <span class="s1">&#39;key2&#39;</span><span class="p">:</span> <span class="s1">&#39;value2&#39;</span><span class="p">}</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
-</pre></div>
-
-
-<h4>使用Python爬虫框架</h4>
-<div class="highlight"><pre><span></span>    4.1--使用Selenium
-    4.2---使用爬虫框架--Scrapy
-</pre></div>
-
-
-<h4>商业软件</h4>
-<div class="highlight"><pre><span></span>八爪鱼
-import.io
-</pre></div>
-
-
-<h3>参考</h3>
-<div class="highlight"><pre><span></span>Python 爬虫的工具列表 http://python.jobbole.com/82633/
-[Python]网络爬虫（三）：异常的处理和HTTP状态码的分类 http://blog.csdn.net/pleasecallmewhy/article/details/8923725
-Selenium 爬取淘宝实战练习 https://ask.hellobi.com/blog/JiangYiXin/7837
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>网络搜集数据方式</p>
+                <a class="readmore" href="/items/my-item-post-15.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

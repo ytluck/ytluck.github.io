@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Hive高阶数据查询</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-26.html" rel="bookmark"
+           title="Permalink to Hive高阶数据查询">Hive高阶数据查询</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-08-06T19:02:00+08:00">
+                Published: 2017-08-06 19:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/hive.html">Hive</a> </p>
+</footer><!-- /.post-info -->      <h3>Hive中的内置函数</h3>
+<div class="highlight"><pre><span></span>Built-in Operators 和Built-in Functions
+场景：
+一般函数
+    关系运算 数学运算 逻辑运算 数值计算 
+    日期函数  字符串函数  统计函数
+    条件函数   COALESCE     nvl  case when      if
+    类型转换 
+集合函数  std
+聚合函数        Built-in Aggregate Functions (UDAF)             
+表生成函数   explode       stack 
+    UDTF(User-Defined Table-Generating Functions) 用来解决 ，UDTF
+    有两种使用方法，一种直接放到select后面，一种和lateral view一起使用
+    直接select中使用，不可以添加其他字段使用，不可以嵌套调用，
+            不可以和group by/cluster by/distribute by/sort by一起使用
+    输入一行输出多行(On-to-many maping) 的需求
+        select tf.* from (select 0) t lateral view explode(array(&#39;A&#39;,&#39;B&#39;,&#39;C&#39;)) tf as col;
+        select tf.* from (select 0) t lateral view explode(map(&#39;A&#39;,10,&#39;B&#39;,20,&#39;C&#39;,30)) tf as key,value;
+        select tf.* from (select 0) t lateral view stack(2,&#39;A&#39;,10,
+                date &#39;2015-01-01&#39;,&#39;B&#39;,20,date &#39;2016-01-01&#39;) tf as col0,col1,col2;
+    posexplode() --同时返回原来所在的位置
+分析函数    Analytics functions
+窗口函数 Windowing functions
+User-Defined Functions (UDFs)
+    自定义函数
+            •虽然Hive提供了很多函数，但是有些还是难以满足我们的需求。因此Hive提供了自定义函数开发
+        •自定义函数包括三种UDF、UADF、UDTF
+            •UDF(User-Defined-Function)
+            •UDAF（User- Defined Aggregation Funcation）
+            •UDTF(User-Defined Table-Generating Functions)  用来解决 输入一行输出多行(On-to-many maping) 的需求。 
+        HIVE中使用定义的函数的三种方式
+            •在HIVE会话中add 自定义函数的jar文件，然后创建function，继而使用函数
+            •在进入HIVE会话之前先自动执行创建function，不用用户手工创建
+            •把自定义的函数写到系统函数中，使之成为HIVE的一个默认函数，这样就不需要create temporary function
+</pre></div>
+
+
+<h3>窗口函数用于计算基于组的某种聚合值</h3>
+<div class="highlight"><pre><span></span>    聚合函数和窗口函数over()
+sum(s)over(order by s range between 2 preceding and 2 following) 表示加2或减2的范围内的求和
+sum(s)over(order by s rows between 2 preceding and 2 following)表示在上下两行之间的范围内
+    PRECEDING：往前
+    FOLLOWING：往后
+    CURRENT ROW：当前行
+    UNBOUNDED：起点
+    UNBOUNDED PRECEDING 表示从前面的起点，
+    UNBOUNDED FOLLOWING：表示到后面的终点
+聚合函数对于每个组只返回一行。
+分析函数用于计算基于组的某种聚合值，对于每个组返回多行
+窗口函数
+    function_name ( * ) OVER ( window_definition )
+    窗口函数中--分析函数
+         row_number()、  rank()、dense_rank() 、 
+                            first_value(value any)、last_value(value any)，
+                            lag(value any)、lead(value any)
+            sum(),agv()，max(),min()
+</pre></div>
+
+
+<h3>去重</h3>
+<div class="highlight"><pre><span></span>去重采用的方式有三种
+distinct    distinct支持单列、多列的去重方式
+        单列去重的方式简明易懂，即相同值只保留1个。 
+        多列的去重则是根据指定的去重的列信息来进行，
+        即只有所有指定的列信息都相同，才会被认为是重复的信息。
+        位置：
+          选择两个字段时
+            将distinct放在前一个字段之前，则会返回对两个字段的组合去重后的结果；
+            而如果将distinct放在后一个字段之前，则会报错。
+                                解决方式：多次去重，逐次减少字段
+group by
+(row_number() over( partition by ) as order  from tableA t1   )tt1  where tt1.order=1
+            有null值的情况--默认order by 时，desc NULL 值排在首位，ASC时NULL值排在末尾，
+                可通过NULLS LAST、NULLS FIRST 控制
+                RANK() OVER (ORDER BY column_name DESC NULLS LAST)
+</pre></div>
+
+
+<h3>分组--Top N</h3>
+<div class="highlight"><pre><span></span>1.group by
+2.利用生成序号，通过序号来进行使用 例如数据  500,500,300按照该降序排列
+    row_number() over()     1   2   3
+    dense_rank() over()     1   1   2
+    rank() over()                   1   1   3
+    分组中的最值所在的行数据
+        max  +    group by 
+    最值有多个的情况    --返回窗口的第一个和最后一个值--FIRST_VALUE() 和LAST_VALUE()
+            FIRST、LAST  获得一个排序分组中的第一个值和组后一个值
+        保留一个 max(ename) keep(dense_rank LAST order by sal) over(PARTITION BY deptno)
+    firsr_value
+</pre></div>
+
+
+<h3>聚合函数--动态Group By</h3>
+<div class="highlight"><pre><span></span>hive窗口函数，部分和oracle相似，cube需要2的N次方次分组, 而rollup只需要N+1个分组
+cube对所有的维度进行聚合
+grouping sets
+        在GROUP BY语句后面指定多个统计选项，
+        可以简单理解为多条group by语句通过union all把查询结果聚合起来结合起来
+rollup 在层次上对数据进行聚合
+    cube简称数据魔方，可以实现hive多个任意维度的查询, 低版本hive可以通过union all方式解决      
+        cube(a,b,c),则2^3 =8,首先会对(a,b,c)进行group by，然后依次是(a,b),(a,c),(a),(b,c),(b),(c),
+        最后在对全表进行group by，会统计所选列中值的所有组合的聚合,
+            即(a,b,c),(a,b),(a,c),(a),(b,c),(b),(c),()
+        select device_id,os_id,app_id,client_version,from_id,count(user_id) 
+        from test_reg 
+        group by device_id,os_id,app_id,client_version,from_id with cube;
+    rollup可以实现从右到做递减多级的统计，显示统计某一层次结构的聚合。
+        --维度在分组的结果集中进行聚合操作 rollup(a,b,c)  
+            则(a,b,c),(a,b),(a),()  N+1
+             select device_id,os_id,app_id,client_version,from_id,count(user_id) 
+                from test_reg 
+                group by device_id,os_id,app_id,client_version,from_id with rollup
+    Grouping_ID函数--grouping_id其实就是所统计各列二进制和
+            没有统计某一列时，它的值显示为null，
+            这可能与列本身就有null值冲突，
+            这就需要一种方法区分是没有统计还是值本来就是null
+</pre></div>
+
+
+<h3>join的连接条件</h3>
+<div class="highlight"><pre><span></span>先筛选
+连接条件的位置
+on and和on where
+    在使用left join时，on and和on where条件的区别如下：  
+        1、 (on and)条件 是在生成临时表时使用的条件，
+                它不管on中的条件是否为真，都会返回左边表中的记录。  
+        2、where条件是在临时表生成好后，再对临时表进行过滤的条件。
+                这时已经没有left join的含义（必须返回左边表的记录）了，
+                条件不为真的就全部过滤掉，
+                on后的条件用来生成左右表关联的临时表，
+                where后的条件对临时表中的记录进行过滤。
+        3.on and  和 on where
+        where是生成临时表以后再进行过滤，对左右表都进行筛选。
+        而and后面的语句如果是对left join中的左表进行过滤将不起任何作用，对右表进行过滤的话，
+            那么左表还是返回所有行，只是右表会被过滤掉一部分行。
+    在使用inner join 时
+        这里on and条件和on where条件一样对生成以后的临时表同样会被过滤
+where and --不使用on的方式 
+     select t1.name,t2.grade from  t1, t2 where t1.name= t2.name and t1.class!=&#39;2&#39;;
+
+多表查询时空值处理
+        coalesce(t1.count,0)
+</pre></div>
+
+
+<h3>字符串类型数字</h3>
+<div class="highlight"><pre><span></span>对字符串类型的数字进行比较--关系运算
+    是从右到左第一个数字比较，如果相等再比较下一个。
+字符串类型的数据的数学运算
+        转成数字进行运算
+    字符串数学运算--也会得出结果
+string  int doubel  bigint  round
+</pre></div>
+
+
+<h3>行转列以及列转行</h3>
+<div class="highlight"><pre><span></span>行转列
+    case when end
+列转行
+  case when  
+  union all
+输入一行变多行
+     Lateral View用于UDTF(user-defined table generating functions)中将行转成列
+     UDTF(User-Defined Table-Generating Functions)  用来解决 输入一行输出多行(On-to-many maping) 的需求
+     select src.id, mytable.col1, mytable.col2 from src lateral view explode_map  (properties) mytable as col1, col2;
+
+综合
+    把结果分级并转为列
+        dense_rank() over()--case when-再次生成一组case when-- dense_rank()   over()
+聚合函数 分析函数 窗口函数 group  动态group函数
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Oracle查询优化改写
+Enhanced Aggregation, Cube, Grouping and Rollup  https://cwiki.apache.org/confluenc/display/Hive/Enhanced+Aggregation%2C+Cube%2C+Grouping+and+Rollup
+ hive新功能 Cube, Rollup介绍  http://blog.csdn.net/moon_yang_bj/article/details/17200367
+LanguageManual GroupBy  https://cwiki.apache.org/confluence/display/Hive/LanguageManual+GroupBy
+LanguageManual UDF https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
+hive udaf开发入门和运行过程详解 http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888051.html
+ Hive分析窗口函数系列文章  http://blog.csdn.net/guohecang/article/details/51582242
+ SQL左右连接中的on and和on where的区别  http://blog.csdn.net/xingzhemoluo/article/details/39677891
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
