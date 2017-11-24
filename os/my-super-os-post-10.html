@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Linux多用户和多任务管理</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-10.html" rel="bookmark"
+           title="Permalink to Linux多用户和多任务管理">Linux多用户和多任务管理</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-11-19T21:04:00+08:00">
+                Published: 2017-11-19 21:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>了解如何增加用户以及用户组，同时对安全有所了解，对常见的主机管理有个轮廓的认识
+账户和权限
+</pre></div>
+
+
+<h3>A.Linux的用户和任务管理</h3>
+<div class="highlight"><pre><span></span>多用户多任务
+        用户管理
+        任务管理
+    01.文件权限 r  w  x(4  2  1)和账户体系
+                user group  others  750             ls -l
+                    相关的文件 /etc/passwd  /etc/shadow
+                                        /etc/group   /etc/gshadow
+                    修改：  chown  chgrp  chmod
+            账户体系：  UID  GID  查看 figer
+                    useradd         groupadd
+                    passwd
+                    usermod     groupmod
+                    userdel         groupdel
+            账户之间交流
+                    改变 su  sudo
+                    交流 mesg  write  wall  mail
+    02.ACL(Access Control List)    查看 mount    setfacl用于增加或者修改ACL，getfacl用于显示分配完的ACL
+    03.PAM      PAM (Pluggable Authentication Modules, 嵌入式模块)认证机制 
+                文件/etc/pam.conf；或者是/etc/pam.d/目录
+    04.SELinux              查看状态：#  sestatus   或     #   getenforce
+    05.Quota                quota quotacheck    usrquota,grpquota参数
+    06.firewalld            查看状态 firewall-cmd --state 
+        iptables            查看状态 chkconfig --list iptables
+</pre></div>
+
+
+<h3>附录：</h3>
+<h4>安全准则</h4>
+<div class="highlight"><pre><span></span>0.预防问题
+1.及时发现问题
+    01.预警
+    02.巡查
+    03.通过日志系统 排查和审查
+2.发现问题，快速解决问题
+    灵活机动 快速
+    预案
+</pre></div>
+
+
+<h4>管理与安全</h4>
+<div class="highlight"><pre><span></span>01.安全级别
+    具体为D、C（C1、C2）、B（B1、B2、B3）和A四部分。
+            B1级称为标识安全保护（Labeled Security Protection）
+            B2级称为结构保护级别（Security Protection）
+            B3级别称为安全域保护级别（Security Domain）
+            A级别称为验证设计级（Verity Design）
+02.安全策略
+         一种是信息流模型
+         一种是访问控制模型          
+           访问控制--识别、验证、授权
+           基于个人的策略（IDLBACP：Individual-based Access Control Policies）
+           基于组的策略（GBACP：Group-based Access Control Policies）
+          I、 Discretionary Access Control（DAC）自主访问控制
+
+         II、  Mandatory Access Control（MAC）强制访问控制
+                系统强制主体服从访问控制策略，基于多级安全需求。主体、客体和控制策略
+                管理员制定策略，策略定义了哪个主体能访问哪个对象，任何没有被显式授权的操作都不能执行。
+                    安全等级标签
+                    非等级分类标签
+          III、 Role Based Access Control(RBAC)基于角色的访问控制
+                    用户-角色-权限
+                            用户 ： 用户和用户组
+                            角色
+                            权限：权限类型
+           IV、 Task-based Access Control 基于任务的访问控制
+                    采用动态授权的主动安全模型 
+                        工作流、授权结构体、受托人集、许可集四部分组成
+        实现措施：
+            访问控制表（ACLs：Access Control Lists）
+    03.资源调配
+
+    具体的方式
+            防火墙技术
+            入侵检测
+            反病毒技术
+            内外网隔离
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>《鸟哥的私房菜》
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Unix与Linux系统shell命令</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-09.html" rel="bookmark"
+           title="Permalink to Unix与Linux系统shell命令">Unix与Linux系统shell命令</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-11-18T22:04:00+08:00">
+                Published: 2017-11-18 22:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Unix系统中有不同的shell家族，而在Linux中接触到的只是其中的一部分，通过对Unix家族的了解，有助于对操作系统来龙去脉有个了解。
+了解技术渊源，或许能激发有趣和有价值的想法。或者给出一种感觉，原来这样啊。 了解历史可以明白&#39;为什么会如此&#39;的习惯。
+</pre></div>
+
+
+<h3>SHELL家族</h3>
+<div class="highlight"><pre><span></span><span class="x">01.查看系统安装了哪些shell       </span>
+<span class="x">    cat /etc/shells</span>
+<span class="x">02.查看当前shell    </span>
+<span class="x">    echo </span><span class="p">$</span><span class="nv">SHELL</span><span class="x"></span>
+<span class="x">    或者</span>
+<span class="x">    ls -al /bin/sh</span>
+<span class="x">03.查看变量</span>
+<span class="x">    env         env | less</span>
+<span class="x">    printenv </span>
+<span class="x">    set   </span>
+<span class="x">    同时出现在set和env的变量既是环境变量也是shell变量</span>
+<span class="x">04.Shell历史</span>
+<span class="x">  Bourne shell家族</span>
+<span class="x">    bash sh   ksh</span>
+<span class="x">        Mashey  shell</span>
+<span class="x">       Thompson shell</span>
+<span class="x">        Korn    Shell  -&gt; ksh</span>
+<span class="x">        Bourn   Shell    -&gt; sh</span>
+<span class="x">        FreeBSD shell   -&gt; sh</span>
+<span class="x">        Z shell         -&gt; zsh</span>
+<span class="x">        bash  Linux默认的shell Bourne-again shell</span>
+<span class="x">      特性：shell变量和环境变量都采用大写</span>
+<span class="x">        希望某个变量为环境变量的时候 需要使用export </span>
+<span class="x">        销毁变量 unset</span>
+<span class="x">        shell选项设置</span>
+<span class="x">        命令提示符 root </span><span class="err">#</span><span class="x">  简单提示符 </span><span class="p">$</span><span class="x"></span>
+<span class="x">  C-Shell家族</span>
+<span class="x">        C-shell 适用于编写C语言</span>
+<span class="x">        Tcsh</span>
+<span class="x">        特性--环境变量采用大写，shell变量采用小写</span>
+<span class="x">             环境变量通过setenv创建 shell变量有set创建</span>
+<span class="x">        命令提示符 root </span><span class="err">#</span><span class="x">  简单提示符 %或者使用大于号提示 &gt;</span>
+<span class="x">    05.临时和永久改变shell方法，目前使用默认的shell</span>
+<span class="x">        临时切换</span>
+<span class="x">        切换默认</span>
+<span class="x">    Dash Shell 比 Bash Shell 小的多，符合POSIX标准。</span>
+<span class="x">        Debian和Ubuntu中，/bin/sh默认已经指向dash，这是一个不同于bash的shell，</span>
+<span class="x">        它主要是为了执行脚本而出现，而不是交互，它速度更快</span>
+<span class="x">        dash(theDebian Almquist Shell)</span>
+</pre></div>
+
+
+<h3>shell命令</h3>
+<div class="highlight"><pre><span></span><span class="x">01.元字符  引用 和转义</span>
+<span class="x"> 使用一对双引号，保留 </span><span class="p">$</span><span class="x">  `  \  三个符号的特殊含义  </span><span class="p">$</span><span class="x"> 参数替换  ` 命令替换</span>
+<span class="x"> 使用一对单引号--strong quote</span>
+<span class="x"> 转义\  所有的都是用转义字符，可读性差</span>
+<span class="x">    例如：</span>
+<span class="x">    </span><span class="cp">##</span><span class="c">含有特殊变量的文本替换成对应的日期</span><span class="x"></span>
+<span class="x">    sed  &#39;s/</span><span class="p">$</span><span class="nv">example_version_yesterday</span><span class="x">/&#39;</span><span class="p">$</span><span class="nv">example_version_yesterday</span><span class="x">&#39;/g&#39;  /opt/coderevariable.txt</span>
+<span class="x">    sed  &quot;s/\</span><span class="p">$</span><span class="nv">example_version_yesterday</span><span class="x">/</span><span class="p">$</span><span class="nv">example_version_yesterday</span><span class="x">/g&quot;  /opt/coderevariable.txt</span>
+<span class="x"> 特殊字符</span>
+<span class="x">    \w</span>
+<span class="x">02.Shell搜索路径</span>
+<span class="x">内部命令和外部命令  type 区分</span>
+<span class="x">    type  time                      内部</span>
+<span class="x">       man builtin | grep time      查看说明</span>
+<span class="x">       help time</span>
+<span class="x">       help -s time                 查看使用语法</span>
+
+<span class="x">    type  date      外部</span>
+<span class="x">            查看外部搜索路径 echo  </span><span class="p">$</span><span class="nv">PATH</span><span class="x"></span>
+<span class="x">            /usr/local/sbin: /usr/local/bin:  </span>
+<span class="x">            /sbin:  /bin:</span>
+<span class="x">            /usr/sbin:  /usr/bin:</span>
+<span class="x">            /root/bin</span>
+<span class="x">03.Shell命令</span>
+<span class="x">history</span>
+<span class="x">    重用，而不是重新键入，调取历史命令，对命令进行修改，然后执行</span>
+<span class="x">    临时修改history的大小 set savelist=100</span>
+<span class="x">    永久修改 - export HISTSIZT=100</span>
+<span class="x">fc -l  fix command 修复命令</span>
+<span class="x">    fc -s pattern=replacement number</span>
+<span class="x">使用rm之前先ls 列举文件，然后使用修复命令  fc -c ls=rm</span>
+<span class="x">自动补全 completion</span>
+<span class="x">    tab 键一次</span>
+<span class="x">    tab 键两次</span>
+
+<span class="x">别名  </span>
+<span class="x">    alias</span>
+<span class="x">    临时挂起别名    \ls</span>
+<span class="x">    unlias</span>
+<span class="x">04.SHELL命令</span>
+<span class="x">初始化文件</span>
+<span class="x">登陆文件 .bash_profile  或者 .bash_login</span>
+<span class="x">环境文件 .bashrc</span>
+<span class="x">    .profile</span>
+<span class="x">注销文件</span>
+<span class="x">.bash_logout</span>
+
+<span class="x">点文件 --隐藏文件，通常被程序默默使用的配置文件</span>
+</pre></div>
+
+
+<h3>附录-参考</h3>
+<div class="highlight"><pre><span></span>&lt;Unix &amp; Linux大学教程&gt;
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -70,70 +70,126 @@
 
 
 <h3>Linux 中命令-date</h3>
-<div class="highlight"><pre><span></span><span class="mf">1.</span> <span class="err">语法：</span> <span class="n">date</span><span class="p">(</span><span class="err">选项</span><span class="p">)(</span><span class="err">参数</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">.</span> <span class="err">语法：</span> <span class="n">date</span><span class="p">(</span><span class="err">选项</span><span class="p">)(</span><span class="err">参数</span><span class="p">)</span>
     <span class="err">选项</span>
-        <span class="o">-</span><span class="n">d</span><span class="o">&lt;</span><span class="err">字符串</span><span class="o">&gt;</span><span class="err">显示字符串所指的日期与时间；</span> 
-        <span class="o">-</span><span class="n">s</span><span class="o">&lt;</span><span class="err">字符串</span><span class="o">&gt;</span><span class="err">：根据字符串来设置日期与时间；</span>
+        <span class="o">-</span><span class="n">d</span><span class="sr">&lt;字符串&gt;</span><span class="err">显示字符串所指的日期与时间；</span> 
+        <span class="o">-</span><span class="sr">s&lt;字符串&gt;</span><span class="err">：根据字符串来设置日期与时间；</span>
          <span class="o">-</span><span class="n">u</span><span class="err">：显示</span><span class="n">GMT</span><span class="err">；</span>
          <span class="o">--</span><span class="n">help</span><span class="err">：在线帮助；</span>
         <span class="o">--</span><span class="n">version</span><span class="err">：显示版本信息。</span> 
-    <span class="err">参数</span> <span class="o">&lt;+</span><span class="err">时间日期格式</span><span class="o">&gt;</span><span class="err">：指定显示时使用的日期时间格式。</span>
-
+    <span class="err">参数</span> <span class="sr">&lt;+时间日期格式&gt;</span><span class="err">：指定显示时使用的日期时间格式。</span>
+    <span class="n">date</span> <span class="err">是指</span> <span class="n">linux</span> <span class="err">下的</span> <span class="n">GNU</span> <span class="n">date</span>  
+<span class="err">变量命令：</span> <span class="err">所使用的目的</span>
+                    <span class="err">区分出日期的格式</span>
+                    <span class="err">区分出是获得日期还是时间戳</span><span class="n">mysql_v_today_s</span>
+<span class="n">today</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span><span class="p">)</span>
+<span class="n">yest</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;last-day $today&quot;</span> <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span><span class="p">)</span>
+<span class="n">week</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span><span class="s">&quot;$yest-$((`date -d $yest +%u`-1)) days&quot;</span> <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span><span class="p">)</span>
+<span class="n">today_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="nv">$today</span> <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+<span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="nv">$yest</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+<span class="n">week_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="nv">$week</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
     <span class="n">GNU</span> <span class="n">date</span> <span class="err">的日期加减运算是支持自然语言的</span>
     <span class="o">-</span><span class="n">d</span> <span class="err">主要有三种指令：</span>
-            <span class="n">last</span><span class="o">/</span><span class="n">next</span><span class="err">指令</span>  <span class="n">ago</span><span class="err">指令</span> <span class="err">负数指令</span>
-<span class="mf">2.</span><span class="err">时间格式变换</span>
+            <span class="k">last</span><span class="o">/</span><span class="k">next</span><span class="err">指令</span> 
+             <span class="n">ago</span><span class="err">指令</span> 
+            <span class="err">负数指令</span>
+<span class="mo">01</span><span class="o">.</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="nv">$yest</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+
+<span class="mo">02</span><span class="o">.</span><span class="err">时间戳变动</span><span class="o">-</span><span class="err">可以得到过去的日期：</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;1 hour ago $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;-1 hour ago $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+
+<span class="mo">03</span><span class="o">.</span><span class="err">前后顺序</span> <span class="err">以及</span> <span class="err">横杠加不加</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;last hour $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;last-hour $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;next hour $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;next-hour $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;$yest last hour &quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+
+<span class="n">date</span> <span class="err">里面时间的</span> <span class="o">+</span> <span class="o">-</span> <span class="err">注意格式会影响结果</span><span class="o">/</span><span class="err">时区（最安全的写法是不要带符号，用自然语言即可）</span>
+ <span class="err">注意最好用自然语言，别用</span> <span class="o">+</span><span class="mi">1</span> <span class="o">-</span><span class="mi">1</span> <span class="err">操作，</span>
+<span class="err">某些早期版本（如</span><span class="n">RedHat</span> <span class="mi">4</span><span class="n">U7</span><span class="err">）不支持可能造成错误结果，而且这种写法会和时区语法冲突，容易出问题</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;+ 1 hour $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+    <span class="n">yest_s</span><span class="o">=</span><span class="nv">$</span><span class="err">(</span><span class="nv">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;- 1 hour $yest&quot;</span>  <span class="o">+</span><span class="nv">%s000</span><span class="p">)</span>
+<span class="mi">2</span><span class="o">.</span><span class="err">时间格式变换</span>
     <span class="err">从时间戳变为日期格式</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="mi">@0</span>            <span class="c1">//当时间戳为0的时候，可以看到时间为 1970年08:00:00</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">@1498863660</span><span class="err">&#39;</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">@1498863660</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="mi">@1498863660</span>   <span class="o">+</span><span class="s">&quot;%Y-%m-%d %H:%M:%S&quot;</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="nv">@0</span>            <span class="sr">//</span><span class="err">当时间戳为</span><span class="mi">0</span><span class="err">的时候，可以看到时间为</span> <span class="mi">1970</span><span class="err">年</span><span class="mi">08</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&#39;@1498863660&#39;</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&#39;@1498863660&#39;</span> <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="nv">@1498863660</span>   <span class="o">+</span><span class="s">&quot;%Y-%m-%d %H:%M:%S&quot;</span>
     <span class="err">从时间戳变为日期</span>
-        <span class="n">shell</span><span class="err">将时间字符串与时间戳互转</span><span class="o">--+%</span><span class="n">s</span><span class="err">表示输出时间戳</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;$( date &quot;</span><span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span> <span class="o">%</span><span class="nl">H</span><span class="p">:</span><span class="o">%</span><span class="nl">M</span><span class="p">:</span><span class="o">%</span><span class="n">S</span><span class="s">&quot;)&quot;</span> <span class="o">+%</span><span class="n">s</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="n">last</span><span class="o">-</span><span class="n">day</span> <span class="o">+%</span><span class="n">s</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">2017</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mo">01</span> <span class="mi">22</span><span class="o">:</span><span class="mi">14</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">s</span>
+        <span class="n">shell</span><span class="err">将时间字符串与时间戳互转</span><span class="o">--+</span><span class="nv">%s</span><span class="err">表示输出时间戳</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;$( date &quot;</span><span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span> <span class="nv">%H:%M:%S</span><span class="s">&quot;)&quot;</span> <span class="o">+</span><span class="nv">%s</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="k">last</span><span class="o">-</span><span class="n">day</span> <span class="o">+</span><span class="nv">%s</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&#39;2017-07-01 22:14&#39;</span> <span class="o">+</span><span class="nv">%s</span>
     <span class="err">日期格式变换</span>
         <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;2017-07-01&quot;</span> <span class="o">+</span><span class="s">&quot;%Y/%m/%d %H:%M:%S&quot;</span>                   
-<span class="mf">3.</span><span class="err">今天日期</span><span class="o">--</span><span class="err">注意中间有空格</span>
-    <span class="cp">#对应昨天日期</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>   <span class="n">last</span><span class="o">-</span><span class="n">day</span>    <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="err">&#39;</span><span class="n">last</span> <span class="n">day</span><span class="err">&#39;</span>   <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
-    <span class="cp">#对应周的周一</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="err">&#39;</span><span class="n">last</span> <span class="n">monday</span><span class="err">&#39;</span> <span class="o">+</span><span class="s">&quot;%Y-%m-%d&quot;</span>
-        <span class="cp">#下周周一</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="err">&#39;</span><span class="n">next</span> <span class="n">monday</span><span class="err">&#39;</span> <span class="o">+</span><span class="s">&quot;%Y-%m-%d&quot;</span>
+<span class="mi">3</span><span class="o">.</span><span class="err">今天日期</span><span class="o">--</span><span class="err">注意中间有空格</span>
+    <span class="c1">#对应昨天日期</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>   <span class="k">last</span><span class="o">-</span><span class="n">day</span>    <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="s">&#39;last day&#39;</span>   <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span>
+    <span class="c1">#对应周的周一</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="s">&#39;last monday&#39;</span> <span class="o">+</span><span class="s">&quot;%Y-%m-%d&quot;</span>
+        <span class="c1">#下周周一</span>
+        <span class="n">date</span> <span class="o">-</span><span class="n">d</span>  <span class="s">&#39;next monday&#39;</span> <span class="o">+</span><span class="s">&quot;%Y-%m-%d&quot;</span>
         <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;last sunday&quot;</span> <span class="o">+</span><span class="s">&quot;%Y%m%d</span>
-        <span class="n">date</span> <span class="o">+%</span><span class="n">w</span>   <span class="err">#获得当天是星期几</span> 
-    <span class="err">#今天本日期对应的月初日期</span>   
-        <span class="n">date</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m01</span>
-        <span class="n">date</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-</span><span class="mo">01</span>
-    <span class="cp">#今天对应的上个月月初</span>
-        <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">1</span> <span class="n">month</span> <span class="n">ago</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m01</span>
-    <span class="cp">#本月月初</span>
-        <span class="n">v_lm</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m01</span><span class="err">`</span>
-    <span class="cp">#上个月月末</span>
-        <span class="n">v_lm_rq</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;${v_lm} last day&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="err">`</span>
-        <span class="n">echo</span> <span class="err">$</span><span class="p">{</span><span class="n">v_lm_rq</span><span class="p">}</span>
+<span class="s">        date +%w   #获得当天是星期几 </span>
+<span class="s">    #今天本日期对应的月初日期   </span>
+<span class="s">        date +%Y%m01</span>
+<span class="s">        date +%Y-%m-01</span>
+<span class="s">    #今天对应的上个月月初</span>
+<span class="s">        date -d &#39;1 month ago&#39; +%Y%m01</span>
+<span class="s">    #本月月初</span>
+<span class="s">        v_lm=`date +%Y%m01`</span>
+<span class="s">    #上个月月末</span>
+<span class="s">        v_lm_rq=`date -d &quot;</span><span class="nv">$</span><span class="p">{</span><span class="n">v_lm</span><span class="p">}</span> <span class="k">last</span> <span class="n">day</span><span class="s">&quot; +%Y%m%d`</span>
+<span class="s">        echo ${v_lm_rq}</span>
 
-<span class="mf">4.</span><span class="err">昨天</span><span class="o">-</span><span class="err">特定日期所对应的各个时间</span>
-                <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
-                <span class="n">yestD</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="err">`</span>
-                <span class="n">echo</span> <span class="err">$</span><span class="p">{</span><span class="n">yestD</span><span class="p">}</span>               
-    <span class="err">#昨天日期对应的月初日期</span>
-                <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="err">&#39;</span><span class="mi">1</span> <span class="n">day</span>  <span class="n">ago</span><span class="err">&#39;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-</span><span class="mo">01</span>
-    <span class="cp">#昨天日期的周一</span>
-        <span class="cp">#写法01.昨天日期</span>
-                <span class="n">v_yesterday</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="err">`</span>
-                <span class="cp">#昨天日期对应的周一的日期</span>
-                <span class="n">v_lm_week</span><span class="o">=</span><span class="err">`</span><span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;${v_yesterday} last monday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span><span class="err">`</span>
-                <span class="n">echo</span> <span class="err">$</span><span class="p">{</span><span class="n">v_lm_week</span><span class="p">}</span>
+<span class="s">4.昨天-特定日期所对应的各个时间</span>
+<span class="s">                date -d &quot;</span><span class="n">yesterday</span><span class="s">&quot; +%Y-%m-%d</span>
+<span class="s">                yestD=`date -d &quot;</span><span class="n">yesterday</span><span class="s">&quot; +%Y%m%d`</span>
+<span class="s">                echo ${yestD}               </span>
+<span class="s">    #昨天日期对应的月初日期</span>
+<span class="s">                date -d &#39;1 day  ago&#39; +%Y-%m-01</span>
+<span class="s">    #昨天日期的周一</span>
+<span class="s">        #写法01.昨天日期</span>
+<span class="s">                v_yesterday=`date -d &quot;</span><span class="n">yesterday</span><span class="s">&quot; +%Y%m%d`</span>
+<span class="s">                #昨天日期对应的周一的日期</span>
+<span class="s">                v_lm_week=`date -d &quot;</span><span class="nv">$</span><span class="p">{</span><span class="n">v_yesterday</span><span class="p">}</span> <span class="k">last</span> <span class="n">monday</span><span class="s">&quot; +%Y-%m-%d`</span>
+<span class="s">                echo ${v_lm_week}</span>
 
-        <span class="cp">#写法02.将当前日期赋值给DATE变量</span>
-                <span class="n">DATEA</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">date</span>  <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">%</span><span class="n">m</span><span class="o">%</span><span class="n">d</span><span class="p">)</span>
-                <span class="n">date</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;${DATEA} last monday&quot;</span> <span class="o">+%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span>
-        <span class="cp">#写法03</span>
-            <span class="cp">#date -d &quot; $(date  -d &quot;yesterday&quot; +%Y%m%d)  last monday&quot; +%Y-%m-%d</span>
+<span class="s">        #写法02.将当前日期赋值给DATE变量</span>
+<span class="s">                DATEA=$(date  -d &quot;</span><span class="n">yesterday</span><span class="s">&quot; +%Y%m%d)</span>
+<span class="s">                date -d &quot;</span><span class="nv">$</span><span class="p">{</span><span class="n">DATEA</span><span class="p">}</span> <span class="k">last</span> <span class="n">monday</span><span class="s">&quot; +%Y-%m-%d</span>
+<span class="s">        #写法03</span>
+<span class="s">            #date -d &quot;</span> <span class="nv">$</span><span class="err">(</span><span class="nv">date</span>  <span class="o">-</span><span class="n">d</span> <span class="s">&quot;yesterday&quot;</span> <span class="o">+</span><span class="nv">%Y%m%d</span><span class="p">)</span>  <span class="k">last</span> <span class="n">monday</span><span class="err">&quot;</span> <span class="o">+</span><span class="nv">%Y</span><span class="o">-</span><span class="nv">%m</span><span class="o">-</span><span class="nv">%d</span>
+</pre></div>
+
+
+<h3>Linux中和时间有关的</h3>
+<div class="highlight"><pre><span></span>Linux常驻内存
+        daemon  service
+linux定时任务crontab
+Linux下 ntp时间同步服务器
+</pre></div>
+
+
+<h3>时间</h3>
+<div class="highlight"><pre><span></span>时间段--时间点
+ 1. second  minute hour day month year      
+2. morning   noon   afternoon    evening   tonight   night
+3.week weekend Monday Tuesday  Wednesday Thursday Friday Saturday Sunday
+4.月份
+    January     Jan     February    Feb         March       Mar 
+    April       Apr     May             May         June            Jun 
+    July            Jul         August      Aug         September   Sep
+    October Oct     November    Nov     December    Dec
+5.季度和季节
+            anniversary  
+            spring  summer  autumn/fall  winter 
+ 6.年代世纪         
+            century  age  1980s
 </pre></div>
 
 

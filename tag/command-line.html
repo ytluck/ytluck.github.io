@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>ytluck—For you - command line</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-30.html">Linux环境下命令行的数据处理</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-11-24T20:04:00+08:00">
+                Published: 2017-11-24 20:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/command-line.html">command line</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Linux命令行中的数据处理，在进行数据处理之前，需要获得数据以及对数据进行必要的数据预处理。
+</pre></div>
+
+
+<h3>Linux中对数据的清洗</h3>
+<div class="highlight"><pre><span></span>类型--纯文本的数据清洗以及原始数据的提取等
+01.行列的处理
+    行过滤 
+    列分割 列合并 列抽取 
+    单词提取    值替换  缺失数据处理
+02.数据格式转换
+        csv  json xml等
+</pre></div>
+
+
+<h4>01.查看类型</h4>
+<div class="highlight"><pre><span></span>显示--显示文档和目录，显示文档内容，显示变量，
+显示进程，显示资源
+   显示目录和文档
+        pwd() ls()  tree()
+  显示文档内容
+     分页显示-- less more  head  tail  grep
+     全部显示-- cat
+  显示变量
+     显示变量--echo  print  type  env
+  显示资源
+    who  hostname  data   cal
+  显示进程
+     ps()    pstree()
+  显示网络
+    ifconfig   netstat
+</pre></div>
+
+
+<h4>02.查找--遍历 搜索</h4>
+<div class="highlight"><pre><span></span>&lt;索引技术-名称-位置-模式-关系&gt;
+    whereis
+    find  locate
+    which
+ls  /home | wc -l
+find  /usr  -name ascii
+</pre></div>
+
+
+<h4>03.数据化处理-- 管道-正则表达式-shell脚本--命令风格</h4>
+<div class="highlight"><pre><span></span>常见操作
+    00.数据来源
+        下载 
+        解压  unzip  tar
+    01.查看-查找--动作
+        定位
+        whereis
+        find  /  -name  yt
+        find /   -type  
+        过滤--筛选--抽取  cut
+        删除--替换
+            tr
+            sed
+        排序 sort
+        连接--拼接--分割-分列
+       文件 split
+            fieldsplit
+            paste
+        创建---移动--清除 -- 
+            创建  mkdir
+            移动和改变 cd  mv  cp  chmod
+            清除  rm   rmdir  kill
+        对比： cmp  comm   diff   sdiff
+    02.汇总-- wc     &lt;Word Count) line  word character&gt;
+    03. 删除重复值  查找重复值
+          uniq
+</pre></div>
+
+
+<h4>04.CSV格式文件处理</h4>
+<div class="highlight"><pre><span></span>csvcut--  从CSV 数据中抽取列
+csvgrep 过滤表格数据
+csvlook         csvstat
+csvsort  对CSV文件排序
+csvsql          csvstack  行堆积               csvjoin
+header
+日期 dseq         数字 seq
+</pre></div>
+
+
+<h4>05.数据格式变换：</h4>
+<div class="highlight"><pre><span></span>格式转换
+    xml2json
+    json2csv
+设置--
+    export   git   ssh    sudo
+</pre></div>
+
+
+<h3>文字和文本处理</h3>
+<div class="highlight"><pre><span></span>01.文字处理软件
+        01.所见即所得：OpenOffice
+        02.Latex编辑器
+02.文本编辑器--三种类型  
+        01.Gedit
+        02.Vim Emacs   交互式文本编辑器
+        03.sed awk         非交互式上下文编辑器
+                                优势：提前涉及命令，将命令发送给程序，程序自动执行
+                                不足：缺乏相对地址(由于操作是每次一行的)，和缺乏对命令如期运行的立即验证
+    其他：markdown-- MarkdownPad
+Linux上文本处理三大剑客
+    1 grep：文本过滤(模式：pattern)工具; *（grep, egrep, fgrep）
+    2 sed：stream editor，文本编辑工具；
+    3 awk：Linux上的实现gawk，文本报告生成器；
+在不同平台上的shell脚本，在Windows下的编辑脚本，文件的是DOS文件格式，在Linux下执行
+需要（替换原始文件或者不替换原始文件，产生新的文件）
+    01.替换Tab键
+    02.文件格式从DOS转换为Unix
+</pre></div>
+
+
+<h4>01.替换Tab键</h4>
+<div class="highlight"><pre><span></span>在Windows平台--替换  先按Tab键，出来一个，然后复制或者剪切
+                                            ctr+R  替换 为空格
+在Linux平台下
+            方式一：交互式编辑
+                    TAB替换为空格：
+                    vim  dos.txt  
+                    进入编辑模式 -(按下 &#39;a  A    O  o    I  i&#39;  )
+                            :set ts=4
+                            :set expandtab
+                            :%retab!
+            方式二：非交互式编辑--不替换原始文件，产生新的文件
+                将linux文件中的tab更换为空格的三种方法
+                    1,用sed命令
+                    sed &#39;s/\t/ /g&#39; filename &gt;filename1
+                    2,  用tr命令
+                    cat filename|tr  &quot;\t&quot; &quot; &quot; &gt;filename2
+                    3,用col -x命令
+                    cat filename|col -x &gt;filename2
+                确认方式：统计文件的字符 wc -l filename
+</pre></div>
+
+
+<h4>02.将文件格式从DOS转换为Unix</h4>
+<div class="highlight"><pre><span></span>方式一：交互式编辑--使用Vim
+      vim  dos.txt    
+     进入编辑模式-- (按下 &#39;a  A    O  o    I  i&#39;  )
+    :set fileformat=unix
+    :w 
+   查看确认：    
+    :set ff  ?　     　可以看到dos或unix的字样.
+    :q  
+  注释：01.回退到一般模式  按下Esc键
+                命令行模式  :  ? /
+            02.离开 :q    强制离开:q!
+               保存 :w
+               保存离开 :wq 
+方式二：非交互式编辑              
+    可以用sed 这样的工具来做:
+　　sed &#39;s/^M//&#39;  filename &gt; tmp_filename
+　　其中^M是同时Ctrl+V+M按出来的，表示回车。
+   方法二
+      sed &#39;s/.$//&#39;  filename &gt; tmp_filename
+</pre></div>
+
+
+<h4>查看---</h4>
+<div class="highlight"><pre><span></span><span class="x">  分屏查看：less tail head  grep</span>
+<span class="x">  全部查看：cat</span>
+<span class="x">    echo &#39;realtion&#39; &gt;   ~/testrelation.txt</span>
+<span class="x">    echo &#39;</span><span class="p">$</span><span class="nv">example_data</span><span class="x">&#39;,  </span><span class="p">$</span><span class="nv">example_data</span><span class="x">   &gt;&gt; ~/testrelation.txt</span>
+</pre></div>
+
+
+<h4>编辑器：</h4>
+<div class="highlight"><pre><span></span><span class="x">    交互式编辑器  : Vim    Emacs  gedit</span>
+<span class="x">    非交互式编辑器:    sed    awk</span>
+<span class="x">01.sed --新增--删除--替换&lt;整行替换和部分替换&gt;</span>
+<span class="x">  </span><span class="err">#</span><span class="x">!/bin/bash</span>
+<span class="x">--简单变量的替换</span>
+<span class="x">sed -i &quot;[/address|pattern/]s/serach/replace/g&quot; </span>
+<span class="x">    其中address 是输入流的一个或者多行的地址</span>
+<span class="x">      pattern是一个字符串</span>
+<span class="x">      search 是正则表达式-搜索文本</span>
+<span class="x">      replace是替换文本</span>
+<span class="x"> 在这个替换中，注意事项有三点</span>
+<span class="x">    01.属于非交互式编辑还是交互式</span>
+<span class="x">    02.改变原文件和不改变原文件</span>
+<span class="x">    03.最外面的命令是单引号还是双引号</span>
+<span class="x">    04.特殊字符的处理以及对结果的验证</span>
+<span class="x">    sed  -e &#39;s/</span><span class="p">$</span><span class="nv">terday</span><span class="x">/&#39;</span><span class="p">$</span><span class="nv">terday</span><span class="x">&#39;/g&#39;  \</span>
+<span class="x">         -e &#39;s/today_s/&#39;today_s&#39;/g&#39;  \</span>
+<span class="x">        -e &#39;s/</span><span class="p">$</span><span class="nv">lastday</span><span class="x">/&#39;</span><span class="p">$</span><span class="nv">lastday</span><span class="x">&#39;/g&#39;  /example/test/amp.sh  &gt; /example/test/amp.sql</span>
+<span class="x">  使用-i选项可以直接在原文件进行修改，</span>
+<span class="x">    系统会将sed原本输出到屏幕的内容输出到一个以sed开头的临时文件，</span>
+<span class="x">    处理完毕后他会将这个临时文件替换原本的文件，如果运行的时候出现错误，这个临时文件就不会被删除，一直留在那里</span>
+<span class="x">    </span><span class="err">#</span><span class="x">变量定义</span>
+<span class="x">    example_data=</span><span class="p">$(</span><span class="err">date</span> <span class="err">+%Y-%m-%d</span><span class="p">)</span><span class="x"></span>
+<span class="x">    --简单变量的替换</span>
+<span class="x">    sed -i &quot;s/原字符串/新字符串/g&quot;    </span>
+<span class="x">    sed  &#39;s/insert / --insert /g&#39;  example.sh</span>
+<span class="x">    sed  &#39;s/use / example_data /g&#39;  example-2.sh</span>
+<span class="x">    -- 替换成对应的日期</span>
+<span class="x">    sed  &#39;s/use / &#39;example_data&#39; /g&#39;  example-2.sh</span>
+<span class="x">    </span><span class="cp">##</span><span class="x"></span>
+<span class="x">    sed  &#39;s/ example_data / use /g&#39;  example-2.sh</span>
+<span class="x">    </span><span class="cp">##</span><span class="c">特殊对特殊</span><span class="x"></span>
+<span class="x">    </span><span class="cp">##</span><span class="c">--sed单引号--变量不带单引号的</span><span class="x"></span>
+<span class="x">    sed  &#39;s/ &#39;\example_data&#39; / &#39;example_data&#39; /g&#39;  example-2.sh</span>
+<span class="x">    </span><span class="cp">##</span><span class="c">sed带单双引号的  --变量带有单双引号的</span><span class="x"></span>
+<span class="x">    sed  &quot;s/ \\&#39;example_data\\&#39; / &#39;example_data&#39; /g&quot;  example.sh</span>
+<span class="x">    sed  &#39;s/ &quot;example_data&quot; / &#39;example_data&#39; /g&#39;  /root/example-2.sh</span>
+<span class="x">  查看</span>
+<span class="x">  nl /etc/passwd | sed &#39;12,15d&#39;</span>
+<span class="x">    nl /etc/passwd | sed &#39;12,17p&#39;</span>
+<span class="x">    nl /etc/passwd | sed -n  &#39;12,17p&#39;</span>
+<span class="x">02.awk--动作以单引号括住</span>
+<span class="x">    去重</span>
+<span class="x"> awk &#39;!a[</span><span class="p">$</span><span class="x">0]++</span><span class="err">{</span><span class="x">print </span><span class="p">$</span><span class="x">0}&#39; file1</span>
+<span class="x"> 解释说明：</span>
+<span class="x">这个是经典的去重的写法，如果</span><span class="p">$</span><span class="x">0是第一次出现的话，a[</span><span class="p">$</span><span class="x">0]的结果为0，!的结果是1，</span>
+<span class="x">在进行++操作的话a[</span><span class="p">$</span><span class="x">0]结果就变称了1,从而进行输出。但是如果不是第一次的话，a[</span><span class="p">$</span><span class="x">0]的结果不是1，</span>
+<span class="x">取反的话就是0，0++的结果就还是0，所以就不会进行输出。</span>
+<span class="x">这里的去除重复行 并不是真正的删除重复行而是 利用unix shell 管道 对重复行的不进行重定向输出</span>
+<span class="x">--查看</span>
+<span class="x"> last -n 5 |awk &#39;</span><span class="err">{</span><span class="x">print </span><span class="p">$</span><span class="x">1&quot;\t &quot;</span><span class="p">$</span><span class="x">3 &quot;\t &quot; NR &quot;\t&quot; NF}&#39;</span>
+<span class="x"> last -n 5 |awk &#39;</span><span class="err">{</span><span class="x">print </span><span class="p">$</span><span class="x">1&quot;\t &quot;</span><span class="p">$</span><span class="x">3 &quot;\t &quot; NR &quot;\t&quot; NF &quot;\t&quot; FS }&#39;</span>
+<span class="x">03.grep</span>
+<span class="x">    grep -i</span>
+<span class="x">    grep -E</span>
+<span class="x">     dmesg  | grep --color=auto &#39;IP&#39;</span>
+<span class="x">     ls -F /etc | grep  &quot;/&quot;</span>
+<span class="x">     grep &#39;yt&#39; /etc/passwd</span>
+</pre></div>
+
+
+<h4>帮助系统--自文档化</h4>
+<div class="highlight"><pre><span></span>文档化  man
+       info
+    交互式命令行
+    可重复命令行
+</pre></div>
+
+
+<h4>Linux命令行处理数据</h4>
+<div class="highlight"><pre><span></span>    01.做一件事情，并把这件事情做好--各种小工具
+    各家所长融为一体--流程的力量
+            管道-重定向
+    多种方式完成一种任务，随着经验的增加，可以意识到什么时候使用什么工具，
+                                以及如何把任务分解，并和当前的工具结合
+    02.创建可重用的命令行工具  变为shell脚本 或者参数化
+        使用python或者R语言等  泛化 重组
+    03.保留所有事情的记录是值得的，因为它不但让你的生活变得简单，而且还会使你开始以
+步骤的形式思考数据的工作流，经过一段时间的累计，你可以变得更加高效以及有条理
+</pre></div>
+
+
+<h3>附录：</h3>
+<div class="highlight"><pre><span></span>cat  concatenate  
+cp          复制
+scp     安全复制
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

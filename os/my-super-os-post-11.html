@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Linux主机与终端</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-11.html" rel="bookmark"
+           title="Permalink to Linux主机与终端">Linux主机与终端</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-11-19T21:35:00+08:00">
+                Published: 2017-11-19 21:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>主机和终端模式，是界面和处理单元分离。主机负责将键入的内容显示出来，即主机将字符回显在屏幕上。
+Host Console Terminal
+</pre></div>
+
+
+<h3>主机</h3>
+<div class="highlight"><pre><span></span>主机的状态：
+    0   关机
+    1   单用户模式
+    3   多用户模式 CLI
+    5   多用户模式 GUI
+其余2和4模式在日常使用中不常见
+    dmsg显示启动消息
+</pre></div>
+
+
+<h3>终端--终端方式及其使用和管理</h3>
+<div class="highlight"><pre><span></span><span class="x">查看终端类型： </span><span class="p">$</span><span class="nv">TERM</span><span class="x"></span>
+<span class="x">查看终端名称： stty -a</span>
+<span class="x">终端的特性：</span>
+<span class="x">    intr 信号</span>
+<span class="x">    ^C          符号解释：^ 表示 Ctrl 那个按键</span>
+<span class="x">    键盘映射</span>
+<span class="x">        stty 可以控制一些具有特殊控制功能的键</span>
+<span class="x">查看终端描述：</span>
+<span class="x"> 终端数据库</span>
+<span class="x">  cd /usr/share/terminfo  下有很多终端设备，对应的首字母</span>
+<span class="x">   列如查看xtern </span>
+<span class="x">        cd /user/share/terminfo/x</span>
+<span class="x">        infocmp xterm | less</span>
+<span class="x">    描述文件位置</span>
+<span class="x">       /usr/share/terminfo/</span>
+<span class="x">    相关程序：</span>
+<span class="x">      Termcap</span>
+<span class="x">      ncurses--  对应的命令  infocmp</span>
+
+<span class="x">终端类型</span>
+<span class="x">    1.硬件终端</span>
+<span class="x">        VT100  VT220 TeletypeABR33</span>
+<span class="x">     仿真硬件终端</span>
+<span class="x">         character terminal</span>
+<span class="x">         graphic  terminal</span>
+<span class="x">    2.内置终端</span>
+<span class="x">      远程终端 常用Internet将终端连接到主机上。</span>
+<span class="x">说明</span>
+<span class="x">    xshell  是终端模拟器</span>
+<span class="x">    stty(set tty，设置tty)命令用于检查和修改当前注册的终端的通信参数</span>
+<span class="x">    xterm 终端仿真程序 Terminal Emulator for  the X window Systerm</span>
+</pre></div>
+
+
+<h3>图形界面系统</h3>
+<div class="highlight"><pre><span></span>01.硬件
+
+02.内核以及驱动
+
+03.X Window System
+    X Server
+    X Client
+04.X Window Manage
+    twm  mwm olwm
+    motif-------CDE       (Unix)
+    KWM---------KDE       (Linux)
+    Netacity----Gnome     (Linux)
+
+05.Desktop Environment
+    CDE
+    KDE
+    GNOME
+06.应用程序
+界面
+CLI
+GUI
+</pre></div>
+
+
+<h3>概念</h3>
+<div class="highlight"><pre><span></span>终端控制台
+普通终端 终端窗口  
+虚拟控制台
+    7个虚拟控制台
+        6个 CLI  Ctrl+Alt+F1~F6
+        1个 GUI
+Console  Terminal
+显示物理设备的伪文件
+    /dev/tty
+    /dev/tty1 dev/tty2 …… dev/tty6
+    /dev/pts
+终端命令方式有两种
+    dev/ttp1
+    dev/pts/1
+  无终端的 路由器等
+  一些操作只能通过控制台，而不能通过远程终端
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

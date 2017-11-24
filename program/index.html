@@ -26,7 +26,228 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-29.html">不同语言中类中方法的定义</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-32.html">正则表达式初步总结</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-11-24T23:20:00+08:00">
+                Published: 2017-11-24 23:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h4>表达式的构造细节</h4>
+<div class="highlight"><pre><span></span>特殊字符
+具体文本
+解释顺序-                       
+针对的对象(什么工具软件)
+</pre></div>
+
+
+<h4>正则表达式字符构成</h4>
+<div class="highlight"><pre><span></span>match 匹配
+    metacharacter           元字符
+    normal text character    解释正则表达式按照字符来理解
+                接下来是and then
+    character set           字符组
+    alternative             多选分支 --自身可以是完整的正则表达式
+</pre></div>
+
+
+<h4>位置：anchor 锚定</h4>
+<div class="highlight"><pre><span></span>行开头      ^
+行结尾     $
+字符开头        \&lt;       并不是所有语言支持，注意
+字符结尾        \&gt;  
+            \b
+( )         使用括号来划定多选结构的范围，以及限制多选分支;分组 ；捕获文本
+</pre></div>
+
+
+<h4>数量</h4>
+<div class="highlight"><pre><span></span>quantifiers 量词
+    ?               0或1个
+    *               0或多个
+    +               1或多个
+interval quantifier 区间量词
+    {n}             =n
+    {n,m}           n&lt;=   &lt;=m
+    {n,}            &gt;=n
+    {,m}            &lt;=m
+</pre></div>
+
+
+<h4>字符</h4>
+<div class="highlight"><pre><span></span>.                               任意字符
+排序-预定义字符类
+大小写                     是够忽略大小写 egrep -i 参数 忽略大小写
+</pre></div>
+
+
+<h4>字符组</h4>
+<div class="highlight"><pre><span></span>[ ]                             字符组
+[^ ]                            排除型字符组 匹配一个未列出的字符
+[a-z] [A-Z] [A-Za-z]
+[0-9] 
+[A-Za-z0-9]
+</pre></div>
+
+
+<h4>字符组和字符</h4>
+<div class="highlight"><pre><span></span>[ - ]                   字符组元字符，必须在字符组中，且位于字符中间
+. ?                     在字符组中是普通字符  
+内外有别
+</pre></div>
+
+
+<h4>转义字符</h4>
+<div class="highlight"><pre><span></span>      \             backslash 反斜线-- escape 转义符
+</pre></div>
+
+
+<h4>其他概念</h4>
+<div class="highlight"><pre><span></span>backreference   反向引用      特殊元字符序列  \1
+正则表达式的解读方式
+</pre></div>
+
+
+<h4>Linux上的命令</h4>
+<div class="highlight"><pre><span></span>基础正则表达式
+        Basic Regular Expression，具有更加严谨的字符串表示方式，其典型辅助程序命令为gre
+扩展正则表达式
+        Extend Regular Expression，具有更加广泛和简便的使用模式，其典型辅助程序命令为egrep。
+</pre></div>
+
+
+<h4>Flavor 流派-了解技术渊源</h4>
+<div class="highlight"><pre><span></span>1.支持的元字符和这些元字符的意义
+2.与宿主语言的交互方式
+3.正则表达式的引擎，以及如何应用到文本
+            所使用的引擎的类型，决定了引擎能够支持的特性以及这些特性的用途
+
+历史
+    正则集合--正则表达式--正则表达式编译器
+    正则表达式--词法分析
+        编译原理--语言和文法、词法分析、语法分析、语法制导翻译、中间代码生成、存储管理、代码优化和目标代码生成
+            程序设计语言的本质
+    Henry Spencer 正则表达式包
+POSIX
+    locale -- 让程序变得国际化
+        Basic Regular Expressions
+        Extended Regular Expressions
+</pre></div>
+
+
+<h4>正则表达式的处理方式：</h4>
+<div class="highlight"><pre><span></span><span class="err">集成式</span>
+            <span class="n">perl</span> <span class="err">的集成式</span>
+                <span class="o">=~</span> <span class="n">m</span><span class="o">/^</span><span class="n">Subject</span><span class="p">:(</span><span class="o">.*</span><span class="p">)</span><span class="o">/</span><span class="n">i</span>
+<span class="err">程序式</span>
+<span class="err">面向对象式</span>
+        <span class="err">由构造函数及其方法提供</span>
+    <span class="err">例如</span><span class="n">java</span><span class="err">包提供两个类</span><span class="o">-</span><span class="n">Pattern</span><span class="err">和</span><span class="n">Matcher</span>
+         <span class="kn">import</span> <span class="nn">java.util.regex.</span><span class="o">*</span><span class="p">;</span>
+         <span class="n">Pattern</span> <span class="n">r</span> <span class="o">=</span> <span class="n">Pattern</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">Pattern</span><span class="o">.</span><span class="n">CASE_INSENSTIVE</span><span class="p">);</span>
+         <span class="n">Matcher</span> <span class="n">m</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">matcher</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+
+<span class="err">函数式</span>
+        <span class="err">由普通函数提供</span>
+</pre></div>
+
+
+<h4>正则表达式原理</h4>
+<div class="highlight"><pre><span></span>Finite Automation
+    当前状态读入一个字符后，和后继状态的转换- (状态-字母表 输入字符-初态集--状态转移矩阵-终态集 )
+            后继状态为自身
+            后继状态只有一个
+            后继状态有多个
+        如果每次转换后继状态唯一，则 Deterministic            DFA
+                                                 反之则 Nondeterministic       NFA
+                                                    NFA 有若干初始状态，允许接受字 ，多值映射
+DFA- 文本主导       text-directed           确定性有穷自动机
+     DFA对于文本串里的每一个字符只需扫描一次，比较快，但特性较少
+    最长的左子正则式优先匹配成功”
+
+NFA- 表达式主导  regex-directed      非确定性有穷自动机
+        速度慢，但是特性丰富
+        支持lazy和backreference等特性
+        最左子正则式优先匹配成功，因此偶尔会错过最佳匹配结果
+</pre></div>
+
+
+<h4>引擎分类的具体语言</h4>
+<div class="highlight"><pre><span></span>DFA
+        awk egrep   MySQL
+NFA--传统型
+        Java、Python 、Perl 、PHP 、
+        GNU Emacs 、vi、
+        grep  、sed 、
+NFA--POSIX型
+    混合
+        GNU awk、GNU grep/egrep
+</pre></div>
+
+
+<h4>编辑文本的正则表达式</h4>
+<div class="highlight"><pre><span></span>01.UltraEdit 
+        UltraEdit的正则表达式
+         删除多余空行。
+            删除空行:   替换  %[ ^t]++^p  为 空串
+            删除行尾空格: 替换  [ ^t]+$     为 空串 
+            删除行首空格: 替换  %[ ^t]+     为 空串
+    UltraEdit 
+        perl的正则表达式
+        1.非某个字符开头的全部替换为空--perl
+            ^(?!create table).*$
+            ^(?!create table).*$
+            ^是字符串开头，(?!   )  是否定环视，意思是后面不是……
+        2.例如
+        ^(?!drop|--).*$
+        3.多个连续的空格替换成一个空格
+            [ ]+
+02.Editplus
+    ^Nov.*$
+    空白行
+        ^[ \t]*\n   ^[ \t]*\n是一行空白行的正则表达式，多次点击全部替换
+</pre></div>
+
+
+<h4>附录：</h4>
+<div class="highlight"><pre><span></span>1.框架性知识和具体知识
+    框架性知识：系统的学习和阅读
+    具体知识：    实践积累
+2.表达式的基本模型和解决问题的基本思路
+以可能未曾想过的方式解决问题
+3. 支持正则表达式
+操作系统
+文本编辑工具
+主流编程语言
+4. 学习过程
+    照猫画虎--融会贯通
+5.比较异同
+    正则表达式 regular expression
+    通配符  wildcards
+</pre></div>
+
+
+<h4>参考</h4>
+<div class="highlight"><pre><span></span>《鸟哥的私房菜》
+《精通正则表达式》
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-29.html" rel="bookmark"
+                           title="Permalink to 不同语言中类中方法的定义">不同语言中类中方法的定义</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-06-03T20:45:00+08:00">
                 Published: 2017-06-03 20:45:00
@@ -37,153 +258,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/scala.html">Scala</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>本文主要学习了Python-Java-Scala中的类的不同方法以及包导入机制的一些内容
-</pre></div>
-
-
-<h2>一.不同语言中的方法</h2>
-<h3>在Python中的方法</h3>
-<div class="highlight"><pre><span></span>01.实例方法 ---的第一个参数必须是”self
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-    def printInstanceInfo(self):
-        print &quot;%s is %d years old&quot; %(self.name, self.age)
-
-02.静态方法  -----没有参数限制，既不需要实例参数，也不需要类参数，定义的时候使用@staticmethod装饰器
-@staticmethod
-def printClassAttr():
-    print Student.count
-    print Student.books
-
-03.类方法 -----=以cls作为第一个参数，cls表示类本身，定义时使用@classmethod装饰器。通过cls可以访问类的相关属性
-@classmethod
-def printClassInfo(cls):
-    print cls.__name__
-    print dir(cls)
-参数
-    主要区别在于参数，
-    静态方法没有参数限制，既不需要实例参数，也不需要类参数
-使用
-    实例方法被绑定到一个实例，只能通过实例进行调用；
-    但是对于静态方法和类方法，可以通过类名和实例两种方式进行调用。
-</pre></div>
-
-
-<h4>访问控制</h4>
-<div class="highlight"><pre><span></span>访问控制
-Python中没有访问控制的关键字，例如private、protected等等。但是，在Python编码中，有一些约定来进行访问控制。
-单下划线”_”
-    在Python中，通过单下划线”_”来实现模块级别的私有化，一般约定以单下划线”_”开头的变量、函数为模块私有的
-
-双下划线”__”
-</pre></div>
-
-
-<h3>Java中的类方法</h3>
-<div class="highlight"><pre><span></span>    Java 实例方法属于每个对象个体的方法
-    Java中类变量也叫静态变量，也就是在变量前加了static 的变量
-
-    调用--import
-        类名.静态方法名
-        new一个实例，然后实例调用方法
-        继承的方法--直接调用
-        模块名.函数名()
-</pre></div>
-
-
-<h3>scala--中的类</h3>
-<div class="highlight"><pre><span></span>    <span class="kn">import</span> <span class="nn">a_trait</span>
-    <span class="n">extends</span> <span class="n">a_trait</span><span class="o">--</span><span class="err">直接用</span>
-    <span class="nb">apply</span><span class="o">---</span><span class="err">不用</span><span class="n">new</span><span class="err">一个对象，在构造样本类的对象时，可以略去</span><span class="n">new</span><span class="err">关键字，言简意赅，提高了代码的表达力。</span>
-    <span class="n">package</span> <span class="nb">object</span><span class="o">--</span><span class="err">对于包对象，</span><span class="n">import</span><span class="err">之后直接用</span>
-
-
-     <span class="err">包对象可以持有函数和变量</span><span class="o">--</span> <span class="err">引入语句可以出现在任何位置，不限于文件顶部</span>
-     <span class="n">scala</span> <span class="n">import</span><span class="err">引入语句可以引入包、类和对象</span>
-
-     <span class="err">引入包</span><span class="o">.</span><span class="n">_</span> 
-            <span class="err">包下的样例类直接调用，样例类</span><span class="o">--</span><span class="err">样例类有参数</span>
-            <span class="kn">import</span> <span class="nn">org.apache.spark.sql.execution.command._</span>
-             <span class="n">DescribeFunctionCommand</span><span class="p">(</span><span class="n">functionName</span><span class="p">,</span> <span class="n">EXTENDED</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span>
-</pre></div>
-
-
-<h2>二.管理大型程序中的名称--包</h2>
-<h3>Java的包管理</h3>
-<div class="highlight"><pre><span></span><span class="err">包管理机制</span><span class="o">-</span>
-    <span class="err">分层管理</span>
-            <span class="err">不同的包</span>
-            <span class="err">同一个包，不同的主类中</span>
-            <span class="err">同一个主类，不同的的类，接口</span>
-            <span class="err">一个类中</span><span class="o">-----------------------</span><span class="err">内部类</span>
-
-<span class="err">复用类</span><span class="o">--</span><span class="err">类的调用</span>
-        <span class="err">利用现有类型生成新的类型</span><span class="o">--</span><span class="err">代码复用机制</span>
-                <span class="err">组合</span><span class="o">--</span>
-                <span class="err">继承</span><span class="o">--</span>
-                <span class="err">实现</span><span class="o">--</span>    
-    <span class="err">组合</span>
-            <span class="err">首先：</span><span class="kn">import</span>
-            <span class="err">其次：</span>
-    <span class="err">继承</span>
-        <span class="n">extends</span>
-    <span class="err">实现</span>
-        <span class="n">implements</span>
-        <span class="err">一个</span><span class="n">java</span><span class="err">主类中引用另一个类的方法</span>
-                <span class="err">类</span><span class="o">--</span><span class="err">静态类</span>
-<span class="err">类说明</span><span class="o">--</span><span class="err">静态变量和静态方法都属于静态对象</span>
-    <span class="err">静态变量的使用</span><span class="o">--</span><span class="n">static</span> 
-            <span class="kn">import</span> <span class="err">类</span> <span class="o">&lt;</span><span class="err">不同包或者类</span><span class="o">&gt;</span>
-            <span class="err">直接用</span> <span class="err">类名</span><span class="o">.</span><span class="err">静态方法名</span>  <span class="err">或者</span>  <span class="err">类名</span><span class="o">.</span><span class="err">静态变量名就可引用</span>
-            <span class="err">不用使用</span><span class="n">new</span><span class="err">一个实例，然后实例调用方法或者变量</span>
-        <span class="err">域</span>
-        <span class="err">方法</span>
-</pre></div>
-
-
-<h3>Scala的包管理</h3>
-<div class="highlight"><pre><span></span>&lt;1&gt;
-- Scala的单例对象Scala不能定义静态成员,而是代之定义单例对象(singleton object)。以object关键字定义
-
-包可以包含类、对象和特质，但不能包含函数或变量的定义。
-    很不幸，这是Java虚拟机的局限。把工具函数或常量添加到包而不是某个Utils对象，这是更加合理的做法。
-包对象的出现正是为了解决这个局限。每个包都可以有一个包对象。你需要在父包中定义它，且名称与子包一样
-</pre></div>
-
-
-<h3>Python模块及包的导入</h3>
-<div class="highlight"><pre><span></span><span class="n">Python</span><span class="err">的包管理</span>
-<span class="err">包下载</span>    <span class="n">pip</span>  <span class="n">install</span>
-
-<span class="err">导入：</span>
-        <span class="kn">from</span> <span class="o">+</span> <span class="n">import</span><span class="err">来导入包中的部分模块</span>
-        <span class="err">整体模块导入</span>
-        <span class="err">包导入</span>
- <span class="kn">import</span> <span class="err">语句导入的模块共有以下四类</span><span class="p">:</span> 
-                    <span class="err">•使用</span><span class="n">Python</span><span class="err">写的程序</span><span class="p">(</span> <span class="o">.</span><span class="n">py</span><span class="err">文件</span><span class="p">)</span>
-                    <span class="err">•</span><span class="n">C</span><span class="err">或</span><span class="n">C</span><span class="o">++</span><span class="err">扩展</span><span class="p">(</span><span class="err">已编译为共享库或</span><span class="n">DLL</span><span class="err">文件</span><span class="p">)</span>
-                    <span class="err">•包</span><span class="p">(</span><span class="err">包含多个模块</span><span class="p">)</span>
-                    <span class="err">•内建模块</span><span class="p">(</span><span class="err">使用</span><span class="n">C</span><span class="err">编写并已链接到</span><span class="n">Python</span><span class="err">解释器内</span><span class="p">)</span>
-<span class="n">Python</span><span class="err">的包搜索路径</span>    
-            <span class="n">Python</span><span class="err">会在以下路径中搜索它想要寻找的模块：</span>
-            <span class="mf">1.</span> <span class="err">程序所在的文件夹</span>
-            <span class="mf">2.</span> <span class="err">标准库的安装路径</span>
-            <span class="mf">3.</span> <span class="err">操作系统环境变量</span><span class="n">PYTHONPATH</span><span class="err">所包含的路径</span>
-</pre></div>
-
-
-<p>参考：
-         python模块及包的导入 http://blog.csdn.net/zyz511919766/article/details/22678143</p>
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>Scala学习(七)---包和引入 http://www.cnblogs.com/sunddenly/p/4436897.html
-Scala样本类  http://www.jianshu.com/p/c374599ed0c4
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Python-Java-Scala包导入机制和类中方法的定义</p>
+                <a class="readmore" href="/program/my-program-post-29.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
