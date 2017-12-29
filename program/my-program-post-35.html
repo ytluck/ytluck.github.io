@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>不同语言的命令行参数</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-35.html" rel="bookmark"
+           title="Permalink to 不同语言的命令行参数">不同语言的命令行参数</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T23:00:00+08:00">
+                Published: 2017-12-24 23:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>在批量运行脚本时，需要对脚本添加一些参数，针对这些参数，不同的计算给出了不同的方式。
+总结SHELL脚本，Python的参数解析，R语言的批量运行方式以及脚本的参数。
+命令行参数的形式
+命令行参数的风格
+</pre></div>
+
+
+<h4>Shell脚本的方式</h4>
+<div class="highlight"><pre><span></span><span class="x">1.shell脚本执行方式：exec（exec script.sh）、source（source script.sh）、fork（./script.sh）</span>
+<span class="x">2.传递参数方式</span>
+<span class="x">    bash中，可以用以下三种方式来处理命令行参数，每种方式都有自己的应用场景。</span>
+<span class="x">        01.直接处理，依次对</span><span class="p">$</span><span class="x">1,</span><span class="p">$</span><span class="x">2,...,</span><span class="p">$</span><span class="nv">n</span><span class="x">进行解析，分别手工处理；</span>
+<span class="x">        02.getopts来处理，单个字符选项的情况（如：-n 10 -f file.txt等选项）；</span>
+<span class="x">        03.getopt，可以处理单个字符选项，也可以处理长选项long-option（如：--prefix=/home等）</span>
+<span class="x">        其中方式一中   </span><span class="p">$</span><span class="x">0表示脚本文件名。</span>
+<span class="x">            第一个参数用</span><span class="p">$</span><span class="x">1表示，第二个参数</span><span class="p">$</span><span class="x">2表示，。。。以此类推。</span>
+<span class="x">            另外一个在shell编程中经常用到 的是&quot;</span><span class="p">$</span><span class="x">@ &quot;这个代表所有的参数</span>
+</pre></div>
+
+
+<h4>Python方式</h4>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="n">Python</span><span class="err">语言简单的解析</span> <span class="n">sys</span> <span class="err">模块</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+<span class="mf">02.</span><span class="n">argparse</span><span class="err">是</span><span class="n">python</span><span class="err">用于解析命令行参数和选项的标准模块，用于解析命令行参数</span>
+<span class="err">命令行参数解析</span>
+    <span class="err">参数类型：</span>
+        <span class="err">定位参数，可选参数</span>
+        <span class="err">互斥参数组</span>
+        <span class="n">default</span> <span class="o">-</span> <span class="err">不指定参数时的默认值</span><span class="p">,</span><span class="err">缺省参数</span>
+        <span class="n">required</span> <span class="o">-</span> <span class="err">可选参数是否可以省略</span> <span class="p">(</span><span class="err">仅针对可选参数</span><span class="p">)</span><span class="err">。</span>    
+<span class="err">步骤</span>
+    <span class="mf">1.</span><span class="err">首先导入该模块；</span>
+        <span class="kn">import</span> <span class="nn">argparse</span>
+    <span class="mf">2.</span><span class="err">然后创建一个解析对象</span><span class="o">-</span><span class="err">并进行简单的描述；</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="mf">3.</span><span class="err">然后向该对象中添加你要关注的命令行参数和选项，每一个</span><span class="n">add_argument</span><span class="err">方法对应一个你要关注的参数或选项；</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">()</span>
+            <span class="nb">type</span><span class="err">：参数的类型，默认是字符串</span><span class="n">string</span><span class="err">类型，还有</span><span class="nb">float</span><span class="err">、</span><span class="nb">int</span><span class="err">等类型</span>
+            <span class="n">action</span> <span class="o">-</span> <span class="err">命令行遇到参数时的动作，默认值是</span> <span class="n">store</span>
+        <span class="err">参数组</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">parse</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="mf">4.</span><span class="err">最后调用</span><span class="n">parse_args</span><span class="p">()</span><span class="err">方法进行解析；</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+
+<h4>R语言</h4>
+<div class="highlight"><pre><span></span><span class="m">01.</span>批量运行脚本
+命令行
+    R CMD BATCH  脚本文件名      输出文件名
+    Rscript         脚本文件名   参数
+R界面
+    <span class="kn">source</span>
+
+<span class="m">02.</span>获得参数使用的函数 <span class="kp">commandArgs</span><span class="p">(</span><span class="kc">TRUE</span><span class="p">)</span>
+    argv <span class="o">&lt;-</span>     <span class="kp">commandArgs</span><span class="p">(</span><span class="kc">TRUE</span><span class="p">)</span>
+    x <span class="o">&lt;-</span> as.numberic<span class="p">(</span>argv<span class="p">[</span><span class="m">1</span><span class="p">])</span>
+    y <span class="o">&lt;-</span> <span class="kp">as.character</span><span class="p">(</span>argv<span class="p">[</span><span class="m">2</span><span class="p">])</span>
+
+<span class="m">03.</span>
+    文件是否存在以及是否有权限
+    执行权限
+    是否 <span class="c1">#/usr/bin/Rscript  可以直接执行</span>
+<span class="m">04.</span>赋予权限
+    Linux 下 chmod
+</pre></div>
+
+
+<h4>其余语言</h4>
+<div class="highlight"><pre><span></span>处理命令行参数是一个相似而又复杂的事情，为此，
+    C提供了getopt/getopt_long等函数
+    C++的boost提供了Options库
+    Java：程序开始于对函数main()的调用。
+        01.在这样做的时候，有两个参数被送给main(),
+            其中的一个描述了命令行参数的个数，通常称为argc；
+                            另一个是命令行参数的数组，通常称为argv。
+        02.命令行的参数以空格隔开。
+            但是，若命令行的参数本身包含空格时，则该参数必须用一对双引号括起来
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

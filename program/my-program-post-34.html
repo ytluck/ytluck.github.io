@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python案例学习-异常处理</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-34.html" rel="bookmark"
+           title="Permalink to Python案例学习-异常处理">Python案例学习-异常处理</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T22:30:00+08:00">
+                Published: 2017-12-24 22:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>数据分析汇总，Python成为一种很流行的语言，    Python出色的模块化特性 以及很容易和C语言结合起来 
+之前的代码，在练手的时候，要达到闭上眼都能写才算会，基础代码需要达到这种熟练程度，在项目中，则以业务为主。
+</pre></div>
+
+
+<h4>原始代码</h4>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="n">rad</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;Enter radis&quot;</span><span class="p">)</span>
+<span class="n">radint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rad</span><span class="p">)</span>
+<span class="n">circum</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span> <span class="n">radint</span>
+<span class="n">area</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">radint</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;the circ&quot;</span><span class="p">,</span><span class="n">circum</span><span class="p">,</span>\
+<span class="s2">&quot;, and the area is :&quot;</span> <span class="n">area</span><span class="p">)</span>
+<span class="o">--</span><span class="err">说明</span>
+<span class="n">I</span><span class="err">、模块化</span>
+    <span class="err">第三方数据库引入</span>
+      <span class="err">函数名</span><span class="o">.</span><span class="err">参数列表</span>
+      <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+      <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">II</span><span class="err">、</span><span class="n">Python</span> <span class="mi">2</span><span class="err">和</span><span class="mi">3</span><span class="err">的区别点</span>
+    <span class="mo">01</span><span class="err">、在</span><span class="n">python2</span><span class="o">.</span><span class="n">x</span><span class="err">中</span><span class="nb">raw_input</span><span class="p">(</span> <span class="p">)</span><span class="err">和</span><span class="nb">input</span><span class="p">(</span> <span class="p">)</span><span class="err">，两个函数都存在，其中区别为</span>
+    <span class="nb">raw_input</span><span class="p">(</span> <span class="p">)</span><span class="o">---</span><span class="err">将所有输入作为字符串看待，返回字符串类型</span>
+    <span class="nb">input</span><span class="p">(</span> <span class="p">)</span><span class="o">-----</span><span class="err">只能接收“数字”的输入，在对待纯数字输入时具有自己的特性，</span>
+    <span class="err">它返回所输入的数字的类型（</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span> <span class="err">）</span>
+    <span class="mo">02</span><span class="err">、在</span><span class="n">python3</span><span class="o">.</span><span class="n">x</span><span class="err">中</span><span class="nb">raw_input</span><span class="p">(</span> <span class="p">)</span><span class="err">和</span><span class="nb">input</span><span class="p">(</span> <span class="p">)</span><span class="err">进行了整合，去除了</span><span class="nb">raw_input</span><span class="p">(</span> <span class="p">)</span><span class="err">，</span>
+    <span class="err">仅保留了</span><span class="nb">input</span><span class="p">(</span> <span class="p">)</span><span class="err">函数，</span>
+    <span class="err">其接收任意任性输入，将所有输入默认为字符串处理，</span>
+    <span class="err">并返回字符串类型。</span>
+<span class="n">III</span><span class="err">、数据类型转换</span><span class="o">--</span><span class="ne">TypeError</span>
+    <span class="mf">01.</span><span class="err">原生数据类型</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="p">[,</span><span class="n">base</span> <span class="p">])</span>         <span class="err">将</span><span class="n">x</span><span class="err">转换为一个整数</span>
+    <span class="mf">02.</span><span class="err">第三方库数据类型</span>
+        <span class="kn">import</span> <span class="nn">pandas</span>
+        <span class="err">数据结构：</span> <span class="n">Series</span> <span class="err">和</span> <span class="n">DataFrame</span>
+                <span class="n">Series</span>    <span class="n">values</span> <span class="err">和</span> <span class="n">index</span> <span class="err">属性</span>
+
+    <span class="mf">03.</span><span class="err">自定义数据类型</span>
+        <span class="err">类定义</span>
+    <span class="mf">04.</span><span class="err">运算符</span>
+            <span class="err">幂运算</span> <span class="o">**</span>
+<span class="n">IV</span><span class="err">、换行</span><span class="o">--</span><span class="err">续行</span>
+        <span class="err">注释</span><span class="o">--</span> <span class="err">我们的主要任务不仅仅是知道计算机做什么</span>
+            <span class="err">还要向人们解释，我们想让计算机做什么</span>
+</pre></div>
+
+
+<h4>异常处理 try except</h4>
+<div class="highlight"><pre><span></span><span class="err">所有输入都是邪恶的，除非被证明不是</span>
+<span class="err">对输入一致性的处理</span> <span class="o">--</span><span class="n">Python</span> <span class="err">提供了让程序开发者处理错误的方式</span>
+    <span class="mf">1.</span><span class="err">异常来源</span><span class="o">-</span> <span class="mf">01.</span><span class="err">输入</span> <span class="mf">02.</span><span class="err">需要处理的事件</span> <span class="mf">03.</span><span class="err">错误</span>
+    <span class="mf">2.</span><span class="err">异常处理流程</span>
+            <span class="mf">01.</span><span class="err">对特定代码进行观察</span>  
+            <span class="mf">02.</span><span class="err">出现异常</span><span class="o">--</span><span class="err">停止执行错误行代码</span> <span class="o">--</span> <span class="err">引发遇到的特定异常</span> <span class="o">--</span><span class="err">捕获异常</span> <span class="o">--</span><span class="err">处理异常</span>
+                <span class="k">except</span>  <span class="err">异常通常用</span><span class="n">Python</span><span class="err">中标准的错误名来指定特定的一场</span>
+                <span class="err">未出现异常：</span>  <span class="o">--</span><span class="k">try</span><span class="err">程序块正常完成的话，所有</span><span class="n">exception</span><span class="err">代码块被忽略</span>
+            <span class="mf">03.</span><span class="err">执行</span><span class="k">try</span><span class="o">-</span><span class="n">exception</span><span class="err">之后的代码</span><span class="p">(</span><span class="err">异常处理未终止操作的情况下</span><span class="p">)</span>
+        <span class="mf">3.</span><span class="err">异常处理哲学</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">rad</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;Enter radis&quot;</span><span class="p">)</span>
+    <span class="n">radint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rad</span><span class="p">)</span>
+    <span class="n">circum</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span> <span class="n">radint</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">radint</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;the circ&quot;</span><span class="p">,</span><span class="n">circum</span><span class="p">,</span>\
+    <span class="s2">&quot;, and the area is :&quot;</span> <span class="n">area</span><span class="p">)</span>
+<span class="k">except</span>  <span class="ne">TypeError</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;类型错误&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Value 错误&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="p">(</span><span class="n">ZeroDivisionErroe</span><span class="p">,</span><span class="n">OverflowErroe</span><span class="p">):</span>
+    <span class="k">return</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Continuing&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>异常处理 try - catch - else - finally</h4>
+<div class="highlight"><pre><span></span>    <span class="mf">2.</span><span class="err">异常处理流程</span>
+            <span class="mf">01.</span><span class="err">对特定代码进行观察</span>  
+            <span class="mf">02.</span><span class="err">出现异常</span><span class="o">--</span><span class="err">停止执行错误行代码</span> <span class="o">--</span> <span class="err">引发遇到的特定异常</span> <span class="o">--</span><span class="err">捕获异常</span> <span class="o">--</span><span class="err">处理异常</span>
+                <span class="k">except</span>  <span class="err">异常通常用</span><span class="n">Python</span><span class="err">中标准的错误名来指定特定的一场</span>
+                <span class="err">未出现异常：</span>  <span class="o">--</span><span class="k">try</span><span class="err">程序块正常完成的话，执行</span><span class="k">else</span><span class="err">语句块</span>
+            <span class="mf">03.</span><span class="err">执行</span><span class="k">finally</span><span class="err">语句</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="n">inputrad</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s2">&quot;Enter radis&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">dataFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputrad</span><span class="p">)</span>
+<span class="k">except</span>  <span class="ne">IOError</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;错误文件&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dataFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span>  <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s2">&quot;again&quot;</span>
+</pre></div>
+
+
+<h4>raise捕捉异常</h4>
+<div class="highlight"><pre><span></span>--大型程序中手动引发异常-并传递出错的值
+valuestr= raw_input(&quot;输入： &quot;)
+try:
+    if valuestr.isdigit():
+        valueInt = int(valuestr)
+    else:
+        raise ValueError,valuestr
+except ValueError
+print(&quot;hello&quot;)
+</pre></div>
+
+
+<h3>自定义异常-- 继承异常类Exception，并提供方法</h3>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="n">NameException</span>(<span class="nb">Exception</span>):
+<span class="nb">pass</span>
+</pre></div>
+
+
+<h4>编程艺术</h4>
+<div class="highlight"><pre><span></span>1.语言
+    C
+    Java        Scala
+    Python      Shell       Perl  PHP   Lisp  放在设计层面
+    R
+    SQL
+    Excel
+其中  Shell的重要优势是
+    01.在预期的目标系统中shell普遍存在，不需要编译或者安装                 
+    02.书写小型脚本非常快捷
+2.开发策略 -专注更有趣的部分
+    可打印-可调试-可理解
+    编译--运行期&lt;调试功能&gt;-性能优化&lt;使用性能分析软件&gt;
+3.版本控制系统-变化追踪   Git
+4. 代码重用的策略
+        数量掌握将代码粘合在一起的方法，从而实现应用组合原则
+5.基础代码以及源码
+    分解问题的新方法
+6. with open() as f:
+    for line in f:
+        pass
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

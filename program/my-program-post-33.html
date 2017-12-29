@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python图像检测-开发环境设置</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-33.html" rel="bookmark"
+           title="Permalink to Python图像检测-开发环境设置">Python图像检测-开发环境设置</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T22:20:00+08:00">
+                Published: 2017-12-24 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>使用网上的代码，一来，再温习温习Python的编程，二来呢也是
+人脸识别系统一般分为：人脸图像采集、人脸图像预处理、人脸图像特征提取以及匹配与识别
+</pre></div>
+
+
+<h4>0.首先明确环境</h4>
+<div class="highlight"><pre><span></span>Python的版本以及位数
+     develop3.6
+     develop2.7
+     系统环境的python
+            2.6
+        计算环境的python
+            2.7
+        最新功能的python
+            3.5
+</pre></div>
+
+
+<h4>第一行：引入cv2包</h4>
+<div class="highlight"><pre><span></span>这个包直接安装没有成功，后来下载了对应的版本
+&lt;对应版本，找起来也是坑啊&gt;找到后，放到目录中，给出绝对路径，然后安装。
+pip  install    /opt/image/opencv_python-3.3.0.10-cp27-cp27m-manylinux1_x86_64.whl
+下载地址：   https://pypi.python.org/pypi/opencv-python
+</pre></div>
+
+
+<h4>第二步：引入一个XML文件</h4>
+<div class="highlight"><pre><span></span>这个需要注意，查看一下内容格式，而不仅仅是后缀
+01.文档类型（doctype） 
+    &lt;!DOCTYPE html&gt; 空一格后跟着文档根元素的名称。
+    而XML的文档  &lt;?xml version=&quot;1.0&quot;?&gt;
+    haarcascade_frontalface_default.xml
+      &lt;?xml version=&quot;1.0&quot;?&gt;
+    haarcascade_frontalface_default.xml
+        &lt;!DOCTYPE html&gt;  查看文件中内容，如果是这个，则是下载错误了
+
+ 02.作用和结构以及内容
+    haarcascade_frontalface_alt_tree.xml是最严格的分类器，
+   数据结构包括Data和FeatureEvaluator两个主要部分。
+        Data中存储的是从训练获得的xml文件中载入的分类器数据；
+    而FeatureEvaluator中是关于特征的载入、存储和计算
+  .可以使用OpenCV训练构建自己想要的
+下载地址：
+https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml
+03.
+    CascadeClassifier 是Opencv中做人脸检测时候的一个级联分类器，
+        该类中封装的是目标检测机制即滑动窗口机制+级联分类器的方式
+04.
+    参数：scaleFactor 是 图像的缩放因子，minSize 是检测窗口的大小
+</pre></div>
+
+
+<h4>上代码：</h4>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python  </span>
+<span class="c1"># -*- coding:utf-8 -*-  </span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="n">imagepath</span> <span class="o">=</span> <span class="s1">r&#39;/opt/internet.jpg&#39;</span>
+<span class="n">outpath</span><span class="o">=</span> <span class="s1">r&#39;/opt/201712_detectd_heat.png&#39;</span>
+<span class="c1">#加载分类器 cv2.CascadeClassifier</span>
+<span class="n">face_cascade</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CascadeClassifier</span><span class="p">(</span><span class="s1">r&#39;/opt/haarcascade_frontalface_default.xml&#39;</span><span class="p">)</span>
+<span class="c1">#加载目标图片 imread</span>
+<span class="n">example_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">imagepath</span><span class="p">)</span>
+<span class="c1">#多尺度检测 detectMultiScale</span>
+<span class="n">faces</span><span class="o">=</span><span class="n">face_cascade</span><span class="o">.</span><span class="n">detectMultiScale</span><span class="p">(</span><span class="n">example_image</span><span class="p">,</span> <span class="n">scaleFactor</span> <span class="o">=</span> <span class="mf">1.15</span><span class="p">,</span><span class="n">minNeighbors</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">minSize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;find{0}face!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">))</span>
+<span class="c1">#为每个人脸画一个框-循环读取人脸的矩形对象列表，获得人脸矩形的坐标和宽高， 然后在原图片中画出该矩形框</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">h</span><span class="p">)</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">:</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">example_image</span><span class="p">,(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),(</span><span class="n">x</span><span class="o">+</span><span class="n">w</span><span class="p">,</span><span class="n">y</span><span class="o">+</span><span class="n">h</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#保存检测后的结果</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">outpath</span><span class="p">,</span><span class="n">example_image</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
+<h4>说明：</h4>
+<div class="highlight"><pre><span></span>01.绝大部分的工作OpenCV已经默默地替我们处理了，所以我们使用起来才会这么简单。
+    OpenCV是一个基于BSD许可发行的跨平台计算机视觉库，用C／C++编写，
+    同时提供了Python、Ruby、MATLAB等接口，
+    实现了图像处理和计算机视觉方面的很多通用算法
+02.涉及编程的还是使用Google吧，最不济的话也可以用Bing的国际版。百度，更懂中国
+03.IndentationError: expected an indented block   缩进错误： 需要缩进排版块
+            python的是用缩进来识别语法逻辑块
+            说明此处需要缩进，你只要在出现错误的那一行，按空格或Tab（但不能混用）键缩进就行  -- 可读性，可解释
+错误类型：
+    SyntaxError         Python的语法错误
+    IndentationError    缩进错误
+    TabError                Tab和空格混合使用
+    ImportError         导入模块失败的时候
+    SystemError          Python编译器系统错误
+    RuntimeError        一般的运行时错误
+    MemoryError 内存溢出（可通过删除对象释放内存）
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>01.http://opencv-python-tutroals.readthedocs.io
+02.7行Python代码的人脸识别 http://blog.csdn.net/wireless_com/article/details/64120516
+03.https://github.com/wepe/OpenCV-demo/blob/master/FaceDetection_python-opencv/face_detection.py
+</pre></div>
+
+
+<h4>开发环境</h4>
+<div class="highlight"><pre><span></span>1.pyenv 是针对 python 版本的管理
+virtualenv来管理python的包环境
+    virtualenv 是针对python的包的多版本管理，
+        通过将python包安装到一个模块来作为python的包虚拟环境，
+        通过切换目录来实现不同包环境间的切换
+2.安装虚拟环境
+cd  /opt/world  
+pyenv virtualenv 2.7.14  develop2.7
+pyenv virtualenv 3.6.3    develop3.6
+3.激活虚拟环境
+    切换目录
+    cd  /opt/world
+  激活
+    激活虚拟环境 pyenv activate develop3.6
+    激活虚拟环境 pyenv activate develop2.7
+
+    退出虚拟环境 pyenv deactivate develop3.6
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>1.注意事项：如果不是超级用户，需要sudo pip install virtualenv
+2. How to install the latest version of Python on CentOS
+https://danieleriksson.net/2017/02/08/how-to-install-latest-python-on-centos/
+3. 使用 pyenv + virtualenv 打造多版本 Python 开发环境  http://python.jobbole.com/85587/
+4. http://pylixm.cc/posts/2016-06-19-Virtualenv-install.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

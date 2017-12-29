@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Linux日志系统以及服务器日志系统</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-12.html" rel="bookmark"
+           title="Permalink to Linux日志系统以及服务器日志系统">Linux日志系统以及服务器日志系统</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-23T21:35:00+08:00">
+                Published: 2017-12-23 21:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Linux 主要介绍日志系统，日志系统，往往是数据采集的来源之一，对日志进行处理以及采集，对数据的影响是很大的。
+了解日志系统，从操作系统到服务应用，再到应用程序。对这些日志的了解，加深对数据源的了解。日志生成以及日志采集和处理，是从技术层面上数据的开始。
+业务层面的数据开始，才是最开始的数据源，确保技术层面不对数据流有太多的影响。
+</pre></div>
+
+
+<h4>文件系统</h4>
+<div class="highlight"><pre><span></span>映射关系：扇区→物理块→逻辑块→文件系统
+1.使用df -T 查看挂载的文件系统类型：
+        df -T -h
+2.支持的文件系统
+                 /lib/modules/kernl-version/kernel/fs/ 目录下包含了当前内核版本支持的文件系统
+                  查看当前内核版本
+                        uname -a                              发行版本：cat /etc/issue
+                ls  /lib/modules/          /kernel/fs/
+3..文件系统 --默认的文件系统以及支持的文件系统
+    传统文件系统              
+            Ext是 GNU/Linux 系统中标准的文件系统，其特点为存取文件的性能极好，对于中小型的文件更显示出优势
+            tmpfs是一种基于内存的文件系统
+    日志式文件系统
+            Ext3是一种日志式文件系统，是对ext2系统的扩展，它兼容ext2，增加了一个日志功能。
+            Ext4 是 Ext3 的改进版，修改了 Ext3 中部分重要的数据结构
+    Windows的文件系统
+    Mac的文件系统
+    分布式文件系统
+        HDFS  Hadoop Distributed File System
+        Alluxio : 开源分布式内存文件系统
+4.文件组织结构
+        继承式的文件组织结构
+5.文件类型
+    1.普通文件          （-)   [表示，可用ls -l查看]
+    2.目录                    （d）directory    [在Linux中，任何东西都被看成文件，外设备也看成文件，注意是任何东西]
+    3.字符设备文件    （c）character
+    4.块设备文件     （b）block
+    5.套接口文件     （s）sockets  [如我们开启MySQL服务后，在/var/lib/mysql/下生成的mysql.sock文件，关闭MySQL服务后，这个文件就消失了]
+    6.管道                    （p）pipe     [管道在Linux/UNIX中式非常有用的东西，必须掌握哈]
+    7.符号链接文件    （l）link         [有点儿像WIN下的快捷方式]
+文件
+    文本文件
+    可执行文件
+与Windows不同。在Windows中，能执行的文件扩展名通常是 .com、.exe、.bat等等，
+而在Linux中，只要属性中有x，例如 [-rwx-r-xr-x] 即表示这个文件可以执行
+</pre></div>
+
+
+<h4>文件系统与文件服务器</h4>
+<div class="highlight"><pre><span></span>文件系统-从数据IO路径以及磁盘等存储管理
+文件服务器- 高层通信协议（网络文件访问协议-网络文件传输协议）
+    1.NFS/CIFS
+      NFS（Network File System）即网络文件系统
+      Common Internet File System (CIFS) Protoco            
+    2.SAMBA ：作为 NFS 的补充使得在 Linux 和 Windows 系统中进行文件共享、打印机共享 
+    3.FTP
+      FTP 是File Transfer Protocol（文件传输协议）
+</pre></div>
+
+
+<h4>日志系统</h4>
+<div class="highlight"><pre><span></span>       日志类型
+        日志操作
+                日志转储也叫日志回卷或日志轮转  logging rotate
+I、系统日志
+    Linux发行版默认的日志守护进程为 syslog，
+            位于 /etc/syslog 或 /etc/syslogd，
+            默认配置文件为 /etc/syslog.conf，
+    任何希望生成日志的程序都可以向 syslog 发送信息
+    常见日志文件
+        所有的系统应用都会在 /var/log 目录下创建日志文件
+
+II、服务日志
+    slf4j--
+            简单日记门面(simple logging Facade for Java)SLF4J是为各种loging APIs提供一个简单统一的接口，
+            从而使得最终用户能够在部署的时候配置自己希望的loging APIs实现
+    Log4j
+        由三个重要的组件构成：日志信息的优先级，日志信息的输出目的地，日志信息的输出格式。
+            日志信息的优先级从高到低有ERROR、WARN、 INFO、DEBUG，分别用来指定这条日志信息的重要程度；
+            日志信息的输出目的地指定了日志将打印到控制台还是文件中；
+            而输出格式则控制了日志信息的显 示内容。
+
+III、数据库服务日志
+    Binlog的三种模式
+    MySQL有六种不同类型的日志。
+        一、日志种类
+        ———–&gt; 1，错误日志：记录启动、运行或停止时出现的问题，一般也会记录警告信息。
+        ———–&gt; 2，一般查询日志：记录建立的客户端连接和执行的语句。
+        ———–&gt; 3，慢查询日志：记录所有执行时间超过long_query_time秒的所有查询或不使用索引的查询，可以帮我们定位服务器性能问题。
+        ———–&gt; 4，二进制日志：任何引起或可能引起数据库变化的操作，主要用于复制和即时点恢复。
+        ———–&gt; 5，中继日志：从主服务器的二进制日志文件中复制而来的事件，并保存为的日志文件。
+        ———–&gt; 6，事务日志：记录InnoDB等支持事务的存储引擎执行事务时产生的日志   
+        binlog模式分三种（row，statement，mixed）
+
+IV、服务器日志
+        开发环境服务器--生产环境服务器
+        Apache通用日志工具commons-logging
+                1.Apache
+                    Apache HTTP Server（简称Apache）是Apache软件基金会的一个开放源码的网页服务器
+                    日志类型
+                        logs目录下就会生成两个文件,分别是access_log和error_log
+                    位置
+                        1.默认位置可以通过编辑Apache的配置文件进行修改
+                                Apache的配置文件为apache.conf，另外还包含了自定义的conf文件。
+                                /etc/httpd/conf/httpd.conf，然后查找 ServerRoot，
+                                  该参数显示了 Apache Web 服务器目录树的顶层，日志文件和配置都位于该目录树中
+                        2.默认位置
+                            在基于Debian的Linux上，Apache错误日志默认位置是/var/log/apache2/error.log
+                            基于 Red Hat 的Linux中，系统范围的 Apache 错误日志文件默认被放置在/var/log/httpd/error_log
+                    内容和格式：
+                        自定义日志格式
+                        默认的日志格式
+                            一般Apache默认的格式为“LogFormat &quot;%h %l %u %t %T \&quot;%r\&quot; %&gt;s %b”
+
+                2.Nginx
+                    Nginx(engine x) 是一个高性能的HTTP和反向代理服务器，分别使用不同的指令来定义其输出位置和相应的级别
+                    类型：
+                            access log 记录了哪些用户，哪些页面以及用户浏览器、ip和其他的访问信息
+                            error log 则是记录服务器错误日志，提供了error_log指令来指定错误日志的输出文件和级别
+                            nginx的日志文件没有rotate功能
+                    位置：
+                         /usr/local/nginx/conf/nginx.conf
+
+                3.Tomact
+                    Tomcat 服务器是一个免费的开放源代码的Web 应用服务器，属于轻量级应用服务器
+
+                在Unix和LINUX平台下使用最广泛的免费HTTP服务器是Apache和Nginx服务器，
+                而Windows平台NT/2000/2003使用IIS的WEB服务器  Internet Information Services 
+V、开源日志系统
+            分别为agent（封装数据源，将数据源中的数据发送给collector），
+                    collector（接收多个agent的数据，并进行汇总后导入后端的store中），
+                    store（中央存储系统，应该具有可扩展性和可靠性
+            Kafka   producer，broker和consumer
+            Flume   是cloudera于2009年7月开源的日志系统 Flume采用了三层架构，分别问agent，collector和storage
+</pre></div>
+
+
+<h4>消息中间件</h4>
+<div class="highlight"><pre><span></span>    广泛运用消息中间件进行系统间的数据交换,一般两个功能,解耦和异步处理,
+        消息队列（Message Queue)
+                常见的三类消息产品(Kafka、RabbitMQ、RocketMQ)
+                Kafka 是LinkedIn开源的分布式发布-订阅消息系统
+                RabbitMQ是使用Erlang语言开发的开源消息队列系统，基于AMQP协议来实现
+                RocketMQ是阿里开源的消息中间件
+</pre></div>
+
+
+<h4>数据存储和数据库</h4>
+<div class="highlight"><pre><span></span>文件系统和数据库系统区别
+  文件系统把数据组织成相互独立的数据文件，实现了记录内的结构性，但整体无结构;
+  而数据库系统实现整体数据的结构化。
+  联系：一般来说数据库系统会调用文件系统来管理自己的数据文件，但也有些数据库系统能够自己管理数据文件
+
+数据管理和数据共享--文件系统不能满足需求
+    根据数据模型- DB
+数据存储系统
+    NAS（Network Attached Storage：网络附属存储）
+存储产品
+    网盘-云盘
+    公有云及私有云
+    群晖科技（Synology ）--提供网络存储解决方案
+</pre></div>
+
+
+<h4>参考</h4>
+<div class="highlight"><pre><span></span>Linux系统日志及日志分析 http://c.biancheng.net/cpp/html/2783.html
+Flask + mod_wsgi + Apache on Windows 部署成功 http://blog.csdn.net/firefox1/article/details/46438769
+阿里中间件团队博客 http://jm.taobao.org/
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

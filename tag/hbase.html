@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>ytluck—For you - HBase</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-27.html">Hbase数据模型以及与Hive的继承</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-10-22T22:02:00+08:00">
+                Published: 2017-10-22 22:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/hbase.html">HBase</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Hbase的表设计以及存储结构的设计，关系到后期数据的查询效果。
+同时Hbase数据中有一些分析型操作的功能没有，所以结合Hbase进行数据集成
+查阅网上的资料以及相关数据的内容，对这部分加深理解
+</pre></div>
+
+
+<h4>数据模型</h4>
+<div class="highlight"><pre><span></span>行键上的单一索引--主键
+命名空间-
+0.namespace
+    命名空间
+            权限&lt;Pernission&gt;--限额&lt;Quota&gt;
+    常用命令--创建、删除和修改
+        describe_namespace、list_namespace 、 list_namespace_table    
+        create_namespace
+        alter_namespace
+        drop_namespace
+01.table
+    对应英文: rowkey,  family name, column name,  column value,  timestamp
+     行    表 行键  列族:列  列值  时间戳
+     单元格cell
+     版本 version--版本基于时间戳的长整型，默认保留3个版本的记录
+                Hbase数据保留技术：版本最小数目 与生存时间TTL
+
+02.数据类型：字节数组
+    Hbase隐式的通过序列化框架将数据转换为字节数组，Hbase数据类型--字节数组
+     put 和Result方法处理对象的编码和解码,可以转化为字节的事物都可以存储在HBase中
+     Cell 单元格存储值范围 10~15MB
+     不包含值的列不进行存储--注意缺省值的处理
+03.模式设计
+    01.HBase特点
+            不支持join操作等
+            支持的操作：
+                    00.通用操作  status  version list
+                    01.数据操作： put  get  scans truncate  disable enable delete  
+                                    grant revoke
+                    02.HBase region 管理：assign compact flush split move
+                    03.Hbase节点管理
+                    04.Hbase访问控制与安全：
+            客户端支持的操作：
+
+    02.选择有效的存储以及访问数据的设置--以便最高效的读取HBase
+    围绕着应用来设计：
+        短而宽：向右增长，更好的原子性
+        高而瘦：向下增长，更好的扩展性 ***&lt;首选&gt;
+    存储方式：
+        批量加载 bulk loading
+
+        Hbase客户端API加载
+    数据结构设计
+            行键的结构-行的版本-列族-列-内容
+            行键的设计：
+                    表数量的设计
+                    行键的索引
+                    复合键--行键的设计
+            压缩算法
+</pre></div>
+
+
+<h4>数据的操作</h4>
+<div class="highlight"><pre><span></span>1.创建Hbase表
+ create &lt;table&gt;, {NAME =&gt; &lt;family&gt;, VERSIONS =&gt; &lt;VERSIONS&gt;,COMPRESSION=&gt;&lt;VERSIONS&gt;}  
+    1.必须在创建表的时候确定列族的个数和对应的名称，
+    2.列可以随时在存储中添加，不包含列值的列不进行存储
+    3.存储到单元格的字节数组 最大10-15MB，太大会有所影响
+    4.版本指定是基于时间戳，默认情况下保存三个版本记录，可以改变保留版本的数量
+2.添加数据
+允许动态添加列
+ put &lt;table&gt;,&lt;rowkey&gt;,&lt;family:column&gt;,&lt;value&gt;,&lt;timestamp&gt;
+    例如：给表my_test的添加一行记录：
+    rowkey是rowkey001，family name：f1，column name：col1，value：value01，timestamp：系统默认  
+        错误做法：    put &#39;my_test&#39;,&#39;rowkey001&#39;,&#39;f1:Channel&#39;,&#39;2&#39;,&#39;f1:Region&#39;,&#39;3&#39;,&#39;f2:Fresh&#39;,&#39;12669&#39;，&#39;f2:Milk&#39;,&#39;9656&#39;,&#39;f2:Grocery&#39;,&#39;12669&#39;，&#39;f2:Frozen&#39;,&#39;9656&#39;,&#39;f2:Detergents_Paper&#39;,&#39;12669&#39;，&#39;f2:Delicassen&#39;,&#39;9656&#39;
+                直接的把多个参数给这个没通过，
+        正确做法：
+            需要单个单个的给
+        put &#39;my_test&#39;,&#39;rowkey001&#39;,&#39;f1:Channel&#39;
+查看帮助 help &quot;put&quot;中可知put的参数一般是5个，所以对于多个参数的时候就会报错；
+3.运行中的Hbase
+    目录表：
+            hbase:meta的目录表：
+                    当前集群所有区域的列表 状态和位置
+                            使用区域名做为主键： 表名,起始行,区域的创建名称,MD5哈希
+</pre></div>
+
+
+<h4>Hbase数据到Hive</h4>
+<div class="highlight"><pre><span></span>用Hive连接Hbase
+Hbase数据到Hive中
+ 1.Hbase中创建表
+    create  &#39;TEST_BOOK_HBASE&#39;,{NAME =&gt;info}  
+        导入数据：
+            方式一：使用put导入数据       
+ 2.创建Hive外部表-并关联Hbase
+  drop table if exists test_book_hive;
+  create external table test_book_HIVE(key STRING, userid STRING, bookeid STRING, rating int)
+  STORED BY &#39;org.apache.hadoop.hive.hbase.HBaseStorageHandler&#39; 
+  WITH SERDEPROPERTIES(&quot;hbase.columns.mapping&quot; = &quot;:key,info:userid,info:bookeid,info:rating&quot;) 
+  TBLPROPERTIES (&quot;hbase.table.name&quot;=&quot;TEST_BOOK_HBASE&quot;);
+    说明：storagehandlers是一个独立的模块，放在hive-hbase-handler-*.jar包中
+                SERDEPROPERTIES ，用来控制hbase列和hive的映射
+    注意：如果没有成功，注意是否关联jar文件
+            Hive-Hbase handler.&lt;version&gt;.jar
+            HBase.&lt;version&gt;.jar
+            Guava.&lt;version&gt;.jar
+        关联方式--启动hive的方式
+            hive --auxpath  /usr/lib/hive/lib/.&lt;version&gt;.jar,
+                            /usr/lib/hive/lib/hive-hbase handler.&lt;version&gt;.jar,
+                            /usr/lib/hive/lib/guava.&lt;version&gt;.jar,
+                            /usr/lib/hive/lib/zookeeper.jar
+    也可以关联hive内部表 create l table test_book_hive(key STRING, userid STRING, bookeid STRING, rating int)
+    在这里第一列是主键列，作为Hbase的行键
+    注意Hive内部表和外部表的不同，根据需要进行选择
+3.在Hive执行SQL查询
+hive&gt; select *  from  test_book_hive limit 100;
+
+其他
+ 01.Hbase中副本对Hive的影响要注意。
+ 02.Hive中插入中文数据
+    INSERT INTO TABLE table_dim  SELECT &#39;25&#39;, decode(binary(&#39;中文字符&#39;),&#39;utf-8&#39;), &#39;uniq&#39;, NULL FROM table_dim LIMIT 1;
+ 03.Hive计算的数据导入到Hbase，这个功能是否需要深入，根据需要再看吧~
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span> 《Learning Hbase 中文版》
+ hive和habse的集成 https://cwiki.apache.org/confluence/display/Hive/HBaseIntegration
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

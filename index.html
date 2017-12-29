@@ -26,7 +26,429 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-32.html">正则表达式初步总结</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-32.html">Python数据处理-联接</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-12-30T02:01:00+08:00">
+                Published: 2017-12-30 02:01:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info --><h4>数据分析</h4>
+<div class="highlight"><pre><span></span>使用Python进行数据分析，在数据预处理方面，python要比R语言有优势。
+通过熟悉Python基本的数据处理，以便工作中更好的发挥两者的功效。
+首先大体浏览命令，建立起轮廓，然后通过具体的案例，熟悉命令
+结构化的数据处理和非结构化的数据处理
+--非结构化数据 转换为结构化的数据
+</pre></div>
+
+
+<h4>数据示例</h4>
+<div class="highlight"><pre><span></span>数据示例：studentid&#39;,&#39;interval&#39;,&#39;countNum
+201 1   1
+201 5   1
+140 1   7
+140 1   2
+140 2   1
+</pre></div>
+
+
+<h4>pandas数据结构</h4>
+<div class="highlight"><pre><span></span>Series  数据和索引 data-index
+DataFrame   表格型数据结构 
+嵌套字典
+</pre></div>
+
+
+<h3>程序代码</h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/python</span>
+<span class="c1"># -*- coding:utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">inpputfile</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">yt</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">Program</span><span class="se">\\</span><span class="s1">Date1030-1112.txt&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#读取txt文件</span>
+        <span class="n">interaldata</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">inpputfile</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;studentid&#39;</span><span class="p">,</span><span class="s1">&#39;interval&#39;</span><span class="p">,</span><span class="s1">&#39;countNum&#39;</span><span class="p">],</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1">#排序</span>
+        <span class="c1">#interaldata.sort_values(by=&#39;studentid&#39;, ascending=True)</span>
+        <span class="c1">#interaldata.sort_index(axis=1, ascending=True)</span>
+        <span class="c1">#数据转换和去重</span>
+        <span class="n">uniqdata</span> <span class="o">=</span> <span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;studentid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span> 
+        <span class="c1">#分组，确定分组的组数</span>
+        <span class="n">grouped</span> <span class="o">=</span> <span class="n">interaldata</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">])</span>
+        <span class="n">mergerK</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+        <span class="c1">#联结-组数上+1&lt;从0开始&gt;</span>
+        <span class="c1">#联结的重复列名处理 -- suffixes-追加到重叠列名末尾</span>
+        <span class="c1">#middata = pd.merge( middata  , interaldata[ interaldata[&#39;interval&#39;]==2], on=&#39;studentid&#39; ,how=&#39;left&#39;,suffixes=(&#39;_left&#39;,&#39;-right&#39;))</span>
+        <span class="n">middata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span> <span class="n">uniqdata</span>  <span class="p">,</span> <span class="n">interaldata</span><span class="p">[</span> <span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">],</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;studentid&#39;</span> <span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ange</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,(</span><span class="n">mergerK</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="n">middata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">middata</span><span class="p">,</span><span class="n">interaldata</span><span class="p">[</span> <span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ange</span><span class="p">],</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;studentid&#39;</span> <span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="c1"># 将NAN替换为0</span>
+        <span class="n">outdata</span> <span class="o">=</span>   <span class="n">middata</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#列数</span>
+        <span class="n">KK</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#outdata.shape[0]行数</span>
+        <span class="n">colodd</span><span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">KK</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#特定位置添加列表元素</span>
+        <span class="n">colodd</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">colevent</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">KK</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">tmpdata</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="n">colodd</span><span class="p">]</span>
+        <span class="c1">#数据类型转换 </span>
+            <span class="n">resultdata</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="n">colevent</span><span class="p">]</span>
+        <span class="n">resultdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">resultdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">resultdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">resultdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="c1">#保存数据-去掉列名</span>
+        <span class="n">resultdata</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">Users</span><span class="se">\\</span><span class="s2">yt</span><span class="se">\\</span><span class="s2">Desktop</span><span class="se">\\</span><span class="s2">Program</span><span class="se">\\</span><span class="s2">submission.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">except</span>  <span class="ne">IOError</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;错误文件&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;again</span>
+        <span class="k">except</span>  <span class="ne">NameError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;again&quot;</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  
+    <span class="n">main</span><span class="p">()</span>
+<span class="c1">##本程序中异常处理功能报错，这部分先放这，待需要时在修正</span>
+<span class="mf">01.</span><span class="c1">#两个对象的列名不同，可以分别指定，例：pd.merge(df1,df2,left_on=&#39;lkey&#39;,right_on=&#39;rkey&#39;)</span>
+    <span class="c1">#middata.rename(columns={&#39;interval_x&#39;:&#39;a&#39;, &#39;interval_y&#39;:&#39;c&#39;}, inplace = True)</span>
+<span class="mf">02.</span>
+<span class="n">interaldata</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>            <span class="c1">#选取多个行</span>
+<span class="n">interaldata</span><span class="o">.</span><span class="n">ix</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span> <span class="c1">#ix 的功能就更强大了，它允许我们混合使用下标和名称进行选取</span>
+<span class="n">interaldata</span><span class="o">.</span><span class="n">irow</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>     <span class="c1">#取data的第一行</span>
+<span class="n">interaldata</span><span class="o">.</span> <span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>        <span class="c1">#取data的第一列 </span>
+<span class="n">interaldata</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>        <span class="c1">#选取第二行第二列，用于已知行、列位置的选取</span>
+<span class="c1"># iloc 使得我们可以对column使用slice（切片）的方法对数据进行选取</span>
+</pre></div>
+</td></tr></table>
+
+<h4>帮助信息</h4>
+<div class="highlight"><pre><span></span> help(resultdata.to_csv)        帮助我们了解该对象的更多信息
+ dir(resultdata)                帮助我们获取该对象的大部分相关属性。
+</pre></div>
+
+
+<h4>pandas输入和输出</h4>
+<div class="highlight"><pre><span></span>文件类型和格式     文本文件 二进制文件 数据库 网页
+=文件类型和格式 - 函数-输入参数-输出格式
+    01.函数
+        pandas.read_table()
+        pandas.read_csv()
+        ……
+    02.参数
+        索引
+                index_col
+        标题  header
+             列名 names
+        跳过文件行
+            skiprows
+            skip_footer
+        分割符 sep
+        缺失值默认处理：na_values
+        读取大文件--只读几行nrows
+            chunksize --逐快读取文件-设置行数 chunksize=1000
+            iterator
+        编码
+            encoding
+    03.输出格式
+
+存储
+    -- Dataframe   Series
+    pandas.to_csv()
+        pandas.save()
+</pre></div>
+
+
+<h4>Pandas 数据操作</h4>
+<div class="highlight"><pre><span></span>    并集-outer        交集-inner
+    pandas.concat(,axis=0) 行
+    pandas.concat(,axis=1) 列        
+        outdata.shape[0] #行数
+        outdata.shape[1] #列数
+    reindex
+</pre></div>
+
+
+<h4>比较</h4>
+<div class="highlight"><pre><span></span>01.函数
+    函数          调用  比如  len()  type    函数式代码组织和复用的方式，
+    函数的作用空间，函数亦对象
+对象方法    调用
+对象属性
+
+02.传递方式 
+    01.Python
+        001.可变对象
+        对变量赋值时，是按照引用传递，即创建等号右侧对象的一个引用，赋值==绑定 binding
+        按照 引用传递 -- 即Python函数可以修改其参数的内容
+        002.不可变对象
+
+    02.R语言
+   按照值传递 -- 创建副本
+    03.C语言
+    按 值传递 的意思就是，传入的数据仅仅是数据的值
+                表现：按值传递方法原本的数据不会有变化
+    按 引用传递&lt;地址传递&gt; 的意思就是，直接把数据的地址传进去
+                表现：按引用传递的话，可以修改原数据
+
+03. 大部分是严格求值
+    迭代器和生成器等是懒惰求值 Lazy Evaluation
+    匿名函数 lambda
+    闭包 closure   currying 柯里化
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-34.html" rel="bookmark"
+                           title="Permalink to 数据产品思考的问题">数据产品思考的问题</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-29T23:04:00+08:00">
+                Published: 2017-12-29 23:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/command-line.html">command line</a> </p>
+</footer><!-- /.post-info -->                <p>数据安全-数据质量-数据服务</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-34.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-33.html" rel="bookmark"
+                           title="Permalink to 数据采集层-埋点">数据采集层-埋点</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-29T22:04:00+08:00">
+                Published: 2017-12-29 22:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/command-line.html">command line</a> </p>
+</footer><!-- /.post-info -->                <p>日志和浏览器数据采集</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-33.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-35.html" rel="bookmark"
+                           title="Permalink to 不同语言的命令行参数">不同语言的命令行参数</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T23:00:00+08:00">
+                Published: 2017-12-24 23:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>shell-Python-R命令行工具参数</p>
+                <a class="readmore" href="/program/my-program-post-35.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-34.html" rel="bookmark"
+                           title="Permalink to Python案例学习-异常处理">Python案例学习-异常处理</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T22:30:00+08:00">
+                Published: 2017-12-24 22:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Python的异常处理</p>
+                <a class="readmore" href="/program/my-program-post-34.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-33.html" rel="bookmark"
+                           title="Permalink to Python图像检测-开发环境设置">Python图像检测-开发环境设置</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T22:20:00+08:00">
+                Published: 2017-12-24 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>cv2包以及pyenv virtualenv</p>
+                <a class="readmore" href="/program/my-program-post-33.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/os/my-super-os-post-12.html" rel="bookmark"
+                           title="Permalink to Linux日志系统以及服务器日志系统">Linux日志系统以及服务器日志系统</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-23T21:35:00+08:00">
+                Published: 2017-12-23 21:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>文件系统-日志系统-中间件-数据库</p>
+                <a class="readmore" href="/os/my-super-os-post-12.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/os/my-super-os-post-13.html" rel="bookmark"
+                           title="Permalink to Linux进程和任务管理">Linux进程和任务管理</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-23T21:35:00+08:00">
+                Published: 2017-12-23 21:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>process -Job-daemon-Service</p>
+                <a class="readmore" href="/os/my-super-os-post-13.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-28.html" rel="bookmark"
+                           title="Permalink to 阿里云离线计算初步使用">阿里云离线计算初步使用</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-16T19:02:00+08:00">
+                Published: 2017-12-16 19:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/hive.html">Hive</a> </p>
+</footer><!-- /.post-info -->                <p>数据仓库-Maxcompute-离线计算</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-28.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-32.html" rel="bookmark"
+                           title="Permalink to 正则表达式初步总结">正则表达式初步总结</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-11-24T23:20:00+08:00">
                 Published: 2017-11-24 23:20:00
@@ -37,209 +459,32 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h4>表达式的构造细节</h4>
-<div class="highlight"><pre><span></span>特殊字符
-具体文本
-解释顺序-                       
-针对的对象(什么工具软件)
-</pre></div>
+</footer><!-- /.post-info -->                <p>正则表达式构成</p>
+                <a class="readmore" href="/program/my-program-post-32.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-31.html" rel="bookmark"
+                           title="Permalink to Linux环境下命令行的数据处理案例">Linux环境下命令行的数据处理案例</a></h1>
+                </header>
 
-<h4>正则表达式字符构成</h4>
-<div class="highlight"><pre><span></span>match 匹配
-    metacharacter           元字符
-    normal text character    解释正则表达式按照字符来理解
-                接下来是and then
-    character set           字符组
-    alternative             多选分支 --自身可以是完整的正则表达式
-</pre></div>
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-11-24T21:04:00+08:00">
+                Published: 2017-11-24 21:04:00
+        </abbr>
 
-
-<h4>位置：anchor 锚定</h4>
-<div class="highlight"><pre><span></span>行开头      ^
-行结尾     $
-字符开头        \&lt;       并不是所有语言支持，注意
-字符结尾        \&gt;  
-            \b
-( )         使用括号来划定多选结构的范围，以及限制多选分支;分组 ；捕获文本
-</pre></div>
-
-
-<h4>数量</h4>
-<div class="highlight"><pre><span></span>quantifiers 量词
-    ?               0或1个
-    *               0或多个
-    +               1或多个
-interval quantifier 区间量词
-    {n}             =n
-    {n,m}           n&lt;=   &lt;=m
-    {n,}            &gt;=n
-    {,m}            &lt;=m
-</pre></div>
-
-
-<h4>字符</h4>
-<div class="highlight"><pre><span></span>.                               任意字符
-排序-预定义字符类
-大小写                     是够忽略大小写 egrep -i 参数 忽略大小写
-</pre></div>
-
-
-<h4>字符组</h4>
-<div class="highlight"><pre><span></span>[ ]                             字符组
-[^ ]                            排除型字符组 匹配一个未列出的字符
-[a-z] [A-Z] [A-Za-z]
-[0-9] 
-[A-Za-z0-9]
-</pre></div>
-
-
-<h4>字符组和字符</h4>
-<div class="highlight"><pre><span></span>[ - ]                   字符组元字符，必须在字符组中，且位于字符中间
-. ?                     在字符组中是普通字符  
-内外有别
-</pre></div>
-
-
-<h4>转义字符</h4>
-<div class="highlight"><pre><span></span>      \             backslash 反斜线-- escape 转义符
-</pre></div>
-
-
-<h4>其他概念</h4>
-<div class="highlight"><pre><span></span>backreference   反向引用      特殊元字符序列  \1
-正则表达式的解读方式
-</pre></div>
-
-
-<h4>Linux上的命令</h4>
-<div class="highlight"><pre><span></span>基础正则表达式
-        Basic Regular Expression，具有更加严谨的字符串表示方式，其典型辅助程序命令为gre
-扩展正则表达式
-        Extend Regular Expression，具有更加广泛和简便的使用模式，其典型辅助程序命令为egrep。
-</pre></div>
-
-
-<h4>Flavor 流派-了解技术渊源</h4>
-<div class="highlight"><pre><span></span>1.支持的元字符和这些元字符的意义
-2.与宿主语言的交互方式
-3.正则表达式的引擎，以及如何应用到文本
-            所使用的引擎的类型，决定了引擎能够支持的特性以及这些特性的用途
-
-历史
-    正则集合--正则表达式--正则表达式编译器
-    正则表达式--词法分析
-        编译原理--语言和文法、词法分析、语法分析、语法制导翻译、中间代码生成、存储管理、代码优化和目标代码生成
-            程序设计语言的本质
-    Henry Spencer 正则表达式包
-POSIX
-    locale -- 让程序变得国际化
-        Basic Regular Expressions
-        Extended Regular Expressions
-</pre></div>
-
-
-<h4>正则表达式的处理方式：</h4>
-<div class="highlight"><pre><span></span><span class="err">集成式</span>
-            <span class="n">perl</span> <span class="err">的集成式</span>
-                <span class="o">=~</span> <span class="n">m</span><span class="o">/^</span><span class="n">Subject</span><span class="p">:(</span><span class="o">.*</span><span class="p">)</span><span class="o">/</span><span class="n">i</span>
-<span class="err">程序式</span>
-<span class="err">面向对象式</span>
-        <span class="err">由构造函数及其方法提供</span>
-    <span class="err">例如</span><span class="n">java</span><span class="err">包提供两个类</span><span class="o">-</span><span class="n">Pattern</span><span class="err">和</span><span class="n">Matcher</span>
-         <span class="kn">import</span> <span class="nn">java.util.regex.</span><span class="o">*</span><span class="p">;</span>
-         <span class="n">Pattern</span> <span class="n">r</span> <span class="o">=</span> <span class="n">Pattern</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">Pattern</span><span class="o">.</span><span class="n">CASE_INSENSTIVE</span><span class="p">);</span>
-         <span class="n">Matcher</span> <span class="n">m</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">matcher</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
-
-<span class="err">函数式</span>
-        <span class="err">由普通函数提供</span>
-</pre></div>
-
-
-<h4>正则表达式原理</h4>
-<div class="highlight"><pre><span></span>Finite Automation
-    当前状态读入一个字符后，和后继状态的转换- (状态-字母表 输入字符-初态集--状态转移矩阵-终态集 )
-            后继状态为自身
-            后继状态只有一个
-            后继状态有多个
-        如果每次转换后继状态唯一，则 Deterministic            DFA
-                                                 反之则 Nondeterministic       NFA
-                                                    NFA 有若干初始状态，允许接受字 ，多值映射
-DFA- 文本主导       text-directed           确定性有穷自动机
-     DFA对于文本串里的每一个字符只需扫描一次，比较快，但特性较少
-    最长的左子正则式优先匹配成功”
-
-NFA- 表达式主导  regex-directed      非确定性有穷自动机
-        速度慢，但是特性丰富
-        支持lazy和backreference等特性
-        最左子正则式优先匹配成功，因此偶尔会错过最佳匹配结果
-</pre></div>
-
-
-<h4>引擎分类的具体语言</h4>
-<div class="highlight"><pre><span></span>DFA
-        awk egrep   MySQL
-NFA--传统型
-        Java、Python 、Perl 、PHP 、
-        GNU Emacs 、vi、
-        grep  、sed 、
-NFA--POSIX型
-    混合
-        GNU awk、GNU grep/egrep
-</pre></div>
-
-
-<h4>编辑文本的正则表达式</h4>
-<div class="highlight"><pre><span></span>01.UltraEdit 
-        UltraEdit的正则表达式
-         删除多余空行。
-            删除空行:   替换  %[ ^t]++^p  为 空串
-            删除行尾空格: 替换  [ ^t]+$     为 空串 
-            删除行首空格: 替换  %[ ^t]+     为 空串
-    UltraEdit 
-        perl的正则表达式
-        1.非某个字符开头的全部替换为空--perl
-            ^(?!create table).*$
-            ^(?!create table).*$
-            ^是字符串开头，(?!   )  是否定环视，意思是后面不是……
-        2.例如
-        ^(?!drop|--).*$
-        3.多个连续的空格替换成一个空格
-            [ ]+
-02.Editplus
-    ^Nov.*$
-    空白行
-        ^[ \t]*\n   ^[ \t]*\n是一行空白行的正则表达式，多次点击全部替换
-</pre></div>
-
-
-<h4>附录：</h4>
-<div class="highlight"><pre><span></span>1.框架性知识和具体知识
-    框架性知识：系统的学习和阅读
-    具体知识：    实践积累
-2.表达式的基本模型和解决问题的基本思路
-以可能未曾想过的方式解决问题
-3. 支持正则表达式
-操作系统
-文本编辑工具
-主流编程语言
-4. 学习过程
-    照猫画虎--融会贯通
-5.比较异同
-    正则表达式 regular expression
-    通配符  wildcards
-</pre></div>
-
-
-<h4>参考</h4>
-<div class="highlight"><pre><span></span>《鸟哥的私房菜》
-《精通正则表达式》
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/command-line.html">command line</a> </p>
+</footer><!-- /.post-info -->                <p>Linux下合并文件-提取行等数据操作</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-31.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -326,6 +571,28 @@ NFA--POSIX型
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>shell的不同版本以及区别和联系</p>
                 <a class="readmore" href="/os/my-super-os-post-09.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-27.html" rel="bookmark"
+                           title="Permalink to Hbase数据模型以及与Hive的继承">Hbase数据模型以及与Hive的继承</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-10-22T22:02:00+08:00">
+                Published: 2017-10-22 22:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/hbase.html">HBase</a> </p>
+</footer><!-- /.post-info -->                <p>Hbase以及Hive外部关联表</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-27.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

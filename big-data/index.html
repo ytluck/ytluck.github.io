@@ -26,7 +26,287 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-26.html">Hive高阶数据查询</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-28.html">阿里云离线计算初步使用</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-12-16T19:02:00+08:00">
+                Published: 2017-12-16 19:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/hive.html">Hive</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>了解数据上云的流程，对数据进入阿里云平台的技术方案进行了解，方案主要涉及技术的流程，成本以等方面的考虑。
+阿里云的使用-个人云时代
+借助云技术，开创新时代
+</pre></div>
+
+
+<h3>大数据离线计算--阿里云使用demo</h3>
+<div class="highlight"><pre><span></span>1.使用的流程--将数据存储到OSS
+2.在Maxcompute创建外部表，同时创建内部表，将数据通过内部表形式导入到Maxcompute
+3.在Maxcompute计算
+4.quick BI 读取Maxcompute 数据-创建报表
+</pre></div>
+
+
+<h3>1.过程：</h3>
+<div class="highlight"><pre><span></span>01.源头对接：
+    数据采集-
+    将采集的数据发送至OSS    
+02.上云处理
+        01.按照文件目录以及文件分区设置好OSS
+        02.只需要创建一个外部表，便可把这张表作为源表进行查询
+        03.创建Maxcompute内部表，并将数据从外部表中导入
+        04.内部表持续累加，外部表周期性删除即可
+        05.对内部表进行maxcompute分析，并将结果保存
+        06.对计算结果进行BI展示
+    涉及的阿里云产品
+            OSS
+            Maxcompute
+            QuickBI
+03.服务输出：
+        Maxcompute 计算结果保存以及调用
+        邮件发送报表
+</pre></div>
+
+
+<h3>2.涉及其他方面：</h3>
+<div class="highlight"><pre><span></span>数据安全和管理：
+数据质量
+成本
+</pre></div>
+
+
+<h3>1.创建OSS对象，并存储数据</h3>
+<div class="highlight"><pre><span></span>01.OSS开通服务
+02.创建存储空间(bucket)
+    通过管理控制台等方式进行文件存储操作
+        01.OSS首先创建存储空间（bucket）
+        02.向存储空间中上传您的数据或文件（即OSS中的对象Object）
+            上传方式：
+                    大文件上传（断点续传）
+                    小文件上传（普通上传）
+                    流式文件上传（追加上传）
+                    网页上传（表单上传）
+            下载方式
+                    文件访问URL
+                    OSS直接下载
+                    配合CDN加速下载
+        03.上传和下载场景
+                客户端直传
+                服务器上传
+        04.授权管理
+            访问控制
+                    基础访问控制（Accesskey）
+                    主子账号控制（RAM）
+                    临时访问授权（STS）
+                    访问日志
+        05.对象存储OSS多种工具
+                    OSS客户端工具 可视化文件管理
+                    OSSFS工具 云端数据本地挂载
+                    OSS FTP工具 论坛附件云端存储
+                    OSS迁移工具 海量数据无缝迁移
+                    Aliyun OSSUTIL 全新上线更好用
+                    OSS图片处理工具
+  OSS上文件路径
+    OSS 的连接格式为oss://oss-cn-shanghai-internal.aliyuncs.com/Bucket名称/目录名称/。目录后不要加文件名称
+     自定义 Extractor 实现更复杂的数据处理抽取逻辑
+I、  01.Bucket   ali 
+        02. directory： 
+                    test
+                        parttag=2017-11-26/C_****.json
+                        parttag=2017-11-26/C_****.json
+                    example
+                        parttag=2017-11-26/
+
+        bucket 为oss-odps-test                                       ali                     
+        endpoint 为oss-cn-shanghai-internal.aliyuncs.com，            oss-cn-beijing.aliyuncs.com
+        数据文件的存放路径为/demo/vehicle.csv                         da/parttag=2017-11-26/C_****.json
+</pre></div>
+
+
+<h4>2.在Maxcompute创建外部表，同时创建内部表，将数据通过内部表形式导入到Maxcompute</h4>
+<div class="highlight"><pre><span></span> <span class="nt">01</span><span class="o">.</span>    <span class="err">前提条件：</span>
+    <span class="err">实名认证云账号，生成</span> <span class="nt">AccessId</span> <span class="err">和</span> <span class="nt">Accesskey</span>
+    <span class="err">给云账号赋建表权限</span>
+ <span class="nt">02</span><span class="o">.</span>    <span class="err">创建表方式</span>
+    <span class="nt">a</span><span class="o">)</span>  <span class="err">可视化建表</span>
+    <span class="nt">b</span><span class="o">)</span>  <span class="err">语句建表</span>
+<span class="err">以下采用语句建表</span>
+<span class="nt">2</span><span class="nc">.1--</span> <span class="err">创建外部表</span>
+<span class="nt">DROP</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">lt_da_item_external</span><span class="o">;</span>
+<span class="nt">CREATE</span> <span class="nt">EXTERNAL</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">EXISTS</span> <span class="nt">lt_da_item_external</span>
+<span class="o">(</span>
+<span class="nt">item_id</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_geohash</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_category</span>  <span class="nt">string</span>
+<span class="o">)</span>
+<span class="nt">STORED</span> <span class="nt">BY</span> <span class="s1">&#39;com.aliyun.odps.CsvStorageHandler&#39;</span> 
+<span class="nt">WITH</span> <span class="nt">SERDEPROPERTIES</span> <span class="o">(</span>
+ <span class="s1">&#39;odps.properties.rolearn&#39;</span><span class="o">=</span><span class="s1">&#39;acs:ram::***********:role/aliyunodpsdefaultrole&#39;</span>
+<span class="o">)</span> 
+<span class="nt">LOCATION</span> <span class="s1">&#39;oss://oss-cn-shanghai-internal.aliyuncs.com/compt/alidata/item/&#39;</span><span class="o">;</span>
+
+<span class="nt">DROP</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">lt_da_user_external</span><span class="o">;</span>
+<span class="nt">CREATE</span> <span class="nt">EXTERNAL</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">EXISTS</span>   <span class="nt">lt_da_user_external</span><span class="o">(</span>
+ <span class="nt">user_id</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_id</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">behavior_type</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">user_geohash</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_category</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">time</span>  <span class="nt">string</span><span class="o">)</span>
+<span class="nt">STORED</span> <span class="nt">BY</span> <span class="s1">&#39;com.aliyun.odps.CsvStorageHandler&#39;</span> 
+<span class="nt">WITH</span> <span class="nt">SERDEPROPERTIES</span> <span class="o">(</span>
+ <span class="s1">&#39;odps.properties.rolearn&#39;</span><span class="o">=</span><span class="s1">&#39;acs:ram::***********:role/aliyunodpsdefaultrole&#39;</span>
+<span class="o">)</span> 
+<span class="nt">LOCATION</span> <span class="s1">&#39;oss://oss-cn-shanghai-internal.aliyuncs.com/compt/alidata/user/&#39;</span><span class="o">;</span>
+
+<span class="nt">2</span><span class="nc">.2--</span> <span class="err">创建内部表</span>
+<span class="nt">DROP</span> <span class="nt">TABLE</span>  <span class="nt">IF</span> <span class="nt">EXISTS</span>  <span class="nt">lt_da_item</span><span class="o">;</span>
+<span class="nt">CREATE</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">EXISTS</span> <span class="nt">lt_da_item</span>
+<span class="o">(</span><span class="nt">item_id</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_geohash</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_category</span>  <span class="nt">string</span><span class="o">);</span>
+
+<span class="nt">DROP</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">lt_da_user</span><span class="o">;</span>
+<span class="nt">CREATE</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">EXISTS</span>  <span class="nt">lt_da_user</span><span class="o">(</span>
+ <span class="nt">user_id</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_id</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">behavior_type</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">user_geohash</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">item_category</span>  <span class="nt">string</span><span class="o">,</span>
+ <span class="nt">time</span>  <span class="nt">string</span><span class="o">);</span>
+
+<span class="nt">2</span><span class="nc">.3--</span> <span class="err">导入数据</span><span class="nt">--</span> <span class="err">外部分区表数据导入内部表操作</span>  <span class="nt">lt_da_item_external</span>
+<span class="nt">INSERT</span> <span class="nt">OVERWRITE</span> <span class="nt">TABLE</span> <span class="nt">lt_da_item</span>
+<span class="nt">SELECT</span>  <span class="nt">item_id</span><span class="o">,</span><span class="nt">item_geohash</span> <span class="o">,</span><span class="nt">item_category</span> <span class="nt">FROM</span> <span class="nt">lt_da_item_external</span> <span class="o">;</span>
+
+<span class="nt">INSERT</span> <span class="nt">OVERWRITE</span> <span class="nt">TABLE</span>   <span class="nt">lt_da_user</span>
+<span class="nt">SELECT</span> <span class="nt">user_id</span><span class="o">.</span> <span class="nt">item_id</span><span class="o">,</span><span class="nt">behavior_type</span><span class="o">,</span><span class="nt">user_geohash</span> <span class="o">,</span><span class="nt">item_category</span><span class="o">,</span><span class="nt">time</span>  <span class="nt">FROM</span> <span class="nt">lt_da_user_external</span> <span class="o">;</span>  
+<span class="nt">III</span><span class="err">、添加表数据</span>
+ <span class="nt">ALTER</span> <span class="nt">TABLE</span> <span class="nt">ca_test_amp_external</span> 
+ <span class="nt">ADD</span> <span class="nt">PARTITION</span> <span class="o">(</span><span class="nt">parttag</span><span class="o">=</span><span class="s1">&#39;2017-11-26&#39;</span><span class="o">)</span> <span class="nt">location</span> <span class="s1">&#39;/parquetdata/test/data/amp/20170929&#39;</span>
+<span class="nt">--</span> <span class="err">外部分区表数据导入内部表操作</span>
+ <span class="nt">INSERT</span> <span class="nt">OVERWRITE</span> <span class="nt">TABLEca_test_amp</span> 
+ <span class="nt">PARTITION</span><span class="o">(</span><span class="nt">parttag</span> <span class="o">=</span> <span class="s1">&#39;2017-11-16&#39;</span><span class="o">)</span> 
+ <span class="nt">SELECT</span> <span class="nt">l</span><span class="o">,</span><span class="nt">version</span> <span class="nt">FROM</span> <span class="nt">ca_test_amp_external</span>  <span class="nt">WHERE</span> <span class="nt">parttag</span> <span class="o">=</span> <span class="s1">&#39;2017-11-26&#39;</span><span class="o">;</span>
+
+ <span class="nt">IV-01</span><span class="err">、针对内部表进行计算</span>
+
+ <span class="nt">IV-02</span><span class="err">、</span> <span class="err">针对内部表进行计算，并保留计算结果</span>
+
+ <span class="nt">V</span><span class="err">、将计算结果使用报表进行可视化</span>
+</pre></div>
+
+
+<h4>3.在Maxcompute计算</h4>
+<div class="highlight"><pre><span></span><span class="x">-- 查看所有表</span>
+<span class="x">show tables;</span>
+<span class="x">--查看外部表数据</span>
+<span class="x">-- 查看表描述</span>
+<span class="x">desc  lt_da_user_external;</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+<span class="x">| Owner: ALIYUN</span><span class="p">$</span><span class="nv">yt</span><span class="x"> | Project: input_demo                                  |</span>
+<span class="x">| TableComment:                                                                      |</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+<span class="x">| CreateTime:               2017-11-27 15:12:29                                      |</span>
+<span class="x">| LastDDLTime:              2017-11-27 15:12:29                                      |</span>
+<span class="x">| LastModifiedTime:         2017-11-27 15:12:29                                      |</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+<span class="x">| ExternalTable: YES                                                                 |</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+<span class="x">| Native Columns:                                                                    |</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+<span class="x">| Field           | Type       | Label | Comment                                     |</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+<span class="x">| item_id         | string     |       |                                             |</span>
+<span class="x">| item_geohash    | string     |       |                                             |</span>
+<span class="x">| item_category   | string     |       |                                             |</span>
+<span class="x">+------------------------------------------------------------------------------------+</span>
+
+<span class="x">SELECT  item_id,item_geohash ,item_category FROM lt_da_item_external  limit 100;</span>
+</pre></div>
+
+
+<h4>4.Quick BI</h4>
+<div class="highlight"><pre><span></span>选定数据源--创建数据集--新建工作表或新建仪表盘--数据门户
+</pre></div>
+
+
+<h4>附录：</h4>
+<div class="highlight"><pre><span></span>00.名词解释
+    对象存储 OSS
+        阿里云对象存储服务（Object Storage Service，简称 OSS）
+        可以通过调用 API，在任何应用、任何时间、任何地点上传和下载数据，
+            也可以通过 Web 控制台对数据进行简单的管理。
+            OSS 适合存放任意类型的文件，适合各种网站、开发企业及开发者使用。
+            按实际容量付费真正使您专注于核心业务。
+01.-- 单独插入
+insert into table lt_da_user  
+values (&#39;a&#39;,1),(&#39;b&#39;,2),(&#39;c&#39;,3);
+创建内部表,并从其他表复制表结构
+CREATE TABLE table_name LIKE table_name2 ;
+02.-- 出现错误
+Semantic analysis exception - external table checking failure, error message: {&quot;RequestId&quot;:&quot;455DA0B3-28FC-4639-9AD6-9EED6AABFB1D&quot;,
+&quot;HostId&quot;:&quot;sts.aliyuncs.com&quot;,&quot;Code&quot;:&quot;NoPermission&quot;,&quot;Message&quot;:&quot;You are not authorized to do this action. You should be authorized by RAM.&quot;}
+    注意设置权限，需要有OSS权限以及大数据权限
+        AliyunOSSFullAccess
+        AliyunODPSRolePolicy
+分区：
+    在实际的生产环境中，使用分区，可以避免很多问题。从OSS到Maxcompute
+
+    -- 分区表的生命周期
+    --分区表的最后一个分区被回收后，该表不会被删除。生命周期只能设定到表级别，不能再分区级
+     ALTER TABLE table_name SET lifecycle days;
+    1.OSS上存储数据时需要遵循location的路径格式。如有效的路径存储layout:
+            //oss-odps-test/log_data/year=2016/month=06/day=01/logfile
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>https://help.aliyun.com/document_detail/30267.html?spm=5176.doc30265.6.554.19UEfT
+MaxCompute常用语句汇总(更新ing) https://yq.aliyun.com/articles/222955?utm_content=m_32180
+帮助企业做好MaxCompute大数据平台成本优化的最佳实践 https://yq.aliyun.com/articles/257512?spm=5176.8091938.0.0.uoFG4n
+访问 OSS 非结构化数据 https://help.aliyun.com/document_detail/45389.html?spm=5176.product27797.6.690.q1k51L
+DDL语句 https://help.aliyun.com/document_detail/27862.html?spm=5176.doc45389.2.12.IJG4cn
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-27.html" rel="bookmark"
+                           title="Permalink to Hbase数据模型以及与Hive的继承">Hbase数据模型以及与Hive的继承</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-10-22T22:02:00+08:00">
+                Published: 2017-10-22 22:02:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/hbase.html">HBase</a> </p>
+</footer><!-- /.post-info -->                <p>Hbase以及Hive外部关联表</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-27.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-26.html" rel="bookmark"
+                           title="Permalink to Hive高阶数据查询">Hive高阶数据查询</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-08-06T19:02:00+08:00">
                 Published: 2017-08-06 19:02:00
@@ -37,195 +317,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/hive.html">Hive</a> </p>
-</footer><!-- /.post-info --><h3>Hive中的内置函数</h3>
-<div class="highlight"><pre><span></span>Built-in Operators 和Built-in Functions
-场景：
-一般函数
-    关系运算 数学运算 逻辑运算 数值计算 
-    日期函数  字符串函数  统计函数
-    条件函数   COALESCE     nvl  case when      if
-    类型转换 
-集合函数  std
-聚合函数        Built-in Aggregate Functions (UDAF)             
-表生成函数   explode       stack 
-    UDTF(User-Defined Table-Generating Functions) 用来解决 ，UDTF
-    有两种使用方法，一种直接放到select后面，一种和lateral view一起使用
-    直接select中使用，不可以添加其他字段使用，不可以嵌套调用，
-            不可以和group by/cluster by/distribute by/sort by一起使用
-    输入一行输出多行(On-to-many maping) 的需求
-        select tf.* from (select 0) t lateral view explode(array(&#39;A&#39;,&#39;B&#39;,&#39;C&#39;)) tf as col;
-        select tf.* from (select 0) t lateral view explode(map(&#39;A&#39;,10,&#39;B&#39;,20,&#39;C&#39;,30)) tf as key,value;
-        select tf.* from (select 0) t lateral view stack(2,&#39;A&#39;,10,
-                date &#39;2015-01-01&#39;,&#39;B&#39;,20,date &#39;2016-01-01&#39;) tf as col0,col1,col2;
-    posexplode() --同时返回原来所在的位置
-分析函数    Analytics functions
-窗口函数 Windowing functions
-User-Defined Functions (UDFs)
-    自定义函数
-            •虽然Hive提供了很多函数，但是有些还是难以满足我们的需求。因此Hive提供了自定义函数开发
-        •自定义函数包括三种UDF、UADF、UDTF
-            •UDF(User-Defined-Function)
-            •UDAF（User- Defined Aggregation Funcation）
-            •UDTF(User-Defined Table-Generating Functions)  用来解决 输入一行输出多行(On-to-many maping) 的需求。 
-        HIVE中使用定义的函数的三种方式
-            •在HIVE会话中add 自定义函数的jar文件，然后创建function，继而使用函数
-            •在进入HIVE会话之前先自动执行创建function，不用用户手工创建
-            •把自定义的函数写到系统函数中，使之成为HIVE的一个默认函数，这样就不需要create temporary function
-</pre></div>
-
-
-<h3>窗口函数用于计算基于组的某种聚合值</h3>
-<div class="highlight"><pre><span></span>    聚合函数和窗口函数over()
-sum(s)over(order by s range between 2 preceding and 2 following) 表示加2或减2的范围内的求和
-sum(s)over(order by s rows between 2 preceding and 2 following)表示在上下两行之间的范围内
-    PRECEDING：往前
-    FOLLOWING：往后
-    CURRENT ROW：当前行
-    UNBOUNDED：起点
-    UNBOUNDED PRECEDING 表示从前面的起点，
-    UNBOUNDED FOLLOWING：表示到后面的终点
-聚合函数对于每个组只返回一行。
-分析函数用于计算基于组的某种聚合值，对于每个组返回多行
-窗口函数
-    function_name ( * ) OVER ( window_definition )
-    窗口函数中--分析函数
-         row_number()、  rank()、dense_rank() 、 
-                            first_value(value any)、last_value(value any)，
-                            lag(value any)、lead(value any)
-            sum(),agv()，max(),min()
-</pre></div>
-
-
-<h3>去重</h3>
-<div class="highlight"><pre><span></span>去重采用的方式有三种
-distinct    distinct支持单列、多列的去重方式
-        单列去重的方式简明易懂，即相同值只保留1个。 
-        多列的去重则是根据指定的去重的列信息来进行，
-        即只有所有指定的列信息都相同，才会被认为是重复的信息。
-        位置：
-          选择两个字段时
-            将distinct放在前一个字段之前，则会返回对两个字段的组合去重后的结果；
-            而如果将distinct放在后一个字段之前，则会报错。
-                                解决方式：多次去重，逐次减少字段
-group by
-(row_number() over( partition by ) as order  from tableA t1   )tt1  where tt1.order=1
-            有null值的情况--默认order by 时，desc NULL 值排在首位，ASC时NULL值排在末尾，
-                可通过NULLS LAST、NULLS FIRST 控制
-                RANK() OVER (ORDER BY column_name DESC NULLS LAST)
-</pre></div>
-
-
-<h3>分组--Top N</h3>
-<div class="highlight"><pre><span></span>1.group by
-2.利用生成序号，通过序号来进行使用 例如数据  500,500,300按照该降序排列
-    row_number() over()     1   2   3
-    dense_rank() over()     1   1   2
-    rank() over()                   1   1   3
-    分组中的最值所在的行数据
-        max  +    group by 
-    最值有多个的情况    --返回窗口的第一个和最后一个值--FIRST_VALUE() 和LAST_VALUE()
-            FIRST、LAST  获得一个排序分组中的第一个值和组后一个值
-        保留一个 max(ename) keep(dense_rank LAST order by sal) over(PARTITION BY deptno)
-    firsr_value
-</pre></div>
-
-
-<h3>聚合函数--动态Group By</h3>
-<div class="highlight"><pre><span></span>hive窗口函数，部分和oracle相似，cube需要2的N次方次分组, 而rollup只需要N+1个分组
-cube对所有的维度进行聚合
-grouping sets
-        在GROUP BY语句后面指定多个统计选项，
-        可以简单理解为多条group by语句通过union all把查询结果聚合起来结合起来
-rollup 在层次上对数据进行聚合
-    cube简称数据魔方，可以实现hive多个任意维度的查询, 低版本hive可以通过union all方式解决      
-        cube(a,b,c),则2^3 =8,首先会对(a,b,c)进行group by，然后依次是(a,b),(a,c),(a),(b,c),(b),(c),
-        最后在对全表进行group by，会统计所选列中值的所有组合的聚合,
-            即(a,b,c),(a,b),(a,c),(a),(b,c),(b),(c),()
-        select device_id,os_id,app_id,client_version,from_id,count(user_id) 
-        from test_reg 
-        group by device_id,os_id,app_id,client_version,from_id with cube;
-    rollup可以实现从右到做递减多级的统计，显示统计某一层次结构的聚合。
-        --维度在分组的结果集中进行聚合操作 rollup(a,b,c)  
-            则(a,b,c),(a,b),(a),()  N+1
-             select device_id,os_id,app_id,client_version,from_id,count(user_id) 
-                from test_reg 
-                group by device_id,os_id,app_id,client_version,from_id with rollup
-    Grouping_ID函数--grouping_id其实就是所统计各列二进制和
-            没有统计某一列时，它的值显示为null，
-            这可能与列本身就有null值冲突，
-            这就需要一种方法区分是没有统计还是值本来就是null
-</pre></div>
-
-
-<h3>join的连接条件</h3>
-<div class="highlight"><pre><span></span>先筛选
-连接条件的位置
-on and和on where
-    在使用left join时，on and和on where条件的区别如下：  
-        1、 (on and)条件 是在生成临时表时使用的条件，
-                它不管on中的条件是否为真，都会返回左边表中的记录。  
-        2、where条件是在临时表生成好后，再对临时表进行过滤的条件。
-                这时已经没有left join的含义（必须返回左边表的记录）了，
-                条件不为真的就全部过滤掉，
-                on后的条件用来生成左右表关联的临时表，
-                where后的条件对临时表中的记录进行过滤。
-        3.on and  和 on where
-        where是生成临时表以后再进行过滤，对左右表都进行筛选。
-        而and后面的语句如果是对left join中的左表进行过滤将不起任何作用，对右表进行过滤的话，
-            那么左表还是返回所有行，只是右表会被过滤掉一部分行。
-    在使用inner join 时
-        这里on and条件和on where条件一样对生成以后的临时表同样会被过滤
-where and --不使用on的方式 
-     select t1.name,t2.grade from  t1, t2 where t1.name= t2.name and t1.class!=&#39;2&#39;;
-
-多表查询时空值处理
-        coalesce(t1.count,0)
-</pre></div>
-
-
-<h3>字符串类型数字</h3>
-<div class="highlight"><pre><span></span>对字符串类型的数字进行比较--关系运算
-    是从右到左第一个数字比较，如果相等再比较下一个。
-字符串类型的数据的数学运算
-        转成数字进行运算
-    字符串数学运算--也会得出结果
-string  int doubel  bigint  round
-</pre></div>
-
-
-<h3>行转列以及列转行</h3>
-<div class="highlight"><pre><span></span>行转列
-    case when end
-列转行
-  case when  
-  union all
-输入一行变多行
-     Lateral View用于UDTF(user-defined table generating functions)中将行转成列
-     UDTF(User-Defined Table-Generating Functions)  用来解决 输入一行输出多行(On-to-many maping) 的需求
-     select src.id, mytable.col1, mytable.col2 from src lateral view explode_map  (properties) mytable as col1, col2;
-
-综合
-    把结果分级并转为列
-        dense_rank() over()--case when-再次生成一组case when-- dense_rank()   over()
-聚合函数 分析函数 窗口函数 group  动态group函数
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>Oracle查询优化改写
-Enhanced Aggregation, Cube, Grouping and Rollup  https://cwiki.apache.org/confluenc/display/Hive/Enhanced+Aggregation%2C+Cube%2C+Grouping+and+Rollup
- hive新功能 Cube, Rollup介绍  http://blog.csdn.net/moon_yang_bj/article/details/17200367
-LanguageManual GroupBy  https://cwiki.apache.org/confluence/display/Hive/LanguageManual+GroupBy
-LanguageManual UDF https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
-hive udaf开发入门和运行过程详解 http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888051.html
- Hive分析窗口函数系列文章  http://blog.csdn.net/guohecang/article/details/51582242
- SQL左右连接中的on and和on where的区别  http://blog.csdn.net/xingzhemoluo/article/details/39677891
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Hive内置运算和内置函数及常用场景</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-26.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

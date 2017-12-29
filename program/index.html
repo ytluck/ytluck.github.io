@@ -26,7 +26,152 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-32.html">正则表达式初步总结</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-35.html">不同语言的命令行参数</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T23:00:00+08:00">
+                Published: 2017-12-24 23:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>在批量运行脚本时，需要对脚本添加一些参数，针对这些参数，不同的计算给出了不同的方式。
+总结SHELL脚本，Python的参数解析，R语言的批量运行方式以及脚本的参数。
+命令行参数的形式
+命令行参数的风格
+</pre></div>
+
+
+<h4>Shell脚本的方式</h4>
+<div class="highlight"><pre><span></span><span class="x">1.shell脚本执行方式：exec（exec script.sh）、source（source script.sh）、fork（./script.sh）</span>
+<span class="x">2.传递参数方式</span>
+<span class="x">    bash中，可以用以下三种方式来处理命令行参数，每种方式都有自己的应用场景。</span>
+<span class="x">        01.直接处理，依次对</span><span class="p">$</span><span class="x">1,</span><span class="p">$</span><span class="x">2,...,</span><span class="p">$</span><span class="nv">n</span><span class="x">进行解析，分别手工处理；</span>
+<span class="x">        02.getopts来处理，单个字符选项的情况（如：-n 10 -f file.txt等选项）；</span>
+<span class="x">        03.getopt，可以处理单个字符选项，也可以处理长选项long-option（如：--prefix=/home等）</span>
+<span class="x">        其中方式一中   </span><span class="p">$</span><span class="x">0表示脚本文件名。</span>
+<span class="x">            第一个参数用</span><span class="p">$</span><span class="x">1表示，第二个参数</span><span class="p">$</span><span class="x">2表示，。。。以此类推。</span>
+<span class="x">            另外一个在shell编程中经常用到 的是&quot;</span><span class="p">$</span><span class="x">@ &quot;这个代表所有的参数</span>
+</pre></div>
+
+
+<h4>Python方式</h4>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="n">Python</span><span class="err">语言简单的解析</span> <span class="n">sys</span> <span class="err">模块</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+<span class="mf">02.</span><span class="n">argparse</span><span class="err">是</span><span class="n">python</span><span class="err">用于解析命令行参数和选项的标准模块，用于解析命令行参数</span>
+<span class="err">命令行参数解析</span>
+    <span class="err">参数类型：</span>
+        <span class="err">定位参数，可选参数</span>
+        <span class="err">互斥参数组</span>
+        <span class="n">default</span> <span class="o">-</span> <span class="err">不指定参数时的默认值</span><span class="p">,</span><span class="err">缺省参数</span>
+        <span class="n">required</span> <span class="o">-</span> <span class="err">可选参数是否可以省略</span> <span class="p">(</span><span class="err">仅针对可选参数</span><span class="p">)</span><span class="err">。</span>    
+<span class="err">步骤</span>
+    <span class="mf">1.</span><span class="err">首先导入该模块；</span>
+        <span class="kn">import</span> <span class="nn">argparse</span>
+    <span class="mf">2.</span><span class="err">然后创建一个解析对象</span><span class="o">-</span><span class="err">并进行简单的描述；</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="mf">3.</span><span class="err">然后向该对象中添加你要关注的命令行参数和选项，每一个</span><span class="n">add_argument</span><span class="err">方法对应一个你要关注的参数或选项；</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">()</span>
+            <span class="nb">type</span><span class="err">：参数的类型，默认是字符串</span><span class="n">string</span><span class="err">类型，还有</span><span class="nb">float</span><span class="err">、</span><span class="nb">int</span><span class="err">等类型</span>
+            <span class="n">action</span> <span class="o">-</span> <span class="err">命令行遇到参数时的动作，默认值是</span> <span class="n">store</span>
+        <span class="err">参数组</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">parse</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="mf">4.</span><span class="err">最后调用</span><span class="n">parse_args</span><span class="p">()</span><span class="err">方法进行解析；</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+
+<h4>R语言</h4>
+<div class="highlight"><pre><span></span><span class="m">01.</span>批量运行脚本
+命令行
+    R CMD BATCH  脚本文件名      输出文件名
+    Rscript         脚本文件名   参数
+R界面
+    <span class="kn">source</span>
+
+<span class="m">02.</span>获得参数使用的函数 <span class="kp">commandArgs</span><span class="p">(</span><span class="kc">TRUE</span><span class="p">)</span>
+    argv <span class="o">&lt;-</span>     <span class="kp">commandArgs</span><span class="p">(</span><span class="kc">TRUE</span><span class="p">)</span>
+    x <span class="o">&lt;-</span> as.numberic<span class="p">(</span>argv<span class="p">[</span><span class="m">1</span><span class="p">])</span>
+    y <span class="o">&lt;-</span> <span class="kp">as.character</span><span class="p">(</span>argv<span class="p">[</span><span class="m">2</span><span class="p">])</span>
+
+<span class="m">03.</span>
+    文件是否存在以及是否有权限
+    执行权限
+    是否 <span class="c1">#/usr/bin/Rscript  可以直接执行</span>
+<span class="m">04.</span>赋予权限
+    Linux 下 chmod
+</pre></div>
+
+
+<h4>其余语言</h4>
+<div class="highlight"><pre><span></span>处理命令行参数是一个相似而又复杂的事情，为此，
+    C提供了getopt/getopt_long等函数
+    C++的boost提供了Options库
+    Java：程序开始于对函数main()的调用。
+        01.在这样做的时候，有两个参数被送给main(),
+            其中的一个描述了命令行参数的个数，通常称为argc；
+                            另一个是命令行参数的数组，通常称为argv。
+        02.命令行的参数以空格隔开。
+            但是，若命令行的参数本身包含空格时，则该参数必须用一对双引号括起来
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-34.html" rel="bookmark"
+                           title="Permalink to Python案例学习-异常处理">Python案例学习-异常处理</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T22:30:00+08:00">
+                Published: 2017-12-24 22:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Python的异常处理</p>
+                <a class="readmore" href="/program/my-program-post-34.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-33.html" rel="bookmark"
+                           title="Permalink to Python图像检测-开发环境设置">Python图像检测-开发环境设置</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-24T22:20:00+08:00">
+                Published: 2017-12-24 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>cv2包以及pyenv virtualenv</p>
+                <a class="readmore" href="/program/my-program-post-33.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-32.html" rel="bookmark"
+                           title="Permalink to 正则表达式初步总结">正则表达式初步总结</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-11-24T23:20:00+08:00">
                 Published: 2017-11-24 23:20:00
@@ -37,209 +182,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h4>表达式的构造细节</h4>
-<div class="highlight"><pre><span></span>特殊字符
-具体文本
-解释顺序-                       
-针对的对象(什么工具软件)
-</pre></div>
-
-
-<h4>正则表达式字符构成</h4>
-<div class="highlight"><pre><span></span>match 匹配
-    metacharacter           元字符
-    normal text character    解释正则表达式按照字符来理解
-                接下来是and then
-    character set           字符组
-    alternative             多选分支 --自身可以是完整的正则表达式
-</pre></div>
-
-
-<h4>位置：anchor 锚定</h4>
-<div class="highlight"><pre><span></span>行开头      ^
-行结尾     $
-字符开头        \&lt;       并不是所有语言支持，注意
-字符结尾        \&gt;  
-            \b
-( )         使用括号来划定多选结构的范围，以及限制多选分支;分组 ；捕获文本
-</pre></div>
-
-
-<h4>数量</h4>
-<div class="highlight"><pre><span></span>quantifiers 量词
-    ?               0或1个
-    *               0或多个
-    +               1或多个
-interval quantifier 区间量词
-    {n}             =n
-    {n,m}           n&lt;=   &lt;=m
-    {n,}            &gt;=n
-    {,m}            &lt;=m
-</pre></div>
-
-
-<h4>字符</h4>
-<div class="highlight"><pre><span></span>.                               任意字符
-排序-预定义字符类
-大小写                     是够忽略大小写 egrep -i 参数 忽略大小写
-</pre></div>
-
-
-<h4>字符组</h4>
-<div class="highlight"><pre><span></span>[ ]                             字符组
-[^ ]                            排除型字符组 匹配一个未列出的字符
-[a-z] [A-Z] [A-Za-z]
-[0-9] 
-[A-Za-z0-9]
-</pre></div>
-
-
-<h4>字符组和字符</h4>
-<div class="highlight"><pre><span></span>[ - ]                   字符组元字符，必须在字符组中，且位于字符中间
-. ?                     在字符组中是普通字符  
-内外有别
-</pre></div>
-
-
-<h4>转义字符</h4>
-<div class="highlight"><pre><span></span>      \             backslash 反斜线-- escape 转义符
-</pre></div>
-
-
-<h4>其他概念</h4>
-<div class="highlight"><pre><span></span>backreference   反向引用      特殊元字符序列  \1
-正则表达式的解读方式
-</pre></div>
-
-
-<h4>Linux上的命令</h4>
-<div class="highlight"><pre><span></span>基础正则表达式
-        Basic Regular Expression，具有更加严谨的字符串表示方式，其典型辅助程序命令为gre
-扩展正则表达式
-        Extend Regular Expression，具有更加广泛和简便的使用模式，其典型辅助程序命令为egrep。
-</pre></div>
-
-
-<h4>Flavor 流派-了解技术渊源</h4>
-<div class="highlight"><pre><span></span>1.支持的元字符和这些元字符的意义
-2.与宿主语言的交互方式
-3.正则表达式的引擎，以及如何应用到文本
-            所使用的引擎的类型，决定了引擎能够支持的特性以及这些特性的用途
-
-历史
-    正则集合--正则表达式--正则表达式编译器
-    正则表达式--词法分析
-        编译原理--语言和文法、词法分析、语法分析、语法制导翻译、中间代码生成、存储管理、代码优化和目标代码生成
-            程序设计语言的本质
-    Henry Spencer 正则表达式包
-POSIX
-    locale -- 让程序变得国际化
-        Basic Regular Expressions
-        Extended Regular Expressions
-</pre></div>
-
-
-<h4>正则表达式的处理方式：</h4>
-<div class="highlight"><pre><span></span><span class="err">集成式</span>
-            <span class="n">perl</span> <span class="err">的集成式</span>
-                <span class="o">=~</span> <span class="n">m</span><span class="o">/^</span><span class="n">Subject</span><span class="p">:(</span><span class="o">.*</span><span class="p">)</span><span class="o">/</span><span class="n">i</span>
-<span class="err">程序式</span>
-<span class="err">面向对象式</span>
-        <span class="err">由构造函数及其方法提供</span>
-    <span class="err">例如</span><span class="n">java</span><span class="err">包提供两个类</span><span class="o">-</span><span class="n">Pattern</span><span class="err">和</span><span class="n">Matcher</span>
-         <span class="kn">import</span> <span class="nn">java.util.regex.</span><span class="o">*</span><span class="p">;</span>
-         <span class="n">Pattern</span> <span class="n">r</span> <span class="o">=</span> <span class="n">Pattern</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">Pattern</span><span class="o">.</span><span class="n">CASE_INSENSTIVE</span><span class="p">);</span>
-         <span class="n">Matcher</span> <span class="n">m</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">matcher</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
-
-<span class="err">函数式</span>
-        <span class="err">由普通函数提供</span>
-</pre></div>
-
-
-<h4>正则表达式原理</h4>
-<div class="highlight"><pre><span></span>Finite Automation
-    当前状态读入一个字符后，和后继状态的转换- (状态-字母表 输入字符-初态集--状态转移矩阵-终态集 )
-            后继状态为自身
-            后继状态只有一个
-            后继状态有多个
-        如果每次转换后继状态唯一，则 Deterministic            DFA
-                                                 反之则 Nondeterministic       NFA
-                                                    NFA 有若干初始状态，允许接受字 ，多值映射
-DFA- 文本主导       text-directed           确定性有穷自动机
-     DFA对于文本串里的每一个字符只需扫描一次，比较快，但特性较少
-    最长的左子正则式优先匹配成功”
-
-NFA- 表达式主导  regex-directed      非确定性有穷自动机
-        速度慢，但是特性丰富
-        支持lazy和backreference等特性
-        最左子正则式优先匹配成功，因此偶尔会错过最佳匹配结果
-</pre></div>
-
-
-<h4>引擎分类的具体语言</h4>
-<div class="highlight"><pre><span></span>DFA
-        awk egrep   MySQL
-NFA--传统型
-        Java、Python 、Perl 、PHP 、
-        GNU Emacs 、vi、
-        grep  、sed 、
-NFA--POSIX型
-    混合
-        GNU awk、GNU grep/egrep
-</pre></div>
-
-
-<h4>编辑文本的正则表达式</h4>
-<div class="highlight"><pre><span></span>01.UltraEdit 
-        UltraEdit的正则表达式
-         删除多余空行。
-            删除空行:   替换  %[ ^t]++^p  为 空串
-            删除行尾空格: 替换  [ ^t]+$     为 空串 
-            删除行首空格: 替换  %[ ^t]+     为 空串
-    UltraEdit 
-        perl的正则表达式
-        1.非某个字符开头的全部替换为空--perl
-            ^(?!create table).*$
-            ^(?!create table).*$
-            ^是字符串开头，(?!   )  是否定环视，意思是后面不是……
-        2.例如
-        ^(?!drop|--).*$
-        3.多个连续的空格替换成一个空格
-            [ ]+
-02.Editplus
-    ^Nov.*$
-    空白行
-        ^[ \t]*\n   ^[ \t]*\n是一行空白行的正则表达式，多次点击全部替换
-</pre></div>
-
-
-<h4>附录：</h4>
-<div class="highlight"><pre><span></span>1.框架性知识和具体知识
-    框架性知识：系统的学习和阅读
-    具体知识：    实践积累
-2.表达式的基本模型和解决问题的基本思路
-以可能未曾想过的方式解决问题
-3. 支持正则表达式
-操作系统
-文本编辑工具
-主流编程语言
-4. 学习过程
-    照猫画虎--融会贯通
-5.比较异同
-    正则表达式 regular expression
-    通配符  wildcards
-</pre></div>
-
-
-<h4>参考</h4>
-<div class="highlight"><pre><span></span>《鸟哥的私房菜》
-《精通正则表达式》
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>正则表达式构成</p>
+                <a class="readmore" href="/program/my-program-post-32.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

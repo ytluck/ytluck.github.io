@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据采集层-埋点</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-33.html" rel="bookmark"
+           title="Permalink to 数据采集层-埋点">数据采集层-埋点</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-12-29T22:04:00+08:00">
+                Published: 2017-12-29 22:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/command-line.html">command line</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>规范化--标准化--自动化--智能化--个性化
+数据埋点
+</pre></div>
+
+
+<h3>数据采集体系方案</h3>
+<div class="highlight"><pre><span></span>1.日志采集  ：
+01.浏览器的日志采集
+        页面浏览日志采集--
+                PV  &lt;page view&gt;     页面浏览量
+                UV &lt;Unique Vistors&gt; 访客数
+            01.HTTP Request
+                    HTTP  Request Line          请求行
+                            请求方法&lt;get post&gt; 、请求资源的URL  HTPP协议版本号
+                    HTTP  Message Header    请求报头
+                    Http Messsage Body          请求正文
+            02.HTTP Response
+                    状态行
+                    响应报头
+                    响应正文
+            03.浏览器展现
+                &lt;在浏览器适当位置增加一个日志采集节点，当浏览器解析到这个节点时，
+                   将自动触发 一个特定的HTTP请求到日志采集服务器&gt;
+                                采集工作和发送模块--收集--解析                                   
+            页面交互日志采集--
+                 采集代码与要监测的交互行为做绑定
+
+            采集--发送--收集--解析--预处理--具有半结构化特征
+                 预处理包括-- 
+                     合法性校验--  识别流量攻击，网络爬虫和虚假流量
+                     数据缺失项补正--对取值进行归一，标准化处理以及反向补正
+                     无效数据剔除
+                     日志数据隔离分发
+02.无线客户端的日志采集
+        事件
+              页面事件
+                    页面展示接口
+                    页面退出接口
+                    页面扩展信息接口
+
+              控件点击事件
+                    呈现高度的业务特征
+
+              分析--
+                    设备和用户的基本信息
+                    被访问的页面信息
+                    页面来源--透传参数，即把当前页面的某些信息，传递到下一个页面
+                基本分析内容：
+                        用户行为路径
+                        计算页面停留时间
+        客户端类型
+                native app
+                    Android
+                    iOS
+                hybrid -app
+                    H5
+        特殊场景
+            无线客户端的访问行为存在明显的回退行为--利用
+            客户端聚合数据
+</pre></div>
+
+
+<h4>数据传输</h4>
+<div class="highlight"><pre><span></span>    无线客户端日志的上传-压缩和传输
+        上传机制
+        01. 产生一条上传一条
+        02.先存储到客户端本地，伺机上传
+    传输--优先级以及分流
+ 面对的问题
+        1.没有数据-需求覆盖不全
+        2.海量数据-结构化和规范化--日志规范以及元数据中心
+        3.采集方案-终端设备技术无关，日志采集的着眼点与基于日志的后续应用。
+</pre></div>
+
+
+<h4>数据同步</h4>
+<div class="highlight"><pre><span></span>    01.业务系统--数据系统--数据服务系统&lt;业务&gt;
+        数据源--来源多样
+                数据库  MySQL ORACLE DB2
+                    --      Mongodb  Hbase   OceanBase  Hive
+                文件系统：
+                        OSS  CSV
+                数据量大以及时效
+    02.同步方式
+            直连同步：
+                    方式：通过规范接口API和基于动态链接库
+                    对业务可能产生影响
+            数据文件同步
+            数据库日志解析同步：
+                    最常见的方式
+                    数据延迟，积压和漂移等情况
+    03分类.
+        从时间上
+            批量数据同步
+                    Data X-- 先创建目标表，在通过同步工具填写数据库连接-表字段等各种配置信息后测试完成同步
+                                OneClick
+            实时数据同步
+                TT  Time Tunnel  消息订阅模式--主动和被动的订阅机制，历史数据订阅
+        从数据量上
+                增量和全量
+                    合并技术--merge=update+insert
+
+    04. 数据同步遇到的问题
+        功能：数据漂移
+            多获取一天的数据，通过多个时间戳字段获取相对准确的数据
+        性能：分库分表方案--解决高并发大数据量的处理能力
+</pre></div>
+
+
+<h4>采集字段</h4>
+<div class="highlight"><pre><span></span>    设备标识
+            PC端--cookie信息
+            APP端--  IMEI IMSI MAC UDID
+                        用户自我保护意识加强-
+                        各系统升级-权限控制
+            阿里巴巴的UTDID--每台设备一个ID作为唯一标志
+                        生成算法-- 存储方式-存储位置-共享方式
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
