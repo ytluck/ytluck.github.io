@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>JSon数据格式和操作</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-36.html" rel="bookmark"
+           title="Permalink to JSon数据格式和操作">JSon数据格式和操作</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-01-27T23:00:00+08:00">
+                Published: 2017-01-27 23:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>JSON是一种轻量级的数据转换格式，json文件占带宽比XML文件小。
+常规操作包括生成JSON字符串、解析JSON字符串
+</pre></div>
+
+
+<h3>JSON建构于两种结构：</h3>
+<div class="highlight"><pre><span></span>1. &quot;名称/值&quot;对的集合（A collection of name/value pairs）。
+    不同的语言中，它被理解为对象（object），
+           记录（record），结构（struct），字典（dictionary），
+           哈希表（hash table），有键列表（keyed list），
+          或者关联数组 （associative array）。
+2. 值的有序列表（An ordered list of values）。
+        在大部分语言中，它被理解为数组（array）。 
+规则：
+        1）映射用冒号（“：”）表示。名称:值  
+        2）并列的数据之间用逗号（“，”）分隔。名称1:值1,名称2:值2  
+        3） 映射的集合（对象）用大括号（“{}”）表示。{名称1:值1,名称2:值2}  
+        4） 并列数据的集合（数组）用方括号(“[]”)表示
+            {} 双括号表示对象
+            [] 中括号表示数组
+        一个JSON数组——JSONArray
+            [{&quot;name&quot;:&quot;胡小&quot; , &quot;age&quot;:26 , &quot;male&quot;:true},{&quot;name&quot;:&quot;赵小&quot; , &quot;age&quot;:27 , &quot;male&quot;:false}]
+</pre></div>
+
+
+<h3>R 语言中的JSON处理</h3>
+<div class="highlight"><pre><span></span>install.packages<span class="p">(</span><span class="s">&quot;rjson&quot;</span><span class="p">)</span> <span class="o">--</span>包含 fromJSON<span class="p">(),</span> newJSONParser<span class="p">(),</span> toJSON<span class="p">()</span>
+<span class="c1"># 加载包</span>
+   <span class="kn">library</span><span class="p">(</span><span class="s">&quot;rjson&quot;</span><span class="p">)</span>
+<span class="c1"># Give the input file name to the function.</span>
+    result <span class="o">&lt;-</span> fromJSON<span class="p">(</span>file <span class="o">=</span> <span class="s">&quot;inputfile.json&quot;</span><span class="p">)</span>
+    <span class="kp">print</span><span class="p">(</span>result<span class="p">)</span>
+<span class="c1"># 数据类型转换    </span>
+    json2data_frame <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>result<span class="p">)</span>
+</pre></div>
+
+
+<h3>Python中JSON</h3>
+<div class="highlight"><pre><span></span><span class="n">I</span><span class="err">、自带的包</span>  <span class="kn">import</span> <span class="nn">json</span>
+    <span class="mf">01.</span><span class="err">把一个</span><span class="n">Python</span><span class="err">对象编码转换成</span><span class="n">Json</span><span class="err">字符串</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span> <span class="p">)</span><span class="err">方法对简单数据类型</span>
+            <span class="err">自定义类型的数据结构，</span><span class="n">json</span><span class="err">模块默认是没法处理的，会抛出异常：</span><span class="ne">TypeError</span> <span class="n">xx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">JSON</span> <span class="n">serializable</span><span class="err">，</span>
+                <span class="err">此时你需要自定义一个转换函数</span><span class="p">:</span>
+    <span class="mf">02.</span><span class="err">把</span><span class="n">Json</span><span class="err">格式字符串解码转换成</span><span class="n">Python</span><span class="err">对象</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">dumps</span><span class="err">是将</span><span class="nb">dict</span><span class="err">转化成</span><span class="nb">str</span><span class="err">格式，</span><span class="n">loads</span><span class="err">是将</span><span class="nb">str</span><span class="err">转化成</span><span class="nb">dict</span><span class="err">格式</span>
+<span class="n">II</span><span class="err">、</span><span class="n">pandas</span><span class="err">中的</span><span class="n">JSON</span>
+    <span class="err">如果是</span><span class="n">Series</span><span class="err">转</span><span class="n">json</span><span class="err">，</span><span class="n">to_json</span><span class="p">()</span> 
+            <span class="err">默认的</span><span class="n">orient</span><span class="err">是</span><span class="s1">&#39;index&#39;</span>
+            <span class="n">orient</span><span class="err">可选参数有</span> <span class="p">{</span><span class="s1">&#39;split&#39;</span><span class="p">,</span> <span class="s1">&#39;records&#39;</span><span class="p">,</span><span class="s1">&#39;index&#39;</span><span class="p">}</span>
+    <span class="err">如果是</span><span class="n">DataFrame</span><span class="err">转</span><span class="n">json</span><span class="err">，</span>
+        <span class="err">默认的</span><span class="n">orient</span><span class="err">是</span><span class="s1">&#39;columns&#39;</span><span class="err">，</span>
+            <span class="n">orient</span><span class="err">可选参数有</span> <span class="p">{</span><span class="s1">&#39;split&#39;</span><span class="p">,</span><span class="s1">&#39;records&#39;</span><span class="p">,</span><span class="s1">&#39;index&#39;</span><span class="p">,</span><span class="s1">&#39;columns&#39;</span><span class="p">,</span><span class="s1">&#39;values&#39;</span><span class="p">}</span>
+
+    <span class="n">json</span><span class="err">的格式如下</span> 
+        <span class="n">split</span><span class="err">，</span>      <span class="nb">dict</span> <span class="n">like</span> <span class="err">样式为</span> <span class="p">{</span><span class="n">index</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">columns</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">columns</span><span class="p">],</span> <span class="n">data</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">values</span><span class="p">]}</span>
+        <span class="n">records</span><span class="err">，</span>    <span class="nb">list</span> <span class="n">like</span>   <span class="err">样式为</span>  <span class="p">[{</span><span class="n">column</span> <span class="o">-&gt;</span> <span class="n">value</span><span class="p">},</span> <span class="err">…</span> <span class="p">,</span> <span class="p">{</span><span class="n">column</span> <span class="o">-&gt;</span> <span class="n">value</span><span class="p">}]</span>
+        <span class="n">index</span> <span class="err">，</span> <span class="nb">dict</span> <span class="n">like</span>   <span class="err">样式为</span> <span class="p">{</span><span class="n">index</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="n">column</span> <span class="o">-&gt;</span> <span class="n">value</span><span class="p">}}</span>
+        <span class="n">columns</span><span class="err">，</span><span class="nb">dict</span> <span class="n">like</span>   <span class="err">样式为</span> <span class="p">{</span><span class="n">index</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="n">column</span> <span class="o">-&gt;</span> <span class="n">value</span><span class="p">}}</span>
+        <span class="n">values</span><span class="err">，</span> <span class="err">样式</span> <span class="n">just</span> <span class="n">the</span> <span class="n">values</span> <span class="n">array</span> 
+        <span class="n">table</span><span class="err">，</span>      <span class="nb">dict</span> <span class="n">like</span>   <span class="err">样式为</span><span class="p">{</span><span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">schema</span><span class="p">},</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">data</span><span class="p">}}</span><span class="err">，和</span><span class="n">records</span><span class="err">类似</span>
+    <span class="err">保存数据</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="err">：以</span><span class="n">Json</span><span class="err">格式导出数据到文本文件</span>
+</pre></div>
+
+
+<h3>Java/Scala中的JSON解析</h3>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="n">jackson</span>
+       <span class="n">jackson</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="mf">2.2.3</span><span class="p">.</span><span class="n">jar</span><span class="err">（核心</span><span class="n">jar</span><span class="err">包）</span><span class="n">jackson</span><span class="o">-</span><span class="n">annotations</span><span class="o">-</span><span class="mf">2.2.3</span><span class="p">.</span><span class="n">jar</span><span class="err">（该包提供</span><span class="n">Json</span><span class="err">注解支持）</span>
+      <span class="n">jackson</span><span class="o">-</span><span class="n">databind</span><span class="o">-</span><span class="mf">2.2.3</span><span class="p">.</span><span class="n">jar</span>
+    <span class="n">JSON</span><span class="err">的三种处理方式</span> 
+    <span class="n">Jackson</span><span class="err">提供了三种可选的</span><span class="n">JSON</span><span class="err">处理方法（一种方式及其两个变型）：</span>
+      <span class="mf">001.</span><span class="err">流式</span> <span class="n">API</span><span class="err">：（也称为</span><span class="s">&quot;增量分析/生成&quot;</span><span class="err">）</span> <span class="err">读取和写入</span> <span class="n">JSON</span> <span class="err">内容作为离散事件。</span>
+            <span class="n">org</span><span class="p">.</span><span class="n">codehaus</span><span class="p">.</span><span class="n">jackson</span><span class="p">.</span><span class="n">JsonParser</span> <span class="err">读，</span>  <span class="n">org</span><span class="p">.</span><span class="n">codehaus</span><span class="p">.</span><span class="n">jackson</span><span class="p">.</span><span class="n">JsonGenerator</span> <span class="err">写。</span>  
+      <span class="mf">002.</span><span class="err">树模型</span> <span class="err">：提供一个</span> <span class="n">JSON</span> <span class="err">文档可变内存树的表示形式。</span>      
+            <span class="n">org</span><span class="p">.</span><span class="n">codehaus</span><span class="p">.</span><span class="n">jackson</span><span class="p">.</span><span class="n">map</span><span class="p">.</span><span class="n">ObjectMapper</span> <span class="err">生成树</span> <span class="err">；树组成</span> <span class="n">JsonNode</span> <span class="err">节点集。</span>
+            <span class="err">树模型类似于</span> <span class="n">XML</span> <span class="n">DOM</span><span class="err">。</span>
+     <span class="mf">003.</span><span class="err">数据绑定：</span> <span class="n">JSON</span><span class="err">和</span><span class="n">POJO</span><span class="err">相互转换，基于属性访问器规约或注解。</span>
+        <span class="err">有</span> <span class="err">两种变体：</span> <span class="err">简单</span> <span class="err">和</span> <span class="err">完整</span> <span class="err">的数据绑定：</span>
+        <span class="err">简单数据绑定：</span> <span class="err">是指从</span><span class="n">Java</span> <span class="n">Map</span><span class="err">、</span><span class="n">List</span><span class="err">、</span><span class="n">String</span><span class="err">、</span><span class="n">Numbers</span><span class="err">、</span><span class="kt">Boolean</span><span class="err">和空值进行转换</span>
+        <span class="err">完整数据绑定</span> <span class="err">：是指从任何</span> <span class="n">Java</span> <span class="n">bean</span> <span class="err">类型</span> <span class="err">（及上文所述的</span><span class="s">&quot;简单&quot;</span><span class="err">类型）</span> <span class="err">进行转换</span>  
+            <span class="n">org</span><span class="p">.</span><span class="n">codehaus</span><span class="p">.</span><span class="n">jackson</span><span class="p">.</span><span class="n">map</span><span class="p">.</span><span class="n">ObjectMapper</span> <span class="err">对两个变种，</span>   
+            <span class="err">进行编组（</span><span class="n">marshalling</span> <span class="err">）处理</span> <span class="err">（写入</span> <span class="n">JSON</span><span class="err">）</span> <span class="err">和反编组（</span><span class="n">unmarshalling</span> <span class="err">，读</span> <span class="n">JSON</span><span class="err">）。</span>
+        <span class="err">引入：</span>
+    <span class="o">*</span> <span class="n">ObjectMapper</span><span class="err">是</span><span class="n">JSON</span><span class="err">操作的核心</span>
+    <span class="o">*</span> <span class="n">Jackson</span><span class="err">的</span><span class="n">JSON</span><span class="err">操作在</span><span class="n">ObjectMapper</span><span class="err">中实现</span>
+    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">new</span> <span class="n">User</span><span class="p">();</span>
+    <span class="n">ObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ObjectMapper</span><span class="p">();</span>
+    <span class="c1">//User类转JSON</span>
+    <span class="c1">//输出结果：{&quot;name&quot;:&quot;zhanli&quot;,&quot;age&quot;:19,&quot;birthday&quot;:82300,&quot;email&quot;:&quot;zhanli@163.com&quot;}</span>
+      <span class="n">String</span> <span class="n">json</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">.</span><span class="n">writeValueAsString</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+      <span class="n">System</span><span class="p">.</span><span class="k">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">json</span><span class="p">);</span>
+    <span class="c1">//mapper.readValue</span>
+<span class="mf">02.f</span><span class="n">asterjson</span>
+    <span class="err">引用：</span> <span class="n">import</span> <span class="n">com</span><span class="p">.</span><span class="n">alibaba</span><span class="p">.</span><span class="n">fastjson</span><span class="p">.</span><span class="n">JSON</span>
+    <span class="c1">//序列化</span>
+    <span class="n">JSON</span><span class="p">.</span><span class="n">toJSONString</span>       <span class="err">把对象</span><span class="n">o</span><span class="err">转化为</span><span class="n">JSON</span><span class="err">格式的文本</span>
+    <span class="n">JSON</span><span class="p">.</span><span class="n">toJSONBytes</span>
+    <span class="c1">//信息反序列化</span>
+    <span class="n">JSON</span><span class="p">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">jsonString</span><span class="p">,</span> <span class="n">Object</span><span class="p">.</span><span class="k">class</span><span class="p">);</span>  
+    <span class="c1">// 将json字符串转成一个对象</span>
+    <span class="n">JSON</span><span class="p">.</span><span class="n">parseArray</span>
+    <span class="nl">eg</span><span class="p">:</span>
+      <span class="n">val</span> <span class="n">jsonObj</span>  <span class="o">=</span> <span class="n">JSON</span><span class="p">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">firstloor</span><span class="p">)</span>
+      <span class="n">val</span> <span class="n">test02</span>     <span class="o">=</span> <span class="n">JSON</span><span class="p">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">jsonObj</span><span class="p">.</span><span class="n">getString</span><span class="p">(</span><span class="s">&quot;jsonData02&quot;</span><span class="p">))</span>
+      <span class="n">JSON</span><span class="p">.</span><span class="n">parseObject</span><span class="p">(</span><span class="n">test02</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;level3&quot;</span><span class="p">).</span><span class="n">toString</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>常用数据数据源：</h4>
+<div class="highlight"><pre><span></span>常用的数据文件格式:  csv txt  xls xlsx
+常用的数据转换格式:  json  xml html
+常用的数据存储方式:  数据库
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>pandas.DataFrame.to_json按行转json  http://blog.csdn.net/huanbia/article/details/72674832
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

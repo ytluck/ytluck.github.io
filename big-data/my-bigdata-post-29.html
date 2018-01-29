@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark2.2项目开发流程</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-29.html" rel="bookmark"
+           title="Permalink to Spark2.2项目开发流程">Spark2.2项目开发流程</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-08T22:49:00+08:00">
+                Published: 2016-11-08 22:49:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Spark2.2版本开发流程和Spark1.6版本基本相似，有部分不同的地方
+在这里讲述整个项目开发的流程，作为一个文档的汇总。
+</pre></div>
+
+
+<h3>1.版本控制和团队合作</h3>
+<div class="highlight"><pre><span></span>本地没有，远程仓库有的情况
+    打开  git bash
+    然后          cd       /c/test
+    创建目录 mkdir  analysis
+    cd   /c/test/analysis
+    git init 
+    git  config --global  user.email  &#39;&#39;***.com&#39;&#39;
+    git  config --global user.name   &quot;***&quot;
+    git remote add origin https://***/***.git
+    git pull origin master
+</pre></div>
+
+
+<h3>2.基本设置</h3>
+<div class="highlight"><pre><span></span>I、Windows操作系统下开发环境设置
+01.安装语言环境和开发工具以及设置网络对应关系
+        &lt;1&gt;  安装JDK
+                 安装SDK
+                安装开发集成工具 Intellij
+开发版本：
+     Java 8+,   Scala 2.11,  Python 2.7+/3.4+ and R 3.1+. 
+    02.环境变量
+    JAVA_HOME                           C:\Program Files\Java\jdk1.8.0_102
+    HADOOP_HOME                 C:\My_Files\Config\hadoop-common-2.7.1-bin-master
+    HADOOP_USER_NAME        hdfs
+    PATH                                        C:\ProgramData\Oracle\Java\javapath
+                                                    C:\Program Files (x86)\scala\bin   
+                                                    C:\Python27
+                                                    C:\My_Files\Config\hadoop-common-2.2.0-bin-master\bin
+     确认版本：  java -version
+03.网络设置：
+    C:\WINDOWS\system32\drivers\etc\hosts  添加集群IP和集群机器名称的对应关系
+            172.12.10.21 linux21
+            172.12.10.22 linux22
+            172.12.10.23 linux23
+04.     hadoop-common-2.7.1-bin-master
+II、本地开发环境
+    2.0版以后的版本，原有lib目录下的大JAR包被分散成多个小JAR包，
+            原来的spark-assembly-*.jar已经不存在
+            添加依赖包 ：project Structure中--&gt;libraries中的 --&gt; +号 ，点击添加你放置的jar包的位置
+    1.6以前的应该都有 spark-assembly-*.jar
+</pre></div>
+
+
+<h3>3.项目开发步骤</h3>
+<div class="highlight"><pre><span></span>    <span class="mf">01.</span><span class="err">创建</span><span class="n">Maven</span><span class="err">工程</span>
+        <span class="n">maven</span> <span class="err">配置：配置依赖的包</span>
+        <span class="n">groupId</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">spark</span>
+        <span class="n">artifactId</span> <span class="o">=</span> <span class="n">spark</span><span class="o">-</span><span class="n">core_2</span><span class="o">.</span><span class="mi">11</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="mf">2.2</span><span class="o">.</span><span class="mi">0</span>
+    <span class="mf">02.</span><span class="err">配置与连接</span>
+    <span class="mf">04.</span><span class="err">构建</span><span class="n">Dataset</span> <span class="n">DataFrame</span>
+        <span class="err">构建数据并计算</span>
+        <span class="err">方式一：使用</span><span class="n">Dataset</span> <span class="err">或者</span><span class="n">DataFrame</span>
+        <span class="kn">import</span> <span class="nn">java.io.File</span>
+        <span class="kn">import</span> <span class="nn">org.apache.spark.sql.Row</span>
+        <span class="kn">import</span> <span class="nn">org.apache.spark.sql.SparkSession</span>
+        <span class="kn">import</span> <span class="nn">spark.sql</span>
+
+      <span class="o">//</span> <span class="n">getAbsolutePath</span><span class="p">():</span><span class="err">返回抽象路径名的绝对路径名字符串</span>
+        <span class="n">val</span> <span class="n">warehouseLocation</span> <span class="o">=</span> <span class="n">new</span> <span class="n">File</span><span class="p">(</span><span class="s2">&quot;spark-warehouse&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getAbsolutePath</span>
+        <span class="n">val</span> <span class="n">spd</span><span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">master</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">&quot;Word Count&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.sql.warehouse.dir&quot;</span><span class="p">,</span> <span class="n">warehouseLocation</span><span class="p">)</span>        
+            <span class="o">.</span><span class="n">enableHiveSupport</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+
+        <span class="o">//</span><span class="err">从</span><span class="n">hive</span><span class="err">中读取数据</span>
+         <span class="n">spd</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;use testdatabase&quot;</span><span class="p">)</span>
+         <span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM src&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="o">//</span>
+        <span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spd</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s2">&quot;examples/src/main/resources/people.json&quot;</span><span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">spark.implicits._</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;people&quot;</span><span class="p">)</span>
+        <span class="n">val</span> <span class="n">sqlDF</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM people&quot;</span><span class="p">)</span>
+        <span class="n">sqlDF</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="o">//</span><span class="n">a</span> <span class="k">global</span> <span class="n">temporary</span> <span class="n">view</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">createGlobalTempView</span><span class="p">(</span><span class="s2">&quot;people&quot;</span><span class="p">)</span>
+        <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM global_temp.people&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="err">方式二，使用</span><span class="n">RDD</span><span class="err">：</span>
+                <span class="n">val</span> <span class="n">SparkConf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span><span class="o">.</span>
+                            <span class="n">setMaster</span><span class="p">(</span><span class="s2">&quot;mr.master&quot;</span><span class="p">)</span>
+                <span class="n">val</span> <span class="n">sc</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkContext</span><span class="p">(</span><span class="n">SparkConf</span><span class="p">)</span>
+
+    <span class="mf">04.</span><span class="err">将程序打包</span>
+        <span class="o">---</span><span class="err">手动模式</span>
+    <span class="err">步骤、</span><span class="mi">1</span><span class="o">&gt;</span>  <span class="n">File</span><span class="o">----&gt;</span><span class="n">Project</span> <span class="n">Structure</span><span class="o">-----&gt;</span>
+                    <span class="n">Artifact</span>   <span class="o">--&gt;</span> <span class="o">+</span>
+                    <span class="o">&lt;</span><span class="n">playDayCount</span><span class="o">&gt;</span>                                      
+    <span class="err">步骤、</span><span class="mi">2</span><span class="o">&gt;</span><span class="n">Build</span><span class="o">------&gt;</span> <span class="n">BUild</span> <span class="n">Artifact</span>
+    <span class="err">在这个文件夹下</span><span class="n">C</span><span class="p">:</span>\<span class="n">Items</span>\<span class="n">Spark_Odr</span>\<span class="n">out</span>\<span class="n">artifacts</span>\<span class="n">Spark_Odr_jar</span>
+        <span class="err">会有</span><span class="n">Spark_Order</span><span class="o">.</span><span class="n">jar</span><span class="err">的</span><span class="n">jar</span><span class="err">包</span>
+
+    <span class="mf">05.</span><span class="err">上传</span><span class="n">Jar</span><span class="err">包，并运行</span>
+        <span class="mf">001.</span><span class="err">上传</span><span class="n">jar</span><span class="err">包</span> <span class="err">：</span> <span class="n">Spark_Order</span><span class="o">.</span><span class="n">jar</span>
+        <span class="mf">002.</span><span class="err">集群运行</span><span class="n">Spark</span><span class="o">---</span>
+        <span class="err">设定系统任务提交</span> <span class="nb">bin</span><span class="o">/</span><span class="n">spark</span><span class="o">-</span><span class="n">submit</span><span class="err">脚本执行应用配置开发环境</span>
+        <span class="n">spark</span><span class="o">-</span><span class="n">submit</span> <span class="o">--</span><span class="n">num</span><span class="o">-</span><span class="n">executors</span> <span class="mi">4</span> 
+        <span class="o">--</span><span class="n">executor</span><span class="o">-</span><span class="n">cores</span> <span class="mi">1</span> 
+        <span class="o">--</span><span class="n">executor</span><span class="o">-</span><span class="n">memory</span> <span class="mi">4</span><span class="n">G</span> 
+        <span class="o">--</span><span class="n">master</span> <span class="n">yarn</span><span class="o">-</span><span class="n">cluster</span> 
+        <span class="o">--</span><span class="n">queue</span> <span class="n">qmc</span> 
+        <span class="o">--</span><span class="k">class</span> <span class="nc">com</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Score</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">clrDir</span><span class="o">/</span><span class="n">Spark_test</span><span class="o">.</span><span class="n">jar</span>
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>Hive在spark2.0.0启动时无法访问spark-assembly-*.jar的解决办法
+http://blog.csdn.net/wjqwinn/article/details/52692308
+Spark SQL, DataFrames and Datasets Guide
+http://spark.apache.org/docs/2.2.0/sql-programming-guide.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
