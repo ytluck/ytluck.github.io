@@ -26,7 +26,100 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-32.html">Python数据处理-联接</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-37.html">R语言读写数据-数据库MySQL</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-04-15T22:21:00+08:00">
+                Published: 2018-04-15 22:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>R语言连接数据库，通过数据库存放数据，使用R语言来调用数据。
+一方面便于数据的管理，另一方面也便于数据计算流程的复用等
+</pre></div>
+
+
+<h3>代码示例</h3>
+<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>RMySQL<span class="p">)</span>
+<span class="c1"># 连接数据库</span>
+MySQLCon <span class="o">&lt;-</span> dbConnect<span class="p">(</span>RMySQL<span class="o">::</span>MySQL<span class="p">(),</span> dbname <span class="o">=</span> <span class="s">&#39;jdata&#39;</span><span class="p">,</span>host<span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> 
+ user<span class="o">=</span><span class="s">&#39;***&#39;</span><span class="p">,</span> password<span class="o">=</span><span class="s">&#39;***&#39;</span><span class="p">,</span>  charset<span class="o">=</span><span class="s">&#39;GBK&#39;</span><span class="p">)</span>
+<span class="kp">summary</span><span class="p">(</span>MySQLCon <span class="p">)</span>
+
+<span class="c1"># 查找数据</span>
+tablesname <span class="o">&lt;-</span> dbListTables<span class="p">(</span>MySQLCon <span class="p">)</span>
+<span class="c1"># 对表进行查看</span>
+querytablename <span class="o">&lt;-</span> tablesname<span class="p">[</span><span class="m">3</span><span class="p">]</span>
+SQLcommand <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;select count(*) from &quot;</span><span class="p">,</span>querytablename <span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+countNum  <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> SQLcommand <span class="p">)</span>
+<span class="kp">paste</span><span class="p">(</span>querytablename <span class="p">,</span><span class="s">&#39; total &#39;</span><span class="p">,</span>countNum  <span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+
+<span class="c1">#方式一：通过SQL的特性查看 表的字段进行查看</span>
+fieldTableSQL  <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;show full columns from &quot;</span><span class="p">,</span>querytablename <span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+fieldsum <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> fieldTableSQL  <span class="p">)</span>
+fieldname <span class="o">&lt;-</span> fieldsum<span class="p">[</span><span class="s">&#39;Field&#39;</span><span class="p">][</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">]</span>
+filSQL <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span> <span class="s">&quot;select&quot;</span> <span class="p">,</span>fieldname<span class="p">,</span> <span class="s">&quot;, count(distinct user_id)  from&quot;</span><span class="p">,</span> querytablename  <span class="p">,</span><span class="s">&quot; group by&quot;</span><span class="p">,</span> fieldname<span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">)</span>
+plotData <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> filSQL <span class="p">)</span>
+
+<span class="c1"># 方式二，通过Dataframe的情况处理</span>
+fieldall  <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> <span class="kp">paste</span><span class="p">(</span> <span class="s">&#39;select * from &#39;</span><span class="p">,</span> querytablename<span class="p">,</span>sep<span class="o">=</span><span class="s">&#39;&#39;</span> <span class="p">))</span>
+<span class="kp">head</span><span class="p">(</span>fieldall  <span class="p">)</span>
+
+<span class="c1"># 数据探索-最值</span>
+<span class="kp">max</span><span class="p">(</span>fieldall<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
+<span class="kp">max</span><span class="p">(</span><span class="kp">as.numeric</span><span class="p">(</span>fieldall<span class="p">[,</span><span class="m">1</span><span class="p">]))</span>
+<span class="kp">min</span><span class="p">(</span> fieldall<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
+
+<span class="c1">## 数据探索-缺失值</span>
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;user_id&#39;</span><span class="p">))</span>
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;age&#39;</span><span class="p">))</span> 
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;sex&#39;</span><span class="p">))</span> 
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;user_lv_cd&#39;</span><span class="p">))</span>
+
+<span class="c1">## 分组等数据探索操作</span>
+
+<span class="c1"># 关闭数据库连接</span>
+dbDisconnect<span class="p">(</span>MySQLCon <span class="p">)</span>
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-36.html" rel="bookmark"
+                           title="Permalink to Python读写数据-数据库MySQL">Python读写数据-数据库MySQL</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-04-14T22:20:00+08:00">
+                Published: 2018-04-14 22:20:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>Python中的PyMysql</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-36.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-32.html" rel="bookmark"
+                           title="Permalink to Python数据处理-联接">Python数据处理-联接</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-12-30T02:01:00+08:00">
                 Published: 2017-12-30 02:01:00
@@ -37,234 +130,10 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/python.html">Python</a> </p>
-</footer><!-- /.post-info --><h4>数据分析</h4>
-<div class="highlight"><pre><span></span>使用Python进行数据分析，在数据预处理方面，python要比R语言有优势。
-通过熟悉Python基本的数据处理，以便工作中更好的发挥两者的功效。
-首先大体浏览命令，建立起轮廓，然后通过具体的案例，熟悉命令
-结构化的数据处理和非结构化的数据处理
---非结构化数据 转换为结构化的数据
-</pre></div>
-
-
-<h4>数据示例</h4>
-<div class="highlight"><pre><span></span>数据示例：studentid&#39;,&#39;interval&#39;,&#39;countNum
-201 1   1
-201 5   1
-140 1   7
-140 1   2
-140 2   1
-</pre></div>
-
-
-<h4>pandas数据结构</h4>
-<div class="highlight"><pre><span></span>Series  数据和索引 data-index
-DataFrame   表格型数据结构 
-嵌套字典
-</pre></div>
-
-
-<h3>程序代码</h3>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/python</span>
-<span class="c1"># -*- coding:utf-8 -*-</span>
-
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">inpputfile</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">yt</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">Program</span><span class="se">\\</span><span class="s1">Date1030-1112.txt&#39;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1">#读取txt文件</span>
-        <span class="n">interaldata</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">inpputfile</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;studentid&#39;</span><span class="p">,</span><span class="s1">&#39;interval&#39;</span><span class="p">,</span><span class="s1">&#39;countNum&#39;</span><span class="p">],</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="c1">#排序</span>
-        <span class="c1">#interaldata.sort_values(by=&#39;studentid&#39;, ascending=True)</span>
-        <span class="c1">#interaldata.sort_index(axis=1, ascending=True)</span>
-        <span class="c1">#数据转换和去重</span>
-        <span class="n">uniqdata</span> <span class="o">=</span> <span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;studentid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span> 
-        <span class="c1">#分组，确定分组的组数</span>
-        <span class="n">grouped</span> <span class="o">=</span> <span class="n">interaldata</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">])</span>
-        <span class="n">mergerK</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
-        <span class="c1">#联结-组数上+1&lt;从0开始&gt;</span>
-        <span class="c1">#联结的重复列名处理 -- suffixes-追加到重叠列名末尾</span>
-        <span class="c1">#middata = pd.merge( middata  , interaldata[ interaldata[&#39;interval&#39;]==2], on=&#39;studentid&#39; ,how=&#39;left&#39;,suffixes=(&#39;_left&#39;,&#39;-right&#39;))</span>
-        <span class="n">middata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span> <span class="n">uniqdata</span>  <span class="p">,</span> <span class="n">interaldata</span><span class="p">[</span> <span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">],</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;studentid&#39;</span> <span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">ange</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,(</span><span class="n">mergerK</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
-            <span class="n">middata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">middata</span><span class="p">,</span><span class="n">interaldata</span><span class="p">[</span> <span class="n">interaldata</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ange</span><span class="p">],</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;studentid&#39;</span> <span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
-        <span class="c1"># 将NAN替换为0</span>
-        <span class="n">outdata</span> <span class="o">=</span>   <span class="n">middata</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="c1">#列数</span>
-        <span class="n">KK</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#outdata.shape[0]行数</span>
-        <span class="n">colodd</span><span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">KK</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-        <span class="c1">#特定位置添加列表元素</span>
-        <span class="n">colodd</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">colevent</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">KK</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">tmpdata</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="n">colodd</span><span class="p">]</span>
-        <span class="c1">#数据类型转换 </span>
-            <span class="n">resultdata</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="n">colevent</span><span class="p">]</span>
-        <span class="n">resultdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">resultdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">resultdata</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">resultdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
-        <span class="c1">#保存数据-去掉列名</span>
-        <span class="n">resultdata</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">Users</span><span class="se">\\</span><span class="s2">yt</span><span class="se">\\</span><span class="s2">Desktop</span><span class="se">\\</span><span class="s2">Program</span><span class="se">\\</span><span class="s2">submission.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-    <span class="k">except</span>  <span class="ne">IOError</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;错误文件&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">)</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s2">&quot;again</span>
-        <span class="k">except</span>  <span class="ne">NameError</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s2">&quot;again&quot;</span>
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  
-    <span class="n">main</span><span class="p">()</span>
-<span class="c1">##本程序中异常处理功能报错，这部分先放这，待需要时在修正</span>
-<span class="mf">01.</span><span class="c1">#两个对象的列名不同，可以分别指定，例：pd.merge(df1,df2,left_on=&#39;lkey&#39;,right_on=&#39;rkey&#39;)</span>
-    <span class="c1">#middata.rename(columns={&#39;interval_x&#39;:&#39;a&#39;, &#39;interval_y&#39;:&#39;c&#39;}, inplace = True)</span>
-<span class="mf">02.</span>
-<span class="n">interaldata</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>            <span class="c1">#选取多个行</span>
-<span class="n">interaldata</span><span class="o">.</span><span class="n">ix</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span> <span class="c1">#ix 的功能就更强大了，它允许我们混合使用下标和名称进行选取</span>
-<span class="n">interaldata</span><span class="o">.</span><span class="n">irow</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>     <span class="c1">#取data的第一行</span>
-<span class="n">interaldata</span><span class="o">.</span> <span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>        <span class="c1">#取data的第一列 </span>
-<span class="n">interaldata</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>        <span class="c1">#选取第二行第二列，用于已知行、列位置的选取</span>
-<span class="c1"># iloc 使得我们可以对column使用slice（切片）的方法对数据进行选取</span>
-</pre></div>
-</td></tr></table>
-
-<h4>帮助信息</h4>
-<div class="highlight"><pre><span></span> help(resultdata.to_csv)        帮助我们了解该对象的更多信息
- dir(resultdata)                帮助我们获取该对象的大部分相关属性。
-</pre></div>
-
-
-<h4>pandas输入和输出</h4>
-<div class="highlight"><pre><span></span>文件类型和格式     文本文件 二进制文件 数据库 网页
-=文件类型和格式 - 函数-输入参数-输出格式
-    01.函数
-        pandas.read_table()
-        pandas.read_csv()
-        ……
-    02.参数
-        索引
-                index_col
-        标题  header
-             列名 names
-        跳过文件行
-            skiprows
-            skip_footer
-        分割符 sep
-        缺失值默认处理：na_values
-        读取大文件--只读几行nrows
-            chunksize --逐快读取文件-设置行数 chunksize=1000
-            iterator
-        编码
-            encoding
-    03.输出格式
-
-存储
-    -- Dataframe   Series
-    pandas.to_csv()
-        pandas.save()
-</pre></div>
-
-
-<h4>Pandas 数据操作</h4>
-<div class="highlight"><pre><span></span>    并集-outer        交集-inner
-    pandas.concat(,axis=0) 行
-    pandas.concat(,axis=1) 列        
-        outdata.shape[0] #行数
-        outdata.shape[1] #列数
-    reindex
-</pre></div>
-
-
-<h4>比较</h4>
-<div class="highlight"><pre><span></span>01.函数
-    函数          调用  比如  len()  type    函数式代码组织和复用的方式，
-    函数的作用空间，函数亦对象
-对象方法    调用
-对象属性
-
-02.传递方式 
-    01.Python
-        001.可变对象
-        对变量赋值时，是按照引用传递，即创建等号右侧对象的一个引用，赋值==绑定 binding
-        按照 引用传递 -- 即Python函数可以修改其参数的内容
-        002.不可变对象
-
-    02.R语言
-   按照值传递 -- 创建副本
-    03.C语言
-    按 值传递 的意思就是，传入的数据仅仅是数据的值
-                表现：按值传递方法原本的数据不会有变化
-    按 引用传递&lt;地址传递&gt; 的意思就是，直接把数据的地址传进去
-                表现：按引用传递的话，可以修改原数据
-
-03. 大部分是严格求值
-    迭代器和生成器等是懒惰求值 Lazy Evaluation
-    匿名函数 lambda
-    闭包 closure   currying 柯里化
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>merge-pandas-结构化数据预处理</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-32.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

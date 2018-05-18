@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>R语言读写数据-数据库MySQL</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-37.html" rel="bookmark"
+           title="Permalink to R语言读写数据-数据库MySQL">R语言读写数据-数据库MySQL</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-04-15T22:21:00+08:00">
+                Published: 2018-04-15 22:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>R语言连接数据库，通过数据库存放数据，使用R语言来调用数据。
+一方面便于数据的管理，另一方面也便于数据计算流程的复用等
+</pre></div>
+
+
+<h3>代码示例</h3>
+<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>RMySQL<span class="p">)</span>
+<span class="c1"># 连接数据库</span>
+MySQLCon <span class="o">&lt;-</span> dbConnect<span class="p">(</span>RMySQL<span class="o">::</span>MySQL<span class="p">(),</span> dbname <span class="o">=</span> <span class="s">&#39;jdata&#39;</span><span class="p">,</span>host<span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> 
+ user<span class="o">=</span><span class="s">&#39;***&#39;</span><span class="p">,</span> password<span class="o">=</span><span class="s">&#39;***&#39;</span><span class="p">,</span>  charset<span class="o">=</span><span class="s">&#39;GBK&#39;</span><span class="p">)</span>
+<span class="kp">summary</span><span class="p">(</span>MySQLCon <span class="p">)</span>
+
+<span class="c1"># 查找数据</span>
+tablesname <span class="o">&lt;-</span> dbListTables<span class="p">(</span>MySQLCon <span class="p">)</span>
+<span class="c1"># 对表进行查看</span>
+querytablename <span class="o">&lt;-</span> tablesname<span class="p">[</span><span class="m">3</span><span class="p">]</span>
+SQLcommand <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;select count(*) from &quot;</span><span class="p">,</span>querytablename <span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+countNum  <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> SQLcommand <span class="p">)</span>
+<span class="kp">paste</span><span class="p">(</span>querytablename <span class="p">,</span><span class="s">&#39; total &#39;</span><span class="p">,</span>countNum  <span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+
+<span class="c1">#方式一：通过SQL的特性查看 表的字段进行查看</span>
+fieldTableSQL  <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;show full columns from &quot;</span><span class="p">,</span>querytablename <span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+fieldsum <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> fieldTableSQL  <span class="p">)</span>
+fieldname <span class="o">&lt;-</span> fieldsum<span class="p">[</span><span class="s">&#39;Field&#39;</span><span class="p">][</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">]</span>
+filSQL <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span> <span class="s">&quot;select&quot;</span> <span class="p">,</span>fieldname<span class="p">,</span> <span class="s">&quot;, count(distinct user_id)  from&quot;</span><span class="p">,</span> querytablename  <span class="p">,</span><span class="s">&quot; group by&quot;</span><span class="p">,</span> fieldname<span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">)</span>
+plotData <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> filSQL <span class="p">)</span>
+
+<span class="c1"># 方式二，通过Dataframe的情况处理</span>
+fieldall  <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> <span class="kp">paste</span><span class="p">(</span> <span class="s">&#39;select * from &#39;</span><span class="p">,</span> querytablename<span class="p">,</span>sep<span class="o">=</span><span class="s">&#39;&#39;</span> <span class="p">))</span>
+<span class="kp">head</span><span class="p">(</span>fieldall  <span class="p">)</span>
+
+<span class="c1"># 数据探索-最值</span>
+<span class="kp">max</span><span class="p">(</span>fieldall<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
+<span class="kp">max</span><span class="p">(</span><span class="kp">as.numeric</span><span class="p">(</span>fieldall<span class="p">[,</span><span class="m">1</span><span class="p">]))</span>
+<span class="kp">min</span><span class="p">(</span> fieldall<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
+
+<span class="c1">## 数据探索-缺失值</span>
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;user_id&#39;</span><span class="p">))</span>
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;age&#39;</span><span class="p">))</span> 
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;sex&#39;</span><span class="p">))</span> 
+ <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;user_lv_cd&#39;</span><span class="p">))</span>
+
+<span class="c1">## 分组等数据探索操作</span>
+
+<span class="c1"># 关闭数据库连接</span>
+dbDisconnect<span class="p">(</span>MySQLCon <span class="p">)</span>
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
