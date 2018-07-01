@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark实时计算--Spark Structure Streaming 集成Kafka</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-32.html" rel="bookmark"
+           title="Permalink to Spark实时计算--Spark Structure Streaming 集成Kafka">Spark实时计算--Spark Structure Streaming 集成Kafka</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-07-01T11:59:00+08:00">
+                Published: 2018-07-01 11:59:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Spark实时数据计算，采用Spark进行实时计算有两种形式-
+    一种是采用Spark Streaming，其数据类型是Dstreams，
+另外一种是采用Spark Structured Streaming，其数据类型是DataFrames
+</pre></div>
+
+
+<h4>输入和输出</h4>
+<div class="highlight"><pre><span></span>输入源：File 和 Socket  以及Kafka
+I.输入源：
+ 1.读取kafka数据
+        key是偏移量，value是一个byte数组
+        如果使用聚合，将会有window的概念，对应属性watermark
+    01.滑动窗口功能由三个参数决定其功能：窗口时间、滑动步长和触发时间
+      window
+        timecolumn:具有时间戳的列；
+        windowDuration：为窗口的时间长度；
+        slideDuration：为滑动的步长；
+    02.返回的数据类型是Column
+        Column对象传递给DataFrame对象，从而就实现了窗口功能的设置。
+II.输出：
+  structured streaming
+   支持四种输出形式：
+        console,parquet,memory,foreach 四种      
+   支持三种输出模式:
+        Complete mode: 整个更新的结果表都会被输出。
+        Append mode: 只有新增加到结果表的数据会被输出。
+        Updated mode: 只有被更新的结果表会输出。当前版本暂不支持这个特性
+    其他参数设置
+        &quot;truncate&quot;只是为了在控制台输出时，不进行列宽度自动缩小。
+        option(&quot;checkpointLocation&quot;, &quot;path/to/HDFS/dir&quot;)
+</pre></div>
+
+
+<h3>代码示例</h3>
+<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">com</span><span class="o">.</span><span class="n">structureStreaming</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.spark.SparkConf</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.SparkSession</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.streaming.StreamingQuery</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.</span><span class="p">{</span><span class="n">StringType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">StructType</span><span class="p">}</span>
+<span class="kn">import</span> <span class="nn">scala.collection.mutable</span>
+<span class="kn">import</span> <span class="nn">com.util.CommonUtils</span>
+
+<span class="nb">object</span> <span class="n">kafkaInput</span>  <span class="n">extends</span> <span class="n">CommonUtils</span>  <span class="p">{</span>  
+<span class="k">def</span> <span class="nf">getSparkSession</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">SparkSession</span>
+<span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+<span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span><span class="o">.</span><span class="n">setMaster</span><span class="p">(</span><span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;mr.master&quot;</span><span class="p">)))</span>
+<span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;mr.appName&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">createOrReplaceTempViewname</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">sourceName</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">Unit</span> <span class="o">=</span> <span class="p">{</span>
+<span class="kn">import</span> <span class="nn">spark.implicits._</span>
+<span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span>
+<span class="o">.</span><span class="n">readStream</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;kafka.bootstrap.servers&quot;</span><span class="p">,</span> <span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;startingOffsets&quot;</span><span class="p">,</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="o">//</span> <span class="err">创建</span> <span class="n">json</span> <span class="n">schema</span><span class="o">-</span><span class="err">指定表结构的方式创建</span><span class="n">DataSet</span> <span class="err">预定义</span><span class="n">json</span><span class="err">的格式并解析</span><span class="n">kafka</span><span class="err">的数据内容</span>
+<span class="n">val</span> <span class="n">schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">(</span><span class="n">mutable</span><span class="o">.</span><span class="n">Seq</span><span class="p">(</span>
+ <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;CT&quot;</span><span class="p">,</span> <span class="n">StringType</span> <span class="p">)</span>
+<span class="p">,</span><span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;LT&quot;</span><span class="p">,</span> <span class="n">StringType</span> <span class="p">)</span>
+<span class="p">,</span><span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;TA&quot;</span><span class="p">,</span> <span class="n">StringType</span> <span class="p">)</span>
+<span class="p">))</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">schema</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span>
+<span class="o">//</span> <span class="n">DataFrame</span><span class="err">的</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;tablename&quot;</span><span class="p">)</span><span class="err">将其创建或者替换一个临时视图，即表</span><span class="n">tablename</span><span class="err">。</span>
+<span class="o">//</span> <span class="err">就可以用</span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="err">方法在表</span><span class="n">tablename</span><span class="err">上运行</span><span class="n">SQL</span><span class="err">语句了</span>
+<span class="n">val</span> <span class="n">jsonDf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span><span class="s2">&quot;CAST(key AS STRING)&quot;</span><span class="p">,</span> <span class="s2">&quot;cast (value as string) as jsonFormatValue&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">from_json</span><span class="p">(</span><span class="err">$</span><span class="s2">&quot;jsonFormatValue&quot;</span><span class="p">,</span> <span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">)</span><span class="o">.</span><span class="k">as</span><span class="p">(</span><span class="s2">&quot;parsedData&quot;</span><span class="p">))</span>
+<span class="n">jsonDf</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;parsedData.*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">sourceName</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="n">println</span><span class="p">(</span><span class="s2">&quot;error,schema is null&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">createNormal</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">sourceName</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">Unit</span> <span class="o">=</span> <span class="p">{</span>
+<span class="kn">import</span> <span class="nn">spark.implicits._</span>
+<span class="o">//</span> <span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">ProcessingTime</span><span class="p">(</span><span class="s2">&quot;25 seconds&quot;</span><span class="p">))</span>
+<span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span>
+<span class="o">.</span><span class="n">readStream</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;kafka.bootstrap.servers&quot;</span><span class="p">,</span> <span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;startingOffsets&quot;</span><span class="p">,</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="n">val</span> <span class="n">jsonDf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span><span class="s2">&quot;CAST(key AS STRING)&quot;</span><span class="p">,</span> <span class="s2">&quot;CAST(value AS STRING)&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="k">as</span><span class="p">[(</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">)]</span>
+<span class="n">jsonDf</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">sourceName</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">sqlWriteStream</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">StreamingQuery</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">val</span> <span class="n">query</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="o">.</span><span class="n">writeStream</span>
+<span class="o">.</span><span class="n">outputMode</span><span class="p">(</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;console&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;truncate&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;numRows&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">query</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Array</span><span class="p">[</span><span class="n">String</span><span class="p">]):</span> <span class="n">Unit</span> <span class="o">=</span> <span class="p">{</span>
+<span class="o">//</span><span class="err">建立连接</span>
+<span class="n">val</span> <span class="n">spark</span> <span class="o">=</span> <span class="n">getSparkSession</span>
+
+<span class="o">//</span><span class="err">读取</span><span class="n">kafka</span><span class="err">的主题</span><span class="n">topic</span><span class="err">，并将数据注册为临时表</span> <span class="n">dy_test</span>
+<span class="n">val</span> <span class="n">topicName</span> <span class="o">=</span> <span class="s2">&quot;data-people&quot;</span>
+<span class="n">println</span><span class="p">(</span><span class="n">topicName</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">spark.implicits._</span>
+
+<span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span>
+<span class="o">.</span><span class="n">readStream</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;kafka.bootstrap.servers&quot;</span><span class="p">,</span> <span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">topicName</span><span class="p">)</span>
+<span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="o">//</span><span class="n">value</span><span class="err">是字节数组，执行</span><span class="n">CAST</span><span class="err">的作用是将</span><span class="n">value</span><span class="err">转换为字符串</span>
+<span class="n">val</span> <span class="n">jsonDf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span><span class="s2">&quot;CAST(key AS STRING)&quot;</span><span class="p">,</span> <span class="s2">&quot;CAST(value AS STRING)&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="k">as</span><span class="p">[(</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">)]</span>
+<span class="n">jsonDf</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;dy_test&quot;</span><span class="p">)</span>
+<span class="o">//</span><span class="n">createNormal</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">topicName</span><span class="p">,</span> <span class="s2">&quot;dy_test&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">querysql</span> <span class="o">=</span> <span class="s2">&quot;select * from dy_test&quot;</span>
+<span class="n">println</span><span class="p">(</span><span class="n">querysql</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">querys</span> <span class="o">=</span> <span class="n">sqlWriteStream</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">querysql</span><span class="p">)</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">awaitAnyTermination</span><span class="p">()</span>
+<span class="o">//</span> <span class="err">从字符串中解析为各个字段并注册成临时表，进而对表进行</span><span class="n">SQL</span><span class="err">操作</span>
+<span class="o">//</span><span class="n">createOrReplaceTempViewname</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">topicName</span><span class="p">,</span> <span class="s2">&quot;dy_test&quot;</span><span class="p">)</span>
+  <span class="o">/*</span>   <span class="n">val</span> <span class="n">sqls</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="s2">&quot;select * from dyl_test&quot;</span><span class="p">,</span> <span class="s2">&quot;select *,&#39;2&#39; as e from dy_test&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">querys</span> <span class="o">=</span> <span class="n">mutable</span><span class="o">.</span><span class="n">ListBuffer</span><span class="p">[</span><span class="n">StreamingQuery</span><span class="p">]()</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">sql</span> <span class="o">&lt;-</span> <span class="n">sqls</span><span class="p">)</span> <span class="p">{</span>
+<span class="n">println</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">querys</span> <span class="o">+=</span> <span class="n">sqlWriteStream</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">awaitAnyTermination</span><span class="p">()</span>
+<span class="p">}</span><span class="o">*/</span>
+<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3>排查错误形式</h3>
+<div class="highlight"><pre><span></span>错误形式一：
+Caused by: java.lang.ClassNotFoundException: Failed to find data source: kafka.
+依赖关系：
+   kafka data source is an external module and is not available to Spark applications by default.
+   两种方式
+    一种是将依赖打入包内
+    另外一种是提交命令时添加到--package
+解决参考： 
+https://stackoverflow.com/questions/48011941/why-does-formatkafka-fail-with-failed-to-find-data-source-kafka-with-ube
+
+错误形式二：2018/6/29
+ 报错
+ Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.SparkSession
+  This may be because you have two spark version on the same machine
+  解决方式：
+  spark2-submit  --master yarn --deploy-mode cluster  
+  spark-submit   --master yarn-cluster 
+  其中
+  spark-submit  -&gt; /Users/test/sparks/spark-1.6.2-bin-hadoop2.6/bin/spark-submit
+  spark2-submit -&gt; /Users/test/sparks/spark-2.1.1-bin-hadoop2.7/bin/spark-submit
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Structured Streaming整合kafka https://blog.csdn.net/dongyunlon/article/details/79037366
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

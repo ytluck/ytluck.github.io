@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark实时计算--Spark Streaming 集成Kafka</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-31.html" rel="bookmark"
+           title="Permalink to Spark实时计算--Spark Streaming 集成Kafka">Spark实时计算--Spark Streaming 集成Kafka</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-07-01T11:49:00+08:00">
+                Published: 2018-07-01 11:49:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>主要内容
+01.Kafka和Spark Streaming  
+   http://spark.apache.org/docs/latest/streaming-kafka-integration.html
+02.Kafka和Spring
+03.Kafka的介绍
+</pre></div>
+
+
+<h3>1.Kafka和Spark Streaming</h3>
+<div class="highlight"><pre><span></span><span class="mf">01.</span> <span class="n">pom</span><span class="o">.</span><span class="n">xml</span><span class="err">引入</span><span class="n">Maven</span>
+  <span class="err">版本</span>
+    <span class="n">spark</span><span class="o">-</span><span class="n">streaming_2</span><span class="o">.</span><span class="mi">11</span>
+    <span class="n">spark</span><span class="o">-</span><span class="n">streaming</span><span class="o">-</span><span class="n">kafka</span><span class="o">-</span><span class="mi">0</span><span class="o">-</span><span class="mi">10</span><span class="n">_2</span><span class="o">.</span><span class="mi">11</span> 
+    <span class="n">kafka_2</span><span class="o">.</span><span class="mi">11</span>              <span class="mf">0.11</span><span class="o">.</span><span class="mf">0.1</span>
+<span class="mf">02.</span><span class="err">引入</span><span class="o">--</span><span class="err">声明</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.SparkConf</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.streaming.kafka010.KafkaUtils</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.streaming.</span><span class="p">{</span><span class="n">Seconds</span><span class="p">,</span> <span class="n">StreamingContext</span><span class="p">}</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe</span>
+<span class="kn">import</span> <span class="nn">org.apache.kafka.common.serialization.StringDeserializer</span>
+
+<span class="mf">03.</span><span class="err">流程</span>
+   <span class="n">val</span> <span class="n">sparkConf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span>
+                            <span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.streaming.kafka.maxRatePerPartition&quot;</span><span class="p">,</span> <span class="s2">&quot;20&quot;</span><span class="p">)</span><span class="o">//</span><span class="err">设置该值需要知道</span><span class="n">Kafka</span><span class="err">有多少个分区</span>
+                             <span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.driver.allowMultipleContexts&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+
+  <span class="n">val</span> <span class="n">ssc</span> <span class="o">=</span> <span class="n">new</span> <span class="n">StreamingContext</span><span class="p">(</span><span class="n">sparkConf</span><span class="p">,</span> <span class="n">Seconds</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+
+  <span class="n">val</span> <span class="n">kafkaParams</span> <span class="o">=</span> <span class="n">Map</span><span class="p">[</span><span class="n">String</span><span class="p">,</span> <span class="n">Object</span><span class="p">](</span>
+           <span class="s2">&quot;bootstrap.servers&quot;</span> <span class="o">-</span><span class="s2">&quot;localhost:9092,anotherhost:9092&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;key.deserializer&quot;</span> <span class="o">-</span><span class="n">classOf</span><span class="p">[</span><span class="n">StringDeserializer</span><span class="p">],</span>
+            <span class="s2">&quot;value.deserializer&quot;</span> <span class="o">-</span><span class="n">classOf</span><span class="p">[</span><span class="n">StringDeserializer</span><span class="p">],</span>
+            <span class="s2">&quot;group.id&quot;</span> <span class="o">-</span><span class="s2">&quot;use_a_separate_group_id_for_each_stream&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;auto.offset.reset&quot;</span> <span class="o">-</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;enable.auto.commit&quot;</span> <span class="o">-</span><span class="p">(</span><span class="n">false</span><span class="p">:</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Boolean</span><span class="p">)</span>
+           <span class="p">)</span>
+<span class="n">val</span> <span class="n">topics</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="s2">&quot;topicA&quot;</span><span class="p">,</span> <span class="s2">&quot;topicB&quot;</span><span class="p">)</span>
+<span class="o">//</span><span class="n">KafkaUtils</span><span class="o">.</span><span class="n">createDirectStream</span> <span class="err">返回值是</span><span class="n">ConsumerRecord</span><span class="p">[</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">]</span><span class="err">类型</span>
+<span class="o">//</span> <span class="n">topic</span><span class="err">，</span><span class="n">partition</span><span class="err">和</span><span class="n">offset</span>
+<span class="n">val</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">KafkaUtils</span><span class="o">.</span><span class="n">createDirectStream</span><span class="p">[</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">](</span>
+  <span class="n">ssc</span><span class="p">,</span>
+  <span class="n">PreferConsistent</span><span class="p">,</span>
+  <span class="n">Subscribe</span><span class="p">[</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">](</span><span class="n">topics</span><span class="p">,</span> <span class="n">kafkaParams</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="o">//</span><span class="err">业务处理</span>
+
+<span class="o">//</span> <span class="err">计算完毕后</span>
+<span class="n">ssc</span><span class="o">.</span><span class="n">awaitTermination</span><span class="p">();</span>  
+<span class="err">说明：</span>
+<span class="mf">00.</span><span class="err">批处理间隔必须根据应用程序和可用群集资源的延迟要求进行设置</span>
+<span class="mf">01.</span><span class="n">StreamingContext</span><span class="err">对象是</span><span class="n">Spark</span> <span class="n">Streaming</span><span class="err">所有流操作的主要入口。</span>
+    <span class="err">一个</span><span class="n">StreamingContext</span> <span class="err">对象可以用</span><span class="n">SparkConf</span><span class="err">对象创建。</span>
+    <span class="err">一个</span><span class="n">SparkContext</span><span class="err">可以重复利用创建多个</span><span class="n">StreamingContext</span><span class="err">，</span>
+    <span class="err">只要在创建下一个</span><span class="n">StreamingContext</span><span class="err">之前停止前一个</span><span class="n">StreamingContext</span><span class="err">（而不停止</span><span class="n">SparkContext</span><span class="err">）即可</span>
+     <span class="n">Seconds</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>   <span class="err">每</span><span class="mi">10</span><span class="err">秒消费一次</span><span class="n">topic</span> <span class="mi">1</span><span class="err">和</span><span class="n">topic2</span>
+<span class="mf">02.</span><span class="n">KafkaUtils</span>
+       <span class="err">订阅主题</span>
+    <span class="err">三种主题订阅方式</span><span class="o">--</span> <span class="n">subscribe</span>
+           <span class="n">subscribe</span><span class="p">()</span>  <span class="o">--</span> <span class="err">通常使用</span><span class="n">ArrayList</span><span class="err">来指定消费者主题</span>
+           <span class="n">subscribe</span><span class="p">()</span>   <span class="o">--</span><span class="err">指定一个监听器</span>
+            <span class="n">subscribe</span><span class="p">()</span>
+  <span class="n">kafka</span><span class="err">设置：</span>
+  <span class="n">val</span> <span class="n">group</span> <span class="o">=</span> <span class="s2">&quot;spark-computing_stat&quot;</span>
+   <span class="n">val</span> <span class="n">kafkaParams</span> <span class="o">=</span> <span class="n">Map</span><span class="p">[</span><span class="n">String</span><span class="p">,</span> <span class="n">Object</span><span class="p">](</span>
+                 <span class="s2">&quot;bootstrap.servers&quot;</span> <span class="o">-&gt;</span>  <span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">),</span>
+                 <span class="s2">&quot;key.deserializer&quot;</span> <span class="o">-&gt;</span> <span class="n">classOf</span><span class="p">[</span><span class="n">StringDeserializer</span><span class="p">],</span>
+                 <span class="s2">&quot;value.deserializer&quot;</span> <span class="o">-&gt;</span> <span class="n">classOf</span><span class="p">[</span><span class="n">StringDeserializer</span><span class="p">],</span>
+                 <span class="s2">&quot;group.id&quot;</span> <span class="o">-&gt;</span> <span class="n">group</span><span class="p">,</span>
+                 <span class="s2">&quot;auto.offset.reset&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;enable.auto.commit&quot;</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">false</span><span class="p">:</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Boolean</span><span class="p">)</span>
+                 <span class="p">)</span>
+  <span class="n">val</span> <span class="n">topics</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="s2">&quot; Info&quot;</span><span class="p">,</span> <span class="s2">&quot; chInfo&quot;</span><span class="p">,</span> <span class="s2">&quot; atchInfo&quot;</span><span class="p">)</span>
+  <span class="err">参数说明：</span>
+<span class="c1">#连接kafka 的brokers</span>
+          <span class="err">示例：</span> <span class="c1">#kafka.brokers=178.10.10.91:6667,178.10.10.92:6667,178.10.10.93:6667</span>
+<span class="n">auto</span><span class="o">.</span><span class="n">offset</span><span class="o">.</span><span class="n">reset</span><span class="err">含义是当数据被消费完之后会，如果</span><span class="n">spark</span> <span class="n">streaming</span><span class="err">的程序由于某种原因停止之后再启动，</span> <span class="err">下次不会重复消费之前消费过的数</span>
+<span class="err">其他</span><span class="o">--</span><span class="err">驱动程序容错</span>
+<span class="err">消息消费：</span>
+   <span class="n">At</span><span class="o">-</span><span class="n">most</span><span class="o">-</span><span class="n">once</span>
+   <span class="n">At</span><span class="o">-</span><span class="n">least</span><span class="o">-</span><span class="n">once</span>
+   <span class="n">Exactly</span><span class="o">-</span><span class="n">once</span>
+  <span class="n">Kafka</span> <span class="err">和</span><span class="n">spark</span> <span class="n">streaming</span>
+     <span class="mf">01.</span><span class="n">Receiver</span><span class="o">-</span><span class="n">based</span> <span class="n">Approach</span> <span class="err">第一种是利用</span> <span class="n">Kafka</span> <span class="err">消费者高级</span> <span class="n">API</span> <span class="err">在</span> <span class="n">Spark</span> <span class="err">的工作节点上创建消费者线程，订阅</span> <span class="n">Kafka</span> <span class="err">中的消息，</span>
+      <span class="err">数据会传输到</span> <span class="n">Spark</span> <span class="err">工作节点的执行器中</span>
+         <span class="n">Kafka</span> <span class="err">用</span><span class="n">Write</span> <span class="n">Ahead</span> <span class="n">Logs</span><span class="err">（</span><span class="n">WAL</span><span class="err">）来保证数据可靠性和一致性的数据保存方式</span>
+         <span class="err">方法：</span><span class="n">kafkaUtils</span><span class="o">.</span><span class="n">createStream</span>
+    <span class="mf">02.</span> <span class="n">Direct</span> <span class="n">Approach</span> <span class="p">(</span><span class="n">No</span> <span class="n">Receivers</span><span class="p">)</span><span class="err">如果需要保证数据安全可以通过</span><span class="n">Spark</span><span class="err">的</span><span class="n">checkPoint</span>
+                 <span class="o">//</span><span class="err">设置在</span><span class="n">HDFS</span><span class="err">上的</span><span class="n">checkpoint</span><span class="err">目录</span> <span class="o">--</span>                 <span class="n">ssc</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="s1">&#39;hdfs://spark/sparkstreaming/checkpoint&#39;</span><span class="p">)</span>
+                   <span class="o">//</span><span class="err">设置通过间隔时间</span><span class="p">,</span><span class="err">定时持久</span><span class="n">checkpoint</span><span class="err">到</span><span class="n">hdfs</span><span class="err">上</span><span class="o">--</span>      <span class="n">stream</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+                <span class="err">缺点是无法使用基于</span><span class="n">zookeeper</span><span class="err">的</span><span class="n">kafka</span><span class="err">监控工具</span>
+       <span class="err">函数：</span><span class="n">kafkaUtils</span><span class="o">.</span><span class="n">createDirectStream</span>
+</pre></div>
+
+
+<h3>2.Kafka和Spring</h3>
+<div class="highlight"><pre><span></span>和Spring整合
+  整合方式：方式一： The Spring for Apache Kafka (spring-kafka) project
+             spring-kafka   https://spring.io/projects/spring-kafka
+            方式二： spring-integration-kafka
+                https://github.com/spring-projects/spring-integration-kafka
+                Spring Integration Kafka is now based on the Spring for Apache Kafka project
+                    spring-integration-kafka module of Spring Integration
+            Spring Integration Kafka 是基于 Apache Kafka 和Spring Integration来集成Kafka，对开发配置提供了方便
+    创建生产者的相关操作有Spring容器来管理KafkaTemplate对象实例化
+    消费者： MessageListenerContainer 接口
+</pre></div>
+
+
+<h3>3.Kafka的介绍</h3>
+<h4>3.1脚本管理</h4>
+<div class="highlight"><pre><span></span>服务管理：
+    启动kafka脚本  kafka-cluster-start.sh
+               kafka-cluster-stop.sh
+配置管理
+     kafka-configs.sh
+创建主题
+    kafka-topics.sh  --create --zookeeper 
+                        -- replication-factor
+                        --partitions 
+                        --topic
+            kafka-topics.sh    --delete  --zookeeper 
+                                                    --topic
+            kafka-topics.sh  --list --zookeeper
+            kafka-topics.sh  --describe--zookeeper
+生产者
+        kafka-console-producer.sh  --broker-list  --topic --property
+消费者：
+  01. 新版消费者 通过消费组协调器同一管理GroupCoordinator 去掉了对Zookeeper的依赖
+      消费组  group   --指定消费者消费的主题
+        kafka-console-consumers.sh   
+               --from-beginning
+               --offset
+    02.消费者列表 主题列表  消费组消费主题的分区偏移量--已消费的最大偏移量
+     消费单个主题，消费多个主题
+      消息的单播和多播
+       单播：  一条消息只能被某一个消费者消费的模式
+       多播： 能被多个消费者消费的模式
+       实现方式：消费者在不同的消费组
+       不存在广播：不能&lt;所有消费者&gt;
+     03.查看消费偏移量
+        kafka-consumer-offset-checker.sh
+        kafka-consumer-groups.sh
+        logSize  消息最大偏移量
+        Lag  消费者未消费的剩余量   或者已消费但是为提交而落后消费偏移量的的剩余量
+    提交偏移量的频率
+       offset.flush.interval.ms
+     保存偏移量的文件路径
+       offset.stoage.file.filename
+      主题订阅方式-- subscribe
+           subscribe()  -- 通常使用ArrayList来指定消费者主题
+           subscribe()   --指定一个监听器
+            subscribe()
+分区：
+      分区迁移-- 生成分区分配方案 kafka-reassign-partitions.sh
+      增加分区-增加副本
+连接器 standalone 和 distributed 两种工作模式
+  connect-standalone.sh
+  connect-distributed.sh
+安全机制和数据备份
+    01.身份认证和权限控制
+    02.镜像操作 kafka-mirror-maker.sh
+</pre></div>
+
+
+<h4>3.2 API接口</h4>
+<div class="highlight"><pre><span></span>    ZkUtils类
+    AdminUtils类  
+                AdminUtils.createTopic() 创建主题
+                AdminUtils.addPartitions() 则增加分区
+                AdminUtils.deleteTopic()
+    ZkClient类
+01.生产者 Producer API
+创建Properties对象-设置生产者级别的配置
+     bootstrap.servers
+      key.serializer
+      value.serializer
+    根据Properties对象实例化一个KafkaProducer对象
+         send方法--需要实现org.apache.kafka.clients.producer.Callback()接口
+         返回 Future对象
+    关闭KafkaProducer ，释放连接的资源
+    多线程--KafkaProducerThread 线程类
+02.消费者API
+新版消费者(Java版本)和旧版消费者(Scala版本)--新版本的消费者不在强依赖Zookeeper，
+偏移量保存在Kafka内部主题&quot;__consumer_offsets&quot;
+  Low-level 底层API
+  High-Level 高级API
+KafkaConsumer
+     bootstrap.servers
+      key.serializer          org.apache.kafka.common.serialization.StringDeserializer
+      value.serializer        org.apache.kafka.common.serialization.StringDeserializer
+      enable.auto.commit
+      auto.commit.interval.ms
+      group.id
+KafkaConsumer三种订阅主题的方式KafkaConsumer.subscribe()
+   subscribe( Collection(String) topics)  通常使用ArrayList
+   subscribe(Collection(String) topics,  ConsumerRebalanceListener listener)
+   subscribe(Pattern pattern,  ConsumerRebalanceListener listener)
+偏移量
+  timestampsToSearch()
+  consumer.commitAsync(new OffsetCommitCallback())
+消费速度控制
+    pause()   和resume()
+序列化和反序列化    Avro依赖Schema来实现数据结构的定义，Schema主要有Json对象来表示
+
+主题-分区-副本-Kafka集群和Zookeeper连接地址
+            主题
+            分区--Kafka并行处理的基本单元
+            副本-副本不能超过节点数
+生产者
+消费者 
+消费组 groupid
+消费者消费位移确认
+    自动提交 enable.auto.commit
+    手动提交:
+        异步提交  commitAsync()
+        同步提交 commitSync()
+-- 最好partiton数目是consumer数目的整数倍
+enable.auto.commit=true
+--自动提交的方式--自动提交是在kafka拉取到数据之后就直接提交
+-- auto.offset.reset
+[earliest | latest]，表示将offset置到哪里 
+    从最开始的地方消费：
+            automatically reset the offset to the earliest offset，自动将偏移量置为最早的       
+            当各分区下有已提交的offset时，从提交的offset开始消费；
+                无提交的offset时，从头开始消费 
+    从最新的数据消费
+       当各分区下有已提交的offset时，从提交的offset开始消费；
+        无提交的offset时，消费新产生的该分区下的数据 
+    抛出异常-none
+    record  消息
+</pre></div>
+
+
+<h4>3.3 Kafka核心组件和主要流程：</h4>
+<div class="highlight"><pre><span></span>控制器 kafkaController
+             Leader 
+              控制器选举机制和过程 --依赖于Zookeeper
+协调器
+    消费者协调        ConsumerCoordinator
+    消费组协调器    GroupCoordinator
+    任务管理协调器 WorkCoodinator
+网络通信服务
+    SocketServer  基于Java NIO实现的网络通信组件
+    KafkaRequestHandlerPool
+日志管理子系统
+一主题为基本单位进行组织的
+</pre></div>
+
+
+<h3>4.参考：</h3>
+<div class="highlight"><pre><span></span>Spark Streaming + Kafka Integration Guide (Kafka broker version 0.10.0 or higher)
+https://www.jianshu.com/p/688e1b751a85
+http://spark.apache.org/docs/latest/streaming-kafka-0-10-integration.html
+https://www.tutorialspoint.com/apache_kafka/apache_kafka_integration_spark.htm
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

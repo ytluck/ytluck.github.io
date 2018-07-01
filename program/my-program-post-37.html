@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Git-版本控制和团队协作工具</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-37.html" rel="bookmark"
+           title="Permalink to Git-版本控制和团队协作工具">Git-版本控制和团队协作工具</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-10T21:35:00+08:00">
+                Published: 2017-02-10 21:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>Git团队协作与版本控制</h3>
+<div class="highlight"><pre><span></span>--人与文件
+-- 备份和修改
+--版本控制
+    将众人的力量聚集在一起，从而创造更大的价值
+    分布式的工作方式
+--专业的技术团队的协作
+    问题： 如果一个工具看上去并非必须，应该如何激励人们去使用它？？
+</pre></div>
+
+
+<h3>代码托管</h3>
+<div class="highlight"><pre><span></span>01.Github https://github.com
+02.GitLab https://gitlab.com
+03.CODING (码市)  https://coding.net/
+04.码云Gitee https://gitee.com/  
+05.自己创建-git服务器。考虑升级、备份、迁移/恢复。安全和简单易用的平衡
+06.其他
+</pre></div>
+
+
+<h3>Git的网络传输方式</h3>
+<div class="highlight"><pre><span></span>1.传输方式：基于SSH协议和基于HTTP协议两种
+       Git 使用 curl 库通过 HTTP来完成网络操作
+  运行方式：Git 总是在一个 bash shell 中运行，并借助一些 shell 环境变量来决定它的运行方式
+访问方式
+ 访问方式有两种：https  和 ssh：
+ 方式二：配置个人的ssh key：
+  01.打开 Git Bash             
+         在Bash中输入 ssh-keygen -t rsa -C &quot;xxxx@yyy.com&quot; , (用你的邮件地址进行替换-gitee的账号邮件)
+            连着按三次回车，
+           第一次提示&quot;Enter file in which to save the key&quot;，
+           第二次提示&quot;Enter passphrase (empty for no passphrase)&quot;，
+           第三次提示&quot;Enter same passphrase again&quot;
+          之后会在 ~/.ssh/ 下生成 &quot;id_rsa&quot; 和 &quot;id_rsa.pub&quot; 两个文件
+              windows下   C:\Users\usname\.ssh
+   02.编辑器打开id_rsa.pub文件，复制内容如: &quot;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB......&quot;，并复制
+   03.打开gitee网站，在&quot;设置&quot;中找到&quot;安全设置&quot;下面找到&quot;SSH公钥&quot;，右边&quot;公钥value&quot;里面粘贴刚才复制的value即可
+      &quot;确定&quot;保存后，回到Bash，输入 &quot;ssh -T git@gitee.com&quot; 测试，如果有问你话，输入 &quot;yes&quot; 回车。
+       如果返回 &quot;Welcome to Gitee.com, 你的账号!&quot;
+    需求一：同一台电脑上连接多个Git账户的不同远程仓库
+        方式一：都使用SSH：
+               创建新的密钥名称，比如id_rsa_x（x为任意名称
+               配置不同的仓库指向不同的密钥文件。
+        方式二：都使用https：
+             取消 git 全局用户名/邮箱的设置，设置独立的 用户名/邮箱
+        方式但：一部分使用HTTPS，另外一部分使用SSH
+    需求二： 同一份代码推送到多个远程仓库&lt;这个暂时用不到&gt;
+</pre></div>
+
+
+<h3>Git进一步应用</h3>
+<div class="highlight"><pre><span></span>Git的状态
+基本状态：已修改（modified）和已暂存（staged）、已提交（committed）
+基本构成： master   branch  remote 
+常规命令
+    commits 提交
+    push            远程仓库推送
+    pull            远程仓库拉取文件
+    派生（Fork）项目
+    想知道某一项在 哪里 ，            git grep
+     想知道是什么 时候 存在或者引入  git log
+     查看这个方法每一行的最后修改时间以及是被谁修改的 git blame
+
+Git的连接
+ 首先确保有
+    01.创建仓库
+         远程创建
+         本地创建：git init        在内部会生成.git文件夹）
+    02.连接途径
+       001.#本地git仓库关联GitHub仓库 
+        git remote add origin git@github.com:last_Test.git
+       002.不用关联Git仓库, 直接从Git中克隆源码到本地, 项目根目录也不用创建;
+         git clone git@github.com:last_Testt.git
+</pre></div>
+
+
+<h3>Git底层原理</h3>
+<div class="highlight"><pre><span></span>Git对象
+数据对象、树对象、提交对象、标签对象（tag object） 
+Git中其他常见术语： Repository、 branch、master分支
+Git Git 能在特定的重要动作发生时触发自定义脚本。 
+    有两组这样的钩子：客户端的和服务器端的
+    提交工作流钩子、电子邮件工作流钩子和其它钩子
+    从底层了解 Git 的工作原理有助于更好地理解 Git 在内部是如何运作的，
+    也方便你能够针对特定的工作流写出自己的工具和脚本。
+运行 git add 和 git commit 命令时， 
+    Git 所做的实质工作——
+     01.将被改写的文件保存为数据对象，更新暂存区，记录树对象，
+        最后创建一个指明了顶层树对象和父提交的提交对象。 
+    02.这三种主要的 Git 对象——数据对象、树对象、提交对象—
+              —最初均以单独文件的形式保存在 .git/objects 目录
+             Git 使用 zlib 压缩这些文件的内容
+一个文件来保存 SHA-1 值，并给文件起一个简单的名字，
+然后用这个名字指针来替代原始的 SHA-1 值。
+ 引用（references，或缩写为 refs）”；你可以在 .git/refs 目录下找到
+   01.HEAD 引用
+   02.标签引用
+   03.远程引用 远程 remote 的别名
+引用规格由 git remote add 命令自动生成， Git 获取服务器中 refs/heads/ 下面的所有引用，
+并将它写入到本地的 refs/remotes/origin/ 中。
+</pre></div>
+
+
+<h3>其他的一些版本控制：</h3>
+<div class="highlight"><pre><span></span>历史--版本控制系统：
+01.复制整个项目目录的方式来保存不同的版本，或许还会改名加上备份时间以示区别
+02.在硬盘上保存补丁集（补丁是指文件修订前后的变化）；
+       通过应用所有的补丁，可以重新计算出各个版本的文件内容
+03.集中化的版本控制系统
+04.分布式版本控制系统
+ Git 分布式版本控制系统，Git把内容按元数据方式存储，内容存储使用的是SHA-1哈希算法
+ 内容寻址文件系统（content-addressable file system-- 
+   核心部分是一个简单的键值对数据库（key-value data store）
+Git 在保存和对待各种信息的时候与其它版本控制系统有很大差异，
+   尽管操作起来的命令形式非常相近。snapshot_快照流，
+   Git 中所有数据在存储前都计算校验和，以校验和来引用-计算校验和的机制叫做 SHA-1 散列
+   Git 数据库中保存的信息都是以文件内容的哈希值来索引，而不是文件名。
+     Subversion以文件变更列表的方式存储信息，
+     它将保存的信息看作是一组基本文件和每个文件随时间逐步累积的差异
+git svn
+Subversion ：
+    1. 安装：安装成功后
+        svn 一个命令行式的客户端程序；
+        svnadmin 用来创建、调整或修复仓库的工具
+        svnversion 报告本地工作副本状态（即当前文档的修订版本号）的程序；
+        snvserve 一个定制的、独立的Subversion服务程序
+    2. 使用：
+     01.启动svn前需要先建立一个文档仓库，我们使用
+     svn服务器端命令 svnadmin建立：svnadmin create 仓库 ，
+     如下：
+         svnadmin create  D:\software\repository\svn\itcast
+        文件系统： .svn这个隐藏目录记录
+      02.启动 Subversionm           
+      03.一些常用的命令
+          对于一个项目而言 import的工作通常只进行一次，
+        然后是在该基础上进行添加、调整、删除等工作。
+         svn import  导入项目源代码 
+         svn status 、svn add    、 svn commit 、svn export
+         svn checkout、 svn switch、 svn copy
+         svn diff、 svn info、svn merge、svn revert
+         托管： SVN China源代码托管中心
+         svn可以对本地、远端分别进行管理，PATH就是本地方式、URL就是远端方式
+    04.Trunk：软件开发过程中的主线
+         Branches：软件开发过程中的分支，发布版本存放的目录
+         tags：表示标签存放的目录，tags只可读，不可写
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>  https://git-scm.com/book/en/v2
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

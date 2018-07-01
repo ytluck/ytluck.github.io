@@ -26,7 +26,266 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/items/my-items-post-18.html">R语言-Shiny-server安装注意事项</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-32.html">Spark实时计算--Spark Structure Streaming 集成Kafka</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-07-01T11:59:00+08:00">
+                Published: 2018-07-01 11:59:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Spark实时数据计算，采用Spark进行实时计算有两种形式-
+    一种是采用Spark Streaming，其数据类型是Dstreams，
+另外一种是采用Spark Structured Streaming，其数据类型是DataFrames
+</pre></div>
+
+
+<h4>输入和输出</h4>
+<div class="highlight"><pre><span></span>输入源：File 和 Socket  以及Kafka
+I.输入源：
+ 1.读取kafka数据
+        key是偏移量，value是一个byte数组
+        如果使用聚合，将会有window的概念，对应属性watermark
+    01.滑动窗口功能由三个参数决定其功能：窗口时间、滑动步长和触发时间
+      window
+        timecolumn:具有时间戳的列；
+        windowDuration：为窗口的时间长度；
+        slideDuration：为滑动的步长；
+    02.返回的数据类型是Column
+        Column对象传递给DataFrame对象，从而就实现了窗口功能的设置。
+II.输出：
+  structured streaming
+   支持四种输出形式：
+        console,parquet,memory,foreach 四种      
+   支持三种输出模式:
+        Complete mode: 整个更新的结果表都会被输出。
+        Append mode: 只有新增加到结果表的数据会被输出。
+        Updated mode: 只有被更新的结果表会输出。当前版本暂不支持这个特性
+    其他参数设置
+        &quot;truncate&quot;只是为了在控制台输出时，不进行列宽度自动缩小。
+        option(&quot;checkpointLocation&quot;, &quot;path/to/HDFS/dir&quot;)
+</pre></div>
+
+
+<h3>代码示例</h3>
+<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">com</span><span class="o">.</span><span class="n">structureStreaming</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.spark.SparkConf</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.SparkSession</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.streaming.StreamingQuery</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.</span><span class="p">{</span><span class="n">StringType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">StructType</span><span class="p">}</span>
+<span class="kn">import</span> <span class="nn">scala.collection.mutable</span>
+<span class="kn">import</span> <span class="nn">com.util.CommonUtils</span>
+
+<span class="nb">object</span> <span class="n">kafkaInput</span>  <span class="n">extends</span> <span class="n">CommonUtils</span>  <span class="p">{</span>  
+<span class="k">def</span> <span class="nf">getSparkSession</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">SparkSession</span>
+<span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+<span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">new</span> <span class="n">SparkConf</span><span class="p">()</span><span class="o">.</span><span class="n">setMaster</span><span class="p">(</span><span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;mr.master&quot;</span><span class="p">)))</span>
+<span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;mr.appName&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">createOrReplaceTempViewname</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">sourceName</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">Unit</span> <span class="o">=</span> <span class="p">{</span>
+<span class="kn">import</span> <span class="nn">spark.implicits._</span>
+<span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span>
+<span class="o">.</span><span class="n">readStream</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;kafka.bootstrap.servers&quot;</span><span class="p">,</span> <span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;startingOffsets&quot;</span><span class="p">,</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="o">//</span> <span class="err">创建</span> <span class="n">json</span> <span class="n">schema</span><span class="o">-</span><span class="err">指定表结构的方式创建</span><span class="n">DataSet</span> <span class="err">预定义</span><span class="n">json</span><span class="err">的格式并解析</span><span class="n">kafka</span><span class="err">的数据内容</span>
+<span class="n">val</span> <span class="n">schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">(</span><span class="n">mutable</span><span class="o">.</span><span class="n">Seq</span><span class="p">(</span>
+ <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;CT&quot;</span><span class="p">,</span> <span class="n">StringType</span> <span class="p">)</span>
+<span class="p">,</span><span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;LT&quot;</span><span class="p">,</span> <span class="n">StringType</span> <span class="p">)</span>
+<span class="p">,</span><span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;TA&quot;</span><span class="p">,</span> <span class="n">StringType</span> <span class="p">)</span>
+<span class="p">))</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">schema</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span>
+<span class="o">//</span> <span class="n">DataFrame</span><span class="err">的</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;tablename&quot;</span><span class="p">)</span><span class="err">将其创建或者替换一个临时视图，即表</span><span class="n">tablename</span><span class="err">。</span>
+<span class="o">//</span> <span class="err">就可以用</span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="err">方法在表</span><span class="n">tablename</span><span class="err">上运行</span><span class="n">SQL</span><span class="err">语句了</span>
+<span class="n">val</span> <span class="n">jsonDf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span><span class="s2">&quot;CAST(key AS STRING)&quot;</span><span class="p">,</span> <span class="s2">&quot;cast (value as string) as jsonFormatValue&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">from_json</span><span class="p">(</span><span class="err">$</span><span class="s2">&quot;jsonFormatValue&quot;</span><span class="p">,</span> <span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">)</span><span class="o">.</span><span class="k">as</span><span class="p">(</span><span class="s2">&quot;parsedData&quot;</span><span class="p">))</span>
+<span class="n">jsonDf</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;parsedData.*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">sourceName</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="n">println</span><span class="p">(</span><span class="s2">&quot;error,schema is null&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">createNormal</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">sourceName</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">Unit</span> <span class="o">=</span> <span class="p">{</span>
+<span class="kn">import</span> <span class="nn">spark.implicits._</span>
+<span class="o">//</span> <span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">ProcessingTime</span><span class="p">(</span><span class="s2">&quot;25 seconds&quot;</span><span class="p">))</span>
+<span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span>
+<span class="o">.</span><span class="n">readStream</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;kafka.bootstrap.servers&quot;</span><span class="p">,</span> <span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">kafkaTopic</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;startingOffsets&quot;</span><span class="p">,</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="n">val</span> <span class="n">jsonDf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span><span class="s2">&quot;CAST(key AS STRING)&quot;</span><span class="p">,</span> <span class="s2">&quot;CAST(value AS STRING)&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="k">as</span><span class="p">[(</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">)]</span>
+<span class="n">jsonDf</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">sourceName</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">sqlWriteStream</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">StreamingQuery</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">val</span> <span class="n">query</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="o">.</span><span class="n">writeStream</span>
+<span class="o">.</span><span class="n">outputMode</span><span class="p">(</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;console&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;truncate&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;numRows&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">query</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Array</span><span class="p">[</span><span class="n">String</span><span class="p">]):</span> <span class="n">Unit</span> <span class="o">=</span> <span class="p">{</span>
+<span class="o">//</span><span class="err">建立连接</span>
+<span class="n">val</span> <span class="n">spark</span> <span class="o">=</span> <span class="n">getSparkSession</span>
+
+<span class="o">//</span><span class="err">读取</span><span class="n">kafka</span><span class="err">的主题</span><span class="n">topic</span><span class="err">，并将数据注册为临时表</span> <span class="n">dy_test</span>
+<span class="n">val</span> <span class="n">topicName</span> <span class="o">=</span> <span class="s2">&quot;data-people&quot;</span>
+<span class="n">println</span><span class="p">(</span><span class="n">topicName</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">spark.implicits._</span>
+
+<span class="n">val</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span>
+<span class="o">.</span><span class="n">readStream</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;kafka.bootstrap.servers&quot;</span><span class="p">,</span> <span class="n">getProperties</span><span class="p">(</span><span class="s2">&quot;kafka.brokers&quot;</span><span class="p">))</span>
+<span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">topicName</span><span class="p">)</span>
+<span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="o">//</span><span class="n">value</span><span class="err">是字节数组，执行</span><span class="n">CAST</span><span class="err">的作用是将</span><span class="n">value</span><span class="err">转换为字符串</span>
+<span class="n">val</span> <span class="n">jsonDf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span><span class="s2">&quot;CAST(key AS STRING)&quot;</span><span class="p">,</span> <span class="s2">&quot;CAST(value AS STRING)&quot;</span><span class="p">)</span>
+<span class="o">.</span><span class="k">as</span><span class="p">[(</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">)]</span>
+<span class="n">jsonDf</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;dy_test&quot;</span><span class="p">)</span>
+<span class="o">//</span><span class="n">createNormal</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">topicName</span><span class="p">,</span> <span class="s2">&quot;dy_test&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">querysql</span> <span class="o">=</span> <span class="s2">&quot;select * from dy_test&quot;</span>
+<span class="n">println</span><span class="p">(</span><span class="n">querysql</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">querys</span> <span class="o">=</span> <span class="n">sqlWriteStream</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">querysql</span><span class="p">)</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">awaitAnyTermination</span><span class="p">()</span>
+<span class="o">//</span> <span class="err">从字符串中解析为各个字段并注册成临时表，进而对表进行</span><span class="n">SQL</span><span class="err">操作</span>
+<span class="o">//</span><span class="n">createOrReplaceTempViewname</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">topicName</span><span class="p">,</span> <span class="s2">&quot;dy_test&quot;</span><span class="p">)</span>
+  <span class="o">/*</span>   <span class="n">val</span> <span class="n">sqls</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="s2">&quot;select * from dyl_test&quot;</span><span class="p">,</span> <span class="s2">&quot;select *,&#39;2&#39; as e from dy_test&quot;</span><span class="p">)</span>
+<span class="n">val</span> <span class="n">querys</span> <span class="o">=</span> <span class="n">mutable</span><span class="o">.</span><span class="n">ListBuffer</span><span class="p">[</span><span class="n">StreamingQuery</span><span class="p">]()</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">sql</span> <span class="o">&lt;-</span> <span class="n">sqls</span><span class="p">)</span> <span class="p">{</span>
+<span class="n">println</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">querys</span> <span class="o">+=</span> <span class="n">sqlWriteStream</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">awaitAnyTermination</span><span class="p">()</span>
+<span class="p">}</span><span class="o">*/</span>
+<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3>排查错误形式</h3>
+<div class="highlight"><pre><span></span>错误形式一：
+Caused by: java.lang.ClassNotFoundException: Failed to find data source: kafka.
+依赖关系：
+   kafka data source is an external module and is not available to Spark applications by default.
+   两种方式
+    一种是将依赖打入包内
+    另外一种是提交命令时添加到--package
+解决参考： 
+https://stackoverflow.com/questions/48011941/why-does-formatkafka-fail-with-failed-to-find-data-source-kafka-with-ube
+
+错误形式二：2018/6/29
+ 报错
+ Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.SparkSession
+  This may be because you have two spark version on the same machine
+  解决方式：
+  spark2-submit  --master yarn --deploy-mode cluster  
+  spark-submit   --master yarn-cluster 
+  其中
+  spark-submit  -&gt; /Users/test/sparks/spark-1.6.2-bin-hadoop2.6/bin/spark-submit
+  spark2-submit -&gt; /Users/test/sparks/spark-2.1.1-bin-hadoop2.7/bin/spark-submit
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Structured Streaming整合kafka https://blog.csdn.net/dongyunlon/article/details/79037366
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-31.html" rel="bookmark"
+                           title="Permalink to Spark实时计算--Spark Streaming 集成Kafka">Spark实时计算--Spark Streaming 集成Kafka</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-07-01T11:49:00+08:00">
+                Published: 2018-07-01 11:49:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>SparkStreaming基本概念和使用以及Kafka的进一步说明</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-31.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-30.html" rel="bookmark"
+                           title="Permalink to Storm实时计算和MapReduce">Storm实时计算和MapReduce</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-06-30T22:49:00+08:00">
+                Published: 2018-06-30 22:49:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Storm基本概念和使用</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-30.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-38.html" rel="bookmark"
+                           title="Permalink to SpringBoot编程入门概念了解">SpringBoot编程入门概念了解</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-06-30T21:00:00+08:00">
+                Published: 2018-06-30 21:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Java/Scala/Python处理JSON格式</p>
+                <a class="readmore" href="/program/my-program-post-38.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-items-post-18.html" rel="bookmark"
+                           title="Permalink to R语言-Shiny-server安装注意事项">R语言-Shiny-server安装注意事项</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-05-13T20:11:00+08:00">
                 Published: 2018-05-13 20:11:00
@@ -37,195 +296,10 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>关于shiny server 的安装和介绍，在官网都有介绍，在这里记录一些需要注意的事项和参考的资料来源以备后需。
-</pre></div>
-
-
-<h3>基础资源和配置</h3>
-<div class="highlight"><pre><span></span>I、本次安装使用的云主机ECS-，操作系统是安装最新的Centos，且是64位的。
-     使用root用户分配个新的用户，尽量不要使用root用户操作系统
-      01.设置新的用户名lego，以后都采用这个用户进行操作
-         useradd  lego
-         passwd  lego
-                  ~**k~
-         02. 把用户加入加入了sudo组
-                     visudo
-                       ## Allow root to run any commands anywhere
-                       root    ALL=(ALL)       ALL               
-                       lego ALL=(ALL)ALL  //添加这一行， lego为要加入sudoers 的用户
-</pre></div>
-
-
-<h3>II、一些网络配置和设置</h3>
-<div class="highlight"><pre><span></span>  01.云服务的配置
-    云服务上的设置--主要是对一些接口放行，比如某个端口已被监听，但是ping不同，除了防火墙等原因
-    安全组也是可能的原因。从云主机的安全层面-操作系统的层面-应用的层面这三方面考虑
-          创建安全组 https://help.aliyun.com/document_detail/25468.html
-          添加安全组规则 https://help.aliyun.com/document_detail/25471.html
-          加入、移出安全组 https://help.aliyun.com/document_detail/25443.html
-    02.操作系统上的设置
-        01.防火墙的设置iptables
-        02.SElinux的设置
-         其余：
-           能 ping 通但端口不通时端口可用性探测说明
-            https://help.aliyun.com/knowledge_detail/40572.html
-            检查 TCP 80 端口是否正常工作
-                https://help.aliyun.com/knowledge_detail/59367.html
-    03.查看方式
-        001.查看端口是否开启--以及是否在监听状态
-        netstat -anp|grep 3838 
-         tcp        0      0 0.0.0.0:3838                0.0.0.0:*                   LISTEN      772/shiny-server
-       002.查看防火墙开放了哪些端口
-          service iptables status 或者
-         /etc/init.d/iptables status
-        003.查看SELinux状态
-            getenforce
-   04.程序安装的权限和文件的读写权限等
-      1s -a  或者 ls -l
-</pre></div>
-
-
-<h3>III、安装</h3>
-<div class="highlight"><pre><span></span>01.安装R语言
-  命令 ：   sudo yum install R   
-  执行
-   反馈：查看是否安装成功 输入 R  然后确认，如果进入R语言后q()
- 02.安装shiny包，已sudo的权限安装
-  sudo su -  -c &quot;R -e \&quot;install.packages(&#39;shiny&#39;, repos=&#39;http://cran.rstudio.com/&#39;)\&quot;&quot;
-  03.   安装shiny-service
-     $ wget https://download3.rstudio.org/centos6.3/x86_64/shiny-server-1.5.7.907-rh6-x86_64.rpm
-     $ sudo yum install --nogpgcheck shiny-server-1.5.7.907-rh6-x86_64.rpm
-    参考： https://www.rstudio.com/products/shiny/download-server/
-    反馈：查看是否安装成功 sudo  status shiny-server
-</pre></div>
-
-
-<h3>IV、查看一些文件</h3>
-<div class="highlight"><pre><span></span>    资源文件
-        /srv/shiny-server
-    配置文件：
-        /etc/shiny-server/shiny-server.conf
-    日志文件
-        /var/log/shiny-server.log以及/var/log/shiny-server/文件夹下的日志文件
-    一些其他配置：
-       /opt/shiny-server/config/default.config
-        ll  /opt/shiny-server/config/init.d/redhat
-                -- 轮循 转储
-                shiny-server.log {
-                       rotate 12
-                       copytruncate
-                       compress
-                       missingok
-                       size 1M
-                }
-                rotate 5: 一次将存储5个归档日志。对于第六个归档，时间最久的归档将被删除。
-                copytruncate ；备份当前日志并截断
-                compress: 在轮循任务完成后，已轮循的归档将使用gzip进行压缩
-                size                    当日志文件到达指定的大小时才转储
-                missingok: 在日志轮循期间，任何错误将被忽略，
-                                 例如“文件无法找到”之类的错误。
-        其他示例--复制
-           cp -R /usr/lib64/R/library/shiny/examples/* /srv/shiny-server/
-</pre></div>
-
-
-<h3>V、网络与操作系统</h3>
-<div class="highlight"><pre><span></span>网络连接情况--例如
-  使用Windows查看
-    使用 -- ping是ICMP协议
-             ping   47.100.13.62
-      探测指定ip是否开放指定端口--windows开启telnet 服务，然后telnet ip地址 端口号
-        telnet  47.100.13.62 3838
-          47.100.13.62...无法打开到主机的连接。 在端口 3838: 连接失败
-
-          47.100.13.62:3838
-   使用Linux查看
-       ping   47.100.13.62
-     netstat -anp|grep 3838 
-        netstat -anp 
-         netstat -anp 显示系统端口使用情况
-        netstat -nupl  (UDP类型的端口)
-        netstat -ntpl  (TCP类型的端口)
-端口：
-     端口类型：分为&quot;TCP协议端口&quot;和&quot;UDP协议端口&quot;。
-     端口号
-        公认端口（Well Known Ports）：这类端口也常称之为&quot;常用端口&quot;。这类端口的端口号从0到1023
-        注册端口（Registered Ports）：端口号从1024到49151
-        动态和/或私有端口（Dynamic and/or Private Ports）：端口号从49152到65535
-     端口状态：
-         TCP端口状态
-              LISTENING     listening               正在监听连接
-              CONNECTED  - connected
-              ESTABLISHED  - established            连接已建立
-防火墙
-    cat      /etc/sysconfig/iptables-config
-    system-config-firewall
-    1)  开启80端口命令：/sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-    2)  保存配置命令：/etc/rc.d/init.d/iptables save
-    3)  重启服务命令：/etc/rc.d/init.d/iptables restart
-    4)  查看已经开放的端口： /etc/init.d/iptables status
-文件权限：
-    命令 ： chmod -R 755 tools_command/
-    解释 ： -R 为递归遍历
-</pre></div>
-
-
-<h3>VI、关于云服务</h3>
-<div class="highlight"><pre><span></span>    云服务：
-       在配置服务的时候，需要考虑的问题
-              01. 云账户：云账户与 RAM 用户是一种主子关系
-              02.用户身份管理 与 资源访问控制 
-                 管理您的用户（比如员工、系统或应用程序），以及控制用户可以访问您名下哪些资源的权限。是
-                云操作系统级别的设置
-                云防火墙：
-                  安全管控：
-                  访问控制 ：
-                        访问控制RAM
-                        用户-群组-角色 管理
-                        策略管理：查看并管理已创建的访问控制策略
-                  AccessKeys：是访问阿里云API的密钥
-                  RAM (Resource Access Management) 是阿里云为客户提供的 用户身份管理 与 资源访问控制 
-                     RAM-User 
-                     RAM-Role
-                    授权：API-Action 和 Resource-ID 授权 以及秘钥
-                      AccessKey:使用访问密钥构造一个 API 请求（或者使用云服务 SDK）来操作资源
-                     多因素认证（MFA）。Multi-Factor Authentication
-              03. 系统访问策略 和客户管理的自定义访问策略
-</pre></div>
-
-
-<h3>VII、关于操作系统-文件属性的缩写和颜色展示</h3>
-<div class="highlight"><pre><span></span>ls的输出颜色不止3种，有以下几种，
-  白色：表示普通文件         - = regular file 
-  蓝色：表示目录                   d = directory 
-  绿色：表示可执行文件
-  红色：表示压缩文件
-  浅蓝色：链接文件
-  红色闪烁：表示链接的文件有问题
-  黄色：表示设备文件
-  灰色：表示其他文件
-  这是linux系统约定的默认颜色，你也可以根据自己喜好自己修改
-  l = symbolic link 、s = Unix domain socket 、p = named pipe 、
-c = character device file 、b = block device file 
-  2.文件属性 文件数 拥有者 所属的group 文件大小 建档日期 文件名
-        u user/owner        g group        o other        a all 
-        r read 、w write 、x execute 
-        4 = read (r) 、2 = write (w) 、1 = execute (x) 、0 = no permission (-)
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>https://github.com/rstudio/shiny-server/issues/153
-https://stackoverflow.com/questions/45109835/shiny-server-change-the-directory-for-app
-http://shiny.rstudio.com/articles/debugging.html
-https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/#shiny-user-perms
-https://qualityandinnovation.com/2015/12/09/deploying-your-very-own-shiny-server/
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>R语言shiny server的安装和配置以及Linux操作系统的一些情况</p>
+                <a class="readmore" href="/items/my-items-post-18.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -1677,6 +1751,28 @@ https://qualityandinnovation.com/2015/12/09/deploying-your-very-own-shiny-server
 <p>tags: <a href="/tag/sql.html">SQL</a> </p>
 </footer><!-- /.post-info -->                <p>安装和查看</p>
                 <a class="readmore" href="/data-mining/my-dataming-post-16.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-37.html" rel="bookmark"
+                           title="Permalink to Git-版本控制和团队协作工具">Git-版本控制和团队协作工具</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-02-10T21:35:00+08:00">
+                Published: 2017-02-10 21:35:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Git的内部原理以及相关版本控制svn</p>
+                <a class="readmore" href="/program/my-program-post-37.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

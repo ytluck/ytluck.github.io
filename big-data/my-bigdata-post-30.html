@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Storm实时计算和MapReduce</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-30.html" rel="bookmark"
+           title="Permalink to Storm实时计算和MapReduce">Storm实时计算和MapReduce</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-06-30T22:49:00+08:00">
+                Published: 2018-06-30 22:49:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <p>Storm和Mapreduce的基本概念和主要流程以及项目示例</p>
+<h3>Storm基本概念</h3>
+<div class="highlight"><pre><span></span>01.系统级别
+            Nimbus：负责资源分配和任务调度
+             Supervisor：负责接受nimbus分配的任务，
+                        启动和停止属于自己管理的worker进程
+            Worker：运行具体处理组件逻辑的进程
+                    executor  task
+02.应用名称  Topology&lt;拓扑&gt;
+03.组件接口 Spout/Bolt
+   Bolt  接受数据然后执行处理的组件
+04.数据.  Tuple、  Stream、  Stream Grouping
+stream是一个没有边界的tuple序列
+</pre></div>
+
+
+<h3>Storm主要流程</h3>
+<div class="highlight"><pre><span></span>    01.Spout会从外部数据源（队列、数据库等）读取数据，
+          然后封装成Tuple形式，之后发送到Stream中
+    02.bolt可以接收任意多个输入stream， 作一些处理。 
+                       有些bolt可能还会发射一些新的stream
+    03.数据流分组就是将数据流进行分组，按需要进入不同的bolt中
+           8种内置的数据流分组方法
+</pre></div>
+
+
+<h3>Storm案例</h3>
+<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">POM</span><span class="err">依赖</span>
+   <span class="n">storm</span><span class="o">-</span><span class="n">core</span>
+
+<span class="mf">2.</span><span class="err">引入包</span>
+    <span class="kn">import</span> <span class="nn">org.apache.storm.Config</span><span class="p">;</span>
+    <span class="kn">import</span> <span class="nn">org.apache.storm.LocalCluster</span><span class="p">;</span>
+    <span class="kn">import</span> <span class="nn">org.apache.storm.StormSubmitter</span><span class="p">;</span>
+    <span class="kn">import</span> <span class="nn">org.apache.storm.topology.TopologyBuilder</span><span class="p">;</span>
+    <span class="kn">import</span> <span class="nn">org.apache.storm.utils.Utils</span><span class="p">;</span>
+
+    <span class="o">//</span><span class="err">编写</span><span class="n">Spout</span><span class="err">类</span>
+        <span class="n">backtype</span><span class="o">.</span><span class="n">storm</span><span class="o">.</span><span class="n">spout</span><span class="o">.</span><span class="n">SpoutOutputCollector</span><span class="p">;</span>
+        <span class="n">backtype</span><span class="o">.</span><span class="n">storm</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">BaseRichSpout</span><span class="p">;</span>
+
+        <span class="n">SpoutOutputCollector</span> 
+          <span class="n">extends</span> <span class="n">BaseRichSpout</span><span class="p">{</span>
+          <span class="mf">01.</span><span class="n">collector</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span><span class="err">方法发射</span><span class="nb">tuple</span>
+          <span class="mf">02.</span><span class="n">declarer</span><span class="o">.</span><span class="n">declare</span>
+           <span class="p">}</span>
+    <span class="o">//</span><span class="err">编写</span><span class="n">bolt</span><span class="err">类</span>  
+          <span class="n">extends</span> <span class="n">BaseBasicBolt</span> <span class="p">{</span>
+           <span class="n">execute</span>
+          <span class="p">}</span>
+    <span class="o">//</span><span class="err">编写运行程序的入口类</span>
+       <span class="mf">01.</span> <span class="err">创建拓扑，然后设置的数据源所在的类</span>
+           <span class="n">TopologyBuilder</span>
+                 <span class="n">TopologyBuilder</span> <span class="n">builder</span> <span class="o">=</span> <span class="n">new</span> <span class="n">TopologyBuilder</span><span class="p">();</span>  
+      <span class="mf">02.</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">setSpout</span><span class="p">(</span><span class="s2">&quot;spout&quot;</span><span class="p">,</span> <span class="n">new</span> <span class="n">RandomSpout</span><span class="p">());</span>  
+            <span class="n">builder</span><span class="o">.</span><span class="n">setBolt</span><span class="p">(</span><span class="s2">&quot;exclaim&quot;</span><span class="p">,</span> <span class="n">new</span> <span class="n">ExclaimBasicBolt</span><span class="p">())</span><span class="o">.</span><span class="n">shuffleGrouping</span><span class="p">(</span><span class="s2">&quot;spout&quot;</span><span class="p">);</span>  
+            <span class="n">builder</span><span class="o">.</span><span class="n">setBolt</span><span class="p">(</span><span class="s2">&quot;print&quot;</span><span class="p">,</span> <span class="n">new</span> <span class="n">PrintBolt</span><span class="p">())</span><span class="o">.</span><span class="n">shuffleGrouping</span><span class="p">(</span><span class="s2">&quot;exclaim&quot;</span><span class="p">);</span> 
+        <span class="mf">03.</span><span class="err">提交方式</span>
+<span class="mf">3.</span><span class="err">打包</span>
+
+<span class="mf">4.</span><span class="err">运行</span>
+</pre></div>
+
+
+<h3>与MapReduce类比</h3>
+<h4>MapReduce基本概念</h4>
+<div class="highlight"><pre><span></span>01.系统级别
+             JobTracker ：负责资源分配和任务调度  资源管理器
+             TaskTracker：负责接受nimbus分配的任务，节点管理
+            Worker：运行具体处理组件逻辑的进程
+                    executor  task
+            Slot                容器
+</pre></div>
+
+
+<p>02.应用名称 Job
+   03.组件接口 Maper/ Reducer
+  04.数据.   以键值对作为输入和输出</p>
+<h4>MapReduce主要流程</h4>
+<div class="highlight"><pre><span></span>Map函数
+    org.apache.hadoop.mapreduce.Mapper
+Reduce函数
+   org.apache.hadoop.mapreduce.Reducer
+MapReduce案例
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
