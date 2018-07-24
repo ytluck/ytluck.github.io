@@ -26,7 +26,111 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-37.html">R语言读写数据-数据库MySQL</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-38.html">R语言数据预处理基本流程</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-04-15T22:25:00+08:00">
+                Published: 2018-04-15 22:25:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span><span class="c1">#涉及到的R包</span>
+<span class="c1"># library(readr)</span>
+<span class="c1"># library(dplyr)</span>
+<span class="c1"># library(ggplot2)</span>
+
+<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>
+Reg_Data <span class="o">&lt;-</span> read_delim<span class="p">(</span><span class="s">&quot;C:/Items/R_Projects/R_DataMining/Data/Original_Data/Rg_Data.txt&quot;</span><span class="p">,</span>
+   <span class="s">&quot;\t&quot;</span><span class="p">,</span> escape_double <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> col_names <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span>
+trim_ws <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># 查看基本情况以及基本的数据清洗</span>
+<span class="c1"># 查看数据的基本字段，字段的含义以及字段的顺序，字段的数据类型</span>
+<span class="c1"># 各个字段是否有缺失值，值的范围，数据是否有重复值</span>
+<span class="c1"># 数据不一致情况，以及数据量和小批量数据示例</span>
+str<span class="p">(</span>Rg_Data<span class="p">)</span>
+View<span class="p">(</span>Rg_Data<span class="p">)</span>
+<span class="c1"># 找出重复数据的函数 duplicated - 判断对象的每个取值是否重复</span>
+<span class="c1"># 去除所有列和去除选择的列 Rg_Data[!duplicated(Rg_Data),] #删掉所有列上都重复的</span>
+<span class="kp">which</span><span class="p">(</span><span class="kp">duplicated</span><span class="p">(</span>Rg_Data<span class="p">))</span>
+<span class="kp">which</span><span class="p">(</span> <span class="kp">duplicated</span><span class="p">(</span>Rg_Data<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">)])</span> <span class="p">)</span>
+Rg_Data<span class="p">[</span><span class="kp">which</span><span class="p">(</span> <span class="kp">duplicated</span><span class="p">(</span>Rg_Data<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">)])</span> <span class="p">)</span> <span class="p">,</span> <span class="p">]</span>
+<span class="c1">#unique返回对象的不同取值</span>
+
+<span class="c1">#统计多列的重复数据- 统计频率</span>
+<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+<span class="c1">#  统计后的X2的顺序发生了变化，sort的排序针对的是排序后的字段n，</span>
+<span class="c1">#  所以不能使用which等来标记</span>
+ countData <span class="o">&lt;-</span> count<span class="p">(</span>Rg_Data<span class="p">,</span>X2<span class="p">,</span>sort <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+ <span class="c1"># 重复的次数的情况</span>
+ repcount <span class="o">&lt;-</span> filter<span class="p">(</span>count<span class="p">(</span>Rg_Data<span class="p">,</span>X2<span class="p">,</span>sort <span class="o">=</span> <span class="kc">FALSE</span><span class="p">),</span>n<span class="o">&gt;=</span><span class="m">2</span><span class="p">)</span><span class="o">$</span>X2
+ Rg_Data<span class="p">[</span><span class="kp">which</span><span class="p">(</span> Rg_Data<span class="o">$</span>X2 <span class="o">%in%</span> repcount<span class="p">),]</span>
+ filter<span class="p">(</span>Rg_Data<span class="p">,</span>Rg_Data<span class="o">$</span>X2 <span class="o">%in%</span> repcount<span class="p">)</span>
+
+ <span class="c1"># 去重- 用来排除有重复记录的行</span>
+ distinct<span class="p">(</span>Rg_Data<span class="p">)</span>
+ distinct<span class="p">(</span>select<span class="p">(</span>Rg_Data<span class="p">,</span>X2<span class="p">))</span>
+
+ <span class="c1"># 判断是否有NA值-并过滤</span>
+filter<span class="p">(</span>Rg_Data<span class="p">,</span> <span class="kp">is.na</span><span class="p">(</span>Rg_Data<span class="o">$</span>X1<span class="p">)</span><span class="o">|</span>  <span class="kp">is.na</span><span class="p">(</span>Rg_Data<span class="o">$</span>X2<span class="p">)</span> <span class="p">)</span>     
+<span class="c1"># 增加字段</span>
+newData <span class="o">&lt;-</span>  mutate<span class="p">(</span>Rg_Data<span class="p">,</span>month<span class="o">=</span> <span class="kp">substr</span><span class="p">(</span>Rg_Data<span class="o">$</span>X1<span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">6</span><span class="p">))</span>
+
+<span class="c1"># 分组后通常使用 summarise function 或者 window function 两类函数操作</span>
+<span class="c1"># 在不分组的情况下使用，这时可以看做是只分为一组的特殊情况</span>
+<span class="c1"># 分组计数-分组的聚合函数   having 可以使用filter来代替</span>
+by_month <span class="o">&lt;-</span> group_by<span class="p">(</span>newData<span class="p">,</span>  month<span class="p">)</span>
+newDataMonth <span class="o">&lt;-</span> summarise<span class="p">(</span>by_month<span class="p">,</span>count <span class="o">=</span> n<span class="p">(),</span>aa<span class="o">=</span><span class="kp">sum</span><span class="p">(</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>month<span class="p">)))</span>
+
+<span class="c1"># 分组之后的窗口函数</span>
+ by_Day <span class="o">&lt;-</span> group_by<span class="p">(</span>Rg_Data<span class="p">,</span> groupname<span class="o">=</span> <span class="kp">as.character</span><span class="p">(</span>Rg_Data<span class="o">$</span>X2<span class="p">)</span> <span class="p">)</span>
+ mutate<span class="p">(</span>by_Day<span class="p">,</span>  employee_age <span class="o">=</span> row_number<span class="p">(</span>X1<span class="p">),</span> rank_salary <span class="o">=</span> min_rank<span class="p">(</span>desc<span class="p">(</span>X1<span class="p">)))</span>
+ mutate<span class="p">(</span>by_Day<span class="p">,</span>  employee_age <span class="o">=</span> row_number<span class="p">(</span>X1<span class="p">))</span>
+ View<span class="p">(</span>mutate<span class="p">(</span>by_Day<span class="p">,</span>  employee_age <span class="o">=</span> row_number<span class="p">(</span>X1<span class="p">),</span> rank_salary <span class="o">=</span> min_rank<span class="p">(</span>desc<span class="p">(</span>X1<span class="p">))))</span>
+ transmute<span class="p">(</span>by_Day<span class="p">,</span>  employee_age <span class="o">=</span> row_number<span class="p">(</span> X1<span class="p">),</span> rank_salary <span class="o">=</span> min_rank<span class="p">(</span>desc<span class="p">(</span>X1<span class="p">))</span> <span class="p">)</span>
+
+ <span class="c1">#默认排序都是从小到大、从低到高，正序排列；如果要倒序，则可使用 desc()</span>
+ windowfun <span class="o">&lt;-</span>  mutate<span class="p">(</span>by_Day<span class="p">,</span>  employee_age <span class="o">=</span> row_number<span class="p">(</span>X1<span class="p">)</span> <span class="p">)</span>
+ windowfun <span class="o">&lt;-</span>  mutate<span class="p">(</span>by_Day<span class="p">,</span>  employee_age <span class="o">=</span> row_number<span class="p">(</span>desc<span class="p">(</span>X1<span class="p">))</span> <span class="p">)</span>
+ View<span class="p">(</span>windowfun<span class="p">)</span>
+
+ <span class="c1"># 联合left_join  semi_join</span>
+ <span class="c1"># mydata &lt;- left_join(x=userno_cash,y=userno_lastcash,by=c(&#39;userno&#39;),copy=F)</span>
+
+ <span class="c1">#集合操作</span>
+ <span class="kp">setdiff</span><span class="p">(</span>Rg_Data<span class="o">$</span>X1<span class="p">,</span>Rg_Data<span class="o">$</span>X1<span class="p">)</span>
+ <span class="kp">setdiff</span><span class="p">(</span>Rg_Data<span class="o">$</span>X1<span class="p">,</span>Rg_Data<span class="o">$</span>X1<span class="p">)</span>
+ <span class="kp">intersect</span><span class="p">(</span>Rg_Data<span class="o">$</span>X1<span class="p">,</span>Rg_Data<span class="o">$</span>X1<span class="p">)</span>
+ <span class="kp">union</span><span class="p">(</span>Rg_Data<span class="o">$</span>X1<span class="p">,</span>Rg_Data<span class="o">$</span>X1<span class="p">)</span>
+
+ <span class="c1"># 绘图</span>
+ <span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+ p1 <span class="o">&lt;-</span>  ggplot<span class="p">(</span>data <span class="o">=</span> newDataMonth<span class="p">)</span> <span class="o">+</span> geom_bar<span class="p">(</span>mapping <span class="o">=</span> aes<span class="p">(</span>x <span class="o">=</span> month<span class="p">,</span> y <span class="o">=</span> aa<span class="p">,</span>fill<span class="o">=</span>month<span class="p">),</span>stat<span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span>
+ p1
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>利用R语言进行数据分析 http://lixionghui.com/blog/
+https://github.com/tidyverse/dplyr
+R语言简明说明 https://www.rstudio.com/resources/cheatsheets/
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-37.html" rel="bookmark"
+                           title="Permalink to R语言读写数据-数据库MySQL">R语言读写数据-数据库MySQL</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-04-15T22:21:00+08:00">
                 Published: 2018-04-15 22:21:00
@@ -37,59 +141,10 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>R语言连接数据库，通过数据库存放数据，使用R语言来调用数据。
-一方面便于数据的管理，另一方面也便于数据计算流程的复用等
-</pre></div>
-
-
-<h3>代码示例</h3>
-<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>RMySQL<span class="p">)</span>
-<span class="c1"># 连接数据库</span>
-MySQLCon <span class="o">&lt;-</span> dbConnect<span class="p">(</span>RMySQL<span class="o">::</span>MySQL<span class="p">(),</span> dbname <span class="o">=</span> <span class="s">&#39;jdata&#39;</span><span class="p">,</span>host<span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> 
- user<span class="o">=</span><span class="s">&#39;***&#39;</span><span class="p">,</span> password<span class="o">=</span><span class="s">&#39;***&#39;</span><span class="p">,</span>  charset<span class="o">=</span><span class="s">&#39;GBK&#39;</span><span class="p">)</span>
-<span class="kp">summary</span><span class="p">(</span>MySQLCon <span class="p">)</span>
-
-<span class="c1"># 查找数据</span>
-tablesname <span class="o">&lt;-</span> dbListTables<span class="p">(</span>MySQLCon <span class="p">)</span>
-<span class="c1"># 对表进行查看</span>
-querytablename <span class="o">&lt;-</span> tablesname<span class="p">[</span><span class="m">3</span><span class="p">]</span>
-SQLcommand <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;select count(*) from &quot;</span><span class="p">,</span>querytablename <span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-countNum  <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> SQLcommand <span class="p">)</span>
-<span class="kp">paste</span><span class="p">(</span>querytablename <span class="p">,</span><span class="s">&#39; total &#39;</span><span class="p">,</span>countNum  <span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-
-
-<span class="c1">#方式一：通过SQL的特性查看 表的字段进行查看</span>
-fieldTableSQL  <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;show full columns from &quot;</span><span class="p">,</span>querytablename <span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">,</span>seq<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-fieldsum <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> fieldTableSQL  <span class="p">)</span>
-fieldname <span class="o">&lt;-</span> fieldsum<span class="p">[</span><span class="s">&#39;Field&#39;</span><span class="p">][</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">]</span>
-filSQL <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span> <span class="s">&quot;select&quot;</span> <span class="p">,</span>fieldname<span class="p">,</span> <span class="s">&quot;, count(distinct user_id)  from&quot;</span><span class="p">,</span> querytablename  <span class="p">,</span><span class="s">&quot; group by&quot;</span><span class="p">,</span> fieldname<span class="p">,</span><span class="s">&#39;;&#39;</span><span class="p">)</span>
-plotData <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> filSQL <span class="p">)</span>
-
-<span class="c1"># 方式二，通过Dataframe的情况处理</span>
-fieldall  <span class="o">&lt;-</span> dbGetQuery<span class="p">(</span>MySQLCon <span class="p">,</span> <span class="kp">paste</span><span class="p">(</span> <span class="s">&#39;select * from &#39;</span><span class="p">,</span> querytablename<span class="p">,</span>sep<span class="o">=</span><span class="s">&#39;&#39;</span> <span class="p">))</span>
-<span class="kp">head</span><span class="p">(</span>fieldall  <span class="p">)</span>
-
-<span class="c1"># 数据探索-最值</span>
-<span class="kp">max</span><span class="p">(</span>fieldall<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
-<span class="kp">max</span><span class="p">(</span><span class="kp">as.numeric</span><span class="p">(</span>fieldall<span class="p">[,</span><span class="m">1</span><span class="p">]))</span>
-<span class="kp">min</span><span class="p">(</span> fieldall<span class="p">[,</span><span class="m">1</span><span class="p">])</span>
-
-<span class="c1">## 数据探索-缺失值</span>
- <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;user_id&#39;</span><span class="p">))</span>
- <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;age&#39;</span><span class="p">))</span> 
- <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;sex&#39;</span><span class="p">))</span> 
- <span class="kp">which</span><span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>fieldall<span class="o">$</span><span class="s">&#39;user_lv_cd&#39;</span><span class="p">))</span>
-
-<span class="c1">## 分组等数据探索操作</span>
-
-<span class="c1"># 关闭数据库连接</span>
-dbDisconnect<span class="p">(</span>MySQLCon <span class="p">)</span>
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>R语言中的 RMySQL</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-37.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
