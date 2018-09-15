@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Hive之UDF开发示例</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-36.html" rel="bookmark"
+           title="Permalink to Hive之UDF开发示例">Hive之UDF开发示例</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-08-12T20:01:00+08:00">
+                Published: 2018-08-12 20:01:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>基本内容介绍
+UDF:最简单的自定义，实现一对一，输入一行数据输出一行数据  
+UDAF:自定义聚合函数，实现多对一，输入多行数据输出一行数  
+UDTF：用来实现一行输入多行输出，这次先不讲 
+MaxCompute的UDF包括UDF、UDAF和UDTF三种函数。通常情况下，这三种函数被统称为UDF
+</pre></div>
+
+
+<h3>1.UDF开发主要流程：</h3>
+<div class="highlight"><pre><span></span>在自己机器的java环境中编辑测试好，然后输出jar包，
+再通过console或大数据开发套件将jar包添加成resource，
+最后再注册成function
+</pre></div>
+
+
+<h3>2.具体步骤</h3>
+<div class="highlight"><pre><span></span>01.依赖关系pom.xml      
+02.编写一个UDF类，集成UDF并实现evaluate        
+03.将工程打包成.jar包形式并上传上传到集群服务器；
+04.将jar包添加到Hive中
+    add jar  /test/program/hiveudf/function.udf-stringLen.jar;
+4.自定义函数
+    create temporary function urldecode as &#39;******&#39;;    
+5.使用自定义函数
+select  distinct   id ,strlen(detail)  from  testinfo;
+06.使用完，可以删除该自定义函数
+   drop temporary function strlen;
+
+    add jar /test/program/hiveudf/function.udf-stringLen.jar;
+    create temporary function strlen as &#39;com.test.hive.StringLen&#39;;
+    select  distinct   id ,strlen(detail)  from  testinfo;
+    drop temporary function strlen;
+</pre></div>
+
+
+<h3>3.Hive的UDF开发过程</h3>
+<div class="highlight"><pre><span></span>  <span class="err">依赖关系</span>
+ <span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hadoop</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">hadoop</span><span class="o">-</span><span class="n">common</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="err">$</span><span class="p">{</span><span class="n">hadoop</span><span class="o">.</span><span class="n">version</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">scope</span><span class="o">&gt;</span><span class="n">provided</span><span class="o">&lt;/</span><span class="n">scope</span><span class="o">&gt;</span>
+ <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span> 
+<span class="o">&lt;</span><span class="err">!</span><span class="o">--</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mvnrepository</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">artifact</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hive</span><span class="o">/</span><span class="n">hive</span><span class="o">-</span><span class="k">exec</span> <span class="o">--&gt;</span>
+<span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hive</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">hive</span><span class="o">-</span><span class="k">exec</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">1.2</span><span class="o">.</span><span class="mi">0</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>    
+  <span class="err">开发代码：</span>
+    <span class="kn">import</span> <span class="nn">org.apache.hadoop.hive.ql.exec.UDF</span><span class="p">;</span>
+    <span class="kn">import</span> <span class="nn">java.net.URLDecoder</span><span class="p">;</span>
+        <span class="n">public</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">UrlDecode</span> <span class="n">extends</span> <span class="n">UDF</span> <span class="p">{</span>
+            <span class="n">public</span> <span class="n">String</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">final</span> <span class="n">String</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">null</span><span class="p">;</span> <span class="p">}</span>
+                <span class="k">return</span> <span class="n">getString</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+            <span class="p">}</span>    
+            <span class="n">public</span> <span class="n">static</span> <span class="n">String</span> <span class="n">getString</span><span class="p">(</span><span class="n">String</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">String</span> <span class="n">a</span><span class="p">;</span>
+                <span class="k">try</span> <span class="p">{</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="n">URLDecoder</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="s2">&quot;utf-8&quot;</span><span class="p">);</span>
+                <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span> <span class="ne">Exception</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span> <span class="n">args</span><span class="p">[])</span> <span class="p">{</span>
+                <span class="n">String</span> <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">5%a4%a9</span><span class="si">%e</span><span class="s2">5%a4%a9</span><span class="si">%e</span><span class="s2">6</span><span class="si">%9c%89%</span><span class="s2">e5%a5%bd</span><span class="si">%e</span><span class="s2">8%bf%90&quot;</span><span class="p">;</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">getString</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+</pre></div>
+
+
+<h3>4.MaxCompute 的UDF</h3>
+<div class="highlight"><pre><span></span><span class="err">依赖关系</span>
+<span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">com</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">odps</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">odps</span><span class="o">-</span><span class="n">sdk</span><span class="o">-</span><span class="n">udf</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">0.20</span><span class="o">.</span><span class="mi">7</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+<span class="err">代码编写</span>
+<span class="n">package</span> <span class="o">&lt;</span><span class="n">package</span><span class="err">名称</span><span class="o">&gt;</span><span class="p">;</span>
+       <span class="kn">import</span> <span class="nn">com.aliyun.odps.udf.UDF</span><span class="p">;</span>
+       <span class="n">public</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">Lower</span> <span class="n">extends</span> <span class="n">UDF</span> <span class="p">{</span>
+       <span class="n">public</span> <span class="n">String</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">String</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">null</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">toLowerCase</span><span class="p">();</span>
+       <span class="p">}</span>
+       <span class="p">}</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
+http://bigdatums.net/2016/11/13/how-to-decode-urls-in-hive/
+https://sematext.com/opensee/m/Hive/h4wBF18pS9m1aZX541?subj=Re:+slow+performance+when+using+udf
+开发和调试UDF
+https://help.aliyun.com/document_detail/50902.html?spm=a2c4g.11186623.2.22.19ed75c4kTIYst
+JAVA UDF开发
+https://help.aliyun.com/document_detail/27811.html?spm=a2c4g.11186623.4.2.35fb6982UC817p
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
