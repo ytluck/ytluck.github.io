@@ -26,7 +26,239 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-36.html">Hive之UDF开发示例</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-35.html">基于阿里云计算的数据仓库方案</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-08-18T21:23:00+08:00">
+                Published: 2018-08-18 21:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>通过阿里云实现存储和计算分离的数据仓库架构，扩展计算能力和存储方式。通过尝试三种不同的方案，对不同的技术方案做基本的了解。
+</pre></div>
+
+
+<h3>0.数据仓库-存储和计算分离。</h3>
+<div class="highlight"><pre><span></span>01.将计算和存储分开可以简化操作，用户可以分别扩展和管理计算和存储系统。
+     保证存储集群长期运行即可，计算集群可以随时使用随时创建
+   数据仓库在企业的数据汇总有着基础功能的作用，而目前的大数据技术系统也有着对数据仓库良好的支持。
+   传统和常见的数据仓库采用的架构多是存储和计算放在一起，而本文主要是汇总存储和计算分离的数据仓库架构。
+   通过阿里云提供的技术，实现数据仓库的云端化。
+02.基于阿里云的数据仓库-技术方案：
+    存储层面上采用的OSS,
+    计算层面，可以采用 阿里云 E-MapReduce 作为计算集群，
+                    亦可以采用阿里云 Maxcomputer 作为计算集群。
+      注意基于这种存储和计算分离的技术方案的瓶颈在哪里，要解决的问题在哪里： 将OSS作为数据源时存在的两类问题：数据读 和数据写问题
+</pre></div>
+
+
+<h3>1.基于OSS+E-MapReduce构建数据仓库</h3>
+<div class="highlight"><pre><span></span><span class="err">步骤：</span>
+<span class="n">I</span><span class="err">、</span><span class="n">E</span><span class="o">-</span><span class="n">MapReduce</span><span class="err">集群运行程序</span>
+    <span class="mf">01.</span><span class="err">上传文件到</span><span class="n">OSS</span>
+        <span class="err">方式一：通过</span><span class="n">OSSImport</span>
+           <span class="err">前期环境准备：</span>
+             <span class="mf">1.</span><span class="err">本地的环境</span>
+               <span class="err">本地需要有</span><span class="n">Java</span><span class="err">环境，且版本</span><span class="o">&gt;=</span><span class="mf">1.7</span>
+             <span class="mf">2.</span><span class="n">OSS</span><span class="err">端环境配置</span>
+              <span class="mf">001.</span><span class="err">在</span><span class="n">RAM</span><span class="err">控制台创建子帐号，并授权该子账号可访问</span><span class="n">OSS</span><span class="err">。</span>
+                   <span class="err">保存</span><span class="n">AccessKeyID</span><span class="err">和</span><span class="n">AccessKeySecret</span>
+               <span class="mf">002.</span><span class="err">区域</span><span class="o">-</span><span class="err">目的</span><span class="n">endpoint</span>
+               <span class="mf">003.</span><span class="n">bucket</span> <span class="err">设置</span>
+                  <span class="n">OSS</span><span class="err">的存储类型</span>
+                <span class="mf">3.</span><span class="err">下载并解压文件</span><span class="n">ossimport</span>
+                  <span class="err">解压的位置</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Items</span>\<span class="n">ossimport</span> 
+                              <span class="mf">1.</span><span class="err">修改单机配置文件</span>
+            <span class="err">单机的配置文件名是</span><span class="n">local_job</span><span class="o">.</span><span class="n">cfg</span>
+                        <span class="mf">001.</span><span class="err">将</span> <span class="n">srcPrefix</span><span class="o">=</span><span class="n">d</span><span class="p">:</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">oss</span><span class="o">/</span><span class="n">data</span><span class="o">/</span>
+                             <span class="err">变为自己放置的数据</span>
+                              <span class="n">srcPrefix</span><span class="o">=</span><span class="n">c</span><span class="p">:</span><span class="o">/</span><span class="n">Data</span><span class="o">/</span><span class="n">MapData</span><span class="o">/</span><span class="n">crawData</span><span class="o">/</span>
+                        <span class="mf">002.</span>
+                        <span class="n">destDomain</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">oss</span><span class="o">-</span><span class="n">cn</span><span class="o">-</span><span class="n">hangzhou</span><span class="o">-</span><span class="n">internal</span><span class="o">.</span><span class="n">aliyuncs</span><span class="o">.</span><span class="n">com</span>
+                        <span class="err">修改为</span>
+                        <span class="n">destAccessKey</span><span class="o">=</span><span class="n">LT</span><span class="o">***</span><span class="n">j216JVY6</span><span class="o">*</span>
+                        <span class="n">destSecretKey</span><span class="o">=*****</span><span class="n">oufMnfAX</span><span class="o">*</span>
+                        <span class="n">destDomain</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">oss</span><span class="o">-</span><span class="n">cn</span><span class="o">-</span><span class="n">shanghai</span><span class="o">.</span><span class="n">aliyuncs</span><span class="o">.</span><span class="n">com</span>
+                        <span class="n">destBucket</span><span class="o">=</span><span class="n">comp</span>
+                        <span class="n">destPrefix</span><span class="o">=</span><span class="n">alidata</span><span class="o">/</span>
+                    <span class="c1">#目的bucket，不需要加上&quot;/&quot;</span>
+                    <span class="n">destBucket</span><span class="o">=</span>
+                    <span class="mf">2.</span><span class="err">运行</span><span class="n">import</span><span class="o">.</span><span class="n">bat</span><span class="o">/</span><span class="n">import</span><span class="o">.</span><span class="n">sh</span><span class="err">为一键导入脚本</span>
+                        <span class="n">Window</span><span class="err">系统下在</span><span class="n">cmd</span><span class="o">.</span><span class="n">exe</span><span class="err">中执行</span><span class="n">import</span><span class="o">.</span><span class="n">bat</span><span class="err">，</span><span class="n">Linux</span><span class="err">终端中执行</span> <span class="n">bash</span> <span class="n">import</span><span class="o">.</span><span class="n">sh</span>
+                        <span class="err">步骤：</span><span class="n">Windows</span><span class="err">下执行</span> <span class="n">import</span><span class="o">.</span><span class="n">bat</span><span class="err">，将命令行转到</span><span class="n">ossimport</span><span class="err">目录下，然后执行</span>
+                          <span class="n">cd</span>     <span class="n">C</span><span class="p">:</span>\<span class="n">Items</span>\<span class="n">ossimport</span>
+                          <span class="n">import</span><span class="o">.</span><span class="n">bat</span>
+    <span class="mf">02.</span><span class="err">开发并打</span><span class="n">Jar</span><span class="err">包</span>
+         <span class="mf">001.</span><span class="err">安装</span> <span class="n">E</span><span class="o">-</span><span class="n">MapReduce</span> <span class="n">SDK</span><span class="o">--</span><span class="err">依赖关系</span>
+                <span class="mo">001</span><span class="err">、</span><span class="n">emr</span><span class="o">.</span><span class="n">version</span>
+                        <span class="n">com</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">emr</span>
+                                <span class="n">emr</span><span class="o">-</span><span class="n">core</span>
+                                <span class="n">emr</span><span class="o">-</span><span class="n">sdk</span>
+                <span class="mf">002.</span><span class="n">oss</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">version</span>   
+          <span class="mf">002.</span><span class="n">Spark</span> <span class="err">代码本地调试，调试结束后</span> <span class="err">打成</span><span class="n">Jar</span> <span class="err">包运行</span>
+                <span class="s2">&quot;spark.hadoop.mapreduce.job.run-local&quot;</span>
+              <span class="err">这个配置项只是针对需要在本地调试</span> <span class="n">Spark</span> <span class="err">代码读写</span> <span class="n">OSS</span> <span class="err">数据的场景</span>
+    <span class="mo">03</span><span class="err">创建集群</span>
+        <span class="err">创建集群后，您可以提交作业。</span>
+            <span class="err">首先，创建集群</span>
+            <span class="err">然后，您需要在</span> <span class="n">E</span><span class="o">-</span><span class="n">MapReduce</span> <span class="err">中创建一个作业，配置作业</span>
+            <span class="err">最后，创建执行计划</span>           
+    <span class="mf">04.</span><span class="err">执行集群命令</span>
+      <span class="err">在</span> <span class="n">E</span><span class="o">-</span><span class="n">MapReduce</span> <span class="err">场景下设置</span> <span class="n">spark</span><span class="o">-</span><span class="n">submit</span> <span class="err">的参数。</span>
+      <span class="o">--</span><span class="k">class</span> <span class="nc">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">SparkPi</span> <span class="o">--</span><span class="n">master</span> <span class="n">yarn</span> <span class="o">--</span><span class="n">deploy</span><span class="o">-</span><span class="n">mode</span> <span class="n">client</span> <span class="o">--</span><span class="n">driver</span><span class="o">-</span><span class="n">memory</span> <span class="mi">4</span><span class="n">g</span> <span class="o">--</span><span class="n">num</span><span class="o">-</span><span class="n">executors</span> <span class="mi">2</span> <span class="o">--</span><span class="n">executor</span><span class="o">-</span><span class="n">memory</span> <span class="mi">2</span><span class="n">g</span> <span class="o">--</span><span class="n">executor</span><span class="o">-</span><span class="n">cores</span> <span class="mi">2</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">spark</span><span class="o">-</span><span class="mf">1.6</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="nb">bin</span><span class="o">-</span><span class="n">hadoop2</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">spark</span><span class="o">-</span><span class="n">examples</span><span class="o">*.</span><span class="n">jar</span> <span class="mi">10</span>
+      <span class="o">--</span><span class="n">master</span> <span class="n">yarn</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">driver</span><span class="o">-</span><span class="n">memory</span> <span class="mi">5</span><span class="n">g</span> <span class="o">--</span><span class="n">num</span><span class="o">-</span><span class="n">executors</span> <span class="mi">15</span> <span class="o">--</span><span class="n">executor</span><span class="o">-</span><span class="n">memory</span> <span class="mi">4</span><span class="n">g</span> <span class="o">--</span><span class="n">executor</span><span class="o">-</span><span class="n">cores</span> <span class="mi">4</span>
+        <span class="n">spark</span><span class="o">-</span><span class="n">submit</span> <span class="o">--</span><span class="n">master</span> <span class="n">yarn</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">num</span><span class="o">-</span><span class="n">executors</span> <span class="mi">2</span> <span class="o">--</span><span class="k">class</span> <span class="nc">com</span><span class="o">.</span><span class="n">abel</span><span class="o">.</span><span class="n">userCount</span>  <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">jar</span><span class="o">/</span><span class="n">Spark_Amout</span><span class="o">.</span><span class="n">jar</span>
+
+    <span class="err">注意事项：</span>
+        <span class="mf">01.</span><span class="err">常见错误：</span> <span class="n">Jar</span><span class="err">包冲突</span>
+                <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">ClassNotFoundException</span><span class="p">:</span> <span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">ssl</span><span class="o">.</span><span class="n">TrustStrategy</span>
+                <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">NoClassDefFoundError</span><span class="p">:</span> <span class="n">org</span><span class="o">/</span><span class="n">apache</span><span class="o">/</span><span class="n">http</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="n">TrustStrategy</span>
+               <span class="err">依赖一个</span><span class="n">jar</span><span class="err">包往往会下载相互关联的</span><span class="n">jar</span><span class="err">包这就是依赖传递</span>
+                 <span class="err">：因为阿里云</span><span class="n">sdk</span><span class="err">自动依赖了</span><span class="n">httpclient</span><span class="o">-</span><span class="mf">4.4</span><span class="o">.</span><span class="mi">1</span><span class="err">和</span><span class="n">httpcore</span><span class="o">-</span><span class="mf">4.4</span><span class="o">.</span><span class="mi">1</span><span class="err">跟项目中引入的</span><span class="n">httpclient</span><span class="err">其他版本冲突了</span>
+                 <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">yq</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ask</span><span class="o">/</span><span class="mi">358</span>
+                        <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">httpcomponents</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+                   <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">httpcore</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+                    <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">4.4</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+               <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+               <span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+                   <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">httpcomponents</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+                   <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">httpclient</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+                   <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">4.4</span><span class="o">.</span><span class="mi">1</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+               <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+
+<span class="n">II</span><span class="err">、</span><span class="o">.</span><span class="n">Hive</span><span class="err">计算步骤</span>
+        <span class="err">创建外部表以及命令</span>
+        <span class="n">Hive</span><span class="err">并不会自动关联指定目录的</span><span class="n">partitions</span><span class="err">目录，需要手动操作</span>  <span class="n">alter</span> <span class="n">table</span> <span class="n">storage_log</span> <span class="n">add</span> <span class="n">partition</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="mi">123</span><span class="p">);</span>  
+    <span class="o">--</span> <span class="err">创建外部表</span>
+             <span class="n">DROP</span> <span class="n">TABLE</span> <span class="n">IF</span> <span class="n">EXISTS</span> <span class="n">lt_da_item_external</span><span class="p">;</span>
+             <span class="n">CREATE</span> <span class="n">EXTERNAL</span> <span class="n">TABLE</span> <span class="n">IF</span> <span class="n">NOT</span> <span class="n">EXISTS</span> <span class="n">lt_da_item_external</span>
+             <span class="p">(</span>
+             <span class="n">item_id</span>  <span class="n">string</span><span class="p">,</span>
+              <span class="n">item_geohash</span>  <span class="n">string</span><span class="p">,</span>
+              <span class="n">item_category</span>  <span class="n">string</span>
+             <span class="p">)</span>
+             <span class="n">STORED</span> <span class="n">BY</span> <span class="s1">&#39;com.aliyun.odps.CsvStorageHandler&#39;</span> 
+             <span class="n">WITH</span> <span class="n">SERDEPROPERTIES</span> <span class="p">(</span>
+              <span class="s1">&#39;odps.properties.rolearn&#39;</span><span class="o">=</span><span class="s1">&#39;acs:ram::1**6061588274:role/aliyunodpsdefaultrole&#39;</span>
+             <span class="p">)</span> 
+             <span class="n">LOCATION</span> <span class="s1">&#39;oss://oss-cn-shanghai-internal.aliyuncs.com/comp/alidata/item/&#39;</span><span class="p">;</span>
+</pre></div>
+
+
+<h3>2.基于OSS+MaxCompute构建数据仓库</h3>
+<div class="highlight"><pre><span></span>AliyunODPSDefaultRole
+ODPS请求获取访问您云资源的权限
+使用
+    DataWorks -数据工厂
+        包含数据集成-数据开发-数据运算MaxCompute
+    01.账号和权限
+        准备阿里云账号中的步骤检查账号是否已可用
+        Access Key 
+    02.项目配置--注意依赖关系
+        项目名称
+        主账号登录DataWorks管理控制台创建MaxCompute项目
+        配置新建项目的基本信息和高级设置
+开发工具与环境设置：
+    通过 MaxCompute Studio开发-开发者客户端的大数据集成开发环境工具：
+    Studio支持 MaxCompute SQL 和Java UDF 以及MapReduce的开发
+    Idea 创建MaxCompute项目链接  --项目空间连接管理
+        MaxCompute 项目浏览器 （Project Explorer）
+        end_point=http://service.odps.aliyun.com/api
+    使用Cost SQL估算费用 --阿里云Maxcomputer 内的支持，从OSS中读取数据是否支持？目前版本应该不支持，待确认！
+</pre></div>
+
+
+<h3>3.基于OSS+DataLake Analytics构建数据仓库</h3>
+<div class="highlight"><pre><span></span><span class="err">新一代数据仓库</span><span class="nt">-</span> <span class="err">数据湖</span>     
+ <span class="nt">Source</span><span class="err">层</span>            <span class="nt">NoSQL</span>  <span class="nt">RDBMS</span>   <span class="nt">OSS</span> <span class="err">跨多路数据源</span>
+ <span class="nt">Serverless</span> <span class="err">分析层</span> <span class="nt">Data</span> <span class="nt">Lake</span> <span class="nt">Analytics</span>
+ <span class="err">结果层</span>
+ <span class="nt">BI-SaaS</span><span class="err">层</span>
+<span class="o">&gt;</span>  <span class="nt">CREATE</span> <span class="nt">SCHEMA</span> <span class="nt">my_test_schema</span> <span class="nt">with</span> <span class="nt">DBPROPERTIES</span>
+<span class="o">&gt;</span>  <span class="o">(</span><span class="nt">LOCATION</span><span class="o">=</span> <span class="s1">&#39;oss://compt/alidata/item/&#39;</span><span class="o">,</span> 
+<span class="o">&gt;</span>  <span class="nt">catalog</span><span class="o">=</span> <span class="s1">&#39;oss&#39;</span><span class="o">)</span> <span class="o">;</span>
+<span class="o">&gt;</span> 
+<span class="o">&gt;</span> <span class="nt">use</span> <span class="nt">my_test_schema</span>
+<span class="o">&gt;</span> 
+<span class="o">&gt;</span> <span class="nt">CREATE</span> <span class="nt">EXTERNAL</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">EXISTS</span> <span class="nt">item_external</span>
+<span class="o">&gt;</span> <span class="o">(</span>
+<span class="o">&gt;</span> <span class="nt">item_id</span>  <span class="nt">string</span><span class="o">,</span>
+<span class="o">&gt;</span>  <span class="nt">item_geohash</span>  <span class="nt">string</span><span class="o">,</span>
+<span class="o">&gt;</span>  <span class="nt">item_category</span>  <span class="nt">string</span>
+<span class="o">&gt;</span> <span class="o">)</span>
+<span class="o">&gt;</span> <span class="nt">ROW</span> <span class="nt">FORMAT</span> <span class="nt">DELIMITED</span> <span class="nt">FIELDS</span> <span class="nt">TERMINATED</span> <span class="nt">BY</span> <span class="s1">&#39;,&#39;</span>
+<span class="o">&gt;</span> <span class="nt">LOCATION</span> <span class="s1">&#39;oss://compt/alidata/item/&#39;</span><span class="o">;</span> 
+<span class="o">&gt;</span> 
+<span class="o">&gt;</span> <span class="nt">show</span> <span class="nt">tables</span><span class="o">;</span>
+<span class="o">&gt;</span> 
+<span class="o">&gt;</span> <span class="nt">desc</span> <span class="nt">item_external</span><span class="o">;</span>
+<span class="o">&gt;</span> 
+<span class="o">&gt;</span> <span class="nt">SELECT</span> <span class="o">*</span> <span class="nt">from</span>  <span class="nt">item_external</span> <span class="nt">limit</span> <span class="nt">100</span><span class="o">;</span>
+<span class="o">&gt;</span> <span class="nt">DROP</span> <span class="nt">TABLE</span>  <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">item_external</span><span class="o">;</span>
+<span class="o">&gt;</span> <span class="nt">show</span> <span class="nt">databases</span><span class="o">;</span>
+<span class="o">&gt;</span> <span class="nt">DROP</span> <span class="nt">database</span>   <span class="nt">my_test_schema</span><span class="o">;</span>
+</pre></div>
+
+
+<h3>3.名词注释：</h3>
+<div class="highlight"><pre><span></span>RAM --权限管理机制包括访问控制（Resource Access Management，简称 RAM）
+STS --和安全凭证管理（Security Token Service，简称 STS）
+MaxCompute计费方式
+    按CU预付费：1CU包含的计算资源为4GB内存加上1核CPU
+    按量后付费
+Bucket - 存储空间（Bucket）
+控制地域、访问权限、生命周期
+Object - 对象（Object）
+对象由元信息（Object Meta），用户数据（Data）和文件名（Key）组成
+OSS提供标准、低频访问、归档三种存储类型
+Standard - Infrequent Access  - Archive
+Endpoint：Bucket所在数据中心的访问域名，您需要填写外网Endpoint
+AccessKeyId，AccessKeySecret
+数据转换过程中思考的问题：
+       结构化数据
+      半结构化数据：常见的半结构数据有XML和JSON
+      非结构化数据：各种文档、图片、视频/音频等都属于非结构化数据
+                                一般直接整体进行存储，而且一般存储为二进制的数据格式
+      半结构化数据 转化为结构化数据
+        1. 常规的转化-健壮-以及易于定位问题和恢复 
+        2.其他问题
+            数据量的考虑  
+            变化维度的考虑
+        增加维度-历史数据怎么处理？
+</pre></div>
+
+
+<h3>4.参考：</h3>
+<div class="highlight"><pre><span></span>单机部署
+https://help.aliyun.com/document_detail/57053.html?spm=a2c4g.11186623.6.1187.31a129d8QUKRRK
+默认参数设置：
+https://helpcdn.aliyun.com/document_detail/42802.html?spm=a2c4g.11186623.4.4.181f1aa1dmbB5j
+E-MapReduce SDK 发布说明
+ https://www.alibabacloud.com/help/zh/doc-detail/43970.htm?spm=a2c63.p38356.b99.168.33f35afc9NZdfs
+MaxCompute常用语句汇总(更新ing) https://yq.aliyun.com/articles/222955?utm_content=m_32180
+帮助企业做好MaxCompute大数据平台成本优化的最佳实践 https://yq.aliyun.com/articles/257512?spm=5176.8091938.0.0.uoFG4n
+OSS常用工具汇总
+https://help.aliyun.com/document_detail/44075.html?spm=a2c4g.11186623.6.1161.64f7779c54ZqFa
+https://yq.aliyun.com/ask/58660
+MaxCompute Studio
+https://help.aliyun.com/document_detail/50855.html?spm=a2c4g.11186623.2.4.3ac36fc2kukxGb
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-36.html" rel="bookmark"
+                           title="Permalink to Hive之UDF开发示例">Hive之UDF开发示例</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-08-12T20:01:00+08:00">
                 Published: 2018-08-12 20:01:00
@@ -37,134 +269,8 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>基本内容介绍
-UDF:最简单的自定义，实现一对一，输入一行数据输出一行数据  
-UDAF:自定义聚合函数，实现多对一，输入多行数据输出一行数  
-UDTF：用来实现一行输入多行输出，这次先不讲 
-MaxCompute的UDF包括UDF、UDAF和UDTF三种函数。通常情况下，这三种函数被统称为UDF
-</pre></div>
-
-
-<h3>1.UDF开发主要流程：</h3>
-<div class="highlight"><pre><span></span>在自己机器的java环境中编辑测试好，然后输出jar包，
-再通过console或大数据开发套件将jar包添加成resource，
-最后再注册成function
-</pre></div>
-
-
-<h3>2.具体步骤</h3>
-<div class="highlight"><pre><span></span>01.依赖关系pom.xml      
-02.编写一个UDF类，集成UDF并实现evaluate        
-03.将工程打包成.jar包形式并上传上传到集群服务器；
-04.将jar包添加到Hive中
-    add jar  /test/program/hiveudf/function.udf-stringLen.jar;
-4.自定义函数
-    create temporary function urldecode as &#39;******&#39;;    
-5.使用自定义函数
-select  distinct   id ,strlen(detail)  from  testinfo;
-06.使用完，可以删除该自定义函数
-   drop temporary function strlen;
-
-    add jar /test/program/hiveudf/function.udf-stringLen.jar;
-    create temporary function strlen as &#39;com.test.hive.StringLen&#39;;
-    select  distinct   id ,strlen(detail)  from  testinfo;
-    drop temporary function strlen;
-</pre></div>
-
-
-<h3>3.Hive的UDF开发过程</h3>
-<div class="highlight"><pre><span></span>  <span class="err">依赖关系</span>
- <span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hadoop</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">hadoop</span><span class="o">-</span><span class="n">common</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="err">$</span><span class="p">{</span><span class="n">hadoop</span><span class="o">.</span><span class="n">version</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">scope</span><span class="o">&gt;</span><span class="n">provided</span><span class="o">&lt;/</span><span class="n">scope</span><span class="o">&gt;</span>
- <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span> 
-<span class="o">&lt;</span><span class="err">!</span><span class="o">--</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mvnrepository</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">artifact</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hive</span><span class="o">/</span><span class="n">hive</span><span class="o">-</span><span class="k">exec</span> <span class="o">--&gt;</span>
-<span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hive</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">hive</span><span class="o">-</span><span class="k">exec</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
-   <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">1.2</span><span class="o">.</span><span class="mi">0</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
-<span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>    
-  <span class="err">开发代码：</span>
-    <span class="kn">import</span> <span class="nn">org.apache.hadoop.hive.ql.exec.UDF</span><span class="p">;</span>
-    <span class="kn">import</span> <span class="nn">java.net.URLDecoder</span><span class="p">;</span>
-        <span class="n">public</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">UrlDecode</span> <span class="n">extends</span> <span class="n">UDF</span> <span class="p">{</span>
-            <span class="n">public</span> <span class="n">String</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">final</span> <span class="n">String</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">null</span><span class="p">;</span> <span class="p">}</span>
-                <span class="k">return</span> <span class="n">getString</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
-            <span class="p">}</span>    
-            <span class="n">public</span> <span class="n">static</span> <span class="n">String</span> <span class="n">getString</span><span class="p">(</span><span class="n">String</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">String</span> <span class="n">a</span><span class="p">;</span>
-                <span class="k">try</span> <span class="p">{</span>
-                    <span class="n">a</span> <span class="o">=</span> <span class="n">URLDecoder</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="s2">&quot;utf-8&quot;</span><span class="p">);</span>
-                <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span> <span class="ne">Exception</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
-            <span class="p">}</span>
-
-            <span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span> <span class="n">args</span><span class="p">[])</span> <span class="p">{</span>
-                <span class="n">String</span> <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">5%a4%a9</span><span class="si">%e</span><span class="s2">5%a4%a9</span><span class="si">%e</span><span class="s2">6</span><span class="si">%9c%89%</span><span class="s2">e5%a5%bd</span><span class="si">%e</span><span class="s2">8%bf%90&quot;</span><span class="p">;</span>
-                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">getString</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-</pre></div>
-
-
-<h3>4.MaxCompute 的UDF</h3>
-<div class="highlight"><pre><span></span><span class="err">依赖关系</span>
-<span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">com</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">odps</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">odps</span><span class="o">-</span><span class="n">sdk</span><span class="o">-</span><span class="n">udf</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
-    <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">0.20</span><span class="o">.</span><span class="mi">7</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
-<span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
-<span class="err">代码编写</span>
-<span class="n">package</span> <span class="o">&lt;</span><span class="n">package</span><span class="err">名称</span><span class="o">&gt;</span><span class="p">;</span>
-       <span class="kn">import</span> <span class="nn">com.aliyun.odps.udf.UDF</span><span class="p">;</span>
-       <span class="n">public</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">Lower</span> <span class="n">extends</span> <span class="n">UDF</span> <span class="p">{</span>
-       <span class="n">public</span> <span class="n">String</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">String</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">null</span><span class="p">;</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">toLowerCase</span><span class="p">();</span>
-       <span class="p">}</span>
-       <span class="p">}</span>
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
-http://bigdatums.net/2016/11/13/how-to-decode-urls-in-hive/
-https://sematext.com/opensee/m/Hive/h4wBF18pS9m1aZX541?subj=Re:+slow+performance+when+using+udf
-开发和调试UDF
-https://help.aliyun.com/document_detail/50902.html?spm=a2c4g.11186623.2.22.19ed75c4kTIYst
-JAVA UDF开发
-https://help.aliyun.com/document_detail/27811.html?spm=a2c4g.11186623.4.2.35fb6982UC817p
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-35.html" rel="bookmark"
-                           title="Permalink to 基于阿里云计算的数据仓库方案">基于阿里云计算的数据仓库方案</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2018-08-11T20:01:00+08:00">
-                Published: 2018-08-11 20:01:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info -->                <p>oss+ E-MapReduce、Maxcomputer、DataLake Analytics</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-35.html">read more</a>
+</footer><!-- /.post-info -->                <p>hive中 UDF</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-36.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
