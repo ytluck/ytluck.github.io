@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>各种语言的循环以及升级版</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-39.html" rel="bookmark"
+           title="Permalink to 各种语言的循环以及升级版">各种语言的循环以及升级版</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-09-15T21:00:00+08:00">
+                Published: 2018-09-15 21:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>各种语言的循环以及升级版
+一些历史概念
+    01.for 语句——让数值渐增的 while 语句更简洁-代码阅读者很容易就能理解循环的意图
+    02.foreach句型：  过处理的对象来控制循环操作
+          为了方便编写对某对象内所有元素进行某种处理的代码
+    03.会使用，善于使用，了解来龙去脉
+    控制机制： 方式一：循环和选择
+               方式二：递归 --递归就是函数调用自身
+</pre></div>
+
+
+<h3>Python</h3>
+<div class="highlight"><pre><span></span>01.循环： for 循环
+ for x in s:
+    statesments
+02.迭代：
+   列表表达式 [ len(x) for x  in  open(&#39;tmp/mytest.txt&#39;) ]
+    生成器
+        01.( len(x) for x  in  open(&#39;tmp/mytest.txt&#39;) )
+            {len() for name,rank in chile_ranks.items()} 
+        02. yield
+        03. enumerate 
+          for i, x in enumerate(s):
+               status
+        04. zip
+    迭代器     
+03.函数式： map  filter lambda表达式
+    常用的map、reduce等函数，但是没有foreach
+04.结构式查询： pandas 的数据结构
+递归 --递归就是函数调用自身
+重点：
+重点一：递归步骤 --分解问题并重组问题
+ 如何分解成小的部分-每部分都是用函数来解决，然后重新组合
+重点二：包含递归的结束条件
+ 递归触底 即递归必须有基础情况，且出现在函数的第一步
+说明：
+ Python maximum recursion depth exceeded
+   python解释器有一个默认的最大递归次数是999
+   同时，操作系统也有一个最大迭代次数
+</pre></div>
+
+
+<h3>Scala</h3>
+<div class="highlight"><pre><span></span><span class="m">01.</span><span class="kr">while</span> do <span class="kr">for</span>
+<span class="m">02.</span>循环构造一个集合，每次迭代生成集合中的一个值
+  <span class="m">001.</span> 生成器对延迟操作提供了支持
+    <span class="o">&lt;-</span>   提供生成器， yield
+    <span class="kr">for</span><span class="p">(</span>i <span class="o">&lt;-</span> <span class="m">1</span>to <span class="m">10</span><span class="p">)</span> yield  i<span class="o">%3   等价于 (1 to 10).map(i =&gt;  i%</span><span class="m">3</span> <span class="p">)</span>
+     和常规函数类似，返回值通过yield，而不是<span class="kr">return</span>
+   <span class="m">002.</span>迭代器
+        有了迭代器，可以通过<span class="kr">next</span> 和hasNext方法来遍历集合中的元素
+         <span class="kr">while</span><span class="p">(</span>iter.hasNext<span class="p">)</span> 注意这个是有状态的，如果只是想查看元素，而不是消费，
+          可以使用buffered方法把迭代器转换成另外一种迭代器
+  迭代器协议：
+  示例：在Python中文件可以使用<span class="kr">for</span>循环进行遍历
+    原因：文件对象在Python中实现了迭代器协议，标志 <span class="kr">next</span>方法
+<span class="m">03.</span>高阶函数<span class="o">-</span>函数式编程
+     map 将某个函数应用到集合中的每个元素，并给出其结果的集合
+     flatMap    foreache  collect<span class="p">()</span>
+     reduce flod  aggragate  
+     filter slice take  zip
+<span class="m">04.</span>
+</pre></div>
+
+
+<h3>Java</h3>
+<div class="highlight"><pre><span></span>01. do while for
+02.迭代器（Iterator）模式 
+提供一种方法访问一个容器对象中各个元素，而又不需暴露该对象的内部细节
+一种遍历的算法
+Java通过提供Iterator和Iterable俩个接口来实现集合类的可迭代性
+03.foreach循环
+   for(int element:a){System.out.println(element)} 遍历数组中每一个元素，而不需要使用下标值
+ 等价于 for(int i=0 ; i &lt;a.length; i++){System.out.println(a[i])}
+04.函数式编程
+lambda表达式  使用 -&gt;  以及一个表达式
+</pre></div>
+
+
+<h3>编程范式简单分类</h3>
+<div class="highlight"><pre><span></span>在比较中学习-掌握多种语言的共通点，
+在历史中学习--语言设计者为解决何种问题而创造了相应语言以及语言经历了什么样的变迁，理解为什么会有这种功能了
+在实践中学习--项目中学习
+两种范式：声明式编程、命令式编程
+声明式编程：关注做什么，让计算机明白目标
+    SQL
+    函数式编程                 Scala
+    逻辑式编程
+命令式编程：关注怎么做，要明确指出来每一步该怎么做
+       面向过程式编程： C Language
+       面向对象编程：    Java
+代码重用在不同语言中的
+    代码重用在面向对象的世界里多表现为对结构的重用
+    而函数式的世界则多以组合和高阶函数作为重用的手段
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span> 各种语言的筛选与遍历 https://ytluck.github.io/program/my-program-post-09.html
+ 代码之髓
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

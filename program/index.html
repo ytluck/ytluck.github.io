@@ -26,7 +26,217 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-38.html">SpringBoot编程入门概念了解</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-40.html">Python的一些高级特性</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-09-16T21:00:00+08:00">
+                Published: 2018-09-16 21:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Python的一些高级特性，有一些在其他语言中出现，有一些没有，明确共同点，找出差异，进而更加熟练掌握各种特性
+Python的特性
+</pre></div>
+
+
+<h3>迭代器：</h3>
+<div class="highlight"><pre><span></span>迭代器协议：
+在Python中文件可以使用for循环进行遍历
+    原因：文件对象在Python中实现了迭代器协议，标志 next方法
+</pre></div>
+
+
+<h3>生成器</h3>
+<div class="highlight"><pre><span></span>生成器对延迟操作提供了支持
+Python提供了几种不同的方式构建生成器
+  01、生成器函数 yield
+   和常规函数类似，返回值通过yield，而不是return
+  02、生成器表达式
+  03.enumerate
+</pre></div>
+
+
+<h3>装饰器decorator</h3>
+<div class="highlight"><pre><span></span>装饰器  
+装饰器-回调函数 等，这些内容以后整理
+</pre></div>
+
+
+<h3>上下文管理器</h3>
+<div class="highlight"><pre><span></span>上下文管理器
+ with 语句块 + 上下文管理器
+ 对象实现__enter__ 和 __exit__方法 或者contextlib模块
+对资源的处理：Python中可使用finally语句保证无论什么情况下文件都会被关闭--with语句也可以
+确保加锁以后锁的释放 try/finally 语句
+</pre></div>
+
+
+<h3>递归</h3>
+<div class="highlight"><pre><span></span>--递归就是函数调用自身
+重点：
+    重点一：递归步骤 --分解问题并重组问题
+       如何分解成小的部分-每部分都是用函数来解决，然后重新组合
+    重点二：包含递归的结束条件
+       递归触底 即递归必须有基础情况，且出现在函数的第一步
+说明：
+ Python maximum recursion depth exceeded
+   python解释器有一个默认的最大递归次数是999
+   同时，操作系统也有一个最大迭代次数
+</pre></div>
+
+
+<blockquote>
+<div class="highlight"><pre><span></span> # -*- coding:utf8 -*-
+  # !/usr/bin/python
+  def factorial(n):
+      if n == 1:
+          return 1
+      else:
+          return n * factorial(n-1)
+  def fibon(n):
+      if n == 0 or n == 1:
+          return 1
+      else:
+          return fibon(n-1) + fibon(n-2)
+
+  if __name__ == &#39;__main__&#39;:
+      data1 = factorial(23)
+      data2 = fibon(9)
+      print(data1)
+      print(data2)
+</pre></div>
+
+
+</blockquote>
+<h3>高阶函数和匿名函数</h3>
+<div class="highlight"><pre><span></span>高阶函数  
+map filter sorted   
+reduce  
+匿名函数 lambda 表达
+</pre></div>
+
+
+<h3>Python反转字符串中涉及到的内容</h3>
+<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="s s-Atom">字符串的一些特性</span>
+  <span class="mf">01.</span><span class="s s-Atom">索引特性：负数索引--从末端建立索引，从</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">开始</span>
+             <span class="s s-Atom">正数索引--从起始端建立索引，从0开始</span>
+  <span class="mf">02.</span><span class="s s-Atom">分片特性：对字符串子序列建立索引</span> <span class="s s-Atom">冒号:指出子序列的范围--起始以及步长</span>
+   <span class="p">[],</span><span class="s s-Atom">其中的字母是【）半开区间，包含范围起始值，不包含结束值</span>
+   <span class="s s-Atom">单个冒号和两个冒号的规则</span>
+   <span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">步长为</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">表示向后进行</span>
+  <span class="mf">03.</span><span class="s s-Atom">字符串操作</span> <span class="s s-Atom">连接</span> <span class="o">+</span>  <span class="s s-Atom">检查成员的</span> <span class="s s-Atom">in</span>
+<span class="mf">2.</span><span class="s s-Atom">列表的一些特性：列表本身是可变的</span>
+    <span class="mf">01.</span><span class="s s-Atom">列表的索引和分片特性</span>
+    <span class="mf">02.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">将列表中的元素反向排列</span>
+    <span class="s s-Atom">列表和字符串之间的转换</span>
+      <span class="s s-Atom">将列表变为字符串--</span> <span class="s s-Atom">s</span> <span class="o">=</span>  <span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nv">L</span><span class="p">)</span>  <span class="s s-Atom">调用字符串str</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">iterable</span><span class="p">)</span>
+      <span class="s s-Atom">将字符串变为列表</span>  <span class="nv">L</span><span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
+    <span class="nf">内置函数reverse，是直接操作变量本身，调用reverse</span><span class="p">()</span><span class="s s-Atom">后，</span>
+    <span class="s s-Atom">变量本身的值就是reverse后的值了，而返回值，是空的，不返回任何值</span>
+    <span class="s s-Atom">所以不能出现：</span>
+      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
+    <span class="s s-Atom">而应该是</span>
+      <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
+      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">;</span>
+     <span class="s s-Atom">sort等函数也有此类规则，方法</span><span class="p">.</span><span class="nf">sort</span><span class="p">()</span><span class="s s-Atom">和函数sorted</span> <span class="s s-Atom">以及</span>  <span class="s s-Atom">方法</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">和函数reserved类似</span>
+    <span class="s s-Atom">这一点和R语言有所不同，请注意</span>
+<span class="mf">3.</span><span class="s s-Atom">内置函数</span>
+  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">返回的是一个迭代器对象</span> 
+  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">函数是返回序列seq的反向访问的迭代子。</span>
+     <span class="s s-Atom">参数可以是列表，元组，字符串，不改变原对象</span>
+<span class="mf">4.</span><span class="s s-Atom">高阶函数和匿名函数</span>
+  <span class="nf">map</span><span class="p">()</span><span class="s s-Atom">函数、</span><span class="nf">filter</span><span class="p">()</span><span class="s s-Atom">函数</span> <span class="nf">sorted</span><span class="p">()</span>
+  <span class="nf">reduce</span><span class="p">()</span><span class="s s-Atom">传入的参数f必须接受2个参数</span>
+    <span class="s s-Atom">第一次调用是把list的前两个元素传递给f</span><span class="p">,</span><span class="s s-Atom">第二次调用时，</span>
+    <span class="s s-Atom">就是把前两个list元素的计算结果当成第一个参数，list的第三个元素当成第二个参数，</span>
+    <span class="s s-Atom">传入f进行操作，以此类推，并最终返回结果</span>
+  <span class="s s-Atom">使用</span> <span class="s s-Atom">lambda</span> <span class="s s-Atom">来创建匿名函数</span>
+
+<span class="c1"># -*- coding:utf8 -*-</span>
+<span class="c1"># !/usr/bin/python</span>
+
+<span class="c1"># 反转字符串</span>
+<span class="c1"># 使用递归 -使用循环 -使用 reduce和lambda表达式</span>
+<span class="c1"># 自身的索引特性-</span>
+<span class="c1"># 使用Python内置函数结合字符串函数使用</span>
+<span class="c1"># 变成其他数据类型使用其函数</span>
+
+<span class="s s-Atom">def</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">)</span><span class="s s-Atom">:</span>
+<span class="nf">if</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="s s-Atom">:</span>
+<span class="s s-Atom">return</span> <span class="s s-Atom">astr</span>
+<span class="nn">else</span><span class="p">:</span>
+<span class="s s-Atom">newstr</span> <span class="o">=</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">1</span><span class="s s-Atom">:</span><span class="p">])</span> <span class="o">+</span> <span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="s s-Atom">return</span> <span class="s s-Atom">newstr</span>
+
+
+<span class="s s-Atom">def</span> <span class="nf">func</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
+<span class="s s-Atom">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="s s-Atom">max_index</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+<span class="s s-Atom">for</span> <span class="s s-Atom">index</span><span class="p">,</span> <span class="s s-Atom">value</span> <span class="s s-Atom">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
+<span class="s s-Atom">result</span> <span class="s s-Atom">+=</span> <span class="s s-Atom">s</span><span class="p">[</span><span class="s s-Atom">max_index</span><span class="o">-</span><span class="s s-Atom">index</span><span class="p">]</span>
+<span class="s s-Atom">return</span> <span class="s s-Atom">result</span>
+
+
+<span class="s s-Atom">if</span> <span class="k">__</span><span class="s s-Atom">name__</span> <span class="o">==</span> <span class="s s-Atom">&#39;__main__&#39;:</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">func</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">reduce</span><span class="p">(</span><span class="s s-Atom">lambda</span> <span class="s s-Atom">x</span><span class="p">,</span> <span class="nn">y</span><span class="p">:</span> <span class="s s-Atom">y</span><span class="o">+</span><span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">])</span>
+<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s2">&quot;efg&quot;</span><span class="p">))</span>
+
+<span class="c1"># 列表变为字符串 --注意事项</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">)))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">([</span><span class="s s-Atom">&#39;a&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;b&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;c&#39;</span><span class="p">]))</span>
+<span class="nv">Li</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)</span>
+<span class="nv">Li</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span>
+<span class="s s-Atom">dealLi</span> <span class="o">=</span> <span class="nv">Li</span>
+<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">dealLi</span><span class="p">))</span>
+</pre></div>
+
+
+<h3>参考</h3>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-39.html" rel="bookmark"
+                           title="Permalink to 各种语言的循环以及升级版">各种语言的循环以及升级版</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-09-15T21:00:00+08:00">
+                Published: 2018-09-15 21:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>循环、迭代、高阶函数以及语法糖</p>
+                <a class="readmore" href="/program/my-program-post-39.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-38.html" rel="bookmark"
+                           title="Permalink to SpringBoot编程入门概念了解">SpringBoot编程入门概念了解</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-06-30T21:00:00+08:00">
                 Published: 2018-06-30 21:00:00
@@ -37,247 +247,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>SpringBoot的基本概念和开发流程
-随着微服务的普及，使用springboot作为微服务开发的一部分，有必要了解其中的一些基本的概念和使用方式，
-同时保证可以快速的开发和实现相应的功能。
-</pre></div>
-
-
-<h3>1.开发方式：</h3>
-<div class="highlight"><pre><span></span> Java中JDK开发方式: 
-       new一个依赖类再调用类实例的方法
-      正转: 是程序员进行实例控制，类实例不好统一管理
-  Spring  开发方式  ：由 Spring来负责控制对象的生命周期和对象间的关系
-  IOC/DI是同一个概念的不同角度描述：
-   01.依赖注入&lt;Dependency Injection&gt;：
-     对象 依赖于 IOC/DI容器，需要IOC/DI容器来提供对象需要的 外部资源
-    IOC/DI容器注入对象
-   02.控制反转(IOC)&lt;Inversion of Control&gt;
-      将设计好的对象交给容器控制--对象被动的等待IoC容器来创建并注入它所需要的资源
-   03.创建应用对象之间协作关系的行为称为装配
-     依赖注入的本质就是装配，装配是依赖注入的具体行为   
-   04.Bean  Spring中的所有对象称为Bean
-2.Spring容器中为一个bean配置依赖注入
- 注入依赖对象可以采用手工装配或自动装配
-   1.手动装配的方式 --手动装配会覆盖自动装配
-       一种是在XML文件中，通过在bean节点下配置；
-             使用属性的Setter方法注入依赖对象 和 
-             使用构造器方法：在配置文件中配置该类的bean，并配置构造器
-        另外一种：
-             使用注解的方式
-                  @Autowired 是自动注入，自动从spring的上下文找到合适的bean来注入 
-                     默认按类型装配
-                 @Resource  按照名称进行装配
-    2.自动装配-4种类型的自动装配
-       byName, byType, constructor, autodetect
-          &lt;bean id=&quot;...&quot; class=&quot;...&quot; autowire=&quot;byType&quot;/&gt;
-    开发中常用的注入
-        01.XML配置
-        02.注解配置  @Service    @Controller @Repository @Component
-        03.Java配置  通过 @Configuration 和 @Bean实现
-        04. groovy配置
-</pre></div>
-
-
-<h3>2. SpringBoot</h3>
-<div class="highlight"><pre><span></span>  https://spring.io/
- https://start.spring.io/
- 1.有一个入口类，入口类有一个main方法，
-   main方法中使用SpringApplication.run启动Spring Boot的应用项目
-         @SpringBootApplication 是Spring Boot项目的核心注解，主要目的是开启自动配置
-                  main方法 是作为项目启动的入口
-          @SpringBootApplication(eration.class) 关闭特定的自动配置
-
-  01.可以通过 @ ImportResource来加载xml配置
-  02.外部配置文件 ：properties文件、yaml文件 或者命令行参数
-       注入properties文件里的值的方式--
-        通过@PropertySource指明properties文件的位置
-          通过@Value注入值 --在Spring boot 中直接使用@Value注入即可
-    基于类型安全的配置方式
-    @ConfigurationProperties 加载properties文件内的配置，通过prefix属性指定配置前缀，location指定位置
- 1.pom.xml文件的相关内容
-    01.spring-boot-starter
-      starter会把所有用到的依赖都给包含进来，避免了开发者自己去引入依赖所带来的麻烦
-       不同的starter是为了解决不同的依赖，所以它们内部的实现可能会有很大的差异
-     有众多Starter
-        Starter通常命名为   spring-boot-starter-{name}   如 spring-boot-starter-web，
-                   建议非官方 {name}-spring-boot-starter的格式。
-    要在Spring Boot中引入Web MVC的支持时，我们通常会引入这个模块spring-boot-starter-web
-2.配置文件 resource
- 2.Spring Boot的web开发
- 01. spring-boot-starter-web
-       嵌入了Tomcat以及Spring MVC的依赖
-02.数据持久层框架--
-     001  ORM框架
-        Hibernate与Mybatis
-        @Entity 注解指明这是一个和数据库表映射的实体类
-        @ID注解指明这个属性映射为数据库的主键
-        @Table  @Column
-        @Query
-  002..Spring 的事务机制
-    提供API开启事务 提交事务以及发生错误的时候回滚
-    -- org.springframework.transaction.annotation包
-    PlatformTransactionManager接口
-    @Transaction
-    @EnableTransactionManager 声明开启事务支持
-  003.数据缓存 Cache 缓存支持
-    org.springframework.cache.CacheManager
-    org.springframework.cache.Cache
-      @Cacheable @CachePut @CacheEvit
-      切换缓存技术
-         01.EhCache
-         02.Guava
-         03.Redis
-    004.MongoDB
-      @Document 注解映射领域模型和MongoDB的文文档
-      @ID
-      @Field
-     005.批处理
-        Spring Batch-- @EnableBatchProcessing
- 03.安全控制
-    Authentication和Authorization
-    安全认证和授权
-      用户认证 以及请求授权
- 04.异步消息
-    消息代理 
-    目的地  queue 和topic
-      JMS ： org.springframework.boot.autoconfigure.jms
-    开发-测试与部署 
-       测试 @Test  @Ignore
-      部署--01.热部署 spring-boot-devtools
-              --02.常规部署
-                打包-jar 或者war
-                运行
-              03.云部署-基于Docker
-</pre></div>
-
-
-<h3>3.注解</h3>
-<div class="highlight"><pre><span></span>Java注解：annotation 关联信息和关联数据的途径和方法
- 01.按照运行机制: 源码注解--编译时注解-运行时注解RetentionPolicy.
-  2.按照来源：JDK自带的注解--来自第三方的注解&lt;框架上的注解&gt;--自定义注解
-  3.
-   JDK的注解 @ --编译时注解
-   Spring 的  -- @ 运行时注解
-  04.自定义注解 
-     001. 定义注解
-     public @interface {}
-        JAVA基本类型 String Class   注解只有一个值的是value()
-  002.使用注解
-    @&lt;注解名&gt;(成员名=成员值,……)
-      注解（Annotation）提供了一种安全的类似注释的机制，
-     1.作用范围 包 类 字段 方法 方法的参数 局部变量
-     2.生命周期：SOURCE CLASS RUNNING
-     3.功能
-     003.解析注解：通过反射获取类、函数或者成员上的运行时注解信息，
-       从而实现动态控制程序运行的逻辑
-        1.使用类加载器加载类2.找到类上的注解isAnnotationPresent3.拿到注解实例4.找打方法上的注解
-  5.常见注解
-   001.JDK自带的注解    @Override  @Deprecated @Suppvisewarnings
-     @Override 告诉编译器 重写
-   002. Spring 的注解  @Service  @Autowired @Repository
-      Mybatis 的注解 @InserProvider @UpdateProvider @Options       
-      4.了解相关
-      JSP
-           00.JavaBean
-           Bean相关配置全部是
-                 使用xml配置文件实现的，配置文件--
-               使用实现接口来实现
-                       使用注解实现bean的注入和管理-- 自动生成一个实例注入
-      002.MVC
-      @service是处于m，即业务层
-      @controller对应的是mvc模式中的c    
-            相关类（框架或工具中的类）根据这些信息来决定如何使用该程序元素或改变它们的行为
-</pre></div>
-
-
-<h3>4. AOP 面向切面编程</h3>
-<div class="highlight"><pre><span></span>        01.基于注解拦截   和  02.基于方法规则拦截
-        @Aspect 声明是一个切面 @PointCut  @After @Before @Around
-        @Transactional
-常见分离
-水平分离：展示层 服务层 持久层
-垂直分离：模块划分(订单、库存)
-切面分离：功能和非功能分离，非功能集中管理
-      常用的场景： 权限控制、 缓存控制 、事务控制、审计日志
-                          性能监控、 异常处理、分布式追踪                     
-    拆分-- 水平拆分和垂直拆分
-        水平拆分： service  dao control
-        垂直拆分： 模块划分 订单-库存等
-         切面分离
-            @Aspect  声明切面
-               //定义切面 切面的构成
-                @Pointcut
-                @Before()
-        切面表达式
-            匹配类的方法   designators
-                    匹配方法  execution()      
-                    匹配注解  @target()、  @annotation()
-                    匹配对象target()
-             wildcards  通配符
-                     operators   运算符
-</pre></div>
-
-
-<h3>5.系统框架结构</h3>
-<div class="highlight"><pre><span></span>dao接口层      用于放置封装好的底层数据库访问操作
-service接口层  抽象业务及实现，调用dao层
-control接口层
-entity层       
-  uitl 工具类
-  config 配置
-  doc 文档目录       
-pojo   &lt;POJO(Plain Ordinary Java Object)&gt;；
-   能够做到维护数据库表记录的persisent object
-   完全是一个符合Java Bean规范的纯Java对象，没有增加别的属性和方法
-    Service
-   配置
-      配置、  接口、实现类
-    实现业务逻辑。将增删改查整合在一起
-Control
-  01.业务Controller 方法实现 web
-    @RequestMapping(&quot;/superadmin&quot;)
-  统一异常处理 Handler    
-MVC全名是Model View Controller，
-      是模型(model)－视图(view)－控制器(controller)的
-    Entity层
-    Dao是数据访问层 就是用来访问数据库实现数据的持久化
-    Services 业务逻辑层  - BIZE层
-    Action是管理业务（Service）调度和管理跳转
-    Controller
-      web
-</pre></div>
-
-
-<h3>6.Spring Boot 整合</h3>
-<div class="highlight"><pre><span></span>1.整合mybatis方式：
-        01.使用XML 便于后期优化
-        02.使用注解
-        03.使用实体类
-    mybatis3.4.0开始加入了 @Mapper注解
-2.SpringBoot整合Redis
-   spring-boot-starter-data-redis
-     01. POM文件引入redis依赖
-  02. 资源文件对redis进行配置
-      Redis数据库默认的索引 spring.redis.database
-     Redis服务器地址            spring.redis.host
-     连接池最大连接数           spring.redis.pool.max-active=1000
-     连接池中最大空闲连接 spring.redis.pool.max-idle=10
-     spring.redis.pool.min-idle=2
-     spring.redis.pool.max-wait      
-     spring.redis.timeout
- 03.切换到指定的数据库，数据库索引号 index 用数字值指定，以 0 作为起始索引值
-    默认使用 0 号数据库  --  数据库索引号 index
-       SELECT index 
-     redis配置文件中下面的参数来控制数据库总数  database 16 #默认为16个数据库，可以自己更改
-     redis下，数据库是由一个整数索引标识，而不是由一个数据库名称
- 04.使用redis的工具类
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>控制反转和依赖注入-IOC/DI</p>
+                <a class="readmore" href="/program/my-program-post-38.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
