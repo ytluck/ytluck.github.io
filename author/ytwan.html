@@ -26,7 +26,193 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-40.html">Python的一些高级特性</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-39.html">Flink-scala实现批计算和流计算</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-11-17T18:21:00+08:00">
+                Published: 2018-11-17 18:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>Flink 的计算</h3>
+<div class="highlight"><pre><span></span>离线计算--任务调度-定时调度任务来处理数据
+流失任务-- 属于常驻进程任务
+Specifying Keys
+    在Flink中有许多函数需要我们为其指定key，比如groupBy，Join中的where等
+    要求在一组元素上定义一个key,只是被定义在实际数据之上的函数，以指导分组算子使用
+    四种选择的方式
+            指定keyTuple中的Field Position
+            指定key选择函数(Key Selector Functions)
+            一个或多个字段位置键（field position keys） ，这个仅仅对Tuple类型的DataSet有效)
+            Case Class中的字段--DataSet转换成case class，实现和转换成Tuple1类似
+</pre></div>
+
+
+<h3>接口类型一</h3>
+<div class="highlight"><pre><span></span><span class="n">Java</span><span class="o">-</span> <span class="n">DataStream</span> <span class="err">、</span><span class="n">DataSet</span><span class="o">||</span><span class="n">Scala</span>
+<span class="err">流计算</span> <span class="o">--</span><span class="kn">import</span> <span class="nn">org.apache.flink.streaming.api.scala.extensions._</span>
+    <span class="o">//</span><span class="mf">1.</span><span class="err">环境设置</span><span class="o">-</span> <span class="n">StreamExecutionEnvironment</span> 
+    <span class="n">val</span> <span class="n">env</span> <span class="o">=</span> <span class="n">StreamExecutionEnvironment</span><span class="o">.</span><span class="n">getExecutionEnvironment</span>
+    <span class="o">//</span><span class="err">容错设置</span><span class="o">-</span> <span class="n">Fault</span> <span class="n">Tolerance</span><span class="o">-</span><span class="n">n</span><span class="err">是以毫秒为单位的检查点间隔</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">enableCheckpointing</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span> 
+    <span class="o">//</span><span class="mf">2.</span><span class="err">读取数据</span><span class="o">--</span><span class="err">获取的预定义</span><span class="n">Stream</span>  <span class="n">Data</span> <span class="n">Source</span>  
+    <span class="n">val</span> <span class="n">text</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">socketTextStream</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">9999</span><span class="p">)</span>
+    <span class="o">//</span><span class="mf">3.</span><span class="err">数据处理</span>
+    <span class="n">val</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">W+&quot;</span><span class="p">)</span> <span class="nb">filter</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">nonEmpty</span> <span class="p">}</span> <span class="p">}</span>
+      <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
+      <span class="o">.</span><span class="n">keyBy</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">timeWindow</span><span class="p">(</span><span class="n">Time</span><span class="o">.</span><span class="n">seconds</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+      <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">//</span><span class="mf">4.</span><span class="err">输出数据</span>
+
+    <span class="o">//</span><span class="mf">5.</span><span class="err">触发执行</span> <span class="n">trigger</span> <span class="n">the</span> <span class="n">program</span> <span class="n">execution</span> <span class="n">by</span> <span class="n">calling</span> <span class="n">execute</span><span class="p">()</span> 
+        <span class="n">env</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;Window WordCount&quot;</span><span class="p">);</span>
+<span class="err">批量计算</span> <span class="o">--</span> <span class="kn">import</span> <span class="nn">org.apache.flink.api.scala.extensions._</span> 
+    <span class="o">//</span><span class="mf">1.</span><span class="err">环境设置</span><span class="o">-</span> <span class="n">ExecutionEnvironment</span> 
+    <span class="n">val</span> <span class="n">env</span> <span class="o">=</span> <span class="n">ExecutionEnvironment</span><span class="o">.</span><span class="n">getExecutionEnvironment</span>
+    <span class="o">//</span><span class="mf">2.</span><span class="err">读取数据</span><span class="o">-</span><span class="err">获取的预定义</span>   <span class="n">Data</span> <span class="n">Sources</span>
+    <span class="n">val</span> <span class="n">text</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">readTextFile</span><span class="p">(</span><span class="s2">&quot;/path/to/file&quot;</span><span class="p">)</span>
+    <span class="o">//</span><span class="mf">3.</span><span class="err">数据处理</span><span class="o">--</span><span class="n">Transformation</span>
+    <span class="n">val</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">W+&quot;</span><span class="p">)</span> <span class="nb">filter</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">nonEmpty</span> <span class="p">}</span> <span class="p">}</span>
+     <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
+     <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">//</span><span class="mf">4.</span><span class="err">输出数据</span><span class="o">--</span><span class="n">Sink</span>
+    <span class="n">counts</span><span class="o">.</span><span class="n">writeAsCsv</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>接口类型二- the Table API and SQL</h3>
+<div class="highlight"><pre><span></span>0.Maven 设置
+1.代码
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val tableEnv = TableEnvironment.getTableEnvironment(env)
+
+    // input tables and output tables--// register a Table
+    tableEnv.registerTable(&quot;table1&quot;, ...)    
+    // create a Table from a Table API query
+    val tapiResult = tableEnv.scan(&quot;table1&quot;).select(...)
+     // Create a Table from a SQL query
+    val sqlResult  = tableEnv.sqlQuery(&quot;SELECT ... FROM table2 ...&quot;)
+
+    // emit a Table API result Table to a TableSink, same for SQL result
+    // create a TableSink
+    val sink: TableSink = new CsvTableSink(&quot;/path/to/file&quot;, fieldDelim = &quot;|&quot;)
+     tapiResult.writeToSink(sink)
+2.批量计算 
+  val bEnv = ExecutionEnvironment.getExecutionEnvironment
+  val bTableEnv = TableEnvironment.getTableEnvironment(bEnv)
+3.说明：两种层级的API的交互
+    A DataStream or DataSet can be registered in a TableEnvironment as a Table
+    Convert a DataStream or DataSet into a Table
+    Convert a Table into a DataStream or DataSet
+</pre></div>
+
+
+<h3>接口类型三：SQL</h3>
+<div class="highlight"><pre><span></span>QL Client -- Flink’s Table &amp; SQL API makes it possible to work with queries written in the SQL language
+支持两种方式
+     supports two modes for maintaining and visualizing results. 命令：SET execution.result-mode=
+         table mode 表模式
+         changelog mode 模式
+</pre></div>
+
+
+<h3>常见流式计算</h3>
+<div class="highlight"><pre><span></span>01.多流关联--流式计算-数据到达是一个增量的过程，并且数据到达的时间不确定和无需，
+   因此在数据处理过程中涉及到中间状态的保持和恢复机制等问题
+02.维度表的使用
+    全量加载和增量加载
+03.任务优化
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>https://ci.apache.org/projects/flink/flink-docs-release-1.6/quickstart/setup_quickstart.html
+https://github.com/apache/flink/tree/master/flink-examples
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-38.html" rel="bookmark"
+                           title="Permalink to Flink介绍">Flink介绍</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-11-17T15:01:00+08:00">
+                Published: 2018-11-17 15:01:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>消息传输层-流处理层</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-38.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-39.html" rel="bookmark"
+                           title="Permalink to SQL的相关计算和原理。">SQL的相关计算和原理。</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-11-15T21:25:00+08:00">
+                Published: 2018-11-15 21:25:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/sql.html">SQL</a> </p>
+</footer><!-- /.post-info -->                <p>SQL三值逻辑</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-39.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-43.html" rel="bookmark"
+                           title="Permalink to Spring数据库编程">Spring数据库编程</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-11-10T22:32:00+08:00">
+                Published: 2018-11-10 22:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>pring与两种常见的ORM方案集成</p>
+                <a class="readmore" href="/program/my-program-post-43.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-40.html" rel="bookmark"
+                           title="Permalink to Python的一些高级特性">Python的一些高级特性</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-09-16T21:00:00+08:00">
                 Published: 2018-09-16 21:00:00
@@ -37,176 +223,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/python.html">Python</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Python的一些高级特性，有一些在其他语言中出现，有一些没有，明确共同点，找出差异，进而更加熟练掌握各种特性
-Python的特性
-</pre></div>
-
-
-<h3>迭代器：</h3>
-<div class="highlight"><pre><span></span>迭代器协议：
-在Python中文件可以使用for循环进行遍历
-    原因：文件对象在Python中实现了迭代器协议，标志 next方法
-</pre></div>
-
-
-<h3>生成器</h3>
-<div class="highlight"><pre><span></span>生成器对延迟操作提供了支持
-Python提供了几种不同的方式构建生成器
-  01、生成器函数 yield
-   和常规函数类似，返回值通过yield，而不是return
-  02、生成器表达式
-  03.enumerate
-</pre></div>
-
-
-<h3>装饰器decorator</h3>
-<div class="highlight"><pre><span></span>装饰器  
-装饰器-回调函数 等，这些内容以后整理
-</pre></div>
-
-
-<h3>上下文管理器</h3>
-<div class="highlight"><pre><span></span>上下文管理器
- with 语句块 + 上下文管理器
- 对象实现__enter__ 和 __exit__方法 或者contextlib模块
-对资源的处理：Python中可使用finally语句保证无论什么情况下文件都会被关闭--with语句也可以
-确保加锁以后锁的释放 try/finally 语句
-</pre></div>
-
-
-<h3>递归</h3>
-<div class="highlight"><pre><span></span>--递归就是函数调用自身
-重点：
-    重点一：递归步骤 --分解问题并重组问题
-       如何分解成小的部分-每部分都是用函数来解决，然后重新组合
-    重点二：包含递归的结束条件
-       递归触底 即递归必须有基础情况，且出现在函数的第一步
-说明：
- Python maximum recursion depth exceeded
-   python解释器有一个默认的最大递归次数是999
-   同时，操作系统也有一个最大迭代次数
-</pre></div>
-
-
-<blockquote>
-<div class="highlight"><pre><span></span> # -*- coding:utf8 -*-
-  # !/usr/bin/python
-  def factorial(n):
-      if n == 1:
-          return 1
-      else:
-          return n * factorial(n-1)
-  def fibon(n):
-      if n == 0 or n == 1:
-          return 1
-      else:
-          return fibon(n-1) + fibon(n-2)
-
-  if __name__ == &#39;__main__&#39;:
-      data1 = factorial(23)
-      data2 = fibon(9)
-      print(data1)
-      print(data2)
-</pre></div>
-
-
-</blockquote>
-<h3>高阶函数和匿名函数</h3>
-<div class="highlight"><pre><span></span>高阶函数  
-map filter sorted   
-reduce  
-匿名函数 lambda 表达
-</pre></div>
-
-
-<h3>Python反转字符串中涉及到的内容</h3>
-<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="s s-Atom">字符串的一些特性</span>
-  <span class="mf">01.</span><span class="s s-Atom">索引特性：负数索引--从末端建立索引，从</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">开始</span>
-             <span class="s s-Atom">正数索引--从起始端建立索引，从0开始</span>
-  <span class="mf">02.</span><span class="s s-Atom">分片特性：对字符串子序列建立索引</span> <span class="s s-Atom">冒号:指出子序列的范围--起始以及步长</span>
-   <span class="p">[],</span><span class="s s-Atom">其中的字母是【）半开区间，包含范围起始值，不包含结束值</span>
-   <span class="s s-Atom">单个冒号和两个冒号的规则</span>
-   <span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">步长为</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">表示向后进行</span>
-  <span class="mf">03.</span><span class="s s-Atom">字符串操作</span> <span class="s s-Atom">连接</span> <span class="o">+</span>  <span class="s s-Atom">检查成员的</span> <span class="s s-Atom">in</span>
-<span class="mf">2.</span><span class="s s-Atom">列表的一些特性：列表本身是可变的</span>
-    <span class="mf">01.</span><span class="s s-Atom">列表的索引和分片特性</span>
-    <span class="mf">02.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">将列表中的元素反向排列</span>
-    <span class="s s-Atom">列表和字符串之间的转换</span>
-      <span class="s s-Atom">将列表变为字符串--</span> <span class="s s-Atom">s</span> <span class="o">=</span>  <span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nv">L</span><span class="p">)</span>  <span class="s s-Atom">调用字符串str</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">iterable</span><span class="p">)</span>
-      <span class="s s-Atom">将字符串变为列表</span>  <span class="nv">L</span><span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
-    <span class="nf">内置函数reverse，是直接操作变量本身，调用reverse</span><span class="p">()</span><span class="s s-Atom">后，</span>
-    <span class="s s-Atom">变量本身的值就是reverse后的值了，而返回值，是空的，不返回任何值</span>
-    <span class="s s-Atom">所以不能出现：</span>
-      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
-    <span class="s s-Atom">而应该是</span>
-      <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
-      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">;</span>
-     <span class="s s-Atom">sort等函数也有此类规则，方法</span><span class="p">.</span><span class="nf">sort</span><span class="p">()</span><span class="s s-Atom">和函数sorted</span> <span class="s s-Atom">以及</span>  <span class="s s-Atom">方法</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">和函数reserved类似</span>
-    <span class="s s-Atom">这一点和R语言有所不同，请注意</span>
-<span class="mf">3.</span><span class="s s-Atom">内置函数</span>
-  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">返回的是一个迭代器对象</span> 
-  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">函数是返回序列seq的反向访问的迭代子。</span>
-     <span class="s s-Atom">参数可以是列表，元组，字符串，不改变原对象</span>
-<span class="mf">4.</span><span class="s s-Atom">高阶函数和匿名函数</span>
-  <span class="nf">map</span><span class="p">()</span><span class="s s-Atom">函数、</span><span class="nf">filter</span><span class="p">()</span><span class="s s-Atom">函数</span> <span class="nf">sorted</span><span class="p">()</span>
-  <span class="nf">reduce</span><span class="p">()</span><span class="s s-Atom">传入的参数f必须接受2个参数</span>
-    <span class="s s-Atom">第一次调用是把list的前两个元素传递给f</span><span class="p">,</span><span class="s s-Atom">第二次调用时，</span>
-    <span class="s s-Atom">就是把前两个list元素的计算结果当成第一个参数，list的第三个元素当成第二个参数，</span>
-    <span class="s s-Atom">传入f进行操作，以此类推，并最终返回结果</span>
-  <span class="s s-Atom">使用</span> <span class="s s-Atom">lambda</span> <span class="s s-Atom">来创建匿名函数</span>
-
-<span class="c1"># -*- coding:utf8 -*-</span>
-<span class="c1"># !/usr/bin/python</span>
-
-<span class="c1"># 反转字符串</span>
-<span class="c1"># 使用递归 -使用循环 -使用 reduce和lambda表达式</span>
-<span class="c1"># 自身的索引特性-</span>
-<span class="c1"># 使用Python内置函数结合字符串函数使用</span>
-<span class="c1"># 变成其他数据类型使用其函数</span>
-
-<span class="s s-Atom">def</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="nf">if</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">astr</span>
-<span class="nn">else</span><span class="p">:</span>
-<span class="s s-Atom">newstr</span> <span class="o">=</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">1</span><span class="s s-Atom">:</span><span class="p">])</span> <span class="o">+</span> <span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">newstr</span>
-
-
-<span class="s s-Atom">def</span> <span class="nf">func</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="s s-Atom">max_index</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
-<span class="s s-Atom">for</span> <span class="s s-Atom">index</span><span class="p">,</span> <span class="s s-Atom">value</span> <span class="s s-Atom">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">result</span> <span class="s s-Atom">+=</span> <span class="s s-Atom">s</span><span class="p">[</span><span class="s s-Atom">max_index</span><span class="o">-</span><span class="s s-Atom">index</span><span class="p">]</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">result</span>
-
-
-<span class="s s-Atom">if</span> <span class="k">__</span><span class="s s-Atom">name__</span> <span class="o">==</span> <span class="s s-Atom">&#39;__main__&#39;:</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">func</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">reduce</span><span class="p">(</span><span class="s s-Atom">lambda</span> <span class="s s-Atom">x</span><span class="p">,</span> <span class="nn">y</span><span class="p">:</span> <span class="s s-Atom">y</span><span class="o">+</span><span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">])</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s2">&quot;efg&quot;</span><span class="p">))</span>
-
-<span class="c1"># 列表变为字符串 --注意事项</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">)))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">([</span><span class="s s-Atom">&#39;a&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;b&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;c&#39;</span><span class="p">]))</span>
-<span class="nv">Li</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)</span>
-<span class="nv">Li</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span>
-<span class="s s-Atom">dealLi</span> <span class="o">=</span> <span class="nv">Li</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">dealLi</span><span class="p">))</span>
-</pre></div>
-
-
-<h3>参考</h3>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>生成器、以及递归和字符串反转</p>
+                <a class="readmore" href="/program/my-program-post-40.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -271,6 +291,28 @@ reduce
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>hive中 UDF</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-36.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-37.html" rel="bookmark"
+                           title="Permalink to 大数据架构之Kappa架构">大数据架构之Kappa架构</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-07-24T23:01:00+08:00">
+                Published: 2018-07-24 23:01:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>消息传输层-流处理层</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-37.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
@@ -2208,6 +2250,50 @@ reduce
 <p>tags: <a href="/tag/sql.html">SQL</a> </p>
 </footer><!-- /.post-info -->                <p>Orcale的客户端以及API连接</p>
                 <a class="readmore" href="/data-mining/my-dataming-post-13.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-42.html" rel="bookmark"
+                           title="Permalink to Java动态特性和多态">Java动态特性和多态</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-10T22:32:00+08:00">
+                Published: 2016-12-10 22:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>JAVA-静态和动态绑定机制</p>
+                <a class="readmore" href="/program/my-program-post-42.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-41.html" rel="bookmark"
+                           title="Permalink to Java注解以及相关内容">Java注解以及相关内容</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-10T21:32:00+08:00">
+                Published: 2016-12-10 21:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>注解的三种机制</p>
+                <a class="readmore" href="/program/my-program-post-41.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

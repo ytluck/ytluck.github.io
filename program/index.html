@@ -26,7 +26,213 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-40.html">Python的一些高级特性</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-43.html">Spring数据库编程</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-11-10T22:32:00+08:00">
+                Published: 2018-11-10 22:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info --><h3>1.数据库基本操作</h3>
+<div class="highlight"><pre><span></span>增、删、改、查
+分页 排序
+事务特征：原子性，一致性，独立性，持久性。--ACID
+     自动提交、保存点、回滚  COMMIT &amp; ROLLBACK
+     批量更新(patch update)
+  缓存 、刷新 flush
+  动态来构建查询条件
+  flush方法的主要作用就是清理缓存，commit方法隐式的调用了flush
+  加入flush强制Hibernate将缓存中记录的操作flush入数据库
+</pre></div>
+
+
+<h3>2.Spring与两种常见的ORM方案集成</h3>
+<div class="highlight"><pre><span></span>ORM框架可以通过javax.persistence包 中元数据标签，使得实体类与数据库中的表建立映射关系
+    JPA中,标准查询是以元模型的概念为基础的
+    方案一： JPA
+    方案二： Hibernate
+方案一：
+       Hibernate          org.apache.Session
+方案二：
+    JPA
+     01.Java Persistence API
+          基于模板的JPA方式
+          基于纯粹的JPA方式 
+      02.基于Spring Data实现自动化JPA Repository
+          public interface CasDao extends JpaRepository&lt;CashShunt, Integer&gt; {}
+             集成JpaRepository接口意味着默认已经拥有以下数据访问操作方法
+              自定义方式
+                @Query (&quot;select P from  Person  where address =?l&quot;)
+</pre></div>
+
+
+<h3>3.JPA的核心概念和基本过程</h3>
+<div class="highlight"><pre><span></span>0.实体生命周期是JPA中非常重要的概念，描述了实体对象从创建到受控、从删除到游离的状态变换。
+ 对实体的操作主要就是改变实体的状态。
+ 基本概念：ID生成策略、关联关系、继承关系、事件及监听、事务管理
+1.JPA中和数据库中对应关系
+         对象端            数据库端            annotion        可选annotion
+        Class               Table           @Entity         @Table(name=&quot;tablename&quot;)
+        property            column          –               @Column(name = &quot;columnname&quot;)
+        property            primary key     @Id             @GeneratedValue 详见ID生成策略
+        property            NONE            @Transient   
+2.JPA和Hibernate中的对应关系
+     org.hibernate                  javax.persistence           说明
+     cfg.Configuration              Persistence                 读取配置信息
+     SessionFactory                 EntityManagerFactory        用于创建会话/实体管理器的工厂类
+     Session                        EntityManager               提供实体操作API，管理事务，创建查询
+     Transaction                    EntityTransaction           管理事务
+     Query                          Query                       执行查询
+3. JPA提供三种查询方式： 1）JPQL 2）Criteria API 3）SQL
+1.Criteria API
+      01.// 获得实体管理器             EntityManager em = …
+        // 获得Criteria建立器            CriteriaBuilder cb = em.getCriteriaBuilder();
+        // 建立Criteria查询             CriteriaQuery&lt;Contact&gt; query = cb.greateQuery(Contact.class);
+        // 创建查询Root                 Root&lt;Contact&gt; root = query.from(Contact.class);
+        // 创建firstName的查询条件，使用静态元模型 Predicate firstNameIs = cb.equal(root.get(Contact_.firstName, &quot;John&quot;));
+        // 指定查询的where条件                    query.where(firstNameIs);
+        //通过EntityManager创建TypedQuery      TypedQuery&lt;Contact&gt; q = em.createQuery(query);
+        // 创建查询并获取结果                           List&lt;Contact&gt; contacts = q.getResultList();
+        说明：Root代表要查询的表，
+                 CriteriaBuilder创建条件Predicate，Predicate相对于SQL的where条件，多个Predicate可以进行与、或操作
+            元模型类，类名最后一个字符为下划线
+2.另一种就是使用JPQL查询语言：JPQL全称Java Persistence Query Language，通过 Query 接口封装执行
+        JPQL的查询可以分为命名查询和动态查询
+        动态：
+            EntityManager.createQuery 方法创建动态查询：
+                    有位置参数和命名参数，位置前加符号”?”，命名参数是名称前是加符号”:”
+                    from后边的Person是实体Bean而不是数据表
+        命名查询
+                实体bean上通过 @NamedQuery or @NamedQueries预先定义一个或多个查询语句
+                当命名查询定义好了之后，我们就可以通过名称执行其查询
+        查询的过程
+         01// 获得实体管理器   EntityManager em = …
+              // 建立JPQL查询       String getByFirstName = &quot;SELECT c FROM Contact c WHERE c.firstName = :firstName&quot;;
+              // 创建查询实例     TypedQuery&lt;Contact&gt; query = em.createQuery(getByFirstName, Contact.class);
+              // 设置查询参数     query.setParameter(&quot;firstName&quot;, &quot;John&quot;);
+              // 获取结果               List&lt;Contact&gt; contacts = query.getResultList();
+        查询过程说明：利用 EntityManager API 和 Query API 的相应方法
+            01、使用注入或通过 EntityManagerFactory 实例获取一个 EntityManager 实例。
+            02.   通过调用相应 EntityManager 的方法（如 createQuery ），创建一个 Query 实例。
+            03.   相关设置
+                        001.如果有查询参数，使用相应 Query 的 setParameter 方法进行设置。
+                        002.如果需要，使用 setFlushMode Query 的方法设置查询执行的刷新模式，覆盖实体管理器的刷新模式
+                        等，FlushModeType.AUTO 为自动更新数据库记录，FlushMode Type.COMMIT 为直到提交事务时才更新数据库记录
+3.  JPA支持本地查询，所谓本地查询，就是使用原生的sql语句（
+     根据数据库的不同，在sql的语法或结构方面可能有所区别）进行查询数据库的操作
+    01.// 获得实体管理器           EntityManager em = …
+    // 建立SQL查询              String getByFirstName = &quot;SELECT * FROM contacts c WHERE c.first_name = ?1&quot;;
+    // 创建查询实例               Query query = em.createNativeQuery(getByFirstName, Contact.class);  
+    // 设置查询参数               query.setParameter(1, &quot;John&quot;);
+    // 获取结果                     List contacts = query.getResultList();
+说明
+ EntityManager 是JPA中用于增删改查的接口，
+它的作用相当于一座桥梁，连接内存中的java对象和数据库的数据存储
+ 持久化单元(Persistence Unit)
+  注入EntityManager对 象时必须指定持久化名称，
+  通过 @PersistenceContext注释的unitName属性进行指定
+     @PersistenceContext(unitName = &quot;billingEntityManagerFactory&quot;)
+     private EntityManagerFactory emf;
+     EntityManagerFactory emf = Persistence.createEntityManagerFactory(&quot;jpa-1&quot;)
+         persist方法的一个功能：使对象由临时状态变为持久化状态     
+    TypedQuery
+      TypedQuery.
+         setMaxResults、setFirstResult、 setHint、setParameter、setFlushMode、setLockMode
+         getResultList、getSingleResult、
+常见的分层设计
+T 是指任意类，而PK是指一个继承了Serializable接口的接口或者实现了Serializable的实现类
+   public interface IGDAO&lt;T extends Serializable, PK extends Serializable&gt; extends Serializable {
+   public abstract class BaseDaoImpl&lt;T extends Serializable, PK extends Serializable&gt; implements IGDAO&lt;T, PK&gt; {
+  public interface AccountCodeDao extends IGDAO&lt;Tbillconfig, String&gt;     
+  public class AccountCodeDaoImpl extends BaseDaoImpl&lt;Tbillconfig, String&gt; implements AccountCodeDao {
+
+方式二
+ BaseDAO， 其他DAO继承这个BaseDAO，根据主键来进行添删改查 ，适用于通用的
+    至于具体业务操作的，就一对一写在特定的DAO里面 
+   public class BaseDao {
+   public interface NewsDao 
+public class NewsDaoImpl extends BaseDao implements NewsDao{
+
+方式三
+public abstract class BaseDao&lt;T extends Serializable, PK extends Serializable&gt; {
+public class  AccountCodeDao extends BaseDao&lt;BankAccountCode, Integer&gt; {
+
+2.serialVersionUID适用于Java的序列化机制。
+一个类实现了Serializable接口
+   简单来说，Java的序列化机制是通过判断类的serialVersionUID来验证版本一致性的
+   serialVersionUID有两种显示的生成方式：        
+一是默认的1L，比如：private static final long serialVersionUID = 1L;        
+二是根据类名、接口名、成员方法及属性等来生成一个64位的哈希字段，比如：        
+private static final  long   serialVersionUID = xxxxL;
+</pre></div>
+
+
+<h3>SpringBoot—访问关系型数据库</h3>
+<div class="highlight"><pre><span></span>spring-boot-starter-data-jpa 的 起步依赖
+    spring-boot-starter-data-jpa    支持Hibernate的Spring JPA。
+      org.springframework.boot.jdbc.DataSourceBuilder
+      org.apache.commons.dbcp2.BasicDataSource
+ 数据库配置--连接和参数设置
+01.Tomcat数据源连接池
+02.开源数据库连接池主要有c3p0、 dbcp 、proxool三种 com.mchange.c3p0
+    DBCP(DataBase connection pool)数据库连接池
+    C3P0开源项目有Hibernate，Spring等。c3p0有自己主动回收空暇连接功能
+03.Spring Boot中默认支持的连接池： dbcp、 dbcp2  等
+    prefix： spring.datasource.dbcp2.*
+ org.springframework.boot.jdbc
+     Spring Boot实现了自动加载DataSource及相关配置
+spring-boot-starter-data-jpa
+    SpringDataJPA对类似hibernate这样的框架又做了一层封装
+    SpringDataJPA中，我们不在称其为mapper或者dao，而是称为repository
+    创建接口,继承自JpaRepository，泛型左边为实体类型，右边为该实体的主键类型
+    SpringDataJPA帮我们提供了一套实现，在运行的时候会以代理的形式给我们生成实现类，
+    只要你继承了Spring给你的这些Repository接口，那么你就能获得这些方法支持
+         自定义的方法一般有两种，第一种就是这种“约定命名”法，
+           内部帮我们拼接sql代理生成方法的实现
+         第二种方法就是 使用 @Query注解使用JPQL（类似SQL与EL的组合）语句查询，
+           直接内部转化成SQL进行执行
+关于DAO层的规范 
+    1.对于不需要写实现类的情况： 
+   定义XxxxRepository 接口
+       并继承 JpaRepository 接口， 说明：org.springframework.data.jpa.repository.JpaRepository;
+        默认预先生成了一些基本的CURD的方法，例如：增、删、改等等
+   如果Spring data 所提供的默 认接口方法不够用， 可以使用 @Query在其中定义个性化的接口方法。
+   SpringDataJPA在使用的时候，也只需要声明一个接口，让其Spring以代理的形式生成Dao   
+    2.对于需要写实现类的情况：
+      定义XxxxDao 接口
+          并继承com.aceona.appleframework.persistent.data.GenericDao 
+     书写XxxxDaoImpl实现类
+          并继承com.aceona.appleframework.persistent.data.GenericJpaDao，同时实现XxxxDao接口中的方法  
+ SpringBoot 实现的JPA 封装了JPA的特性，只需要写接口即可
+    JpaRepository
+Repository（资源库）：通过用来访问领域对象的一个类似集合的接口，
+    在领域与数据映射层之间进行协调。这个叫法就类似于我们通常所说的DAO
+    即 把数据访问层叫Repository
+所有继承这个接口的interface都被spring所管理，此接口作为标识接口
+    public interface ChargeShuntDao extends JpaRepository&lt;ChargeShunt, Integer&gt;  {}
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Spring实战
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-40.html" rel="bookmark"
+                           title="Permalink to Python的一些高级特性">Python的一些高级特性</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-09-16T21:00:00+08:00">
                 Published: 2018-09-16 21:00:00
@@ -37,176 +243,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/python.html">Python</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Python的一些高级特性，有一些在其他语言中出现，有一些没有，明确共同点，找出差异，进而更加熟练掌握各种特性
-Python的特性
-</pre></div>
-
-
-<h3>迭代器：</h3>
-<div class="highlight"><pre><span></span>迭代器协议：
-在Python中文件可以使用for循环进行遍历
-    原因：文件对象在Python中实现了迭代器协议，标志 next方法
-</pre></div>
-
-
-<h3>生成器</h3>
-<div class="highlight"><pre><span></span>生成器对延迟操作提供了支持
-Python提供了几种不同的方式构建生成器
-  01、生成器函数 yield
-   和常规函数类似，返回值通过yield，而不是return
-  02、生成器表达式
-  03.enumerate
-</pre></div>
-
-
-<h3>装饰器decorator</h3>
-<div class="highlight"><pre><span></span>装饰器  
-装饰器-回调函数 等，这些内容以后整理
-</pre></div>
-
-
-<h3>上下文管理器</h3>
-<div class="highlight"><pre><span></span>上下文管理器
- with 语句块 + 上下文管理器
- 对象实现__enter__ 和 __exit__方法 或者contextlib模块
-对资源的处理：Python中可使用finally语句保证无论什么情况下文件都会被关闭--with语句也可以
-确保加锁以后锁的释放 try/finally 语句
-</pre></div>
-
-
-<h3>递归</h3>
-<div class="highlight"><pre><span></span>--递归就是函数调用自身
-重点：
-    重点一：递归步骤 --分解问题并重组问题
-       如何分解成小的部分-每部分都是用函数来解决，然后重新组合
-    重点二：包含递归的结束条件
-       递归触底 即递归必须有基础情况，且出现在函数的第一步
-说明：
- Python maximum recursion depth exceeded
-   python解释器有一个默认的最大递归次数是999
-   同时，操作系统也有一个最大迭代次数
-</pre></div>
-
-
-<blockquote>
-<div class="highlight"><pre><span></span> # -*- coding:utf8 -*-
-  # !/usr/bin/python
-  def factorial(n):
-      if n == 1:
-          return 1
-      else:
-          return n * factorial(n-1)
-  def fibon(n):
-      if n == 0 or n == 1:
-          return 1
-      else:
-          return fibon(n-1) + fibon(n-2)
-
-  if __name__ == &#39;__main__&#39;:
-      data1 = factorial(23)
-      data2 = fibon(9)
-      print(data1)
-      print(data2)
-</pre></div>
-
-
-</blockquote>
-<h3>高阶函数和匿名函数</h3>
-<div class="highlight"><pre><span></span>高阶函数  
-map filter sorted   
-reduce  
-匿名函数 lambda 表达
-</pre></div>
-
-
-<h3>Python反转字符串中涉及到的内容</h3>
-<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="s s-Atom">字符串的一些特性</span>
-  <span class="mf">01.</span><span class="s s-Atom">索引特性：负数索引--从末端建立索引，从</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">开始</span>
-             <span class="s s-Atom">正数索引--从起始端建立索引，从0开始</span>
-  <span class="mf">02.</span><span class="s s-Atom">分片特性：对字符串子序列建立索引</span> <span class="s s-Atom">冒号:指出子序列的范围--起始以及步长</span>
-   <span class="p">[],</span><span class="s s-Atom">其中的字母是【）半开区间，包含范围起始值，不包含结束值</span>
-   <span class="s s-Atom">单个冒号和两个冒号的规则</span>
-   <span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">步长为</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">表示向后进行</span>
-  <span class="mf">03.</span><span class="s s-Atom">字符串操作</span> <span class="s s-Atom">连接</span> <span class="o">+</span>  <span class="s s-Atom">检查成员的</span> <span class="s s-Atom">in</span>
-<span class="mf">2.</span><span class="s s-Atom">列表的一些特性：列表本身是可变的</span>
-    <span class="mf">01.</span><span class="s s-Atom">列表的索引和分片特性</span>
-    <span class="mf">02.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">将列表中的元素反向排列</span>
-    <span class="s s-Atom">列表和字符串之间的转换</span>
-      <span class="s s-Atom">将列表变为字符串--</span> <span class="s s-Atom">s</span> <span class="o">=</span>  <span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nv">L</span><span class="p">)</span>  <span class="s s-Atom">调用字符串str</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">iterable</span><span class="p">)</span>
-      <span class="s s-Atom">将字符串变为列表</span>  <span class="nv">L</span><span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
-    <span class="nf">内置函数reverse，是直接操作变量本身，调用reverse</span><span class="p">()</span><span class="s s-Atom">后，</span>
-    <span class="s s-Atom">变量本身的值就是reverse后的值了，而返回值，是空的，不返回任何值</span>
-    <span class="s s-Atom">所以不能出现：</span>
-      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
-    <span class="s s-Atom">而应该是</span>
-      <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
-      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">;</span>
-     <span class="s s-Atom">sort等函数也有此类规则，方法</span><span class="p">.</span><span class="nf">sort</span><span class="p">()</span><span class="s s-Atom">和函数sorted</span> <span class="s s-Atom">以及</span>  <span class="s s-Atom">方法</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">和函数reserved类似</span>
-    <span class="s s-Atom">这一点和R语言有所不同，请注意</span>
-<span class="mf">3.</span><span class="s s-Atom">内置函数</span>
-  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">返回的是一个迭代器对象</span> 
-  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">函数是返回序列seq的反向访问的迭代子。</span>
-     <span class="s s-Atom">参数可以是列表，元组，字符串，不改变原对象</span>
-<span class="mf">4.</span><span class="s s-Atom">高阶函数和匿名函数</span>
-  <span class="nf">map</span><span class="p">()</span><span class="s s-Atom">函数、</span><span class="nf">filter</span><span class="p">()</span><span class="s s-Atom">函数</span> <span class="nf">sorted</span><span class="p">()</span>
-  <span class="nf">reduce</span><span class="p">()</span><span class="s s-Atom">传入的参数f必须接受2个参数</span>
-    <span class="s s-Atom">第一次调用是把list的前两个元素传递给f</span><span class="p">,</span><span class="s s-Atom">第二次调用时，</span>
-    <span class="s s-Atom">就是把前两个list元素的计算结果当成第一个参数，list的第三个元素当成第二个参数，</span>
-    <span class="s s-Atom">传入f进行操作，以此类推，并最终返回结果</span>
-  <span class="s s-Atom">使用</span> <span class="s s-Atom">lambda</span> <span class="s s-Atom">来创建匿名函数</span>
-
-<span class="c1"># -*- coding:utf8 -*-</span>
-<span class="c1"># !/usr/bin/python</span>
-
-<span class="c1"># 反转字符串</span>
-<span class="c1"># 使用递归 -使用循环 -使用 reduce和lambda表达式</span>
-<span class="c1"># 自身的索引特性-</span>
-<span class="c1"># 使用Python内置函数结合字符串函数使用</span>
-<span class="c1"># 变成其他数据类型使用其函数</span>
-
-<span class="s s-Atom">def</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="nf">if</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">astr</span>
-<span class="nn">else</span><span class="p">:</span>
-<span class="s s-Atom">newstr</span> <span class="o">=</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">1</span><span class="s s-Atom">:</span><span class="p">])</span> <span class="o">+</span> <span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">newstr</span>
-
-
-<span class="s s-Atom">def</span> <span class="nf">func</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="s s-Atom">max_index</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
-<span class="s s-Atom">for</span> <span class="s s-Atom">index</span><span class="p">,</span> <span class="s s-Atom">value</span> <span class="s s-Atom">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">result</span> <span class="s s-Atom">+=</span> <span class="s s-Atom">s</span><span class="p">[</span><span class="s s-Atom">max_index</span><span class="o">-</span><span class="s s-Atom">index</span><span class="p">]</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">result</span>
-
-
-<span class="s s-Atom">if</span> <span class="k">__</span><span class="s s-Atom">name__</span> <span class="o">==</span> <span class="s s-Atom">&#39;__main__&#39;:</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">func</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">reduce</span><span class="p">(</span><span class="s s-Atom">lambda</span> <span class="s s-Atom">x</span><span class="p">,</span> <span class="nn">y</span><span class="p">:</span> <span class="s s-Atom">y</span><span class="o">+</span><span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">])</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s2">&quot;efg&quot;</span><span class="p">))</span>
-
-<span class="c1"># 列表变为字符串 --注意事项</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">)))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">([</span><span class="s s-Atom">&#39;a&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;b&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;c&#39;</span><span class="p">]))</span>
-<span class="nv">Li</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)</span>
-<span class="nv">Li</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span>
-<span class="s s-Atom">dealLi</span> <span class="o">=</span> <span class="nv">Li</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">dealLi</span><span class="p">))</span>
-</pre></div>
-
-
-<h3>参考</h3>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>生成器、以及递归和字符串反转</p>
+                <a class="readmore" href="/program/my-program-post-40.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -799,6 +839,50 @@ reduce
 <p>tags: <a href="/tag/scala.html">Scala</a> </p>
 </footer><!-- /.post-info -->                <p>Scala的语法框架以及Options</p>
                 <a class="readmore" href="/program/my-program-post-12.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-42.html" rel="bookmark"
+                           title="Permalink to Java动态特性和多态">Java动态特性和多态</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-10T22:32:00+08:00">
+                Published: 2016-12-10 22:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>JAVA-静态和动态绑定机制</p>
+                <a class="readmore" href="/program/my-program-post-42.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-41.html" rel="bookmark"
+                           title="Permalink to Java注解以及相关内容">Java注解以及相关内容</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-10T21:32:00+08:00">
+                Published: 2016-12-10 21:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>注解的三种机制</p>
+                <a class="readmore" href="/program/my-program-post-41.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

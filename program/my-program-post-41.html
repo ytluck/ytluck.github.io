@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java注解以及相关内容</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-41.html" rel="bookmark"
+           title="Permalink to Java注解以及相关内容">Java注解以及相关内容</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-10T21:32:00+08:00">
+                Published: 2016-12-10 21:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <p>注解以及相关内容
+    JVM方法调用的静态(static binding) 和动态绑定机制(auto binding)
+    创建组件之间协作的行为通常称为 Wiring，装配bean的方式有很多
+      采用XML文件的装配方式
+      采用基于注解的装配方式  @Service   @Controller @Repository @Component
+      基于Java的装配方式    通过 @Configuration 和 @Bean实现</p>
+<h3>1.注解</h3>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="err">创建注解</span>
+    <span class="err">元注解：</span> <span class="nd">@Target</span> <span class="nd">@Retention</span> <span class="nd">@Document</span> <span class="nd">@Inherit</span>
+    <span class="nd">@Retention</span>
+        <span class="n">RetentionPolicy</span>
+            <span class="o">.</span><span class="n">SOURCE</span>
+            <span class="o">.</span><span class="n">CLASS</span>
+            <span class="o">.</span><span class="n">RUNTIME</span>
+    <span class="nd">@Target</span>
+        <span class="n">ElementType</span>
+            <span class="o">.</span><span class="n">TYPE</span>   <span class="o">.</span><span class="n">FIELD</span>  <span class="o">.</span><span class="n">PARAMETER</span>  <span class="o">.</span><span class="n">CONSTRUCTOR</span>
+            <span class="o">.</span><span class="n">METHOD</span> <span class="o">.</span><span class="n">LOCAL_VARTABLE</span> <span class="n">MODULE</span>
+    <span class="nd">@interface</span>
+        <span class="n">String</span><span class="p">[]</span> <span class="n">value</span><span class="p">()</span> <span class="p">;</span>
+        <span class="err">如果注解只有一个成员，则成员名必须取名为</span><span class="n">value</span><span class="p">()</span><span class="err">，使用时可以忽略成员名和赋值号</span>
+<span class="err">示例</span>
+  <span class="n">JDK</span><span class="err">内置的注解</span>
+    <span class="o">--</span><span class="err">没有成员的注解称为</span> <span class="err">标识注解</span>
+    <span class="kn">import</span> <span class="nn">java.lang.annotation.</span><span class="o">*</span>
+
+    <span class="nd">@Target</span><span class="p">(</span><span class="n">ElementType</span><span class="o">.</span><span class="n">METHOD</span><span class="p">)</span>
+    <span class="nd">@Retention</span><span class="p">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="n">SOURCE</span><span class="p">)</span>
+    <span class="n">public</span> <span class="nd">@interface</span> <span class="n">Override</span><span class="p">{</span>
+    <span class="p">}</span>
+  <span class="err">第三方框架的注解</span>
+   <span class="n">Spring</span>
+    <span class="nd">@Service</span>
+      <span class="nd">@Target</span><span class="p">({</span><span class="n">ElementType</span><span class="o">.</span><span class="n">TYPE</span><span class="p">})</span>
+      <span class="nd">@Retention</span><span class="p">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">)</span>
+      <span class="nd">@Documented</span>
+      <span class="nd">@Component</span>
+      <span class="n">public</span> <span class="nd">@interface</span> <span class="n">Service</span> <span class="p">{</span>
+          <span class="n">String</span> <span class="n">value</span><span class="p">()</span> <span class="n">default</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+      <span class="p">}</span>
+   <span class="n">Junit</span>
+     <span class="nd">@Test</span>
+       <span class="nd">@Retention</span><span class="p">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">)</span>
+       <span class="nd">@Target</span><span class="p">({</span><span class="n">ElementType</span><span class="o">.</span><span class="n">METHOD</span><span class="p">})</span>
+       <span class="n">public</span> <span class="nd">@interface</span> <span class="n">Test</span> <span class="p">{</span>
+           <span class="n">Class</span><span class="o">&lt;</span><span class="err">?</span> <span class="n">extends</span> <span class="n">Throwable</span><span class="o">&gt;</span> <span class="n">expected</span><span class="p">()</span> <span class="n">default</span> <span class="n">Test</span><span class="o">.</span><span class="n">None</span><span class="o">.</span><span class="n">class</span><span class="p">;</span>
+           <span class="nb">long</span> <span class="n">timeout</span><span class="p">()</span> <span class="n">default</span> <span class="il">0L</span><span class="p">;</span>
+           <span class="n">public</span> <span class="n">static</span> <span class="k">class</span> <span class="nc">None</span> <span class="n">extends</span> <span class="n">Throwable</span> <span class="p">{</span>
+               <span class="n">private</span> <span class="n">static</span> <span class="n">final</span> <span class="nb">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="il">1L</span><span class="p">;</span>
+               <span class="n">private</span> <span class="bp">None</span><span class="p">()</span> <span class="p">{</span>
+               <span class="p">}</span>
+           <span class="p">}</span>
+       <span class="p">}</span>
+<span class="mf">02.</span><span class="err">注解的使用</span>
+  <span class="err">@</span>
+  <span class="err">作用二：</span>
+    <span class="err">自动处理源代码以产生更多的源代码</span><span class="o">-</span><span class="err">配置文件</span><span class="o">-</span><span class="err">脚本或者其他我们想要的东西</span>
+    <span class="err">例如</span><span class="o">-</span><span class="err">使用注解，根据模板来生成不同源码</span>
+<span class="mf">03.</span><span class="err">注解的应用</span>
+<span class="n">RUNNING</span> <span class="err">中的情况</span>
+    <span class="n">DI</span><span class="err">容器</span>
+      <span class="n">DI</span><span class="err">的容器类</span><span class="o">-</span><span class="err">创建需要的对象并配置依赖关系</span>
+        <span class="err">使用代码</span>
+            <span class="n">SimpleContainer</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">ServiceA</span><span class="o">.</span><span class="n">class</span><span class="p">)</span><span class="o">.</span><span class="n">callB</span><span class="p">();</span>
+        <span class="err">底层代码：注解工具内部处理机制</span>
+            <span class="err">注解如何被处理的，在运行时的处理过程</span>
+</pre></div>
+
+
+<h3>2.Hibernate 注解</h3>
+<div class="highlight"><pre><span></span>  <span class="n">Hibernate</span><span class="err">实现</span><span class="n">JPA</span><span class="err">注解</span>
+      <span class="n">pom</span><span class="o">.</span><span class="n">xml</span><span class="err">组件</span>  <span class="n">hibernate</span><span class="o">-</span><span class="n">core</span><span class="err">、</span><span class="n">hibernate</span><span class="o">-</span><span class="n">entitymanager</span><span class="err">、</span><span class="n">hibernate</span><span class="o">-</span><span class="n">validator</span><span class="err">、</span>
+            <span class="n">hibernate</span><span class="o">-</span><span class="n">jpa</span><span class="o">-</span><span class="mf">2.0</span><span class="o">-</span><span class="n">api</span>
+      <span class="err">配置文件</span> <span class="n">hibernate</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">xml</span>
+         <span class="err">数据库相关配置</span>
+         <span class="err">开发常用的参数</span>
+         <span class="err">会话相关配置</span>
+      <span class="err">配置对象关系映射关系有两种，一种是基于</span><span class="n">xml</span><span class="err">的方式，另一种是基于</span><span class="n">annotation</span><span class="err">的注解方式</span>
+  <span class="n">Hibernate</span><span class="err">三种类型</span>
+    <span class="err">类级别的注解：</span> <span class="nd">@Entity</span>  <span class="nd">@Table</span>   <span class="nd">@Embeddable</span>
+    <span class="err">属性级别注解：</span> <span class="nd">@Id</span><span class="err">、</span><span class="nd">@GeneratedValue</span><span class="err">、</span><span class="nd">@Column</span><span class="err">、</span><span class="nd">@Embedded</span><span class="err">、</span><span class="nd">@EmbeddedId</span><span class="err">和</span><span class="nd">@Transient</span>
+
+    <span class="err">映射关系注解：</span> <span class="err">一对一，一对多，多对多</span> <span class="nd">@OneToOne</span><span class="err">、</span> <span class="nd">@OneToMany</span><span class="p">(</span><span class="n">mappedBy</span><span class="o">=</span><span class="s2">&quot;room&quot;</span><span class="p">)</span> <span class="err">、</span><span class="nd">@ManyToOne</span><span class="err">　</span>
+                  <span class="err">单向、双向</span>
+                  <span class="err">外键连接</span> <span class="nd">@JoinColumn</span>
+ <span class="nd">@GeneratedValue</span><span class="err">提供了主键的生成策略，两个属性</span><span class="p">,</span><span class="err">分别是</span><span class="n">strategy</span><span class="err">和</span><span class="n">generator</span>
+   <span class="nd">@GeneratedValue</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">GenerationType</span><span class="o">.</span><span class="n">IDENTITY</span><span class="p">)</span>
+     <span class="err">四种主键生成策略</span>
+     <span class="err">包括</span><span class="n">GenerationType</span><span class="o">.</span><span class="n">TABLE</span><span class="p">,</span>
+         <span class="n">GenerationType</span><span class="o">.</span><span class="n">SEQUENCE</span><span class="p">,</span>
+         <span class="n">GenerationType</span><span class="o">.</span><span class="n">IDENTITY</span><span class="err">和</span>
+         <span class="n">GenerationType</span><span class="o">.</span><span class="n">AUTO</span>
+            <span class="err">主键生成策略交给持久化引擎</span><span class="p">(</span><span class="n">persistence</span> <span class="n">engine</span><span class="p">),</span><span class="err">持久化引擎会根据数据库</span>
+            <span class="err">在以上三种主键生成策略中选择其中一种</span>
+            <span class="err">可以直接</span><span class="nd">@GeneratedValue</span>
+ <span class="err">和</span><span class="n">JAP</span><span class="o">&lt;</span><span class="n">Java</span> <span class="n">Persistence</span> <span class="n">API</span><span class="o">&gt;</span><span class="err">之间的关系</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.EntityManager</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.FlushModeType</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.LockModeType</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.PersistenceContext</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.Query</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.TypedQuery</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.criteria.CriteriaBuilder</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.persistence.metamodel.EntityType</span><span class="p">;</span>
+</pre></div>
+
+
+<h3>3. Spring中的注解</h3>
+<div class="highlight"><pre><span></span><span class="err">工程结构</span>
+     <span class="err">底层数据库（具体数据的存储）</span>
+     <span class="err">——</span><span class="o">&gt;</span><span class="n">dao</span><span class="err">（实现从表中读数据）</span>
+     <span class="err">——</span><span class="o">&gt;</span><span class="n">domain</span><span class="p">(</span><span class="err">表与实体进行关联，进行实体的定义，</span><span class="nb">set</span><span class="p">,</span><span class="n">get</span><span class="err">方法的定义</span><span class="p">)</span>
+     <span class="err">——</span><span class="o">&gt;</span><span class="n">service</span><span class="p">(</span><span class="err">逻辑的实现，进行数据关联，方便底层取数据</span><span class="p">)</span>
+     <span class="err">——</span><span class="o">&gt;</span><span class="n">controller</span><span class="err">（方便为前段提供数据）</span>
+
+   <span class="err">主容器中</span> <span class="n">applicationContext</span><span class="o">.</span><span class="n">xml</span>
+   <span class="err">定时器</span>
+   <span class="n">applicationContext</span><span class="o">-</span><span class="n">quartz</span>
+    <span class="n">org</span><span class="o">.</span><span class="n">springframework</span><span class="o">.</span><span class="n">scheduling</span><span class="o">.</span><span class="n">quartz</span>
+     <span class="err">定义</span><span class="n">quartz</span><span class="err">的配置文件</span><span class="n">applicationContext</span><span class="o">-</span><span class="n">quartz</span><span class="o">.</span><span class="n">xml</span>
+
+<span class="n">Spring</span> <span class="n">MVC</span> <span class="err">中的常用注解</span>
+     <span class="kn">import</span> <span class="nn">javax.annotation.Resource</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.annotation.Resources</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.annotation.Generated</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">javax.annotation.PostConstruct</span><span class="p">;</span>
+
+     <span class="kn">import</span> <span class="nn">org.springframework.stereotype.Repository</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="p">;</span>
+
+     <span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Bean</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.context.annotation.ComponentScan</span>
+
+     <span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Value</span><span class="p">;</span>
+
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestParam</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestHeader</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestBody</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMethod</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.Mapping</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ResponseBody</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ResponseStatus</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.SessionAttributes</span><span class="p">;</span>
+
+    <span class="mf">1.</span><span class="err">说明</span>
+    <span class="mo">01</span><span class="err">：</span><span class="n">Spring</span><span class="err">能够从</span><span class="n">classpath</span><span class="err">下自动扫描，侦测和实例化具有特定注解的组件</span>
+      <span class="nd">@Component</span><span class="err">是用来标记任何被</span><span class="n">Spring</span><span class="err">管理的组件。泛指组件，当组件不好归类的时候，我们可以使用这个注解进行标注。</span>
+      <span class="nd">@Controller</span><span class="err">用来标记</span><span class="n">presentation</span><span class="err">层（比如</span><span class="n">web</span> <span class="n">controller</span><span class="err">）。</span>
+      <span class="nd">@Repository</span><span class="err">用来标记</span><span class="n">persistence</span><span class="err">层（比如</span><span class="n">DAO</span><span class="err">）即标注数据访问组件</span>
+      <span class="nd">@Service</span><span class="err">用来标记</span><span class="n">service</span><span class="err">层。标注业务层组件</span>
+      <span class="nd">@Controller</span><span class="err">用于标注控制层组件（如</span><span class="n">struts</span><span class="err">中的</span><span class="n">action</span><span class="err">）</span>
+
+    <span class="mf">03.</span>
+    <span class="nd">@RequestMapping</span> <span class="err">是一个用来处理请求地址映射的注解</span>
+    <span class="err">接受客户端传递过来的参数包括</span>
+      <span class="err">路径变量（</span><span class="n">url</span><span class="err">），内容变量（</span><span class="n">http</span> <span class="n">body</span><span class="err">），头变量（</span><span class="n">header</span><span class="err">），</span><span class="n">COOKIE</span><span class="err">变量等几类。</span>
+      <span class="nd">@PathVariable</span> <span class="err">注解，其用来获取请求路径（</span><span class="n">url</span> <span class="err">）中的动态参数</span>
+<span class="n">Spring</span> <span class="err">装载</span><span class="n">bean</span>
+   <span class="err">通过</span><span class="p">(</span> <span class="n">Applicatioon</span> <span class="n">Context</span><span class="p">)</span><span class="err">应用上下文</span> <span class="err">进行组装</span>
+</pre></div>
+
+
+<h3>Spring MVC</h3>
+<div class="highlight"><pre><span></span>特点
+  01.DI实现软件组件的松耦合
+  02.AOP 将功能分离出来形成可以重用的组件
+  03.Spring不会强迫应用继承它们的类或者实现它们的接口，从而导致应用和框架绑死，即非侵入式
+  04.Spring通过模板封装来消除样板式代码
+Spring 容器
+第一类：bean 工厂是最简单的容器，提供基本的 DI 支持；
+第二类：应用上下文基于 BeanFactory 构建，并提供应用框架级别的服务
+创建-组装-配置-管理
+装配
+1.自动装配
+    1.组件扫描
+      01.显示启用组件扫描
+        通过注解的方式： @ComponentScan
+        通过XML配置的方式：spring-context空间中 context:component-scan base-package=&quot;al&quot;
+    2.自动装配
+      自动装配
+        @Autowired
+2.显示装配
+Java装配
+    01.创建配置类       @Configuration 表明这是一个配置类
+    02.声明简单的bean   @Bean
+    03.借助javaConfig实现注入    必要的java功能产生实例
+XML装配
+    01.创建XML文件
+        以&lt;beans&gt;元素作为根
+        声明一个bean &lt;bean&gt;
+        注入初始化Bean &lt;constructor-arg&gt;
+        设置属性&lt;property&gt;
+3.混合装配
+    在典型的Spring应用中，我们可能会同时使用自动化和显式配置
+</pre></div>
+
+
+<h3>Spring Boot</h3>
+<div class="highlight"><pre><span></span>1.起步依赖- 依赖管理 -- 
+2.自动配置
+  @SpringBootApplication: 开启组件扫描和自动配置功能
+    将 @Configuration 、 @ComponentScan  @EnableAutoConfiguration
+    分别是标明该类是基于Java的配置，启动组件扫描、开启自动配置
+  3.在Spring Boot基础上调整
+     01.起步依赖： 前置依赖
+       示例：覆盖起步依赖引入的传递依赖  是在Maven中pom.xml调整 <span class="nt">&lt;exclusions&gt;</span>
+     02.自动配置的调整
+        基于条件化配置的特性。使用Spring Boot 提供的条件化注解
+        使用显式配置进行覆盖
+        使用属性进行精细化配置
+4.Actuator  提供运行时检视应用程序内部情况的能力
+5.常规的-内嵌的方式部署
+      01.把项目启动这个任务直接委托给SpringApplication.run方法
+      @SpringBootApplication
+      public class DemoApplication {      
+        public static void main(String[] args) {
+            SpringApplication.run(DemoApplication.class, args);
+        }
+      }
+   6.Tomcat部署-编码方式
+     一个spring-boot项目想以外部的 tomcat部署 而不是内嵌的方式
+      01.这个时候需要让spring-boot 入口类继承至 SpringBootServletInitializer 并重载configure方法，
+      02. 并给项目的打包方式改为war，pom.xml 中设置  <span class="nt">&lt;packaging&gt;</span>war<span class="nt">&lt;/packaging&gt;</span>
+         packaging给出了项目的打包类型，即作为项目的发布形式，其可能的类型
+      03.同时添加如下依赖：
+      <span class="nt">&lt;dependency&gt;</span>
+                  <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+                  <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-tomcat<span class="nt">&lt;/artifactId&gt;</span>
+                  <span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
+       04.代码
+           @SpringBootApplication
+           public class DemoApplication extends SpringBootServletInitializer {       
+               @Override
+               protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+                   return application.sources(BillingApplication.class);
+               }
+               public static void main(String[] args) {
+                   SpringApplication.run(DemoApplication.class, args);
+               }
+           }
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

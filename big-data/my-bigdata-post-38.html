@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Flink介绍</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-38.html" rel="bookmark"
+           title="Permalink to Flink介绍">Flink介绍</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-11-17T15:01:00+08:00">
+                Published: 2018-11-17 15:01:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>数据分析应该分别起到助力（Empower）、优化（Optimize）、创新（Innovate）的三大作用。
+</pre></div>
+
+
+<h3>Apache Flink</h3>
+<div class="highlight"><pre><span></span>Table API
+    面向流处理对应DataStream API，
+    面向批处理对应DataSet API
+I、 Flink组件
+        3.封装的计算框架
+            基于DataSet: 01.MRQL 类似于Spark SQL；02.Flink ML、04.Table API
+                03.图计算Spargel（基础）和Gelly（库）  类似于Spark中的 GraphX
+             基于DataStream： Table API、 Complex Event Processing (CEP API):复杂事件处理
+        2. API层：面向无界Stream 的流处理层DataStream以及面向Batch的批处理层API-DataSet
+        1.核心层：Runtime层--支持Flink计算的全部核心计算
+        0.部署层： 部署模式-本地模式-集群模式-云模式
+
+        3.说明：目前历史：API的层级
+          01.Stateful streaming-- The ProcessFunctions
+          02. Core API :Flink有2套基础的API，The DataStream API
+                    一套是面向流处理的DataStream，一套是面向批处理的DataSet。
+          03.Table API and SQL.
+        最新：01.统一 API Stack
+                让开发者在不同的节点，不同的边上定义不同的属性，来规划数据是流属性还是批属性
+                 02.统一 SQL方案
+II、流程
+    Client、 JobGraph、JobManager 、TaskManager
+    TaskManager 负责执行的计算的Worker  Task Slot      
+III、Flink开发模型：
+   基础构建模块是 streams 以及 transformation
+   输入--source       
+   输出--sink    Hbase、Redis    -- addSink
+     时间窗口：滚动窗口、 滑动窗口、会话窗口
+    transformation的算子
+            DataSet API
+                    map  flatMap  MapPartition  Filter   
+                    keyBy  timeWindow
+                    reduce   fold
+            DataStream API
+</pre></div>
+
+
+<h3>Blink</h3>
+<div class="highlight"><pre><span></span>I、Flink SQL 作为核心的API。传统 SQL 是为传统批处理设计的，不是为流处理设计的，
+    1.Flink SQL 的核心概念：流与表的二象性（duality）
+            动态表（Dynamic Table） --  流 Stream。 流可以看做动态表，动态表可以看做流
+               一个流可以看做对表的一系列更新操作（changelog）
+     依据动态表--在流上定义 SQL- 流式 SQL 可以想象成连续查询（Continuous Query）
+    2. Flink 5种源表插件、4种维表插件、11种结果表插件
+       源表--流式数据存储 -- 每个实时计算子作业必须提供至少一个流式数据存储
+       01.源表： 数据总线（DataHub）源表、日志服务（Log Service）源表、
+                消息队列（MQ）源表 、消息队列（Kafka）源表、
+        02.结果表      --仅支持INSERT操作    
+              数据总线（DataHub）结果表、日志服务（Log Service）结果表、
+              消息队列（MQ）结果表、 Kafka结果表
+              表格存储（Table Store）结果表、分析型数据库(AnalyticDB)结果表
+              云数据库(RDS/DRDS)结果表、cloudhbase结果表
+              高性能时间序列数据库（HiTSDB）结果表、云数据库HybridDB for MySQL结果表
+       03.维度表-维表是一张不断变化的表
+                 云数据库（RDS/DRDS）维表、表格存储（Table Store）维表、cloudhbase维表
+                 PERIOD FOR SYSTEM_TIME的声明。这行声明定义了维表的变化周期，
+                 即表明该表是一张会变化的表。
+    3.Connector 是连接外部数据和blink计算框架的桥梁，也是流计算的入口和出口
+        中间状态-拍快照 snapshot
+         Watermark 是一种衡量Event Time进展的机制，它是数据本身的一个隐藏属性
+          WATERMARK FOR ts AS withOffset(ts, 1000)
+          DataHub本身是流数据存储，实时计算只能将其作为流式数据输入
+II、Flink SQL中的窗口函数
+支持的窗口聚合-- 窗口聚合主要是两种：window aggregate和over aggregate
+窗口函数：
+    01.Window aggregate是Group By Window，支持两种时间类型做窗口：
+          Event Time和Processing Time
+            滚动窗口（TUMBLE）、滑动窗口（HOP）和会话窗口（SESSION）
+            滚动窗口（TUMBLE）将每个元素分配到一个指定大小的窗口中，窗口函数用在 GROUP BY 子句
+                                    TUMBLE_START(ts, INTERVAL &#39;1&#39; MINUTE),
+            滑动窗口（HOP），也被称作 Sliding Window。不同于滚动窗口，滑动窗口的窗口可以重叠。
+                滑动窗口有两个参数：size 和 slide。size 为窗口的大小，slide 为每次滑动的步长
+                    如果 slide &lt; size，则窗口会重叠，每个元素会被分配到多个窗口
+                    如果 slide = size，则等同于滚动窗口（TUMBLE）
+                    如果 slide &gt; size，则为跳跃窗口，窗口之间不重叠且有间隙
+          会话窗口
+             会话窗口（SESSION）通过session活动来对元素进行分组 。即会话断开时，这个窗口就会关闭
+      02.over窗口
+        OVER窗口（OVER Window）是传统数据库的标准开窗，OVER Window不同于Group By Window
+            每一个元素都对应一个OVER Window，每一个元素都触发一次数据计算
+                ROWS OVER Window - 每一行元素都视为新的计算行，即每一行都是一个新的窗口，
+                    也有Unbounded和Bounded的两种情况
+                RANGE OVER Window - 具有相同时间值的所有元素行视为同一计算行，即具有相同时间值的所有行都是同一个窗口。
+            ROWS   BETWEEN 2 preceding AND CURRENT ROW
+            RANGE BETWEEN INTERVAL &#39;2&#39; MINUTE preceding AND CURRENT ROW
+    使用：
+       001.用户需要显式定义一个processing time列，这个定义需要在source的DDL中显式指明
+         示例命令：  filedName as PROCTIME()
+            实际示例： d AS PROCTIME()
+      002.Event Time是用户的原始数据，用户不需要显式重新定义一个event time列, 
+         但必须指定watermark的计算方法
+III、时间说明：
+  Event Time和Processing Time的声明只能在源表上声明
+   Processing Time：系统对事件进行处理的本地系统时间
+                     processing time是系统为流记录增加的时间属性， 是系统产生的
+
+   Event Time：用户提供的事件时间，event time一定是用户提供在Schema里的数据
+                       通常是数据的最原始的创建时间，流记录本身携带的时间属性
+IV、 Watermark是一种衡量Event Time进展的机制，它是数据本身的一个隐藏属性，
+     watermark的定义是source表DDL定义的一部分
+        WATERMARK [watermarkName] FOR &lt;rowtime_field&gt; AS withOffset(&lt;rowtime_field&gt;, offset)
+       实际示例：
+          WATERMARK FOR rowtime AS withOffset(rowtime, 4000)
+        Flink何时触发window？
+            watermark与timestamp的时间，并通过数据来看看window的触发时机
+            window的触发要符合以下几个条件
+              1、watermark时间 &gt;= window_end_time
+              2、在[window_start_time,window_end_time)中有数据存在
+            或者：
+              1、Event Time &lt; watermark时间（对于late element太多的数据而言）
+V、 Flink如何处理乱序
+              watermark+window处理乱序
+        流处理从事件产生，到流经source，再到operator，中间是有一个过程和时间的
+        理论上数据都是按照事件产生的时间顺序来的，但
+        但是也不排除由于网络、背压等原因，导致乱序的产生延迟的事件
+        有个机制来保证一个特定的时间后，必须触发window去进行计算
+        接收到watermark数据的operator以此不断调整自己管理的window event time clock
+           首先，eventTime计算意味着flink必须有一个地方用于抽取每条消息中自带的时间戳
+           其次，在数据进入window前，需要有一个Watermarker生成当前的event time对应的水位线
+           flink支持两种后置的Watermarker：Periodic和Punctuated，
+            With Periodic Watermarks
+                是定期产生watermark（即使没有消息产生）， Watermark需要实现接口为Watermark getCurrentWatermark()
+           可以定义一个最大允许乱序的时间，这种情况应用较多
+        watermark、Event Time和window的关系
+   标量函数（Scalar-Valued Function）和表值函数(Table-Valued Function)。
+          其中表值函数又分为Inline table-valued functions和Multistatement table-valued functions。
+</pre></div>
+
+
+<h3>应用案例</h3>
+<div class="highlight"><pre><span></span>    <span class="err">案例</span><span class="nt">1</span><span class="err">、</span>
+       <span class="nt">--</span> <span class="nt">udf</span> <span class="nt">str</span><span class="nc">.length</span><span class="o">()</span>
+     <span class="nt">CREATE</span> <span class="nt">FUNCTION</span> <span class="nt">stringLengthUdf</span> <span class="nt">AS</span> <span class="s1">&#39;com.hjc.test.blink.sql.udx.StringLengthUdf&#39;</span><span class="o">;</span>                    
+     <span class="nt">--</span> <span class="nt">udtf</span> <span class="nt">str</span><span class="nc">.split</span><span class="o">(</span><span class="s2">&quot;\\|&quot;</span><span class="o">);</span>
+     <span class="nt">CREATE</span> <span class="nt">FUNCTION</span> <span class="nt">splitUdtf</span> <span class="nt">AS</span> <span class="s1">&#39;com.hjc.test.blink.sql.udx.SplitUdtf&#39;</span><span class="o">;</span>                   
+     <span class="nt">--</span> <span class="nt">udaf</span> <span class="err">计算</span><span class="nt">count</span>
+     <span class="nt">CREATE</span> <span class="nt">FUNCTION</span> <span class="nt">countUdaf</span> <span class="nt">AS</span> <span class="s1">&#39;com.hjc.test.blink.sql.udx.CountUdaf&#39;</span><span class="o">;</span>
+
+     <span class="nt">create</span> <span class="nt">table</span> <span class="nt">sls_stream</span><span class="o">(</span>  <span class="nt">a</span> <span class="nt">int</span><span class="o">,</span> <span class="nt">b</span> <span class="nt">bigint</span><span class="o">,</span> <span class="nt">c</span> <span class="nt">varchar</span><span class="o">)</span> <span class="nt">with</span> <span class="o">(</span> <span class="nt">type</span><span class="o">=</span><span class="s1">&#39;sls&#39;</span><span class="o">,</span>  <span class="nt">endPoint</span><span class="o">=</span><span class="s1">&#39;xxxxxxx&#39;</span><span class="o">,</span>  <span class="nt">accessKeyId</span><span class="o">=</span><span class="s1">&#39;xxxxxxx&#39;</span><span class="o">,</span>  <span class="nt">accessKeySecret</span><span class="o">=</span><span class="s1">&#39;yF6xxxxxxxx&#39;</span><span class="o">,</span>
+       <span class="nt">startTime</span> <span class="o">=</span> <span class="s1">&#39;2017-07-04 00:00:00&#39;</span><span class="o">,</span>  <span class="nt">project</span><span class="o">=</span><span class="s1">&#39;ali-cloud-streamtest&#39;</span><span class="o">,</span>   <span class="nt">logStore</span><span class="o">=</span><span class="s1">&#39;stream-test2&#39;</span><span class="o">,</span> <span class="nt">consumerGroup</span><span class="o">=</span><span class="s1">&#39;consumerGroupTest3&#39;</span> <span class="o">);</span>
+
+       <span class="nt">create</span> <span class="nt">table</span> <span class="nt">rds_output</span><span class="o">(</span>  <span class="nt">len1</span> <span class="nt">bigint</span><span class="o">,</span>  <span class="nt">len2</span> <span class="nt">bigint</span>  <span class="o">)</span> <span class="nt">with</span> <span class="o">(</span>  <span class="nt">type</span><span class="o">=</span><span class="s1">&#39;rds&#39;</span><span class="o">,</span>  <span class="nt">url</span><span class="o">=</span><span class="s1">&#39;jdbc:mysql:xxxxxxxx&#39;</span><span class="o">,</span><span class="nt">tableName</span><span class="o">=</span><span class="s1">&#39;xxxxx&#39;</span><span class="o">,</span>  <span class="nt">userName</span><span class="o">=</span><span class="s1">&#39;xxxxx&#39;</span><span class="o">,</span>  <span class="nt">password</span><span class="o">=</span><span class="s1">&#39;xxxxx&#39;</span> <span class="o">);</span>
+
+     <span class="nt">insert</span> <span class="nt">into</span> <span class="nt">rds_output</span>  <span class="nt">select</span> <span class="nt">count</span><span class="o">(</span><span class="nt">a</span><span class="o">),</span> <span class="nt">countUdaf</span><span class="o">(</span><span class="nt">a</span><span class="o">)</span> <span class="nt">from</span> <span class="nt">sls_stream</span>
+     <span class="err">无限流的双流</span> <span class="nt">JOIN</span> <span class="err">和带窗口的双流</span> <span class="nt">JOIN</span>
+       <span class="err">窗口函数</span>
+          <span class="err">支持滚动窗口（</span><span class="nt">Tumble</span><span class="err">）、滑动窗口（</span><span class="nt">Hop</span><span class="err">）、会话窗口（</span><span class="nt">Session</span><span class="err">）以及</span>
+      <span class="err">传统数据库中的</span><span class="nt">OVER</span><span class="err">窗口</span>
+        <span class="nt">Retraction</span> <span class="err">撤回机制、</span> <span class="nt">checkpoint</span> <span class="err">机制、</span><span class="nt">failover</span> <span class="err">的策略</span>
+    <span class="err">流处理会不断产生结果而不会结束，批处理往往只返回一个最终结果并且结束</span>
+    <span class="err">流计算需要做</span><span class="nt">checkpoint</span><span class="err">并保留状态，这样在</span><span class="nt">failover</span><span class="err">的时候能够快速续跑</span>
+    <span class="err">流数据处理是对最终结果的一个提前观测，往往需要把提前计算的结果撤回（</span><span class="nt">Retraction</span><span class="err">）做更改而批计算则不会</span>
+    <span class="nt">create</span> <span class="nt">table</span> <span class="nt">kafka_stream</span><span class="o">(</span>
+          <span class="nt">messageKey</span> <span class="nt">VARBINARY</span><span class="o">,</span>
+          <span class="err">`</span><span class="nt">message</span><span class="err">`</span> <span class="nt">VARBINARY</span><span class="o">,</span>    <span class="nt">topic</span> <span class="nt">varchar</span><span class="o">,</span>  <span class="err">`</span><span class="nt">partition</span><span class="err">`</span> <span class="nt">int</span><span class="o">,</span>  <span class="err">`</span><span class="nt">offset</span><span class="err">`</span> <span class="nt">bigint</span>   <span class="o">)</span> <span class="nt">with</span> <span class="o">(</span>
+          <span class="nt">type</span> <span class="o">=</span><span class="s1">&#39;kafka010&#39;</span><span class="o">,</span>   <span class="nt">topic</span> <span class="o">=</span> <span class="s1">&#39;xxx&#39;</span><span class="o">,</span>   <span class="err">`</span><span class="nt">group</span><span class="nc">.id</span><span class="err">`</span> <span class="o">=</span> <span class="s1">&#39;xxx&#39;</span><span class="o">,</span>   <span class="nt">bootstrap</span><span class="nc">.servers</span> <span class="o">=</span> <span class="s1">&#39;ip:端口,ip:端口,ip:端口&#39;</span>  <span class="o">);</span>
+<span class="err">案例</span><span class="nt">2</span><span class="err">、</span><span class="nt">flink</span><span class="err">中</span><span class="nt">UDF</span><span class="err">开发</span>
+ <span class="err">开发过程：</span>
+ <span class="err">依赖：</span><span class="nt">org</span><span class="nc">.apache.flink</span>
+     <span class="nt">flink-core-blink-2</span><span class="nc">.0</span>
+     <span class="nt">flink-streaming-java_2</span><span class="nc">.11</span>
+     <span class="nt">flink-table_2</span><span class="nc">.11</span>     
+ <span class="err">介绍：</span>
+ <span class="nt">01</span><span class="o">.</span><span class="err">标量函数（</span><span class="nt">UDF</span><span class="err">）将</span><span class="nt">0</span><span class="err">个、</span><span class="nt">1</span><span class="err">个或多个标量值映射到一个新的标量值。</span>
+    <span class="nt">import</span> <span class="nt">org</span><span class="nc">.apache.flink.table.functions.FunctionContext</span><span class="o">;</span>
+    <span class="nt">import</span> <span class="nt">org</span><span class="nc">.apache.flink.table.functions.ScalarFunction</span><span class="o">;</span>
+    <span class="err">需要继承类</span>  <span class="nt">extends</span> <span class="nt">ScalarFunction</span>
+      <span class="k">@Override</span> <span class="nt">eval</span>
+      <span class="k">@Override</span>  <span class="nt">open</span><span class="err">方法和</span> <span class="nt">close</span><span class="err">方法可以不写</span>
+ <span class="nt">02</span><span class="o">.</span><span class="err">用户自定义聚合函数（</span><span class="nt">UDAF</span><span class="err">）将多条记录聚合成一条值</span>
+    <span class="err">需要继承抽象类</span> <span class="nt">extends</span> <span class="nt">AggregateFunction</span><span class="o">&lt;</span><span class="nt">Long</span><span class="o">,</span> <span class="nt">CountUdaf</span><span class="nc">.CountAccum</span><span class="o">&gt;</span>
+    <span class="nt">import</span> <span class="nt">org</span><span class="nc">.apache.flink.table.functions.AggregateFunction</span><span class="p">;</span>
+      <span class="nt">001</span><span class="nc">.createAccumulator</span><span class="err">、</span><span class="nt">getValue</span> <span class="err">和</span> <span class="nt">accumulate</span><span class="err">三个方法一起使用，就能设计出一个最基本的</span><span class="nt">UDAF</span>
+        <span class="nt">createAccumulator</span><span class="err">和</span><span class="nt">getValue</span><span class="err">的输入输出是确定的，可以定义在</span><span class="nt">AggregateFunction</span><span class="err">抽象类内。</span>
+        <span class="err">除了这两个方法，要设计一个最基本的</span>
+        <span class="nt">UDAF</span><span class="err">必须要有一个</span><span class="nt">accumulate</span><span class="err">方法</span><span class="nt">--</span>  <span class="err">用户需要实现一个</span><span class="nt">accumulate</span><span class="err">方法，</span>
+        <span class="err">来描述如何计算用户的输入的数据，并更新到</span><span class="nt">accumulator</span><span class="err">中</span>
+     <span class="nt">002</span><span class="o">.</span><span class="err">实时计算有一些特殊的场景需要用户提供</span><span class="nt">retract</span><span class="err">和</span><span class="nt">merge</span><span class="err">两个方法才能完成</span>
+
+ <span class="nt">03</span><span class="o">.</span><span class="err">用户定义的表函数（</span><span class="nt">UDTF</span><span class="err">）将</span><span class="nt">0</span><span class="err">个、</span><span class="nt">1</span><span class="err">个或多个标量值作为输入参数</span>
+ <span class="err">返回的行可以由一个或多个列组成，</span><span class="nt">UDTF</span><span class="err">返回多列，只需要将返回值声明成</span><span class="nt">Tuple</span><span class="err">或</span><span class="nt">Row</span><span class="err">即可</span>
+    <span class="nt">import</span> <span class="nt">org</span><span class="nc">.apache.flink.table.functions.FunctionContext</span><span class="p">;</span>
+    <span class="nt">import</span> <span class="nt">org</span><span class="nc">.apache.flink.table.functions.TableFunction</span><span class="o">;</span>
+         <span class="nt">extends</span> <span class="nt">TableFunction</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">&gt;</span>
+         <span class="nt">extends</span> <span class="nt">TableFunction</span><span class="o">&lt;</span><span class="nt">Tuple3</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">,</span> <span class="nt">Long</span><span class="o">,</span> <span class="nt">Integer</span><span class="o">&gt;&gt;</span>
+    <span class="err">注意：</span>
+        <span class="nt">UDTF</span> <span class="err">支持</span><span class="nt">cross</span> <span class="nt">join</span> <span class="err">和</span> <span class="nt">left</span> <span class="nt">join</span><span class="err">，</span>
+        <span class="err">在使用</span><span class="nt">UDTF</span><span class="err">时需要带上</span> <span class="nt">LATERAL</span><span class="err">和</span><span class="nt">TABLE</span><span class="err">两个关键字</span>
+        <span class="nt">LEFT</span> <span class="nt">JOIN</span> <span class="nt">UDTF</span> <span class="err">语句后面必须接</span> <span class="nt">ON</span> <span class="nt">TRUE</span><span class="err">参数</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>UDX概述 https://help.aliyun.com/document_detail/69463.html?spm=a2c4g.11186623.4.3.64ce40fcxbzHYx
+窗口函数概述 https://help.aliyun.com/document_detail/62510.html?spm=a2c4g.11186631.6.638.7ade34ecmkR5xJ
+Flink流计算编程--watermark（水位线）简介 https://blog.csdn.net/lmalds/article/details/52704170
+实时计算 Flink SQL 核心功能解密 https://yq.aliyun.com/articles/457438
+创建消息队列（Kafka）源表 https://help.aliyun.com/knowledge_detail/86824.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
