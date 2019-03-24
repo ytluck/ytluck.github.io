@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java面向对象特征进一步理解</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-46.html" rel="bookmark"
+           title="Permalink to Java面向对象特征进一步理解">Java面向对象特征进一步理解</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T23:00:00+08:00">
+                Published: 2019-03-10 23:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <h3>多态机制</h3>
+<div class="highlight"><pre><span></span>    01.编译时多态：方法的重载；
+    02.运行时多态：
+        存在的必要条件：要有继承；要有重写；父类引用指向子类对象
+         方法的重写、重载与动态连接构成 多态性
+1.methods方法重载和重写的区别
+     方法重写(overriding)：父类和子类中 @override
+     　　1、也叫子类的方法覆盖父类的方法，要求返回值、方法名和参数都相同。
+     　　2、子类抛出的异常不能超过父类相应方法抛出的异常。(子类异常不能超出父类异常)
+     　　3、子类方法的的访问级别不能低于父类相应方法的访问级别(子类访问级别不能低于父类访问级别)
+         4.方法被定义为final不能被重写
+     方法重载(overloading):
+         重载是在 同一个类 中的两个或两个以上的方法，
+         拥有相同的方法名，但是参数却不相同，方法体也不相同，
+         最常见的重载的例子就是类的构造函数，可以参考API帮助文档看看类的构造方法
+       对于构造方法-编译器需要调蓄出具体执行哪个方法-通过用 各个方法给出的参数类型 与 特定方法所调用的值类型进行 匹配
+       如果找不到匹配的参数则会产生编译错误--Overloading resolution 重载解析
+       Java允许重载任何方法：
+          多个同名函数同时存在，具有不同的参数个数/类型。-重载Overloading是一个类中多态性的一种表现
+          调用方法时通过传递给它们的不同参数个数和参数类型来决定具体使用哪个方法, 这就是多态性
+2.定义一个接口类型的引用变量 来 引用实现接口的
+        示例：
+        多态
+        集合类的示例
+          1.private Map&lt;String, Map&lt;String, String&gt;&gt; configMap = new HashMap&lt;String, Map&lt;String, String&gt;&gt;();
+          List&lt;String&gt; keyList = new ArrayList&lt;String&gt;(dataMap.keySet());
+           Collections.sort(keyList);   
+          Map.Entry&lt;String, String&gt; entry : Map&lt;String, String&gt; map.entrySet()
+      自定义示例
+           定义一个接口类型的引用变量 来 引用实现接口的类的实例，当这个引用调用方法时，
+           它会根据实际引用的类的实例来判断具体调用哪个方法。
+           该方法必须已经在接口中被声明，而且在接口的实现类中该实现方法的类型和参数必须与接口中所定义的精确匹配。
+             //定义接口InterA
+             interface InterA  {  void fun();  }
+             //实现接口InterA的类B
+             class B implements InterA  {  public void fun()  {System.out.println(“This is B”);  }
+             //实现接口InterA的类C
+             class C implements InterA  { public void fun()  {System.out.println(“This is C”);   }  }
+              //主类main
+             class Test  { public static void main(String[] args)  {   InterA a;   a= new B();  a.fun();  a = new C();  　　a.fun();  }}
+</pre></div>
+
+
+<h3>基于接口的多态</h3>
+<div class="highlight"><pre><span></span>设计模式中有：“代码尽量依赖于抽象，不依赖于具体代码依赖于抽象的好处是，代码可以方便替换。
+       例如，代码
+          List list = new ArrayList();下面通过list来操作集合。代码编写后发现集合使用的不准确，
+             应该使用LinkedList，那么只要修改一行代码
+         List list = new LinkedList();就可以，这行以后的代码不需要修改，
+             因为List接口保证了调用的都是接口中的方法，而ArrayList与LinkedList都实现了List接口
+      ArrayList list = new ArrayList()这种形式的话，
+        那么list访问到的就可能是ArrayList里独有的方法而非List接口中的方法。
+       这样替换成LinkedList的时候就有可能需要修改很多的代码 
+     因为存放在ArrayList里的值都转换成了Object类型,所以 使用ArrayList内部的值时,必须强制转换才行
+        List&lt;String&gt;  list =   new ArrayList&lt;String&gt;();
+        List&lt;String&gt; list = (String)new ArrayList(); 强制类型转换
+自定义类和接口的方式和步骤如下
+    01.接口
+     public interface IDownloadCenter {
+        DownloadResult download(String payType,String merchantId,String date) throws Exception;
+        //void  writeFileMerchantData(String date,String fileName,String merchantId,String payType,String merchantStatus);
+     }
+ 02.实现接口的抽象类   
+     public abstract class AbstractUnifiedDownload implements IDownloadCenter {
+        @Override
+        public DownloadResult download(String payType, String merchantId, String date) throws Exception {}
+        }
+ 03继承抽象类的具体类    
+     @Service
+    public class PingAnDownloadService  extends AbstractUnifiedDownload {}
+    public class JdSdkPayDownloadService extends AbstractUnifiedDownload {}
+     public class SpayQuickPayDownloadService extends AbstractUnifiedDownload {}
+     public class XinEhuiCashDownloadService extends AbstractUnifiedDownload {}
+     public class YeePayDownloadService extends AbstractUnifiedDownload {
+    public void init() {
+        downloadManager.downloadManagerMap.put(BillType.dynamicH5WechatPay, this);
+        具体的配置-从公用的util中读取}
+    将以下枚举-put 进Map中 
+     public enum BillType {
+        yeePay(&quot;yeePay&quot;, &quot;易支付&quot;) ;
+        public String value;
+        public String memo;
+        BillType(String value, String memo) {
+            this.value = value;
+            this.memo = memo;
+        }
+ 04.从Map中get 枚举   
+    public class DownloadManager {
+    public    Map&lt;BillType, IDownloadCenter&gt; downloadManagerMap = new HashMap&lt;BillType, IDownloadCenter&gt;();
+    public Map&lt;BillType, IDownloadCenter&gt; getDownloadManager(){
+        return downloadManagerMap;
+    }
+    public  IDownloadCenter getCenter(BillType billType) {
+        return  downloadManagerMap.get(billType);
+    }}
+ 05.多态情况
+     public class DownLoadService {
+     iDownloadCenter = downloadManager.getCenter(BillType.get(payType.value));
+     DownloadResult result = iDownloadCenter.download(payType.value, merchantId, date);
+     }
+
+ 06.具体的应用
+  public class DownloadAllTimer {
+    downLoadService.startDownloadAllFile(downTime);//下载方法}
+
+    public class UnifiedDownloadController {
+      downLoadService.startDownloadAllFile(date);}
+</pre></div>
+
+
+<h3>继承</h3>
+<div class="highlight"><pre><span></span>01.继承是实现代码重用的有力手段。
+    通过定义子类或者扩展超类来添加功能
+02.阻止继承：
+        继承没有private的声明
+        abstract 不能使用final
+03.复合-组合
+    在类中增加一个私有域--它引用现有类的一个实例--现有类变为新类的一个组件
+        新类中的每个实例方法都可以调用被包含的现有实例中对应的方法，并返回返回它的结果--转发forwarding-
+        新类中的方法称为转发方法
+    一个类=类本身+ 可重用的转发类
+</pre></div>
+
+
+<h3>封装：</h3>
+<div class="highlight"><pre><span></span>方法的调用--封装
+数据封装- 隐藏成员，将数据封装在类中，只能通过方法获取
+</pre></div>
+
+
+<h4>类</h4>
+<div class="highlight"><pre><span></span>类= 签名+主体
+    主体：
+        变量： 静态变量&lt;类内全局&gt;
+                    成员变量
+        方法： 本地变量
+                    静态方法 成员方法-实例方法
+初始化：
+    类初始化方法
+     实例字段在构造方法中初始化
+    this super --构造方法中，第一语句
+    引用类型转换-数据类型转换
+     不能转换的--基本类型的数组中
+从Java虚拟机的角度清晰解剖一个Java对象的创建过程 -- 对象初始化
+    一个Java对象的创建过程往往包括 类初始化 和 类实例化 两个阶段
+        类初始化：类加载过程中的初始化阶段对类变量按照程序猿的意图进行赋值的过程
+        类实例化：在类完全加载到内存中后创建对象的过程
+        类初始化：
+            类构造器&lt;clinit&gt;()与实例构造器&lt;init&gt;()不同，它不需要程序员进行显式调用，
+             虚拟机会保证在子类类构造器&lt;clinit&gt;()执行之前，父类的类构造&lt;clinit&gt;()执行完毕
+        类实例化    
+            步骤：
+            01.在为这些实例变量分配内存的同时，这些实例变量也会被赋予默认值(零值)
+            02.三种执行对象初始化的结构，分别是 实例变量初始化、 实例代码块初始化 以及 构造函数初始化。 
+常见的实例化
+    从虚拟机角度：01.通过转变为invokevirtual指令直接创建对象的；02.new关键字创建对象
+    01.由执行类实例创建表达式而引起的对象创建：使用new关键字来调用一个类的构造函数显式地创建对象
+        new Student();
+    02.反射机制(Class类的newInstance方法、使用Constructor类的newInstance方法)
+            Class.forName(&quot;Student类全限定名&quot;).newInstance();　
+    03.使用Clone方法
+    04.使用反序列化等方式创建对象：类实现Serializable接口
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

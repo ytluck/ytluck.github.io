@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>不同语言变量以及参数的传递</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-47.html" rel="bookmark"
+           title="Permalink to 不同语言变量以及参数的传递">不同语言变量以及参数的传递</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-16T21:00:00+08:00">
+                Published: 2019-03-16 21:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <h3>变量以及参数传递</h3>
+<div class="highlight"><pre><span></span>01.变量：作用域以及生命周期
+      默认值以及可见性
+      数据类型
+          C语言：全局变量和局部变量 Global Variable  Local Variable
+          Java语言：
+                 类变量（静态变量）：类中用static关键字声明
+                 成员变量(属性, 实例变量)
+                 局部变量（本地变量）在方法、构造器或者块中使用
+          Scala： val  var 
+          Python：
+          R语言：
+02.函数-方法等
+    基本构成：
+    参数传递： 根据语言的特点
+</pre></div>
+
+
+<h4>1. C语言：</h4>
+<div class="highlight"><pre><span></span>    在 C 语言中，函数的参数传递方式有两种：值传递与地址传递
+      01.值传递：参数列表-函数名-返回值
+        函数参数：使用变量、常量、数组元素
+        函数体中的操作：将实参的值复制到形参相应的存储单元
+                                      函数在调用时，隐含地把实参 a 的值赋值给了参数 x
+        调用结束后：
+                形参的存储单元被释放，而形参值的任何变化都不会影响到实参的值
+                实参的存储单元仍保留并维持数值不变
+        返回值：
+    02.地址传递
+        函数参数：数组名或者指针作为函数参数
+          传递的是该数组的首地址或指针的值，而形参接收到的是地址
+</pre></div>
+
+
+<h4>2. Java中</h4>
+<div class="highlight"><pre><span></span>    在Java中，方法的传递方式
+      数据类型： 基本数据类型 以及引用数据类型
+            赋值操作：
+                在基本数据类型中
+                在引用数据类型中
+            传值
+                     传递的是值的副本。方法中对副本的修改，不会影响到调用方
+            传引用：
+                    01.传递的是引用的副本，共用一个内存，会影响到调用方。此时，形参和实参指向同一个内存地址。
+                    02.如果对象被重新创建或赋值为null，即new则会重新指向其他对象，不影响其远对象的值
+                    对引用副本本身（对象地址）的修改，如设置为null，重新指向其他对象，不会影响到调用方。
+        01.传递：
+            01.基本数据类型，传递的都是副本。在函数中改变了副本的值不会改变原始的值
+                String
+            02.对于引用类型(对象、数组)，传引用            
+        02.从内存模型来说参数传递：
+                栈内存(stack)和堆内存(heap)
+    总结：
+        01.基本类型（byte,short,int,long,double,float,char,boolean）为传值
+        02.String、Integer、Double等immutable类型因为类的变量设为final属性，无法被修改，只能重新赋值或生成对象。
+           当Integer作为方法参数传递时，对其赋值会导致原有的引用被指向了方法内的栈地址，
+          失去原有的的地址指向，所以对赋值后的Integer做任何操作都不会影响原有值。
+        03.对象类型（Object,数组，容器）为传引用
+    总结方式：
+      01.在方法中，修改一个基础类型的参数永远不会影响原始参数值。
+      02.在方法中，改变一个对象参数的引用永远不会影响到原始引用。
+        然而，它会在堆中创建了一个全新的对象（指的是包装类和immutable对象）
+      03.在方法中，修改一个对象的属性会影响原始对象参数。
+      04.在方法中，修改集合和Maps会影响原始集合参数。
+</pre></div>
+
+
+<h4>3.Scala</h4>
+<div class="highlight"><pre><span></span>Scala的解释器在
+    解析函数参数(function arguments)
+     传值调用（call-by-value）
+     传名调用（call-by-name）
+    具体解释：
+     传值调用（call-by-value）：计算参数表达式的值(reduce the arguments)，再应用到函数内部
+    通常情况下，函数的参数是传值参数；即参数的值在它被传递给函数之前被确定
+     传名调用（call-by-name）：将未计算的参数表达式直接应用到函数内部--惰性求值
+    使用“按名称传递参数”方式的优点是：1.减少不必要的计算； 2.减少异常
+</pre></div>
+
+
+<h4>4. Python中</h4>
+<div class="highlight"><pre><span></span>    Python传递参数的方式：
+       01.从表现上：Python参数传递采用的是“传对象引用”的方式
+        如果函数收到的是一个
+                    不可变对象（比如数字、字符或者元组）的引用，就不能 直接修改原始对象——相当于通过“传值”来传递对象
+        如果函数收到的是一个
+                    可变对象（比如字典 或者列表）的引用，就能修改对象的原始值——相当于通过“传引用”来传递对象。
+                    可变对象的引用也可以不修改其对象的原始值--这个就要看具体的函数的操作了            
+      02.从内存模型来说参数传递：其主要的关键的地方是了解：
+        python(对可变对象和不可变对象的)赋值过程中是如何分配内存地址的。
+             python中，不可变对象是共享的，创建可变对象永远是分配新地址
+</pre></div>
+
+
+<h4>5. R语言中</h4>
+<div class="highlight"><pre><span></span>    函数式编程：
+        环境和变量作用域--函数可以作为参数
+        函数可以作为参数传递
+        函数式编程-函数不修改局部变量
+        对参数进行重新赋值
+</pre></div>
+
+
+<h3>代码示例</h3>
+<div class="highlight"><pre><span></span>代码：<span class="o">-</span><span class="m">-01.</span>从具体表现角度<span class="m">-02.</span>从内存模型角度
+Python：
+            x<span class="o">=</span><span class="p">[</span><span class="m">6</span><span class="p">,</span><span class="m">25</span><span class="p">,</span><span class="m">3</span><span class="p">]</span>
+            x.sort<span class="p">()</span>
+            <span class="kp">print</span><span class="p">(</span>x<span class="p">)</span>     <span class="p">[</span><span class="m">3</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">25</span><span class="p">]</span>
+R 语言
+        <span class="kp">sort</span><span class="p">(</span>x<span class="p">)</span> <span class="p">[</span><span class="m">3</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">25</span><span class="p">]</span>
+        <span class="kp">print</span><span class="p">(</span>x<span class="p">)</span> <span class="p">[</span><span class="m">6</span><span class="p">,</span><span class="m">25</span><span class="p">,</span><span class="m">3</span><span class="p">]</span>
+      如果想改变x的代码，可以通过对参数x进行重新赋值来解决
+       即 x <span class="o">&lt;-</span> <span class="kp">sort</span><span class="p">(</span>x<span class="p">)</span>
+Java：
+public  class FunctionTransfer <span class="p">{</span>
+ public static void main<span class="p">(</span>String<span class="p">[]</span> <span class="kp">args</span><span class="p">){</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;Hello,Java方法的传递方式-针对基本数据类型&quot;</span><span class="p">);</span>
+    <span class="o">//</span> 虚拟机栈（VM Stack）<span class="o">--</span>虚拟机栈、本地方法栈、程序计数器是线程独立的内存，每个线程只保存自己的数据。
+    <span class="o">//</span>用于实现方法调用，每次方法调用就对应栈中的一个栈帧，
+    <span class="o">//</span> 栈帧包含局部变量表、操作数栈、方法接口等于方法相关的信息。
+    <span class="o">//</span>栈中存放局部变量，参数，运行中间结果<span class="o">--</span>形参是复制实参的一份拷贝
+    <span class="o">//</span> 具体<span class="o">--</span>程序在栈内存中开辟了一块地址为AD8500的内存
+    int num <span class="o">=</span> <span class="m">20</span><span class="p">;</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;基本数据类型-调用前&quot;</span> <span class="o">+</span> num<span class="p">);</span>
+    <span class="o">//</span> <span class="o">//</span> 栈的高度称为栈的深度，栈深度受栈帧大小影响<span class="o">--</span>栈深度<span class="o">:</span><span class="m">11114</span>
+    <span class="o">//</span>虚拟机栈中方法调用的深度超过虚拟机规定的最大深度，则抛出StackOverflowError，特别是方法的递归调用时
+    <span class="o">//</span>虚拟机栈能够容纳的栈帧数量是有限的，若栈帧不断进栈而不出栈，最终会导致当前线程虚拟机栈的内存空间耗尽，
+    <span class="o">//</span> 典型如一个无结束条件的递归函数调用
+    <span class="o">//</span> 虚拟机栈可以动态扩展，如果扩展时没有足够的内存则抛出OutOfMemoryError
+    <span class="o">//</span>OutOfMemoryError指的是当整个虚拟机栈内存耗尽，并且无法再申请到新的内存时抛出的异常
+    add<span class="p">(</span>num<span class="p">);</span>
+    <span class="o">//</span> 程序在栈内存中又开辟了一块地址为AD8600的内存，将num的值<span class="m">30</span>传递进来
+    <span class="o">//</span> 执行param <span class="o">=</span> <span class="m">100</span><span class="p">;</span>后，AD8600中的值变成了<span class="m">100</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;基本数据类型-调用后&quot;</span> <span class="o">+</span> num<span class="p">);</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;############################&quot;</span><span class="p">);</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;Hello,Java方法的传递方式-针对引用数据类型&quot;</span><span class="p">);</span>
+    <span class="o">//</span>方法区和堆是线程共享的内存
+    <span class="o">//</span>存储对象实例，java中通new创建的对象实例就保存在堆中
+    <span class="o">//</span> 对象的创建和存储<span class="o">--</span>堆中分配一块内存来存储对象实例并初始化对象内存空间的值为
+    <span class="o">//</span> 访问对象通过对象的引用，引用保存在栈中
+    <span class="o">//</span>String 类型
+    <span class="o">//</span> String是一个引用类型，但是在作为参数传递的时候表现出来的却是基本类型的特性，
+    <span class="o">//</span> 即在方法中改变了String类型的变量的值后，不会影响方法外的String变量的值
+    String s <span class="o">=</span> <span class="s">&quot;hello&quot;</span><span class="p">;</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;Java方法的传递方式-针对引用数据类型String 前 s=&quot;</span> <span class="o">+</span> s<span class="p">);</span>
+    changeString<span class="p">(</span>s<span class="p">);</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;Java方法的传递方式-针对引用数据类型String 后 s=&quot;</span> <span class="o">+</span> s<span class="p">);</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;############################&quot;</span><span class="p">);</span>
+    <span class="o">//</span>数组对象作为参数传递 <span class="o">--</span> 复制引用的拷贝
+    <span class="o">//</span> 栈内存中开辟了一块地址编号为AD9500内存空间，用于存放<span class="kt">array</span><span class="p">[</span><span class="m">0</span><span class="p">]</span>的引用地址，
+    <span class="o">//</span>里边放的值是堆内存中的一个地址<span class="o">-</span>示例中的值为BE2500，可以理解为有一个指针指向了堆内存中的编号为BE2500的地址
+    <span class="o">//</span>堆内存中编号为BE2500的这个地址中存放的才是<span class="kt">array</span><span class="p">[</span><span class="m">0</span><span class="p">]</span>的值
+    String<span class="p">[]</span> <span class="kt">array</span> <span class="o">=</span> new String<span class="p">[]</span> <span class="p">{</span><span class="s">&quot;Hello-Do you know&quot;</span><span class="p">};</span>
+    System.out.println<span class="p">(</span><span class="s">&quot;调用reset方法前array中的第0个元素的值是:&quot;</span> <span class="o">+</span> <span class="kt">array</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+    <span class="o">//</span>程序在栈内存中又开辟了一块编号为AD9600的内存空间，栈内存AD9500和AD9600
+    <span class="o">//</span> <span class="p">(</span>即<span class="kt">array</span><span class="p">[</span><span class="m">0</span><span class="p">]</span>和param的值<span class="p">)</span>都指向了编号为BE2500的堆内存
+    reset<span class="p">(</span><span class="kt">array</span><span class="p">);</span>
+    <span class="o">//</span>改变对象param的值实际上是改变param这个栈内存所指向的堆内存中的值
+    System.out.println<span class="p">(</span><span class="s">&quot;调用reset方法后array中的第0个元素的值是:&quot;</span> <span class="o">+</span> <span class="kt">array</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+    <span class="o">//</span>当用对象作为参数传递时，真正的值是放在堆内存中的，传递的是栈内存中的值，
+    <span class="o">//</span> 而栈内存中存放的是堆内存的地址，所以传递的就是堆内存的地址。这就是它们的区别。
+
+    <span class="o">//</span>自定义的类的对象作为参数传递
+    <span class="o">//</span>对象作为参数传递时，传递的是对象的引用，也就是对象的地址
+    <span class="o">//</span>java中方法的参数传递机制
+    <span class="o">//</span>参考：https<span class="o">://</span>www.cnblogs.com<span class="o">/</span>lixiaolun<span class="o">/</span>p<span class="o">/</span><span class="m">4311863.</span>html
+  <span class="p">}</span>
+public static void add<span class="p">(</span>int param<span class="p">){</span>
+    param<span class="o">=</span><span class="m">1000</span><span class="p">;</span>
+  <span class="p">}</span>
+public static void changeString<span class="p">(</span>String s<span class="p">)</span> <span class="p">{</span><span class="o">//</span> 改变String型变量的函数
+    s <span class="o">=</span> <span class="s">&quot;changeString&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+  public static void reset<span class="p">(</span>String<span class="p">[]</span> param<span class="p">)</span> <span class="p">{</span>
+    param<span class="p">[</span><span class="m">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;hello, world!&quot;</span><span class="p">;</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

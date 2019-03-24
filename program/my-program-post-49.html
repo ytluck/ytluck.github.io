@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>不同语言Decimal-数据值范围和精度</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-49.html" rel="bookmark"
+           title="Permalink to 不同语言Decimal-数据值范围和精度">不同语言Decimal-数据值范围和精度</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-23T21:00:00+08:00">
+                Published: 2019-03-23 21:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>在大数据处理中，会遇到数据范围和数据精度的问题
+数据范围的问题
+    考虑每种数据类型的最大值
+数据精度问题
+    目前多是64位双精度标注--在金融和会计领域，关于货币的
+    有可能是要保证高精度，超出64位双精度的标准，这个时候要注意
+</pre></div>
+
+
+<h3>Java中</h3>
+<div class="highlight"><pre><span></span>java.math.BigInteger
+java.math.BigDecimal
+        操作：  add  substract  multiply  divide  remainder
+      数据类型转换： toString()  doubleValue  floatValue  longValue  intValue
+</pre></div>
+
+
+<h3>Scala 中</h3>
+<div class="highlight"><pre><span></span>scala.math.BigInt
+scala.math.BigDecimal
+BigInt
+BigDecimal   
+    object BigDecimal extends scala.AnyRef with scala.Serializable <span class="p">{</span>
+    在金融等货币情况，注意是否要用 BigDecimal，看Double 是精度够不够的的
+scala.Int.maxValue<span class="o">=</span><span class="m">2147483647</span>   共<span class="m">10</span>位
+scala.Long.MaxValue
+<span class="o">//</span>当数据比较大的时候，使用Int和long会超出其范围<span class="o">-</span>所以使用Double
+  def <span class="kp">choose</span><span class="p">(</span>n<span class="o">:</span> Int<span class="p">,</span> k<span class="o">:</span> Int<span class="p">)</span><span class="o">:</span> Double <span class="o">=</span><span class="p">{</span>
+    var cnk<span class="o">:</span>Double<span class="o">=</span><span class="m">1.0</span>
+    <span class="kr">if</span> <span class="p">(</span>k <span class="o">!=</span> <span class="m">0</span> <span class="o">&amp;&amp;</span> k <span class="o">!=</span> n<span class="p">)</span> <span class="p">{</span>
+      var ank<span class="o">=</span><span class="m">1</span>d
+      var ak1<span class="o">=</span><span class="m">1</span>d
+      <span class="kr">for</span><span class="p">(</span>i<span class="o">&lt;-</span> <span class="p">(</span>n<span class="o">-</span>k<span class="m">+1</span><span class="p">)</span>to n<span class="p">){</span>
+        ank<span class="o">*=</span>i
+      <span class="p">}</span>
+      <span class="kr">for</span><span class="p">(</span>j<span class="o">&lt;-</span> <span class="m">1</span> to k<span class="p">){</span>
+        ak1<span class="o">*=</span>j
+      <span class="p">}</span>
+      cnk<span class="o">=</span><span class="p">(</span>ank<span class="o">/</span>ak1<span class="p">)</span>
+    <span class="p">}</span>
+    cnk
+  <span class="p">}</span>
+</pre></div>
+
+
+<h3>Python中</h3>
+<div class="highlight"><pre><span></span><span class="c1"># IEEE二进制浮点数算术标准（IEEE 754） 15位数的相对精度(64位电脑)</span>
+<span class="n">Decimal</span> <span class="err">模块为浮点数提供了</span> <span class="err">任意精确度的对象</span>
+                                   <span class="err">以及</span> <span class="err">使用这些数值时处理精度问题的选项</span>
+<span class="c1">#! /usr/bin/python</span>
+<span class="c1"># -*- coding:utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+
+<span class="c1"># 通用十进制计算规范</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;13.4&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;24.5&#39;</span><span class="p">)</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">((</span><span class="mi">1</span><span class="p">,(</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span><span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">z3</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">((</span><span class="mi">0</span><span class="p">,(</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span><span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">z3</span><span class="p">)</span>   
+<span class="k">try</span><span class="p">:</span>
+   <span class="k">print</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+   <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">decimal</span><span class="o">.</span><span class="n">DivisionByZero</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Division by zero&quot;</span><span class="p">)</span>
+
+<span class="c1"># 只改变某个语句块的精度 precision 有效数字</span>
+<span class="k">with</span> <span class="n">decimal</span><span class="o">.</span><span class="n">localcontext</span><span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">prec</span><span class="o">=</span><span class="mi">10</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># 改变精度并执行</span>
+<span class="n">decimal</span><span class="o">.</span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span><span class="o">=</span><span class="mi">3</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>R语言中</h3>
+<div class="highlight"><pre><span></span>numeric()  --double()
+                  integer()
+</pre></div>
+
+
+<h3>SQL</h3>
+<div class="highlight"><pre><span></span>HiveSQL   decimal
+        decimal(P,D) precision,
+        decimal(10,2)
+    BigInt  --Deciaml(38,0)
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

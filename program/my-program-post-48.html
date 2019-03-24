@@ -2,7 +2,7 @@
 <html lang="zh_cn">
 <head>
         <meta charset="utf-8" />
-        <title>ytluck—For you - Tags</title>
+        <title>Python3和Python2的不同</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -20,37 +20,59 @@
                     <li><a href="/data-mining/index.html">Data Mining</a></li>
                     <li><a href="/items/index.html">Items</a></li>
                     <li><a href="/os/index.html">OS</a></li>
-                    <li><a href="/program/index.html">Program</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
-
 <section id="content" class="body">
-    <h1>Tags for ytluck—For you</h1>
-    <ul>
-        <li><a href="/tag/api.html">API</a> (3)</li>
-        <li><a href="/tag/app.html">APP</a> (2)</li>
-        <li><a href="/tag/command-line.html">command line</a> (4)</li>
-        <li><a href="/tag/fp.html">FP</a> (2)</li>
-        <li><a href="/tag/git.html">Git</a> (1)</li>
-        <li><a href="/tag/hbase.html">HBase</a> (1)</li>
-        <li><a href="/tag/hive.html">Hive</a> (2)</li>
-        <li><a href="/tag/java.html">JAVA</a> (17)</li>
-        <li><a href="/tag/linux.html">Linux</a> (4)</li>
-        <li><a href="/tag/maven.html">Maven</a> (1)</li>
-        <li><a href="/tag/mysql.html">MySQL</a> (3)</li>
-        <li><a href="/tag/pelican.html">pelican</a> (1)</li>
-        <li><a href="/tag/publishing.html">publishing</a> (1)</li>
-        <li><a href="/tag/python.html">Python</a> (14)</li>
-        <li><a href="/tag/r.html">R</a> (25)</li>
-        <li><a href="/tag/r-language.html">R Language</a> (1)</li>
-        <li><a href="/tag/scala.html">Scala</a> (11)</li>
-        <li><a href="/tag/sql.html">SQL</a> (9)</li>
-        <li><a href="/tag/things.html">things</a> (53)</li>
-        <li><a href="/tag/web.html">Web</a> (2)</li>
-        <li><a href="/tag/windows.html">Windows</a> (1)</li>
-    </ul>
-</section>
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-48.html" rel="bookmark"
+           title="Permalink to Python3和Python2的不同">Python3和Python2的不同</a></h1>
+    </header>
 
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-16T22:00:00+08:00">
+                Published: 2019-03-16 22:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>0.字符串
+python2中 Unicode字符串和 非Unicode字符串
+    unicode()把对象转换成Unicode字符串，还有str()把对象转换为非Unicode字符串
+python3默认所有字符串都是unicode型
+ Python 3只有一种字符串类型，Unicode字符串，所以str()函数即可完成所有的功能
+
+1.Print区别
+Python 2  print  print为class
+Python3   print( ) print为一个函数，必须用括号括起来
+
+2.运算
+Python2中带上小数点/表示真除，%表示取余，//结果取整
+Python3中/表示真除，%表示取余，//表示地板除（结果取整）
+    比较运算符
+    Python 3只支持!=，不再支持&lt;&gt;
+
+
+2.界面输入
+在python3.x中raw_input( )和input( )进行了整合，去除了raw_input( )，仅保留了input( )函数
+其接收任意任性输入，将所有输入默认为字符串处理，并返回字符串类型
+即input得到的为str
+
+3.Python中的库区别和联系-官方标准库
+在python2中，有urllib库和urllib2库。
+在python3中，urllib2被合并到urllib库中， http会处理所有客户端--服务器http请求的具体细节，
+ urllib是基于http的高层库
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>

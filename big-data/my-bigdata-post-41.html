@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Redis的基本概念</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-41.html" rel="bookmark"
+           title="Permalink to Redis的基本概念">Redis的基本概念</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-09T20:21:00+08:00">
+                Published: 2019-03-09 20:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>Redis</h3>
+<div class="highlight"><pre><span></span>Redis做一个最基本的了解
+     key-value 
+     keyspace
+redis是内存数据库，一切的数据都是存储到内存中的，同时redis为我们提供持久化功能，提供两种持久化方式，分别是RDB和AOF方式。数据的持久化会相对耗时。
+RDB：snapshotting, 二进制格式 
+AOF：Append Only File, fsync
+</pre></div>
+
+
+<h3>Redis概念</h3>
+<div class="highlight"><pre><span></span>其没有表格的概念，而是以字典（键空间）的方式来管理的，
+这与传统的SQL方式是不大一样的
+01.键空间的类型
+    keyspace notification（ 键空间通知）
+02.结构： key-value存储
+03.redis采用的是定期删除+惰性删除策略。 键到期、键被删除
+  可以设定过期时间：expire key 多少秒：设置多少秒后过期
+04.场景
+用途：可用于缓存，事件发布或订阅，高速队列等场景
+Redis支持多个数据库，并且每个数据库的数据是隔离的不能共享
+    每个数据库对外都是一个从0开始的递增数字命名，Redis默认支持16个数据库
+        01.Redis不支持自定义数据库的名字，每个数据库都以编号命名，
+         开发者必须自己记录哪些数据库存储了哪些数据
+        02.Redis也不支持为每个数据库设置不同的访问密码，所以一个客户端要么可以访问全部数据库，
+         要么连一个数据库也没有权限访问
+ //如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
+ private static int MAX_ACTIVE = 1024;
+ //控制一个pool最多有多少个状态为idle(空闲的)的jedis实例，默认值也是8。
+ private static int MAX_IDLE = 200;
+ //等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException；
+ private static int MAX_WAIT = 10000
+</pre></div>
+
+
+<h3>Redis</h3>
+<div class="highlight"><pre><span></span>Redis的键key   只能为字符串string
+Redis的值value 的数据类型有5种
+String
+List
+Hash          一个string类型的field和value的映射表
+Set          String 类型的无序集合。集合成员是唯一的
+Sorted Set
+</pre></div>
+
+
+<h3>常见命令操作</h3>
+<div class="highlight"><pre><span></span>1. 客户端--启动客户端-命令行
+       redis-cli
+       或者 redis-cli  -h host -p port -a password
+       eg: redis-cli -h 127.0.0.1 -p 6379 -a &quot;mypass&quot;
+
+       查看所有key
+        &gt; keys  *
+        -- 查看可以的类型 查看key的value是什么类型的type 
+        &gt; type keyexample
+        -- 查看可以存活多长时间
+        TTL keyexample
+Redis中  Dbsize 命令用于返回当前数据库的 key 的数量
+查看当前库的所有key ：keys *
+
+
+2.API操作
+MULTI 、 EXEC 、 DISCARD 和 WATCH 是 Redis 事务的基础。
+
+
+3.配置等信息
+Redis 的配置文件位于 Redis 安装目录下，文件名为 redis.conf。
+CONFIG GET CONFIG_SETTING_NAME
+CONFIG SET 命令基本语法：
+Redis监听端口，默认端口为6379
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>http://redisdoc.com/
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

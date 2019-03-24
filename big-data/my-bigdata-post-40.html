@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Elasticsearch的基本概念</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-40.html" rel="bookmark"
+           title="Permalink to Elasticsearch的基本概念">Elasticsearch的基本概念</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-09T18:21:00+08:00">
+                Published: 2019-03-09 18:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Elasticsearch
+Elasticsearch 是 面向文档 的，意味着它存储整个对象或 文档_。
+Elasticsearch 不仅存储文档，而且 _索引 每个文档的内容使之可以被检索。
+ 在 Elasticsearch 中，你 对文档进行索引、检索、排序和过滤--而不是对行列数据
+  Elasticsearch 自身带有分布式协调管理功能 使用 JSON 作为文档的序列化格式
+</pre></div>
+
+
+<h3>重点相关术语</h3>
+<div class="highlight"><pre><span></span>文档 --索引--索引类型
+    文档三要素：_index  文档在哪存放
+       _type   文档表示的对象类别
+     _id         文档唯一标识
+    以及其他元数据元素
+文档属性
+索引文档--检索文档
+     请求并指定文档的地址—— 01.索引库、类型和ID。         
+02.索引库、类型和     _search
+03.查询字符串搜索 -- 查询字符串 版本请求路径中使用 _search 端点，并将查询本身赋值给参数 q=
+04.-- 请求体 版本使用 JSON 构造，并使用了一个 match 查询  
+过滤器 filter
+ range 过滤器 
+重点了解--文档存储(分布式文档存储) 、执行分布式搜索(执行分布式检索) 
+数据输入和输出
+    文档操作： 
+        创建新文档、更新整个文档、文档部分更新、删除文档
+        取回多个文档
+         乐观并发控制-悲观并发控制
+        create 、 index 、 update 或 delete 请求
+处理自然语言
+    词汇识别--亚系语言
+        01.Elasticsearch 的 ICU 分析插件 使用 International Components for Unicode (ICU) 函数库
+         02.imdict-chinese-analyzer
+
+接口：
+Java Low Level REST Client
+Java High Level REST Client
+Python
+</pre></div>
+
+
+<h3>安装和运行</h3>
+<div class="highlight"><pre><span></span>安装按照说明提示即可
+1.运行
+cd C:\Program Files\Elastic\Elasticsearch\6.3.1\bin
+bin\elasticsearch.bat
+
+查看： http://localhost:9200/?pretty
+关闭   elasticsearch-service.bat
+
+2.文件夹
+    bin ：运行Elasticsearch实例和插件管理所需的脚本
+    C:\Program Files\Elastic\Elasticsearch\6.3.1\lib    Elasticsearch使用的库
+    C:\ProgramData\Elastic\Elasticsearch\config
+    C:\ProgramData\Elastic\Elasticsearch\logs
+
+交互：
+01. 使用 RESTful API 通过端口 9200 和 Elasticsearch 进行通信
+02. 使用 curl 命令来和 Elasticsearch 交互
+ cmd --然后
+    cd  C:\My_Files\curl-7.60.0-win64-mingw\bin
+   curl localhost:9200/
+   查询集群的健康状态
+        curl localhost:9200/_cat/health?v
+
+其他：ELK日志分析平台--工具的选择由使用场景决定
+Logstash 支持各种输入选择 ，可以在同一时间从众多常用来源捕捉事件
+Logstash 提供众多输出选择，尽管 Elasticsearch 是我们的首选输出方向
+Kibana是一个开源的分析与可视化平台
+比较-- Kafka采用解耦的设计思想，并非原始的发布订阅，
+          product生产者负责产生消息，consumer直接推送给消费者。而是在中间加入持久化层——broker
+         主题topic--&gt;分区的思想
+</pre></div>
+
+
+<h3>其他</h3>
+<div class="highlight"><pre><span></span>    搜索引擎选型：搜索功能往往是巨大的资源消耗并且它们由于沉重的数据库加载而拖垮你的应用的性能。
+        Elasticsearch 可以用于全文搜索，结构化搜索以及分析
+        Solr    利用 Zookeeper 进行分布式管理，支持更多格式的数据
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-api.html
+https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/index.html
+http://elasticsearch.cn/book/elasticsearch_definitive_guide_2.x/index.html
+Elasticsearch 默认分词器和中分分词器之间的比较及使用方法 https://segmentfault.com/a/1190000011065897
+在Windows下安装Elasticsearch——开启大数据分析之旅  http://baijiahao.baidu.com/s?id=1584044449881740596&amp;wfr=spider&amp;for=pc
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

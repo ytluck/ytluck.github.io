@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java多线程基本内容</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-45.html" rel="bookmark"
+           title="Permalink to Java多线程基本内容">Java多线程基本内容</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T22:39:00+08:00">
+                Published: 2019-03-10 22:39:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <p>1.并发基础-线程基本概念
+    01.线程
+        ID以及Name
+    02.线程状态
+        new  Runnable  Blocked  terminated
+                waiting<br />
+                Time  waiting
+    03.线程属性：
+          线程组 - 线程优先级(优先级从1到10，默认是5)
+          守护线程
+          处理未捕获异常的处理器
+    04.线程方法
+        sleep   yield  join 等方法</p>
+<p>2.并发基础-线程中的一些问题
+    01.创建和启动</p>
+<div class="highlight"><pre><span></span>02.竞争访问同一资源-安全竞争同一资源的机制
+     001.共享内存及可能存在的问题
+        竞态条件(race condition)--多个线程访问和操作同一对象时
+                                最终执行结果和执行时序有关
+        内存可见性-- 共享访问和操作相同变量，一个线程对另一个共享变量的修改
+                            另一个线程不一定马上就能看到，甚至永远看不到
+                            原因： 除了内存、数据还会被缓存到CPU寄存器和各级缓存中
+    解决方式：
+        使用volatile 关键字
+        使用synchronized关键字同步-保证原子更新操作
+                代表一种声明式编程思维-由Java负责具体实现
+        使用显式锁同步
+                代表一种命令式编程思维-程序员实现其所有细节
+                Reentrant-Lock
+    出现问题：
+        死锁问题
+03.基本协作机制
+    协作的基本机制： wait/notify  条件是线程间的协作机制
+    协作的核心
+    各种典型的协作场景： 生产者/消费者协作模式、同时开始、等待结束、异步结果
+
+ 04.取消和关闭线程的机制
+    线程的中断
+</pre></div>
+
+
+<p>3.并发包和并发容器
+    01.java.util.concurrent
+        原子变量--包含一些以原子方式实现组合操作的方法
+           AtomicBoolean 、AtomicInteger  AtomicLong<br />
+           AtomicLongArray  AtomicReferenceArray
+           AtomicReference
+         方法：
+            compareAndSet 该方法
+        原子变量的更新逻辑是：非阻塞式的
+    02.非阻塞是容器
+        ConcurrentSkipListMap   ConcurrentSkipListSet
+        ConcurrentLinkedQueue  ConcurrentLinkedDeque
+        ConcurrentHashMap</p>
+<div class="highlight"><pre><span></span>03.异步任务执行服务
+    任务的提交和任务的执行相分离-- 任务提交者关注 提交任务、获取结果以及取消任务
+        Runnable 和Callable
+        Executor 和ExecutorService
+        Future
+    线程池
+        任务队列和工作者线程  ThreadPoolExcutor
+         注意线程池的死锁
+</pre></div>
+
+
+<p>4.代码示例
+    创建和使用方式
+        集成Thread 类/实现Runnable接口
+            01.集成Thread 类
+                public class AThread extends Thread{
+                  @Override
+                  public void run(){ }
+                  }
+                  Thread  testThread = new  AThread();
+                  testThread.start
+          02.实现Runnable接口
+                    public class BThread implements Runnable{
+                  @Override
+                  public void run(){ }
+                  }
+                  Thread  testThread = new  Thread( new  BThread());
+                  testThread.start</p>
+<p>5.一些概念
+    阻塞式和非阻塞式
+    锁  乐观锁和悲观锁 显示锁
+    synchronized 和显示锁
+    wait/notigy   和显示条件 Condition表示条件变量
+    同步和异步
+    原子操作
+    CAS（Compare And Set）比较并交换
+            CAS操作包含三个操作数——内存位置（V）、预期原值（A）、新值(B)
+             java.util.concurrent包中借助CAS实现了区别于synchronouse同步锁的一种乐观锁
+             CAS采用的是一种非阻塞算法（nonblocking algorithms），
+                     一个线程的失败或者挂起不应该影响其他线程的失败或挂起的算法
+            synchronouse是一种悲观锁，它会导致其他所有需要锁的线程挂起。
+    AQS 是AbustactQueued Synchronizer 的简称，它是一个Java提高的底层同步工具类
+    阻塞和非阻塞，同步和异步
+        阻塞和非阻塞是指进程访问的数据如果尚未就绪，进程是否需要等待
+        同步和异步是指访问数据的机制,
+             同步一般指主动请求并等待I/O操作完毕的方式,当数据就绪后在读写的时候必须阻塞,
+            异步则指主动请求数据后便可以继续处理其它任务,随后等待I/O,操作完毕的通知,这可以使进程在数据读写时也不阻塞。
+        synchronous IO
+            同步阻塞 bloking IO   同步非阻塞   non-blocking IO  多路复用IO（multiplexing IO） 信号驱动式IO（signal-driven IO）
+        异步IO（asynchronous IO） 异步阻塞 异步非阻塞
+    乐观锁
+        每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据
+        版本号机制和CAS算法实现。乐观锁适用于多读的应用类型，这样可以提高吞吐量
+        java.util.concurrent.atomic包下面的原子变量类就是使用了乐观锁的一种实现方式CAS实现的。
+        compare and swap（比较与交换），是一种有名的无锁算法，一般情况下是一个自旋操作，即不断的重试。
+    悲观锁
+            共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程
+            做操作之前先上锁，Java中synchronized和ReentrantLock等独占锁
+    ArrayList是非线程安全的，Vector是线程安全的
+    HashMap是非线程安全的，HashTable是线程安全的
+        线程安全
+            线程安全就是多线程访问时，采用了加锁机制
+                是多线程操作同一个对象不会有问题
+                线程安全是通过线程同步控制来实现的，也就是synchronized关键字
+        线程不安全
+            如果是每个线程中new一个ArrayList，而这个ArrayList只在这一个线程中使用，那么肯定是没问题的
+                解决方法：
+                    （1）同步代码块
+                    （2）同步方法
+                    （3）锁机制（Lock）</p>
+<div class="highlight"><pre><span></span>只允许一个线程拥有同步锁，谁拿到锁就进入代码块，其他线程只能在外面等
+使用synchronized修饰的方法叫做同步方法，保证该线程执行该方法的时候，其他线程只能等着
+    synchronized不能修饰run方法
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

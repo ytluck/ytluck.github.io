@@ -26,7 +26,129 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-39.html">Flink-scala实现批计算和流计算</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-41.html">Redis的基本概念</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-09T20:21:00+08:00">
+                Published: 2019-03-09 20:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><h3>Redis</h3>
+<div class="highlight"><pre><span></span>Redis做一个最基本的了解
+     key-value 
+     keyspace
+redis是内存数据库，一切的数据都是存储到内存中的，同时redis为我们提供持久化功能，提供两种持久化方式，分别是RDB和AOF方式。数据的持久化会相对耗时。
+RDB：snapshotting, 二进制格式 
+AOF：Append Only File, fsync
+</pre></div>
+
+
+<h3>Redis概念</h3>
+<div class="highlight"><pre><span></span>其没有表格的概念，而是以字典（键空间）的方式来管理的，
+这与传统的SQL方式是不大一样的
+01.键空间的类型
+    keyspace notification（ 键空间通知）
+02.结构： key-value存储
+03.redis采用的是定期删除+惰性删除策略。 键到期、键被删除
+  可以设定过期时间：expire key 多少秒：设置多少秒后过期
+04.场景
+用途：可用于缓存，事件发布或订阅，高速队列等场景
+Redis支持多个数据库，并且每个数据库的数据是隔离的不能共享
+    每个数据库对外都是一个从0开始的递增数字命名，Redis默认支持16个数据库
+        01.Redis不支持自定义数据库的名字，每个数据库都以编号命名，
+         开发者必须自己记录哪些数据库存储了哪些数据
+        02.Redis也不支持为每个数据库设置不同的访问密码，所以一个客户端要么可以访问全部数据库，
+         要么连一个数据库也没有权限访问
+ //如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
+ private static int MAX_ACTIVE = 1024;
+ //控制一个pool最多有多少个状态为idle(空闲的)的jedis实例，默认值也是8。
+ private static int MAX_IDLE = 200;
+ //等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException；
+ private static int MAX_WAIT = 10000
+</pre></div>
+
+
+<h3>Redis</h3>
+<div class="highlight"><pre><span></span>Redis的键key   只能为字符串string
+Redis的值value 的数据类型有5种
+String
+List
+Hash          一个string类型的field和value的映射表
+Set          String 类型的无序集合。集合成员是唯一的
+Sorted Set
+</pre></div>
+
+
+<h3>常见命令操作</h3>
+<div class="highlight"><pre><span></span>1. 客户端--启动客户端-命令行
+       redis-cli
+       或者 redis-cli  -h host -p port -a password
+       eg: redis-cli -h 127.0.0.1 -p 6379 -a &quot;mypass&quot;
+
+       查看所有key
+        &gt; keys  *
+        -- 查看可以的类型 查看key的value是什么类型的type 
+        &gt; type keyexample
+        -- 查看可以存活多长时间
+        TTL keyexample
+Redis中  Dbsize 命令用于返回当前数据库的 key 的数量
+查看当前库的所有key ：keys *
+
+
+2.API操作
+MULTI 、 EXEC 、 DISCARD 和 WATCH 是 Redis 事务的基础。
+
+
+3.配置等信息
+Redis 的配置文件位于 Redis 安装目录下，文件名为 redis.conf。
+CONFIG GET CONFIG_SETTING_NAME
+CONFIG SET 命令基本语法：
+Redis监听端口，默认端口为6379
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>http://redisdoc.com/
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-40.html" rel="bookmark"
+                           title="Permalink to Elasticsearch的基本概念">Elasticsearch的基本概念</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-09T18:21:00+08:00">
+                Published: 2019-03-09 18:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Elasticsearch</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-40.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-39.html" rel="bookmark"
+                           title="Permalink to Flink-scala实现批计算和流计算">Flink-scala实现批计算和流计算</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-11-17T18:21:00+08:00">
                 Published: 2018-11-17 18:21:00
@@ -37,108 +159,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>Flink 的计算</h3>
-<div class="highlight"><pre><span></span>离线计算--任务调度-定时调度任务来处理数据
-流失任务-- 属于常驻进程任务
-Specifying Keys
-    在Flink中有许多函数需要我们为其指定key，比如groupBy，Join中的where等
-    要求在一组元素上定义一个key,只是被定义在实际数据之上的函数，以指导分组算子使用
-    四种选择的方式
-            指定keyTuple中的Field Position
-            指定key选择函数(Key Selector Functions)
-            一个或多个字段位置键（field position keys） ，这个仅仅对Tuple类型的DataSet有效)
-            Case Class中的字段--DataSet转换成case class，实现和转换成Tuple1类似
-</pre></div>
-
-
-<h3>接口类型一</h3>
-<div class="highlight"><pre><span></span><span class="n">Java</span><span class="o">-</span> <span class="n">DataStream</span> <span class="err">、</span><span class="n">DataSet</span><span class="o">||</span><span class="n">Scala</span>
-<span class="err">流计算</span> <span class="o">--</span><span class="kn">import</span> <span class="nn">org.apache.flink.streaming.api.scala.extensions._</span>
-    <span class="o">//</span><span class="mf">1.</span><span class="err">环境设置</span><span class="o">-</span> <span class="n">StreamExecutionEnvironment</span> 
-    <span class="n">val</span> <span class="n">env</span> <span class="o">=</span> <span class="n">StreamExecutionEnvironment</span><span class="o">.</span><span class="n">getExecutionEnvironment</span>
-    <span class="o">//</span><span class="err">容错设置</span><span class="o">-</span> <span class="n">Fault</span> <span class="n">Tolerance</span><span class="o">-</span><span class="n">n</span><span class="err">是以毫秒为单位的检查点间隔</span>
-    <span class="n">env</span><span class="o">.</span><span class="n">enableCheckpointing</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span> 
-    <span class="o">//</span><span class="mf">2.</span><span class="err">读取数据</span><span class="o">--</span><span class="err">获取的预定义</span><span class="n">Stream</span>  <span class="n">Data</span> <span class="n">Source</span>  
-    <span class="n">val</span> <span class="n">text</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">socketTextStream</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">9999</span><span class="p">)</span>
-    <span class="o">//</span><span class="mf">3.</span><span class="err">数据处理</span>
-    <span class="n">val</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">W+&quot;</span><span class="p">)</span> <span class="nb">filter</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">nonEmpty</span> <span class="p">}</span> <span class="p">}</span>
-      <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
-      <span class="o">.</span><span class="n">keyBy</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-      <span class="o">.</span><span class="n">timeWindow</span><span class="p">(</span><span class="n">Time</span><span class="o">.</span><span class="n">seconds</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
-      <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="o">//</span><span class="mf">4.</span><span class="err">输出数据</span>
-
-    <span class="o">//</span><span class="mf">5.</span><span class="err">触发执行</span> <span class="n">trigger</span> <span class="n">the</span> <span class="n">program</span> <span class="n">execution</span> <span class="n">by</span> <span class="n">calling</span> <span class="n">execute</span><span class="p">()</span> 
-        <span class="n">env</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;Window WordCount&quot;</span><span class="p">);</span>
-<span class="err">批量计算</span> <span class="o">--</span> <span class="kn">import</span> <span class="nn">org.apache.flink.api.scala.extensions._</span> 
-    <span class="o">//</span><span class="mf">1.</span><span class="err">环境设置</span><span class="o">-</span> <span class="n">ExecutionEnvironment</span> 
-    <span class="n">val</span> <span class="n">env</span> <span class="o">=</span> <span class="n">ExecutionEnvironment</span><span class="o">.</span><span class="n">getExecutionEnvironment</span>
-    <span class="o">//</span><span class="mf">2.</span><span class="err">读取数据</span><span class="o">-</span><span class="err">获取的预定义</span>   <span class="n">Data</span> <span class="n">Sources</span>
-    <span class="n">val</span> <span class="n">text</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">readTextFile</span><span class="p">(</span><span class="s2">&quot;/path/to/file&quot;</span><span class="p">)</span>
-    <span class="o">//</span><span class="mf">3.</span><span class="err">数据处理</span><span class="o">--</span><span class="n">Transformation</span>
-    <span class="n">val</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">W+&quot;</span><span class="p">)</span> <span class="nb">filter</span> <span class="p">{</span> <span class="n">_</span><span class="o">.</span><span class="n">nonEmpty</span> <span class="p">}</span> <span class="p">}</span>
-     <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
-     <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-      <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="o">//</span><span class="mf">4.</span><span class="err">输出数据</span><span class="o">--</span><span class="n">Sink</span>
-    <span class="n">counts</span><span class="o">.</span><span class="n">writeAsCsv</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-</pre></div>
-
-
-<h3>接口类型二- the Table API and SQL</h3>
-<div class="highlight"><pre><span></span>0.Maven 设置
-1.代码
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
-    val tableEnv = TableEnvironment.getTableEnvironment(env)
-
-    // input tables and output tables--// register a Table
-    tableEnv.registerTable(&quot;table1&quot;, ...)    
-    // create a Table from a Table API query
-    val tapiResult = tableEnv.scan(&quot;table1&quot;).select(...)
-     // Create a Table from a SQL query
-    val sqlResult  = tableEnv.sqlQuery(&quot;SELECT ... FROM table2 ...&quot;)
-
-    // emit a Table API result Table to a TableSink, same for SQL result
-    // create a TableSink
-    val sink: TableSink = new CsvTableSink(&quot;/path/to/file&quot;, fieldDelim = &quot;|&quot;)
-     tapiResult.writeToSink(sink)
-2.批量计算 
-  val bEnv = ExecutionEnvironment.getExecutionEnvironment
-  val bTableEnv = TableEnvironment.getTableEnvironment(bEnv)
-3.说明：两种层级的API的交互
-    A DataStream or DataSet can be registered in a TableEnvironment as a Table
-    Convert a DataStream or DataSet into a Table
-    Convert a Table into a DataStream or DataSet
-</pre></div>
-
-
-<h3>接口类型三：SQL</h3>
-<div class="highlight"><pre><span></span>QL Client -- Flink’s Table &amp; SQL API makes it possible to work with queries written in the SQL language
-支持两种方式
-     supports two modes for maintaining and visualizing results. 命令：SET execution.result-mode=
-         table mode 表模式
-         changelog mode 模式
-</pre></div>
-
-
-<h3>常见流式计算</h3>
-<div class="highlight"><pre><span></span>01.多流关联--流式计算-数据到达是一个增量的过程，并且数据到达的时间不确定和无需，
-   因此在数据处理过程中涉及到中间状态的保持和恢复机制等问题
-02.维度表的使用
-    全量加载和增量加载
-03.任务优化
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>https://ci.apache.org/projects/flink/flink-docs-release-1.6/quickstart/setup_quickstart.html
-https://github.com/apache/flink/tree/master/flink-examples
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Flink不同接口层级-Blink</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-39.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

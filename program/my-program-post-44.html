@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java中超类Object和一些常见的接口和类</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-44.html" rel="bookmark"
+           title="Permalink to Java中超类Object和一些常见的接口和类">Java中超类Object和一些常见的接口和类</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T22:32:00+08:00">
+                Published: 2019-03-10 22:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>主要是Object类中的一些总结和介绍，作为一个基础知识点
+</pre></div>
+
+
+<h3>Object</h3>
+<div class="highlight"><pre><span></span>-Object 首字母大写
+01.所有类的超类，
+02.一个类没有使用extend关键字明确标明继承关系，则默认继承object类
+03. JAVA中的每一个类都可以使用object类中定义的方法
+设计其主要目标之一是为了扩展--
+     final修饰方法表示该方法不允许被子类重写
+     非final方法设计成被覆盖的，在覆盖这些方法时需要遵守一些约定
+</pre></div>
+
+
+<h4>Object的方法</h4>
+<div class="highlight"><pre><span></span><span class="err">其方法分为非</span><span class="n">final</span><span class="err">方法和</span><span class="n">final</span><span class="err">方法</span>
+    <span class="n">final</span><span class="err">方法</span> <span class="err">类和</span> <span class="err">线程</span>
+        <span class="n">getClass</span><span class="p">()</span>     <span class="n">public</span> <span class="n">final</span> <span class="n">native</span> <span class="kt">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getClass</span><span class="p">()</span>              
+        <span class="n">notify</span><span class="p">()</span>        <span class="n">public</span> <span class="n">final</span> <span class="n">native</span> <span class="kt">void</span> <span class="n">notify</span><span class="p">();</span>
+        <span class="n">notifyAll</span><span class="p">()</span>     <span class="n">public</span> <span class="n">final</span> <span class="n">native</span> <span class="kt">void</span> <span class="n">notifyAll</span><span class="p">();</span>
+        <span class="n">wait</span><span class="p">()</span>          <span class="n">public</span> <span class="n">final</span> <span class="kt">void</span> <span class="n">wait</span><span class="p">()</span> <span class="n">throws</span> <span class="n">InterruptedException</span> <span class="p">{</span>
+                        <span class="n">public</span> <span class="n">final</span> <span class="kt">void</span> <span class="n">wait</span><span class="p">(</span><span class="kt">long</span> <span class="n">timeout</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nanos</span><span class="p">)</span> <span class="n">throws</span> <span class="n">InterruptedException</span> 
+                        <span class="n">public</span> <span class="n">final</span> <span class="n">native</span> <span class="kt">void</span> <span class="n">wait</span><span class="p">(</span><span class="kt">long</span> <span class="n">timeout</span><span class="p">)</span> <span class="n">throws</span> <span class="n">InterruptedException</span>
+    <span class="err">非</span><span class="n">final</span><span class="err">方法</span>    
+            <span class="n">hashCode</span><span class="p">()</span>  <span class="n">public</span> <span class="n">native</span> <span class="kt">int</span> <span class="n">hashCode</span><span class="p">();</span>
+            <span class="n">equals</span><span class="p">()</span>    <span class="n">public</span> <span class="n">boolean</span> <span class="n">equals</span><span class="p">(</span><span class="n">Object</span> <span class="n">obj</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span><span class="n">this</span> <span class="o">==</span> <span class="n">obj</span><span class="p">);}</span>
+            <span class="n">toString</span><span class="p">()</span>  <span class="n">public</span> <span class="n">String</span> <span class="n">toString</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">getClass</span><span class="p">().</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;@&quot;</span> <span class="o">+</span> <span class="n">Integer</span><span class="p">.</span><span class="n">toHexString</span><span class="p">(</span><span class="n">hashCode</span><span class="p">());}</span>
+    <span class="err">按照</span><span class="n">public</span> <span class="err">以及</span><span class="n">protected</span> <span class="err">复制和垃圾回收</span>
+            <span class="n">protected</span> <span class="n">native</span> <span class="n">Object</span> <span class="n">clone</span><span class="p">()</span> <span class="n">throws</span> <span class="n">CloneNotSupportedException</span><span class="p">;</span>
+            <span class="n">protected</span> <span class="kt">void</span> <span class="nf">finalize</span><span class="p">()</span> <span class="n">throws</span> <span class="n">Throwable</span> <span class="p">{</span> <span class="p">}</span>
+    <span class="n">getClass</span><span class="p">()</span> <span class="err">方法返回对象所属的类，是一个</span> <span class="kt">Class</span> <span class="err">对象。通过</span> <span class="kt">Class</span> <span class="err">对象可以获取该类的各种信息，包括类名、父类以及它所实现接口的名字等</span>
+    <span class="err">方法</span>  <span class="err">说明</span>       
+    <span class="kt">Class</span> <span class="n">getClass</span><span class="p">()</span>    <span class="err">返回一个对象运行时的实例类</span>
+    <span class="kt">void</span> <span class="n">notify</span><span class="p">()</span>       <span class="err">激活等待在该对象的监视器上的一个线程</span>
+    <span class="kt">void</span> <span class="n">notifyAll</span><span class="p">()</span>    <span class="err">激活等待在该对象的监视器上的全部线程</span>
+    <span class="kt">int</span> <span class="n">hashCode</span><span class="p">()</span>      <span class="err">返回该对象的散列码值</span>
+    <span class="n">boolean</span> <span class="n">equals</span><span class="p">(</span><span class="n">Object</span><span class="p">)</span>  <span class="err">比较两对象是否相等</span><span class="o">-</span>  <span class="n">equals</span><span class="p">()</span> <span class="err">方法用于对象与对象之间的比较</span>
+    <span class="n">String</span> <span class="n">toString</span><span class="p">()</span>   <span class="err">返回该对象的字符串表示</span>
+    <span class="kt">void</span> <span class="n">wait</span><span class="p">()</span>         <span class="err">在其他线程调用此对象的</span> <span class="n">notify</span><span class="p">()</span> <span class="err">方法或</span> <span class="n">notifyAll</span><span class="p">()</span> <span class="err">方法前，导致当前线程等待</span>
+    <span class="n">Object</span> <span class="n">clone</span><span class="p">()</span>      <span class="err">创建与该对象的类相同的新对象</span>
+    <span class="kt">void</span> <span class="n">finalize</span><span class="p">()</span>     <span class="err">当垃圾回收器确定不存在对该对象的更多引用时，对象的圾回收器调用该方法</span>
+<span class="err">关于继承后的覆盖</span>
+<span class="err">覆盖</span><span class="n">equals</span> <span class="p">@</span><span class="n">override</span>  <span class="err">和不覆盖</span><span class="n">equals</span>
+    <span class="n">equals</span><span class="err">：</span> <span class="err">自反性</span><span class="o">-</span><span class="err">对象必须等于自身</span>
+                   <span class="err">对称性</span><span class="o">-</span> <span class="err">任何两个对象对于</span> <span class="err">是否相等</span> <span class="err">的问题必须保持一致</span>
+                   <span class="err">传递性</span><span class="o">--</span><span class="err">以及一致性</span><span class="o">--</span><span class="err">非空性</span>
+                <span class="err">使用方法：使用</span> <span class="o">==</span> <span class="err">检查参数引用是否为这个对象的引用</span>
+                        <span class="err">使用</span> <span class="n">instanceof</span> <span class="err">检查参数是否为正确的类型</span>
+                        <span class="err">检查关键域</span>
+                        <span class="err">要覆盖</span><span class="n">hashCode</span>
+    <span class="err">覆盖</span><span class="n">hashCode</span> <span class="o">--</span><span class="err">和</span><span class="n">equals</span> <span class="err">中的一致性</span> 
+            <span class="err">相等的对象必须具有相等的</span><span class="n">hash</span> <span class="n">code</span> <span class="err">散列值</span>
+    <span class="n">toString</span><span class="p">()</span>  <span class="o">-</span><span class="err">返回包含访问的信息</span>
+</pre></div>
+
+
+<h3>修饰类和修饰方法</h3>
+<div class="highlight"><pre><span></span>final 关键字  修饰类-修饰方法-修饰变量
+public/project
+native 关键字告诉JVM调用的是该方法在外部定义
+    使用native关键字说明这个方法是原生函数，也就是这个方法是用C/C++语言实现的，
+    并且被编译成了DLL，由java去调用
+方法-有返回值和没有返回值-有返回值类型没有返回值类型
+        没有返回值：
+            01.一个方法不需要返回值时可以使用void关键字
+            02.不使用返回值类型-- 构造方法
+    01.修饰类以及方法
+    public/project --使用权限-作用域的限制--变量或者方法的作用域
+            作用域     类内部     本包                  子类          外部包 
+            作用域     当前类     同一package       子孙类     其他package 
+            public          √          √                    √            √ 
+            protected       √         √                 √            × 
+            friendly            √         √                  ×            × 
+            private         √         ×                 ×             × 
+            不写时默认为friendly ，也即是“包访问权限”。
+    02.final --和继承-重写-改变有关
+        final修饰
+            Class  类表示不允许被继承
+        修饰方法-- 重写(Override)   重载(Overload)和  重写(Override)
+            final修饰的方法可以被继承  表示该方法不允许被子类重写 
+            不能修饰构造方法
+        修饰变量表示不允许修改 
+                方法内部的局部变量 =&gt; 在使用之前被初始化赋值即可
+                            类中成员变量 =&gt; 只能在定义和构造代码块，构造方法中进行初始化设置
+                基本数据类型的变量 =&gt; 赋值后不允许被修改
+                引用数据类型的变量 =&gt; 初始化后不能再指向另一个对象，但是对象的内容可以改变
+    03.static 初始化相关内容
+        1）static方法
+        2）static变量   static是不允许用来修饰局部变量
+        3）static代码块
+        方便在没有创建对象的情况下来进行调用（方法/变量）
+    Java编译阶段：类变量的初始化-实例变量的初始化
+        编译时类型和运行时类型
+        编译器先执行了类成员数据的初始化过程（静态的和非静态的都是）。然后再执行对象的构造器
+    Java虚拟机通过装载、连接(验证、准备、解析)、初始化来使得一个Java类型可以被Java程序所使用
+</pre></div>
+
+
+<h3>一些接口和类</h3>
+<div class="highlight"><pre><span></span>01. Comparable 接口  Comparator 接口
+    Comparable 接口  java.lang
+        public interface Comparable&lt;T&gt;  { public int compareTo(T o);}
+        只有一个方法compare，
+        比较此对象与指定对象的顺序，
+        返回值是int，有三种情况 如果该对象小于、等于或大于指定对象，则分别返回负整数、零或正整数
+    Comparator 接口
+        public interface Comparator&lt;T&gt;{  int compare(T o1, T o2); boolean equals(Object obj); }
+    区别：
+        Comparable 是排序接口，若一个类实现了Comparable接口，就意味着“该类支持排序”
+                这些类是可以和自己比较
+        Comparator 是比较器，我们若需要控制某个类的次序
+          Comparable 接口位于 java.lang包下， Comparator 接口位于java.util包下。
+        Comparator 接口   compare
+            包含compare()和equals()两个方法
+        Comparable 接口 compareTo
+            只包含一个compareTo()方法,给两个对象排序 返回值  
+                e1.compareTo(e2) &gt; 0 即 e1 &gt; e2
+                e1.compareTo(e2) = 0 即 e1 = e2
+                e1.compareTo(e2) &lt; 0 即 e1 &lt; e2
+02.Iterable 接口和 Iterator 接口
+    Iterable 接口 java.lang.Iterable  
+            public interface Iterable{ java.util.Iterator iterator();}
+            able结尾的表示 能...样，可以做...-- 是用接口定义的 iterator方法提供的。
+            也就是iterator方法需要返回一个Iterator对象
+    Iterator 接口 java.util.Iterator    or 结尾是都是表示 ...样的人 or ... 者
+            iterator就是迭代者，我们一般叫迭代器包含3个方法: hasNext ,  next , remove
+03.Array 类和 Arrays类
+    数组类Array public final class Array extends Object
+            元素的类型必须相同。
+            它无法判断其中实际存有多少元素，length只是告诉我们array的容量
+    静态类Arrays  public class Arrays extends Object
+            静态类专门用来操作array ，提供搜索、排序、复制等静态方法
+                equals() sort()
+
+04.Collection 接口 和 Collections 类
+    Collection 接口 java.util.Collection 是一个集合接口（集合类的一个顶级接口）
+    Collections则是集合类的一个工具类/帮助类，其中提供了一系列静态方法，
+        用于对集合中元素进行排序、搜索以及线程安全等各种操作
+             排序(Sort)    混排（Shuffling） 拷贝(Copy)等
+
+Cloneable接口 --缺少clone方法
+            Object 类的clone 方法是受到保护的
+</pre></div>
+
+
+<h3>其他说明：</h3>
+<div class="highlight"><pre><span></span>通过接口引用对象 -- 通过类 引用对象
+01.声明接口的变量-接口的变量必须引用实现了接口的类对象
+    Collection&lt;String&gt; c = new HashSet&lt;&gt;();
+如果有合适的接口类型--那么对于参数-返回值-变量和域，都应该使用接口类型进行声明
+如果没有合适的接口类型，可以用类来引用对象
+02.接口中定义这些常量，调用的时候直接接口名.常量名来调用
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

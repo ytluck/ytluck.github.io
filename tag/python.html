@@ -26,7 +26,170 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-40.html">Python的一些高级特性</a></h1>
+                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-41.html">Python索引和标签-元素的查看</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T19:52:00+08:00">
+                Published: 2019-03-24 19:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Python中数据元素的查看选取等
+基本概念
+元素-对象
+下标-元素位置-位置索引-整数
+标签索引--名称name和value
+在内部：判断是否 if  a in b
+                      遍历  for  a in b
+</pre></div>
+
+
+<h3>list -列表</h3>
+<div class="highlight"><pre><span></span>    基本：int value (index())  
+  mylisteg  = [&quot;anna&quot;,&quot;baby&quot;,&quot;coff&quot;]
+  # 由位置索引-整数索引找值 
+  mylisteg[2]
+  # 由index 找位置 list.index(value)
+  mylisteg.index(&quot;anna&quot;)
+  # 切片-分片 三个参数[start:stop:step]  左闭右开[ )类似于 range(start, stop[, step])
+    mylisteg[0:2]
+    #分片- slice -- 列表切片是深拷贝
+</pre></div>
+
+
+<h3>dict -字典</h3>
+<div class="highlight"><pre><span></span>  基本情况： key value  items
+  由索引到值 key --  value
+ mydicteg = {&#39;Ali&#39;: &#39;321&#39;, &#39;Beth&#39;: &#39;901&#39;, &#39;Coff&#39;: &#39;456&#39;}
+ mydicteg[&#39;Ali&#39;]
+ if &quot;Ali&quot; in mydicteg:
+    print(mydicteg[&quot;Ali&quot;])
+else:
+    print(&quot;not exist&quot;)
+mydicteg.get(&quot;Ali&quot;,&quot;not-exist&quot;)
+mydicteg.get(&quot;Alim&quot;,&quot;not-exist&quot;)
+其他：  
+mydicteg.keys()
+mydicteg.values()
+mydicteg.items()
+</pre></div>
+
+
+<h3>Numpy中的ndarray</h3>
+<div class="highlight"><pre><span></span><span class="c1"># 和R语言中矩阵或者向量很相似</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">mylist</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">mynarrayeg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="kp">array</span><span class="p">(</span><span class="n">mylist</span><span class="p">)</span>
+ <span class="nb">type</span><span class="p">(</span><span class="n">mynarrayeg</span><span class="p">)</span> 
+ <span class="c1">## 由位置索引-整数索引找值</span>
+ <span class="n">mynarrayeg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+ <span class="c1"># 由value 找位置np.argwhere</span>
+ <span class="n">np</span><span class="o">.</span><span class="kp">argwhere</span><span class="p">(</span><span class="n">mynarrayeg</span><span class="o">==</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Pandas中的DataFrame</h3>
+<div class="highlight"><pre><span></span>Series 
+    由一组数据以及与之相关的标签组成
+    mylist = [8, 0, 0.5, 1, 3]
+    indexname = [&quot;a&quot;,&quot;b&quot;,&quot;c&quot;,&quot;d&quot;,&quot;e&quot;]
+    myserieseg2 = pd.Series(mylist,indexname)
+    myserieseg2.index
+     # 位置索引-标签索引 --切片包含[]左闭右闭
+    myserieseg2[2])
+    myserieseg2[&quot;c&quot;]
+DataFrame索引分为两种，
+    行：index=[]
+    列   columnas=[]
+    一种真实序号索引，0代表第一行，1代表第二行，依此类推；
+    另一种是标签索引，行序号或列序号可以用标签，比如说&#39;a&#39;,&#39;b&#39;等等
+    层次化索引 -- 5.1
+        index  axis  level   标题  header
+        axis = 0     0表示纵轴，方向从上到下--数组的变化是纵向的，体现出行的增加或减少
+        axis = 1     1表示横轴，方向从左到右--数组的变化是横向的，而体现出来的是列的增加或者减少
+        01.单个标量 
+             df.at[label_i,label_j] ==  df.iat[i,j]
+        02.选择单行或者多行
+            df.loc[val] == df.iloc[where]
+        03.选择单列或者多列
+            df.loc[:, val] == df.iloc[:, where]   df[val]
+        04.选择行和列中的一部分
+            df.loc[val1, val2] == df.iloc[where, where]
+        细节：使用loc和iloc严格处理基于标签和基于整数的索引
+        df[val]     选取单列或者列序列
+        df.loc[val]     根据标签选择单行或者多行
+        df.loc[:, val]  根据标签选择单列或多列
+        df.loc[val1, val2] 选择行和列中的一部分
+        df.iloc[where]   根据整数选择单行或者多行
+        df.iloc[:, where] 根据整数选择单列或者多列
+        df.iloc[where, where] 行和列中的一部分
+     pandas.concat(,axis=0) 行
+     pandas.concat(,axis=1) 列   axis=&#39;columns&#39;      
+    outdata.shape[0] #行数  df.index.size()
+    outdata.shape[1] #列数  df.columns.size()
+ reindex 重建索引
+  reindex(columns=)-重建列索引
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-40.html" rel="bookmark"
+                           title="Permalink to Python处理非规范的JSON文件">Python处理非规范的JSON文件</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T19:50:00+08:00">
+                Published: 2019-03-24 19:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>dumps、dump、loads、load</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-40.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-48.html" rel="bookmark"
+                           title="Permalink to Python3和Python2的不同">Python3和Python2的不同</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-16T22:00:00+08:00">
+                Published: 2019-03-16 22:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>Python中不同版本的区别</p>
+                <a class="readmore" href="/program/my-program-post-48.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-40.html" rel="bookmark"
+                           title="Permalink to Python的一些高级特性">Python的一些高级特性</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-09-16T21:00:00+08:00">
                 Published: 2018-09-16 21:00:00
@@ -37,176 +200,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/python.html">Python</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Python的一些高级特性，有一些在其他语言中出现，有一些没有，明确共同点，找出差异，进而更加熟练掌握各种特性
-Python的特性
-</pre></div>
-
-
-<h3>迭代器：</h3>
-<div class="highlight"><pre><span></span>迭代器协议：
-在Python中文件可以使用for循环进行遍历
-    原因：文件对象在Python中实现了迭代器协议，标志 next方法
-</pre></div>
-
-
-<h3>生成器</h3>
-<div class="highlight"><pre><span></span>生成器对延迟操作提供了支持
-Python提供了几种不同的方式构建生成器
-  01、生成器函数 yield
-   和常规函数类似，返回值通过yield，而不是return
-  02、生成器表达式
-  03.enumerate
-</pre></div>
-
-
-<h3>装饰器decorator</h3>
-<div class="highlight"><pre><span></span>装饰器  
-装饰器-回调函数 等，这些内容以后整理
-</pre></div>
-
-
-<h3>上下文管理器</h3>
-<div class="highlight"><pre><span></span>上下文管理器
- with 语句块 + 上下文管理器
- 对象实现__enter__ 和 __exit__方法 或者contextlib模块
-对资源的处理：Python中可使用finally语句保证无论什么情况下文件都会被关闭--with语句也可以
-确保加锁以后锁的释放 try/finally 语句
-</pre></div>
-
-
-<h3>递归</h3>
-<div class="highlight"><pre><span></span>--递归就是函数调用自身
-重点：
-    重点一：递归步骤 --分解问题并重组问题
-       如何分解成小的部分-每部分都是用函数来解决，然后重新组合
-    重点二：包含递归的结束条件
-       递归触底 即递归必须有基础情况，且出现在函数的第一步
-说明：
- Python maximum recursion depth exceeded
-   python解释器有一个默认的最大递归次数是999
-   同时，操作系统也有一个最大迭代次数
-</pre></div>
-
-
-<blockquote>
-<div class="highlight"><pre><span></span> # -*- coding:utf8 -*-
-  # !/usr/bin/python
-  def factorial(n):
-      if n == 1:
-          return 1
-      else:
-          return n * factorial(n-1)
-  def fibon(n):
-      if n == 0 or n == 1:
-          return 1
-      else:
-          return fibon(n-1) + fibon(n-2)
-
-  if __name__ == &#39;__main__&#39;:
-      data1 = factorial(23)
-      data2 = fibon(9)
-      print(data1)
-      print(data2)
-</pre></div>
-
-
-</blockquote>
-<h3>高阶函数和匿名函数</h3>
-<div class="highlight"><pre><span></span>高阶函数  
-map filter sorted   
-reduce  
-匿名函数 lambda 表达
-</pre></div>
-
-
-<h3>Python反转字符串中涉及到的内容</h3>
-<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="s s-Atom">字符串的一些特性</span>
-  <span class="mf">01.</span><span class="s s-Atom">索引特性：负数索引--从末端建立索引，从</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">开始</span>
-             <span class="s s-Atom">正数索引--从起始端建立索引，从0开始</span>
-  <span class="mf">02.</span><span class="s s-Atom">分片特性：对字符串子序列建立索引</span> <span class="s s-Atom">冒号:指出子序列的范围--起始以及步长</span>
-   <span class="p">[],</span><span class="s s-Atom">其中的字母是【）半开区间，包含范围起始值，不包含结束值</span>
-   <span class="s s-Atom">单个冒号和两个冒号的规则</span>
-   <span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">步长为</span><span class="o">-</span><span class="mi">1</span><span class="s s-Atom">表示向后进行</span>
-  <span class="mf">03.</span><span class="s s-Atom">字符串操作</span> <span class="s s-Atom">连接</span> <span class="o">+</span>  <span class="s s-Atom">检查成员的</span> <span class="s s-Atom">in</span>
-<span class="mf">2.</span><span class="s s-Atom">列表的一些特性：列表本身是可变的</span>
-    <span class="mf">01.</span><span class="s s-Atom">列表的索引和分片特性</span>
-    <span class="mf">02.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">将列表中的元素反向排列</span>
-    <span class="s s-Atom">列表和字符串之间的转换</span>
-      <span class="s s-Atom">将列表变为字符串--</span> <span class="s s-Atom">s</span> <span class="o">=</span>  <span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nv">L</span><span class="p">)</span>  <span class="s s-Atom">调用字符串str</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">iterable</span><span class="p">)</span>
-      <span class="s s-Atom">将字符串变为列表</span>  <span class="nv">L</span><span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
-    <span class="nf">内置函数reverse，是直接操作变量本身，调用reverse</span><span class="p">()</span><span class="s s-Atom">后，</span>
-    <span class="s s-Atom">变量本身的值就是reverse后的值了，而返回值，是空的，不返回任何值</span>
-    <span class="s s-Atom">所以不能出现：</span>
-      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
-    <span class="s s-Atom">而应该是</span>
-      <span class="s s-Atom">orignalList</span><span class="p">.</span><span class="nf">reverse</span><span class="p">();</span>
-      <span class="s s-Atom">reversedList</span> <span class="o">=</span> <span class="s s-Atom">orignalList</span><span class="p">;</span>
-     <span class="s s-Atom">sort等函数也有此类规则，方法</span><span class="p">.</span><span class="nf">sort</span><span class="p">()</span><span class="s s-Atom">和函数sorted</span> <span class="s s-Atom">以及</span>  <span class="s s-Atom">方法</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span> <span class="s s-Atom">和函数reserved类似</span>
-    <span class="s s-Atom">这一点和R语言有所不同，请注意</span>
-<span class="mf">3.</span><span class="s s-Atom">内置函数</span>
-  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">返回的是一个迭代器对象</span> 
-  <span class="nf">reversed</span><span class="p">()</span><span class="s s-Atom">函数是返回序列seq的反向访问的迭代子。</span>
-     <span class="s s-Atom">参数可以是列表，元组，字符串，不改变原对象</span>
-<span class="mf">4.</span><span class="s s-Atom">高阶函数和匿名函数</span>
-  <span class="nf">map</span><span class="p">()</span><span class="s s-Atom">函数、</span><span class="nf">filter</span><span class="p">()</span><span class="s s-Atom">函数</span> <span class="nf">sorted</span><span class="p">()</span>
-  <span class="nf">reduce</span><span class="p">()</span><span class="s s-Atom">传入的参数f必须接受2个参数</span>
-    <span class="s s-Atom">第一次调用是把list的前两个元素传递给f</span><span class="p">,</span><span class="s s-Atom">第二次调用时，</span>
-    <span class="s s-Atom">就是把前两个list元素的计算结果当成第一个参数，list的第三个元素当成第二个参数，</span>
-    <span class="s s-Atom">传入f进行操作，以此类推，并最终返回结果</span>
-  <span class="s s-Atom">使用</span> <span class="s s-Atom">lambda</span> <span class="s s-Atom">来创建匿名函数</span>
-
-<span class="c1"># -*- coding:utf8 -*-</span>
-<span class="c1"># !/usr/bin/python</span>
-
-<span class="c1"># 反转字符串</span>
-<span class="c1"># 使用递归 -使用循环 -使用 reduce和lambda表达式</span>
-<span class="c1"># 自身的索引特性-</span>
-<span class="c1"># 使用Python内置函数结合字符串函数使用</span>
-<span class="c1"># 变成其他数据类型使用其函数</span>
-
-<span class="s s-Atom">def</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="nf">if</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">astr</span>
-<span class="nn">else</span><span class="p">:</span>
-<span class="s s-Atom">newstr</span> <span class="o">=</span> <span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">1</span><span class="s s-Atom">:</span><span class="p">])</span> <span class="o">+</span> <span class="s s-Atom">astr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">newstr</span>
-
-
-<span class="s s-Atom">def</span> <span class="nf">func</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="s s-Atom">max_index</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
-<span class="s s-Atom">for</span> <span class="s s-Atom">index</span><span class="p">,</span> <span class="s s-Atom">value</span> <span class="s s-Atom">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span><span class="s s-Atom">:</span>
-<span class="s s-Atom">result</span> <span class="s s-Atom">+=</span> <span class="s s-Atom">s</span><span class="p">[</span><span class="s s-Atom">max_index</span><span class="o">-</span><span class="s s-Atom">index</span><span class="p">]</span>
-<span class="s s-Atom">return</span> <span class="s s-Atom">result</span>
-
-
-<span class="s s-Atom">if</span> <span class="k">__</span><span class="s s-Atom">name__</span> <span class="o">==</span> <span class="s s-Atom">&#39;__main__&#39;:</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">reversert</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">func</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">reduce</span><span class="p">(</span><span class="s s-Atom">lambda</span> <span class="s s-Atom">x</span><span class="p">,</span> <span class="nn">y</span><span class="p">:</span> <span class="s s-Atom">y</span><span class="o">+</span><span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">&#39;efg&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">])</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)[</span><span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">reversed</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">))))</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="s2">&quot;efg&quot;</span><span class="p">))</span>
-
-<span class="c1"># 列表变为字符串 --注意事项</span>
-<span class="nf">print</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;abc&#39;</span><span class="p">)))</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">([</span><span class="s s-Atom">&#39;a&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;b&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;c&#39;</span><span class="p">]))</span>
-<span class="nv">Li</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="s s-Atom">&#39;efg&#39;</span><span class="p">)</span>
-<span class="nv">Li</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span>
-<span class="s s-Atom">dealLi</span> <span class="o">=</span> <span class="nv">Li</span>
-<span class="nf">print</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">dealLi</span><span class="p">))</span>
-</pre></div>
-
-
-<h3>参考</h3>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>生成器、以及递归和字符串反转</p>
+                <a class="readmore" href="/program/my-program-post-40.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

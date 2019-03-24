@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python处理非规范的JSON文件</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-40.html" rel="bookmark"
+           title="Permalink to Python处理非规范的JSON文件">Python处理非规范的JSON文件</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T19:50:00+08:00">
+                Published: 2019-03-24 19:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <h3>处理数据说明</h3>
+<div class="highlight"><pre><span></span>在Python中，处理JSON数据类型是经常会用到的处理，多是把不规范的JSON转换成DataFrame的数据类型，
+通过将数据类型转换成这种半结构的数据转换为结构化数据。  
+JSON数据类型-DataFrame数据-处理DataFrame数据类型数据
+</pre></div>
+
+
+<h4>代码示例</h4>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/python</span>
+<span class="c1"># -*- coding:utf-8 -*-</span>
+<span class="c1"># Python3.x</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1"># 函数加方法&lt;三步+ open file.read file.close</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">Data01.json&quot;</span>
+<span class="n">filename1</span><span class="o">=</span><span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">out.a&quot;</span>
+<span class="n">filename2</span><span class="o">=</span><span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">out.csv&quot;</span>
+
+ <span class="c1"># open函数用于打开一个文件，创建一个 file 对象</span>
+ <span class="c1">#使用方法读取数据-- .read()、.readline() 和 .readlines()</span>
+<span class="c1">#.read() 返回从字符串中读取的字符 fileobj.read()# 从文件中读取指定的字符数，如果未给定或为负则读取所有。</span>
+<span class="c1">#.readline() 每次只读取一行 -仅当没有足够内存可以一次读取整个文件时，使用 .readline()#方法返回一个字符串对象</span>
+<span class="c1"># readlines()方法 读取整个文件所有行，保存在一个列表(list)变量中，每行作为一个元素</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileobj</span><span class="p">:</span>
+<span class="n">stringlist</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readlines</span>
+
+<span class="c1"># 创建一个空的 DataFrame</span>
+<span class="n">df_empty</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
+<span class="c1"># 统计行数</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Json   模块提供了四个方法： dumps、dump、loads、load</span>
+<span class="c1"># 序列化  dumps、dump</span>
+<span class="c1"># 反序列化方法loads、load</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stringlist</span><span class="p">:</span>
+   <span class="n">sdata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+   <span class="n">event</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="c1">#利用dict内置的get(key[,default])方法，如果key存在，则返回其value,否则返回default</span>
+   <span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;not-exist&quot;</span><span class="p">)</span>
+   <span class="n">event</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+   <span class="n">event</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+   <span class="n">df_empty</span><span class="o">=</span> <span class="n">df_empty</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+   <span class="c1"># 统计行数</span>
+   <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="c1"># 数据筛选</span>
+<span class="n">df_empty</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">DataDF</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename1</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="p">(</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ratio&#39;</span><span class="p">])</span>
+<span class="c1">#产生新列#</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataDF</span><span class="p">,</span><span class="n">ratio</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1">#过滤和筛选</span>
+<span class="n">resData</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;ratio&quot;</span><span class="p">]</span><span class="o">&lt;</span><span class="mf">0.5</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">resData</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename2</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1">#数据库风格的DataFrame的连接pd.merge(df1, df2,on=&quot;key&quot;,how=&#39;left&#39;,suffixes=(&#39;_ef&#39;,&#39;_rig&#39;))</span>
+<span class="c1">## 索引的连接parsecap = result.join(</span>
+<span class="c1"># data_tmp = json.dumps(json.loads(json.dumps(json.loads(urlDF[&#39;handicap&#39;][res]))))</span>
+<span class="c1">#jsontmp = json.loads(data_tmp)</span>
+</pre></div>
+</td></tr></table>
+
+<h3>迭代的代码</h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/python</span>
+<span class="c1"># -*- coding:utf-8 -*-</span>
+<span class="c1"># 将不规则的JSON转化为规则的DataFrame=缺省值给默认值</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">findata_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">Usein.json&quot;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileobj</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+        <span class="n">sdata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="c1"># 利用dict内置的get(key[,default])方法，如果key存在，则返回其value,否则返回default</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">sdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;not-exist&quot;</span><span class="p">),</span> <span class="n">sdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">sdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">findata_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+    <span class="n">dfquery</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">findata_list</span><span class="p">)</span>
+<span class="c1"># 迭代版本二#  列表推导式</span>
+<span class="n">findata_list2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">count2</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileobj</span><span class="p">:</span>
+    <span class="n">sdata2</span><span class="o">=</span> <span class="p">[</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sdata2</span><span class="p">)):</span>
+        <span class="n">count2</span> <span class="o">=</span> <span class="n">count2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">count2</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">sdata2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;not-exist&quot;</span><span class="p">),</span> <span class="n">sdata2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">sdata2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">findata_list2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+    <span class="n">dfquery</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">findata_list2</span><span class="p">)</span>
+<span class="c1">#</span>
+<span class="n">filenameDF</span> <span class="o">=</span> <span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">UseinDF.csv&quot;</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;ready to write data to File&quot;</span><span class="p">)</span>
+<span class="n">dfquery</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filenameDF</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1">#读取数据</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;ready to read data &quot;</span><span class="p">)</span>
+<span class="n">DataDF</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filenameDF</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">],</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">#产生新列#</span>
+<span class="c1"># reindex()方法可以添加一列或多列数据，并且可以指定列的位置，也可以对原先存在的列进行重排</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">((</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ratio&#39;</span><span class="p">])</span>
+<span class="n">dataDiff</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">((</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">DataDF</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]),</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dataDiff&#39;</span><span class="p">])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataDF</span><span class="p">,</span><span class="n">ratio</span><span class="p">,</span><span class="n">dataDiff</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#过滤和筛选</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;filter the data&quot;</span><span class="p">)</span>
+<span class="c1">#resData = result[result[&quot;ratio&quot;]&lt;0.1 &amp; result[&quot;dataDiff&quot;]&lt;10 &amp; result[&quot;a&quot;]&gt;0].reset_index(drop=True)</span>
+<span class="n">resData</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">query</span><span class="p">(</span> <span class="s1">&#39;ratio&lt;0.1  &amp; dataDiff&lt;10 &amp; a&gt; 0&#39;</span><span class="p">)</span>
+
+<span class="c1"># 保存数据</span>
+<span class="n">Dataout</span><span class="o">=</span>  <span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">UserlastData.csv&quot;</span>
+<span class="n">resData</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">Dataout</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
+<h3>R语言处理结构化数据</h3>
+<div class="highlight"><pre><span></span>在R语言中，处理非规范的JSON，稍微有一些不便，不过随着R语言的发展，这些会在一定程度上缓解，而且R语言在数据统计上的优势，可以让我们集中精力在数据的洞察中
+R语言：
+<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+ash <span class="o">&lt;-</span> read_delim<span class="p">(</span><span class="s">&quot;C:/Users/ash.txt&quot;</span><span class="p">,</span>  <span class="s">&quot;\t&quot;</span><span class="p">,</span> escape_double <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> col_names <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span>
+   col_types <span class="o">=</span> cols<span class="p">(</span>X1 <span class="o">=</span> col_character<span class="p">()),</span>trim_ws <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="c1">#已知的变量创建新的变量  round(mean(x),2)</span>
+Cash <span class="o">&lt;-</span> mutate<span class="p">(</span>ash<span class="p">,</span>ratio<span class="o">=</span> <span class="kp">round</span><span class="p">((</span>X2<span class="o">-</span>X3<span class="p">)</span><span class="o">/</span>X2<span class="o">*</span><span class="m">1.0</span><span class="p">,</span>digits <span class="o">=</span><span class="m">4</span><span class="p">)</span> <span class="p">)</span>
+<span class="c1">#根据值选择观察（记录）</span>
+resultData  <span class="o">&lt;-</span> filter<span class="p">(</span>Cash<span class="p">,</span> X2<span class="o">&gt;=</span><span class="m">50</span><span class="p">,</span> ratio <span class="o">&lt;</span> <span class="m">0.5</span><span class="p">)</span>
+<span class="kp">colnames</span><span class="p">(</span>resultData<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="s">&#39;b&#39;</span><span class="p">,</span><span class="s">&#39;c&#39;</span><span class="p">,</span><span class="s">&#39;ratio&#39;</span><span class="p">)</span>
+<span class="c1">#left_join</span>
+<span class="c1">#保存数据</span>
+write_csv<span class="p">(</span>resultData<span class="p">,</span>path<span class="o">=</span><span class="s">&#39;C:/Users/Filter.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>总结</h3>
+<div class="highlight"><pre><span></span>数据结构类似-有差异的地方也不少
+调用方法或者函数-- 输入-输出值类型-参数
+    Python中多是类方法或者实例方法，函数不常用
+    R语言多是函数
+Python 在填充数据的时候，使用list等数据结构填充，填充结束后转换为Dataframe，这样速度会快很多
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
