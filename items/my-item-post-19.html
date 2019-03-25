@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据分析思路</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-19.html" rel="bookmark"
+           title="Permalink to 数据分析思路">数据分析思路</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T16:32:00+08:00">
+                Published: 2019-03-24 16:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>数据分析思路
+  问题分析能力、状况判断能力 、数据解读能力、总结提炼能力
+针对课程中的要点，做了记录，并结合自身的问题做了一些侧重点的理解，主要来源-数据分析师八大能力培养
+</pre></div>
+
+
+<h3>1.收集信息-了解业务</h3>
+<div class="highlight"><pre><span></span>谁-业务部门  
+做什么-主要业务动作  
+有什么-产生什么数据  ：           
+            数据库并不能记录一切--不能记录哪些？如何解决这个问题？--数据库不能记录的信息，怎么获取、替代或者过滤
+看什么-哪些环节需要数据    
+为什么-哪些行为对数据有影响
+</pre></div>
+
+
+<h3>2.沟通需求-明确任务--统计口径的了解</h3>
+<div class="highlight"><pre><span></span>了解：
+   数据分析需求的基本形态，在各部门的表现形态以及需求沟通的基本层次
+01.规范化-标准化   02.自动化  03.智能化
+数据分析需求
+   01.哪个部门的需求，
+   02.其次弄清楚需求的背景，比如用途
+   03.简单的从需求的形式做判断
+需求的类别以及表现形式 --需求越清晰，分析越明确
+    评估类需求-- 人数是否下降了
+    原因类需求--为什么人数下降了
+    预测类需求-- 预计多少人点开
+层次：
+I、初级需求沟通： 目的-明确任务内容  你想要一个什么样的分析呢？
+     第一步：沉住气，为做准备不丢人别人提分析需求的时候，第一时间问，怎么定义的？
+     第二步：取数对象 -取数指标-分类维度  -- 数据表+时效性+附加说明
+     量化为Excel表，培养些需求单的习惯--规范化
+        1.数据需求基本情况说明
+            申请部门： 业务部门
+            申请人员：  **
+            联系方式：  1234*****
+            申请时间：  20190321
+            期望完成时间： 今天
+            需求标题： 
+            提数目的： 情况查看
+            筛选条件： a平台，0620后活动，
+            所需字段： 用户ID，活动次数
+            示例数据
+                   123      325    
+   2.沟通确认--常用的确认问题
+         01.什么时间状态下，哪些用户体系，哪些产品的，哪些维度？
+         02. 哪些维度，即哪些字段？字段是是否存在？
+         03.指标的含义-玩法的确认，使用什么字段，在什么条件下的什么功能？
+            相关的业务背景
+           明确的业务需求
+           判断对错的评价标准       
+   03. 查看数据字段-查看数据字段的具体含义
+        查看具体数据
+        查看数据量
+   工作流程 以上如果业务部门强势-不改不规范，自己写好了，让业务方确认
+   1.目的：
+        了解轻重缓急，更合理的安排资源-需求表就是数据分析的挂号
+     收集基础需求信息，为需求管理做准备
+          01.需求部门和需求的人  为拒绝垃圾需求做数据依据
+          02.评估需求的重要性和优先级
+          量化考核支持哪些部门的哪些工作
+          03.需求标题： 分类管理的基础，延伸新的需求
+              同一类需求可以做成分析模板，
+              反复出现的需求可以做成固定报表
+              简单需求可以同类合并或者使用现成数据应对
+         04.需求分析复杂度和预计工时
+           数据分析的工作量，数据分析的产出，数据分析的投入&lt;复杂程度和工时&gt;
+    提取数据的流程
+    孤立的数据集操作
+针对一些问题的
+   01.有数据吗？有哪些数据，需要哪些数据
+   02.问题的逻辑是什么，假设是什么，目标是什么？
+   03.应用场景是什么，用到什么地方，达到什么程度？
+   04.想要解决什么问题？是分类问题还是预测问题？
+</pre></div>
+
+
+<h3>3.定义问题-统计口径的确认</h3>
+<div class="highlight"><pre><span></span>设计方案 --让 业务描述情况，让专业来定义问题-要去理解他们的处境，分析他们的需求，讲清楚问题是专业人士的修行
+定义问题非常重要--用专业的视角重新解析和解构定义问题
+    步骤 清洗描述问题，划分问题边界，区分问题类型，明确输出产物
+追问，将问题透明化
+反问：对于问题，想回答好，要的是反问，反问的目的是弄清问题，很多事情并不是在问题的本身上，如何弄清问题，怎解答问题
+</pre></div>
+
+
+<h3>4.梳理流程--</h3>
+<div class="highlight"><pre><span></span>实际上就是：了解前因后果- 例如：如何挖八卦的精神。现有业务，才有数据
+    是找事实，而不是心路历程，不是感觉
+梳理流程
+    业务流程 -事情发展阶段-步骤
+    管理流程- 事情发展形态-方法
+    数据流 -- 记录事情的数据     
+梳理流程的思路：
+        目标越纯粹，越容易梳理清楚
+        流程越具体越好
+        方法了解和知道的越多，可调控的资源可能就多了
+        确认数据记录哪些，没记录哪些(有没有可能多记录一些)
+02.指标体系-梳理指标体系，是最基础的分析
+渠道的指标体系：
+      激活-注册-购买
+        激活-激活人数，激活单价，渠道，激活单价
+        注册-注册人数，激活注册率，注册单价
+        购买与活跃：购买注册转化
+ 运营的指标体系
+ 财务的指标体系
+        对账体系--toB 第三方的账单和公司实际的账单
+</pre></div>
+
+
+<h3>5.问题的判断</h3>
+<div class="highlight"><pre><span></span> 01.到底是什么问题
+        问题的判断和甄别
+           报表给什么部门什么人看，如果报表不出来，谁来电话催
+ 02.针对什么问题，一共看哪几个指标
+     如果让你加数据，你想看什么数据？为什么想看这个数据，没有人加，难度在哪里？
+ 03.标准在哪里
+      来判断问题何时发生
+ 04.可以干什么？
+            把通报和数据联系起来，多收集业务行为，和数据挂钩
+</pre></div>
+
+
+<h3>6.问题的解决</h3>
+<div class="highlight"><pre><span></span>现状-目标-方法-执行人 
+            现状清洗不清晰？
+            方法可行不可行，哪种更好？
+            目标-未来会增氧
+            执行人：谁来干
+     01.清晰情况
+          现在啥情况，清楚不清楚？      -- 现状是办事情的起点
+          到底咋干，有没有思路？           -- 方法不一定和分析有关系
+          干到啥程度，收手？             --  目标是办事情的终点
+          说了半天，到底谁来干？           --  执行人决定了办事的方式
+    02.评估
+         评估目标的可行性
+            达成目标的方法： 
+                    逻辑上
+                    实际情况： 对时间、成本以及效果的要求
+           不同的方案-有了选择的优劣
+             上中下策
+              和医生学习
+                -- 具体的行动   
+                -- 有前提假设  
+                -- 有监控指标
+</pre></div>
+
+
+<h3>7.汇报：</h3>
+<div class="highlight"><pre><span></span>公司发展阶段
+      基础准备： 底层建设随之BI系统上线同步开展
+      零散数据： 数据建设起点
+      基础报表：BI系统
+      数据产品：  个人跑数到系统上线
+      专题分析和策略建议： 越来越精细化的需求
+      数据应用项目：  有数据，有规范有流程之后
+数据分析的工作层次
+   数据ETL以及统一统计口径    基础准备
+   简单零散的数据工作                跑一个数据
+   简单报表                                 跑一列数据
+   复杂报表                                 跑几列数
+   专题分析，专项研究                跑关键的数
+   策略研究，分析建议                跑有方向的数
+   精准营销，个性化系统           跑有价值的数
+</pre></div>
+
+
+<h3>数据报告的读写：</h3>
+<div class="highlight"><pre><span></span>把数据报告按照阶段分为两种。
+一种是追踪型的数据报告，或者成为dashboard。它是对日常业务数据高频率的展现，它一般用于回答“怎么了”。
+        关键在于发现问题，而不是解决问题。这类报告往往是规律性地长期进行制作。
+另一种就是解决问题的数据报告，它一般是专题型的研究报告，用于回答“为什么”。
+        这类报告往往是不定期地进行制作，而且很有可能是由浅入深的系列报告。
+在数据分析的实际报告中，常常有两种工作模式
+    第一种：拿到基础数据集后给出分析结果？
+    第二种：拿到一个问题，自己去收集数据，分析结果
+主要拿到数据集的怎么办
+当拿到一个数据集时，你通常会怎么做？拿到任何数据集的时候有一个框架思路，对有条不紊地开始工作有很大的帮助。
+将遵循这样的顺序：
+    &lt;1&gt;数据基础了解：  数据源质量→数据类型→数据集质量
+    &lt;2&gt;数据描述性分析： 平均水平→数据分布→量变关系→多维交叉
+    &lt;3&gt;数据可视化分析： 数据可视化
+    &lt;4&gt;机器学习算法       这步非必须
+    &lt;5&gt;数据报告展示： 
+        三种展示信息的工具：表格、文字、数据图表
+        关键信息优先
+        宏观到微观
+          同时考虑到：
+            人脑理解信息的层次关系，并不会依据信息本身的层次关系，反而更依赖接受信息的先后顺序
+            视觉思考的特点
+        建议：
+            判断---行为数据和商业数据的关系
+            方案---基于自己的思考所得出的策略建议
+</pre></div>
+
+
+<h3>附录：</h3>
+<div class="highlight"><pre><span></span>沟通技巧
+沟通技巧的目的是让他们愿意做双方都认可的事情；「让正确的事情发生」是团队的共同目标，
+    引导--提出请求前，如果能激活对方特定的人格面具，可能更容易获得对方认同
+    互惠原理的本质是：当对方产生心理上的亏欠感时，倾向于有所回馈和补偿。而这种亏欠感还可能来源于拒绝你的请求
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>数据分析师的十大吐槽，看到第九条你一定想转给某人 https://ask.hellobi.com/blog/chenwen/5915
+拒绝加班！我要过年！远离5类垃圾需求的正确方式 https://ask.hellobi.com/blog/chenwen/6044
+还有部分参考未列出
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

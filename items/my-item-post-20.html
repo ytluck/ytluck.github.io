@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据质量管理和异常排查</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-20.html" rel="bookmark"
+           title="Permalink to 数据质量管理和异常排查">数据质量管理和异常排查</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T18:32:00+08:00">
+                Published: 2019-03-24 18:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>1.数据质量管理.
+保障原则： 一致，完整、准确、及时
+准确：
+完整：字段缺失和数据缺失，导致年度数据计算数据
+一致： 不同的数据消费环节。保持同一类型，长度以及规则等
+及时：
+</pre></div>
+
+
+<h3>规范化</h3>
+<div class="highlight"><pre><span></span>1.数据流向规范：
+（1）原始数据需要先同步到ods层，除ods外的其他任何层都不能直接使用原始数据
+（2）汇总层/app层数据 不能直接依赖ods层数据
+2.数据表命名规范
+（1）表结构规范维度设计-库以及表的的命名   库名 + 表名
+（2）公共维度层：  _cdm-这个库可以新建的方式-数据层+公司+维度表/事实表+业务
+         dwd_test_dim_order 、dws_test_src_order 其中dim代表是维度表，    
+        应用层test_ads 对于事实表、明细表以及聚合表，表名需具备更新频率信息
+（3）表长度规范以及拼写规范 以及创建表-相应的中文解释（comment）
+（4）表意规范
+</pre></div>
+
+
+<h3>数据分层以及权重</h3>
+<div class="highlight"><pre><span></span>分层以及分权重：异常产生的环节：业务设计层、数据采集层、数据传输层、数据计算层、数据展现层
+权重：数据资产等级—将数据划分等级-并给予标记
+</pre></div>
+
+
+<h3>完善沟通的机制</h3>
+<div class="highlight"><pre><span></span>技术机制和流程管理机制--解决方式：部门的配合方式：
+    业务系统变更，是否要将变更通知到下游
+    相应的手段
+上下游的消息通知机制-沟通机制--了解上游的相应调整，并评估是否会对当前问题造成影响
+</pre></div>
+
+
+<h3>技术手段：</h3>
+<div class="highlight"><pre><span></span>01.各个环节卡点校验
+02.风险点监控    
+03.质量确认
+04.上下游的消息通知机制
+</pre></div>
+
+
+<h3>数据安全管理和数据项目管理</h3>
+<div class="highlight"><pre><span></span>技术手段：身份认证-访问控制-授权管理-加密-会话管理—访问控制，权限管理
+审计-数据库活动监控-评估
+安全意识：文件备份和保密等-数据分发的安全确认
+数据开发周期-实施的进度和节奏
+</pre></div>
+
+
+<h2>数据异常排查</h2>
+<div class="highlight"><pre><span></span>基本的思路-从数据流向排查
+了解业务：谁-业务部门 做什么-主要业务动作  有什么-产生什么数据  看什么-哪些环节需要数据    为什么-哪些行为对数据有影响
+统计口径的确定 
+从数据流的角度：
+    业务端的数据： 数据发送：数据转换：数据计算：数据展示：
+    数据管理和监控：数据安全-权限和隐私保护等
+</pre></div>
+
+
+<h3>出现异常原因顺序排查</h3>
+<div class="highlight"><pre><span></span>1.前端展示错误 -- 平台展示数据异常--记录异常数据
+2.数据库数据查询错误  -- .查询对应数据库表中数据
+3.数据库数据入库错误
+4.数据计算错误
+5.源表表转换错误 -- 查询对应的源表结果表中的数据
+6.流量传输错误 --  查询原始流量数据-查看原始流量 --查看原始文件
+7.业务数据错误
+</pre></div>
+
+
+<h3>常见的错误形式：</h3>
+<h4>1.业务规则</h4>
+<div class="highlight"><pre><span></span>01.线上业务规则-数据一致性
+    客户端逻辑
+    服务端逻辑
+            H5中的平台以及 渠道号对应的平台这两者之间的差别
+02.无关流量发送，但没有相应的标志给出--失败的记录也发送，但没有给出相应的标识
+03.激活 -- 全渠道去重和单渠道去重
+    激活流量中的设备号记录-区分两种系统，即如果IMEI出现在不同的系统中，两种系统都会会被记录。
+    而这两种系统中的记录又有不同。例如：a     包括 a1  a2  a3，是全渠道去重；b      在不同渠道中出现，设备号会被重复记录
+ 02.业务设计的数据埋点：ios在进入客户端启动后事件上的埋点，数据缺失。
+  系统原因：安卓是 APP挂起后一段时间内 后台会杀掉进程  IOS不会。
+  技术原因：进入客户端有可能是直接开机进入也可能是从后台切入两种情况
+ 03.数据源质量
+    对数据背景的了解必不可少
+    对数据源的质量有了解
+    数据源，分为两部分：一部分是数据库中的表，包括你自己取数的表和别人提供的数据的来源表；另一部分是取数代码，一般是SQL代码。对于取数来源的表，我们一定要不厌其烦地明确如下几个问题：  
+        1．表中的字段有没有在近期改动？做了什么样的改动？   
+        2．表中的字段是不是名副其实的字段？      
+        3．该表谁负责维护？有没有定期维护？      
+        4．该表是否是中间表？它的字段内容是从哪里来的？    
+        5．该表是以什么样的频率刷新数据？
+    数据预处理
+        处理数据集中的垃圾（乱码、格式混乱、特殊符号等）
+        处理空值
+        处理异常值
+        处理异常字段
+        统一数据类型和单位
+</pre></div>
+
+
+<h4>2.数据采集</h4>
+<div class="highlight"><pre><span></span>采集出现的情况--数据规范和故障恢复-冗余考虑
+  1. 在流量中，是否会出现重复发的流量，所以第一步要注意是否需要去重
+  2.在流量中会出现将来时间，这个对数据采集的时间规范要注意
+  3.在数据采集中，出现大小写不一致 。例如在平台中出现 Android  和android这种情况
+</pre></div>
+
+
+<h4>3.数据传输：</h4>
+<div class="highlight"><pre><span></span>流量积压，造成数据延迟 T+1 之后的数据--数据积压问题，即流量转化已经开始但是昨天的流量尚未全部发送完成。
+流量发送和程序转化的时序关系
+</pre></div>
+
+
+<h4>4.数据转换规则</h4>
+<div class="highlight"><pre><span></span>数据当日转换不全
+数据转换规则
+    异构数据源中出现的地域信息，例如 北京 北京市、 江苏 江苏省
+            IP地址-- IP地址的更新机制
+数据传输转化层： 数据转化的数据元数据类型和表定义的数据类型不一致。
+</pre></div>
+
+
+<h4>5.数据计算</h4>
+<div class="highlight"><pre><span></span>01.数据计算层：计算的统计口径要一致
+01. 唯一标志
+                用户ID生成规则是否会发生改变-后续的扩展，唯一ID的生成等
+02.数据运算逻辑
+        00.H5的数据没有产品和设备号等数据，进而会造成数据缺失
+        01.缺失值-数据处理 几个默认值：       id                     name                type
+03.计算的精度
+     计算问题：数据计算有效数字和精度的保留
+            小数点后数据保留了两位，造成后面的数据出现偏差
+    使用int数据是否会超出了范围--数据类型的预估和选择
+        int数据最大值 2147483647 --- int的数据范围二十一亿
+04.计算的技术问题
+    连接量表的数据--是否需要去重
+   连接的方式 --内联-左联结
+   连接的条件-- on and   和 on where    where 左表和where右表
+</pre></div>
+
+
+<h3>数据异常排查经历</h3>
+<div class="highlight"><pre><span></span>记录一下个人对数据服务中一次经历
+1.事情起因：对其中业务部门提供数据支撑--每天手动的提取数据-按照要求给数据
+2.出现的问题：结果 其中一天给了一份昨天的数据
+3.发现的方式： 业务人员提出
+4.解决方式：发现并解决当前问题，并针对当前问题做出研究，避免类似的问题出现，发现一个问题，解决一类问题
+    出现的主要原因：没有相应的信息冗余以及验证措施
+具体的后续
+ 数据来源-数据计算-数据输出以及整个过程自动化沟通交流主动
+    01.输出结果-字段冗余
+      给出计算数据的日期--输出的数据量的总量统计
+     表名加上输出时间
+      给出自动化的图表-相对于数据看了，更方便业务人员监控数据
+    02.数据计算逻辑说明
+            依据哪些字段，进行了哪些筛选，给出的字段
+            备注统计的口径，以及可能存在的误差说明
+    03.数据来源：
+         数据来源说明--以便对数据有个预估的基准线
+    04.自动化数据处理的工作流程
+        使用Python处理数据-自动化流程
+        同时在必要的时候手动Excel处理，来比对相应的不同
+     05.请查收~ 通知到并做到反馈-和业务人员保持
+5.结果：形成了一个相对的数据规范，保证了给出数据的准确性
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>HDFS和YARN的进一步介绍</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-mining/my-dataming-post-44.html" rel="bookmark"
+           title="Permalink to HDFS和YARN的进一步介绍">HDFS和YARN的进一步介绍</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-23T20:52:00+08:00">
+                Published: 2019-03-23 20:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/hive.html">Hive</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>HDFS和YARN的基本概念和一些总结
+</pre></div>
+
+
+<h4>HDFS</h4>
+<div class="highlight"><pre><span></span>HDFS 采用Master/Slave的架构来存储数据，
+这种架构主要由四个部分组成，分别为
+  HDFS Client、 NameNode 、 DataNode 和 Secondary NameNode
+        NameNode：就是 master，它是一个主管、管理者
+        DataNode：就是Slave。NameNode 下达命令，DataNode 执行实际的操作
+</pre></div>
+
+
+<h3>YARN</h3>
+<div class="highlight"><pre><span></span>YARN仅支持CPU和内存两种资源，且使用了轻量级资源隔离机制Cgroups进行资源隔离
+ Master/Slave结构，在整个资源管理框架中，resourcemanager为master  RM，nodemanager是slave NM
+  ResourceManager 负责整个系统的资源管理和分配
+  NodeManager：
+    App Master和Container是运行在Slave上的组件，
+    Container是yarn中分配资源的一个单位，包涵内存、CPU等等资源，yarn以Container为单位分配资源
+  若干个针对应用程序的ApplicationMaster（AM） ApplicationManager
+  YARN不同服务组件的通信方式采用了事件驱动的异步并发机制
+   RM是一个全局的资源管理器，负责整个系统的资源管理和分配。
+        它主要由两个组件构成：调度器（Scheduler）和应用程序管理器（Applications Manager，ASM）
+   AM. ApplicationMaster（AM）
+        用户提交的每个应用程序均包含一个AM，主要功能包括：
+            与RM调度器协商以获取资源（用Container表示）；
+            将得到的任务进一步分配给内部的任务(资源的二次分配)；
+            与NM通信以启动/停止任务；
+            监控所有任务运行状态，并在任务运行失败时重新为任务申请资源以重启任务。
+ NM. NodeManager（NM
+     NM是每个节点上的资源和任务管理器，
+        一方面，它会定时地向RM汇报本节点上的资源使用情况和各个Container的运行状态；
+        另一方面，它接收并处理来自AM的Container启动/停止等各种请求
+ Container  是YARN中的资源抽象，它封装了某个节点上的多维度资源，如内存、CPU、磁盘、网络等，
+                    当AM向RM申请资源时，RM为AM返回的资源便是用 Container表示
+</pre></div>
+
+
+<h3>各个资源的名称</h3>
+<div class="highlight"><pre><span></span>HDFS
+Master/Slave的架构
+NameNode/Secondary NameNode
+DataNode
+HDFS Client
+
+YARN
+Master/Slave结构
+ResourceManager
+NodeManager
+ApplicationMaster
+Container
+
+Spark
+一个中心协调器和许多分布式worker
+Master主节点:Cluster Manager  Driver
+Worker节点
+Executor
+Task
+Client
+Job stages task
+
+Hive
+ Driver
+ MetaStore
+ Compiler-Execution Engine
+ Hive Clients:Thrift Client，JDBC Client，ODBC Client
+ operators /operators chain / operators DAG
+
+Flink
+JobManagers
+TaskManagers
+Client
+Slot
+Task
+
+HBase
+HBbase Master和Hregion
+Hmaster/Zookeeper
+RegionServer
+
+Kafka分布式消息系统
+Producer-Consumer-Broker-Zookeeper
+Topic &amp; Partition- segment
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

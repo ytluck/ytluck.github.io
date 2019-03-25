@@ -26,7 +26,223 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/items/my-items-post-18.html">R语言-Shiny-server安装注意事项</a></h1>
+                    <h1 class="entry-title"><a href="/items/my-item-post-20.html">数据质量管理和异常排查</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T18:32:00+08:00">
+                Published: 2019-03-24 18:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>1.数据质量管理.
+保障原则： 一致，完整、准确、及时
+准确：
+完整：字段缺失和数据缺失，导致年度数据计算数据
+一致： 不同的数据消费环节。保持同一类型，长度以及规则等
+及时：
+</pre></div>
+
+
+<h3>规范化</h3>
+<div class="highlight"><pre><span></span>1.数据流向规范：
+（1）原始数据需要先同步到ods层，除ods外的其他任何层都不能直接使用原始数据
+（2）汇总层/app层数据 不能直接依赖ods层数据
+2.数据表命名规范
+（1）表结构规范维度设计-库以及表的的命名   库名 + 表名
+（2）公共维度层：  _cdm-这个库可以新建的方式-数据层+公司+维度表/事实表+业务
+         dwd_test_dim_order 、dws_test_src_order 其中dim代表是维度表，    
+        应用层test_ads 对于事实表、明细表以及聚合表，表名需具备更新频率信息
+（3）表长度规范以及拼写规范 以及创建表-相应的中文解释（comment）
+（4）表意规范
+</pre></div>
+
+
+<h3>数据分层以及权重</h3>
+<div class="highlight"><pre><span></span>分层以及分权重：异常产生的环节：业务设计层、数据采集层、数据传输层、数据计算层、数据展现层
+权重：数据资产等级—将数据划分等级-并给予标记
+</pre></div>
+
+
+<h3>完善沟通的机制</h3>
+<div class="highlight"><pre><span></span>技术机制和流程管理机制--解决方式：部门的配合方式：
+    业务系统变更，是否要将变更通知到下游
+    相应的手段
+上下游的消息通知机制-沟通机制--了解上游的相应调整，并评估是否会对当前问题造成影响
+</pre></div>
+
+
+<h3>技术手段：</h3>
+<div class="highlight"><pre><span></span>01.各个环节卡点校验
+02.风险点监控    
+03.质量确认
+04.上下游的消息通知机制
+</pre></div>
+
+
+<h3>数据安全管理和数据项目管理</h3>
+<div class="highlight"><pre><span></span>技术手段：身份认证-访问控制-授权管理-加密-会话管理—访问控制，权限管理
+审计-数据库活动监控-评估
+安全意识：文件备份和保密等-数据分发的安全确认
+数据开发周期-实施的进度和节奏
+</pre></div>
+
+
+<h2>数据异常排查</h2>
+<div class="highlight"><pre><span></span>基本的思路-从数据流向排查
+了解业务：谁-业务部门 做什么-主要业务动作  有什么-产生什么数据  看什么-哪些环节需要数据    为什么-哪些行为对数据有影响
+统计口径的确定 
+从数据流的角度：
+    业务端的数据： 数据发送：数据转换：数据计算：数据展示：
+    数据管理和监控：数据安全-权限和隐私保护等
+</pre></div>
+
+
+<h3>出现异常原因顺序排查</h3>
+<div class="highlight"><pre><span></span>1.前端展示错误 -- 平台展示数据异常--记录异常数据
+2.数据库数据查询错误  -- .查询对应数据库表中数据
+3.数据库数据入库错误
+4.数据计算错误
+5.源表表转换错误 -- 查询对应的源表结果表中的数据
+6.流量传输错误 --  查询原始流量数据-查看原始流量 --查看原始文件
+7.业务数据错误
+</pre></div>
+
+
+<h3>常见的错误形式：</h3>
+<h4>1.业务规则</h4>
+<div class="highlight"><pre><span></span>01.线上业务规则-数据一致性
+    客户端逻辑
+    服务端逻辑
+            H5中的平台以及 渠道号对应的平台这两者之间的差别
+02.无关流量发送，但没有相应的标志给出--失败的记录也发送，但没有给出相应的标识
+03.激活 -- 全渠道去重和单渠道去重
+    激活流量中的设备号记录-区分两种系统，即如果IMEI出现在不同的系统中，两种系统都会会被记录。
+    而这两种系统中的记录又有不同。例如：a     包括 a1  a2  a3，是全渠道去重；b      在不同渠道中出现，设备号会被重复记录
+ 02.业务设计的数据埋点：ios在进入客户端启动后事件上的埋点，数据缺失。
+  系统原因：安卓是 APP挂起后一段时间内 后台会杀掉进程  IOS不会。
+  技术原因：进入客户端有可能是直接开机进入也可能是从后台切入两种情况
+ 03.数据源质量
+    对数据背景的了解必不可少
+    对数据源的质量有了解
+    数据源，分为两部分：一部分是数据库中的表，包括你自己取数的表和别人提供的数据的来源表；另一部分是取数代码，一般是SQL代码。对于取数来源的表，我们一定要不厌其烦地明确如下几个问题：  
+        1．表中的字段有没有在近期改动？做了什么样的改动？   
+        2．表中的字段是不是名副其实的字段？      
+        3．该表谁负责维护？有没有定期维护？      
+        4．该表是否是中间表？它的字段内容是从哪里来的？    
+        5．该表是以什么样的频率刷新数据？
+    数据预处理
+        处理数据集中的垃圾（乱码、格式混乱、特殊符号等）
+        处理空值
+        处理异常值
+        处理异常字段
+        统一数据类型和单位
+</pre></div>
+
+
+<h4>2.数据采集</h4>
+<div class="highlight"><pre><span></span>采集出现的情况--数据规范和故障恢复-冗余考虑
+  1. 在流量中，是否会出现重复发的流量，所以第一步要注意是否需要去重
+  2.在流量中会出现将来时间，这个对数据采集的时间规范要注意
+  3.在数据采集中，出现大小写不一致 。例如在平台中出现 Android  和android这种情况
+</pre></div>
+
+
+<h4>3.数据传输：</h4>
+<div class="highlight"><pre><span></span>流量积压，造成数据延迟 T+1 之后的数据--数据积压问题，即流量转化已经开始但是昨天的流量尚未全部发送完成。
+流量发送和程序转化的时序关系
+</pre></div>
+
+
+<h4>4.数据转换规则</h4>
+<div class="highlight"><pre><span></span>数据当日转换不全
+数据转换规则
+    异构数据源中出现的地域信息，例如 北京 北京市、 江苏 江苏省
+            IP地址-- IP地址的更新机制
+数据传输转化层： 数据转化的数据元数据类型和表定义的数据类型不一致。
+</pre></div>
+
+
+<h4>5.数据计算</h4>
+<div class="highlight"><pre><span></span>01.数据计算层：计算的统计口径要一致
+01. 唯一标志
+                用户ID生成规则是否会发生改变-后续的扩展，唯一ID的生成等
+02.数据运算逻辑
+        00.H5的数据没有产品和设备号等数据，进而会造成数据缺失
+        01.缺失值-数据处理 几个默认值：       id                     name                type
+03.计算的精度
+     计算问题：数据计算有效数字和精度的保留
+            小数点后数据保留了两位，造成后面的数据出现偏差
+    使用int数据是否会超出了范围--数据类型的预估和选择
+        int数据最大值 2147483647 --- int的数据范围二十一亿
+04.计算的技术问题
+    连接量表的数据--是否需要去重
+   连接的方式 --内联-左联结
+   连接的条件-- on and   和 on where    where 左表和where右表
+</pre></div>
+
+
+<h3>数据异常排查经历</h3>
+<div class="highlight"><pre><span></span>记录一下个人对数据服务中一次经历
+1.事情起因：对其中业务部门提供数据支撑--每天手动的提取数据-按照要求给数据
+2.出现的问题：结果 其中一天给了一份昨天的数据
+3.发现的方式： 业务人员提出
+4.解决方式：发现并解决当前问题，并针对当前问题做出研究，避免类似的问题出现，发现一个问题，解决一类问题
+    出现的主要原因：没有相应的信息冗余以及验证措施
+具体的后续
+ 数据来源-数据计算-数据输出以及整个过程自动化沟通交流主动
+    01.输出结果-字段冗余
+      给出计算数据的日期--输出的数据量的总量统计
+     表名加上输出时间
+      给出自动化的图表-相对于数据看了，更方便业务人员监控数据
+    02.数据计算逻辑说明
+            依据哪些字段，进行了哪些筛选，给出的字段
+            备注统计的口径，以及可能存在的误差说明
+    03.数据来源：
+         数据来源说明--以便对数据有个预估的基准线
+    04.自动化数据处理的工作流程
+        使用Python处理数据-自动化流程
+        同时在必要的时候手动Excel处理，来比对相应的不同
+     05.请查收~ 通知到并做到反馈-和业务人员保持
+5.结果：形成了一个相对的数据规范，保证了给出数据的准确性
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-19.html" rel="bookmark"
+                           title="Permalink to 数据分析思路">数据分析思路</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T16:32:00+08:00">
+                Published: 2019-03-24 16:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/r.html">R</a> </p>
+</footer><!-- /.post-info -->                <p>统计口径-沟通</p>
+                <a class="readmore" href="/items/my-item-post-19.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-items-post-18.html" rel="bookmark"
+                           title="Permalink to R语言-Shiny-server安装注意事项">R语言-Shiny-server安装注意事项</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2018-05-13T20:11:00+08:00">
                 Published: 2018-05-13 20:11:00
@@ -37,195 +253,10 @@
         </address>
 <p>In <a href="/items/index.html">Items</a>.</p>
 <p>tags: <a href="/tag/r.html">R</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>关于shiny server 的安装和介绍，在官网都有介绍，在这里记录一些需要注意的事项和参考的资料来源以备后需。
-</pre></div>
-
-
-<h3>基础资源和配置</h3>
-<div class="highlight"><pre><span></span>I、本次安装使用的云主机ECS-，操作系统是安装最新的Centos，且是64位的。
-     使用root用户分配个新的用户，尽量不要使用root用户操作系统
-      01.设置新的用户名lego，以后都采用这个用户进行操作
-         useradd  lego
-         passwd  lego
-                  ~**k~
-         02. 把用户加入加入了sudo组
-                     visudo
-                       ## Allow root to run any commands anywhere
-                       root    ALL=(ALL)       ALL               
-                       lego ALL=(ALL)ALL  //添加这一行， lego为要加入sudoers 的用户
-</pre></div>
-
-
-<h3>II、一些网络配置和设置</h3>
-<div class="highlight"><pre><span></span>  01.云服务的配置
-    云服务上的设置--主要是对一些接口放行，比如某个端口已被监听，但是ping不同，除了防火墙等原因
-    安全组也是可能的原因。从云主机的安全层面-操作系统的层面-应用的层面这三方面考虑
-          创建安全组 https://help.aliyun.com/document_detail/25468.html
-          添加安全组规则 https://help.aliyun.com/document_detail/25471.html
-          加入、移出安全组 https://help.aliyun.com/document_detail/25443.html
-    02.操作系统上的设置
-        01.防火墙的设置iptables
-        02.SElinux的设置
-         其余：
-           能 ping 通但端口不通时端口可用性探测说明
-            https://help.aliyun.com/knowledge_detail/40572.html
-            检查 TCP 80 端口是否正常工作
-                https://help.aliyun.com/knowledge_detail/59367.html
-    03.查看方式
-        001.查看端口是否开启--以及是否在监听状态
-        netstat -anp|grep 3838 
-         tcp        0      0 0.0.0.0:3838                0.0.0.0:*                   LISTEN      772/shiny-server
-       002.查看防火墙开放了哪些端口
-          service iptables status 或者
-         /etc/init.d/iptables status
-        003.查看SELinux状态
-            getenforce
-   04.程序安装的权限和文件的读写权限等
-      1s -a  或者 ls -l
-</pre></div>
-
-
-<h3>III、安装</h3>
-<div class="highlight"><pre><span></span>01.安装R语言
-  命令 ：   sudo yum install R   
-  执行
-   反馈：查看是否安装成功 输入 R  然后确认，如果进入R语言后q()
- 02.安装shiny包，已sudo的权限安装
-  sudo su -  -c &quot;R -e \&quot;install.packages(&#39;shiny&#39;, repos=&#39;http://cran.rstudio.com/&#39;)\&quot;&quot;
-  03.   安装shiny-service
-     $ wget https://download3.rstudio.org/centos6.3/x86_64/shiny-server-1.5.7.907-rh6-x86_64.rpm
-     $ sudo yum install --nogpgcheck shiny-server-1.5.7.907-rh6-x86_64.rpm
-    参考： https://www.rstudio.com/products/shiny/download-server/
-    反馈：查看是否安装成功 sudo  status shiny-server
-</pre></div>
-
-
-<h3>IV、查看一些文件</h3>
-<div class="highlight"><pre><span></span>    资源文件
-        /srv/shiny-server
-    配置文件：
-        /etc/shiny-server/shiny-server.conf
-    日志文件
-        /var/log/shiny-server.log以及/var/log/shiny-server/文件夹下的日志文件
-    一些其他配置：
-       /opt/shiny-server/config/default.config
-        ll  /opt/shiny-server/config/init.d/redhat
-                -- 轮循 转储
-                shiny-server.log {
-                       rotate 12
-                       copytruncate
-                       compress
-                       missingok
-                       size 1M
-                }
-                rotate 5: 一次将存储5个归档日志。对于第六个归档，时间最久的归档将被删除。
-                copytruncate ；备份当前日志并截断
-                compress: 在轮循任务完成后，已轮循的归档将使用gzip进行压缩
-                size                    当日志文件到达指定的大小时才转储
-                missingok: 在日志轮循期间，任何错误将被忽略，
-                                 例如“文件无法找到”之类的错误。
-        其他示例--复制
-           cp -R /usr/lib64/R/library/shiny/examples/* /srv/shiny-server/
-</pre></div>
-
-
-<h3>V、网络与操作系统</h3>
-<div class="highlight"><pre><span></span>网络连接情况--例如
-  使用Windows查看
-    使用 -- ping是ICMP协议
-             ping   47.100.13.62
-      探测指定ip是否开放指定端口--windows开启telnet 服务，然后telnet ip地址 端口号
-        telnet  47.100.13.62 3838
-          47.100.13.62...无法打开到主机的连接。 在端口 3838: 连接失败
-
-          47.100.13.62:3838
-   使用Linux查看
-       ping   47.100.13.62
-     netstat -anp|grep 3838 
-        netstat -anp 
-         netstat -anp 显示系统端口使用情况
-        netstat -nupl  (UDP类型的端口)
-        netstat -ntpl  (TCP类型的端口)
-端口：
-     端口类型：分为&quot;TCP协议端口&quot;和&quot;UDP协议端口&quot;。
-     端口号
-        公认端口（Well Known Ports）：这类端口也常称之为&quot;常用端口&quot;。这类端口的端口号从0到1023
-        注册端口（Registered Ports）：端口号从1024到49151
-        动态和/或私有端口（Dynamic and/or Private Ports）：端口号从49152到65535
-     端口状态：
-         TCP端口状态
-              LISTENING     listening               正在监听连接
-              CONNECTED  - connected
-              ESTABLISHED  - established            连接已建立
-防火墙
-    cat      /etc/sysconfig/iptables-config
-    system-config-firewall
-    1)  开启80端口命令：/sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-    2)  保存配置命令：/etc/rc.d/init.d/iptables save
-    3)  重启服务命令：/etc/rc.d/init.d/iptables restart
-    4)  查看已经开放的端口： /etc/init.d/iptables status
-文件权限：
-    命令 ： chmod -R 755 tools_command/
-    解释 ： -R 为递归遍历
-</pre></div>
-
-
-<h3>VI、关于云服务</h3>
-<div class="highlight"><pre><span></span>    云服务：
-       在配置服务的时候，需要考虑的问题
-              01. 云账户：云账户与 RAM 用户是一种主子关系
-              02.用户身份管理 与 资源访问控制 
-                 管理您的用户（比如员工、系统或应用程序），以及控制用户可以访问您名下哪些资源的权限。是
-                云操作系统级别的设置
-                云防火墙：
-                  安全管控：
-                  访问控制 ：
-                        访问控制RAM
-                        用户-群组-角色 管理
-                        策略管理：查看并管理已创建的访问控制策略
-                  AccessKeys：是访问阿里云API的密钥
-                  RAM (Resource Access Management) 是阿里云为客户提供的 用户身份管理 与 资源访问控制 
-                     RAM-User 
-                     RAM-Role
-                    授权：API-Action 和 Resource-ID 授权 以及秘钥
-                      AccessKey:使用访问密钥构造一个 API 请求（或者使用云服务 SDK）来操作资源
-                     多因素认证（MFA）。Multi-Factor Authentication
-              03. 系统访问策略 和客户管理的自定义访问策略
-</pre></div>
-
-
-<h3>VII、关于操作系统-文件属性的缩写和颜色展示</h3>
-<div class="highlight"><pre><span></span>ls的输出颜色不止3种，有以下几种，
-  白色：表示普通文件         - = regular file 
-  蓝色：表示目录                   d = directory 
-  绿色：表示可执行文件
-  红色：表示压缩文件
-  浅蓝色：链接文件
-  红色闪烁：表示链接的文件有问题
-  黄色：表示设备文件
-  灰色：表示其他文件
-  这是linux系统约定的默认颜色，你也可以根据自己喜好自己修改
-  l = symbolic link 、s = Unix domain socket 、p = named pipe 、
-c = character device file 、b = block device file 
-  2.文件属性 文件数 拥有者 所属的group 文件大小 建档日期 文件名
-        u user/owner        g group        o other        a all 
-        r read 、w write 、x execute 
-        4 = read (r) 、2 = write (w) 、1 = execute (x) 、0 = no permission (-)
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>https://github.com/rstudio/shiny-server/issues/153
-https://stackoverflow.com/questions/45109835/shiny-server-change-the-directory-for-app
-http://shiny.rstudio.com/articles/debugging.html
-https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/#shiny-user-perms
-https://qualityandinnovation.com/2015/12/09/deploying-your-very-own-shiny-server/
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>R语言shiny server的安装和配置以及Linux操作系统的一些情况</p>
+                <a class="readmore" href="/items/my-items-post-18.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
