@@ -26,7 +26,188 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-41.html">Redis的基本概念</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-45.html">Scala函数式编程和Spark的联系</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T20:52:00+08:00">
+                Published: 2019-03-24 20:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Scala中的一些概念是Spark中有相似的地方，在这里总结以下，以作为进一步的巩固
+</pre></div>
+
+
+<h3>Scala的函数式编程</h3>
+<h4>1.基本概念</h4>
+<div class="highlight"><pre><span></span>   匿名函数
+   闭包 (函数和上下文-函数和运行时的数据)
+   函数科里化-柯里化 Curry --只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数
+        带有多参数的函数转化为一系列函数，每个函数都只有一个参数
+   偏函数
+   递归- 尾递归
+   函数式编程中的
+    数据结构
+    数据结构中的常见操作：
+        通用的操作：
+        各自特有的操作：
+            flatter  map    == flatMap
+            折叠：scan scanLeft scanRight-将中间结果放到新的集合，并将中间结果传递给一下函数调用
+                     输入参数： 初始值和运算函数
+                     返回值：中间结果新的集合
+            规约： reduce
+            聚合： sum  实际上调用的是 foldLeft
+                     span 遇到不符合就停止
+                     partition 对所有元素进行断言判断
+            分组：按照条件将元素分组-根据提供的函数生成分组关键字
+</pre></div>
+
+
+<h4>2.通用操作归类</h4>
+<div class="highlight"><pre><span></span>01.映射与遍历 map   flatMap  foreach  Iterator  flatten filter filterNot  filterKeys mapValue
+02.混洗    shuffle&lt;隐式操作-对用户透明&gt;
+03.规约与聚合  fold  reduce  aggregate  max  min
+04.分区和分组  partition  groupBy  grouped
+05.数据变换 zip unzip  zipWithIndex concat   toArray toList  collect range
+06.逻辑判断 empty  isEmpty contains containsSlice
+07.查看  head tail  last init take drop  slice  size  count  find apply 
+            indexOf lastIndexOf indexWhere  lastIndexWhere  indexOfSlice  lastIndexOfSlice
+            startsWith endsWith
+08.其他重要 drop dropWhile  take takeWhile
+            排序： sorted sortWith sortBy 
+            去重： distinct
+            集合操作： diff  union intersect
+            insert append
+            add  remove clear  
+            put  remove  clear   update  keys keySet values 
+            trim
+            pop push  update clear top
+            get getOrElse
+ 09.其他不常见： 转置 transpose  反转 reverse  转换 transform
+    mkString addString stringPrefix  copyToArray clone
+    填充 fill 滑动 sliding
+</pre></div>
+
+
+<h3>Spark 的一些内容</h3>
+<h4>基于RDD的操作</h4>
+<div class="highlight"><pre><span></span><span class="nv">RDD的类型</span><span class="s s-Atom">--</span> <span class="nv">RDD</span> <span class="s s-Atom">pairRDD</span>
+<span class="s s-Atom">函数作用以及返回值类型</span>
+<span class="mf">01.</span> <span class="s s-Atom">foreach</span> <span class="s s-Atom">、map、flatMap</span>
+    <span class="s s-Atom">foreach</span>  <span class="s s-Atom">对集合中每个元素进行操作</span>  <span class="s s-Atom">没有返回值</span>
+    <span class="s s-Atom">map</span>      <span class="s s-Atom">对集合中每个元素进行操作</span>
+    <span class="s s-Atom">flatMap</span>     <span class="s s-Atom">返回的迭代器的所有内容构成新的RDD</span>
+                    <span class="s s-Atom">是一个序列化的数据而不是单个数据项--</span> <span class="s s-Atom">a</span> <span class="nv">Seq</span>
+    <span class="s s-Atom">区别</span>
+            <span class="s s-Atom">map：对集合中每个元素进行操作。</span> 
+            <span class="s s-Atom">flatMap：对集合中每个元素进行操作然后再扁平化。</span>
+<span class="mf">02.</span> <span class="s s-Atom">fold</span> <span class="s s-Atom">以及</span> <span class="s s-Atom">reduce</span>  <span class="s s-Atom">和</span> <span class="s s-Atom">aggragate</span>
+    <span class="s s-Atom">fold</span> <span class="s s-Atom">将中间结果传递给下一次函数调用，返回最后一次函数计算的结果-返回结果是一个单值，其类型与初始值相同</span>
+    <span class="s s-Atom">共同点：返回的数据类型</span> 
+    <span class="s s-Atom">不同点：fold需要提供初始值</span> <span class="s s-Atom">fold</span> <span class="s s-Atom">foldLeft</span>  <span class="s s-Atom">foldRight</span>
+     <span class="s s-Atom">reduce函数和fold</span>  <span class="s s-Atom">函数输入和输出数据类型</span> <span class="s s-Atom">必须一致</span>
+    <span class="s s-Atom">aggragate</span>  <span class="s s-Atom">并不要求返回结果的类型是集合元素类型的父类</span>
+        <span class="s s-Atom">aggregate先对每个分区的元素做聚集，然后对所有分区的结果做聚集</span>
+    <span class="nv">Aggregate</span>
+     <span class="nn">eg</span><span class="p">:</span>
+        <span class="s s-Atom">t</span><span class="p">.</span><span class="nf">reduce</span><span class="p">(</span><span class="k">_</span> <span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
+        <span class="s s-Atom">t</span><span class="p">.</span><span class="nf">fold</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span> <span class="k">_</span> <span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
+        <span class="nf">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span>  <span class="p">(</span><span class="k">_</span><span class="p">,</span><span class="k">_</span><span class="p">)</span><span class="s s-Atom">=&gt;</span><span class="mi">0</span><span class="p">)</span>  <span class="s s-Atom">seqop在遍历分区的时候更新结果，</span> <span class="s s-Atom">combop</span> <span class="s s-Atom">-分区汇总--并行有分区的情况下</span>
+        <span class="nf">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span>  <span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
+<span class="mf">03.</span><span class="s s-Atom">groupByKey</span> <span class="s s-Atom">和reduceByKey</span>
+    <span class="nf">groupByKey</span><span class="p">():-</span><span class="s s-Atom">-作用以及返回值类型</span> <span class="s s-Atom">--对具有相同键的值进行分组</span>
+        <span class="s s-Atom">groupByKey也是对每个key进行操作，但只生成一个sequence</span>
+        <span class="p">[</span><span class="nv">K</span><span class="p">,</span> <span class="nv">Iterable</span><span class="p">[</span><span class="nv">V</span><span class="p">]]</span>
+    <span class="nf">reduceByKey</span><span class="p">()</span>  <span class="s s-Atom">----------------------------</span>   <span class="s s-Atom">合并具有相同键的值</span>
+        <span class="s s-Atom">规约，对具有键相同的值合并起来--返回</span> <span class="s s-Atom">各键以及</span> <span class="s s-Atom">对应键规约出来的结果值</span> <span class="s s-Atom">组成的新的RDD</span>
+        <span class="s s-Atom">对大数据进行复杂计算时，reduceByKey优于groupByKey</span>
+    <span class="nv">AggregateByKey</span> <span class="s s-Atom">根据Key的值来聚合--aggregateByKey调用的就是combineByKey方法</span>
+    <span class="s s-Atom">combineByKey</span>
+        <span class="nf">groupByKey</span><span class="p">()</span><span class="s s-Atom">是对RDD中的所有数据做shuffle</span><span class="p">,</span><span class="s s-Atom">根据不同的Key映射到不同的partition中再进行aggregate</span>
+        <span class="nf">aggregateByKey</span><span class="p">()</span><span class="s s-Atom">是先对每个partition中的数据根据不同的Key进行aggregate，然后将结果进行shuffle，完成各个partition之间的aggregate</span>
+
+    <span class="s s-Atom">grouped</span> <span class="s s-Atom">将对象分成固定大小组，且最后一组之前的组的大小必须相同，最后一组必须小于</span>
+    <span class="s s-Atom">grouped</span> <span class="s s-Atom">是根据元素数量分组</span>
+    <span class="s s-Atom">groupBy</span> <span class="s s-Atom">是根据计算的键值进行分组</span>
+             <span class="p">.</span><span class="nf">reduceByKey</span><span class="p">(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span> <span class="s s-Atom">reduceNum</span><span class="p">)</span>
+<span class="mf">04.</span><span class="s s-Atom">分区执行mapPartitions</span>   <span class="s s-Atom">foreachPartition</span>
+   <span class="nv">Spark提供基于分区的map和foreach</span>
+    <span class="s s-Atom">mapPartitions</span>   <span class="s s-Atom">foreachPartition</span>
+    <span class="s s-Atom">从算子的类型：</span>
+        <span class="s s-Atom">foreachPartition应该属于action运算操作，而</span> <span class="s s-Atom">mapPartitions</span> <span class="s s-Atom">是在Transformation中</span>
+        <span class="s s-Atom">返回值上：mapPartitions</span> <span class="s s-Atom">返回值类型迭代器：</span> <span class="nv">Iterator</span><span class="p">[</span><span class="nv">U</span><span class="p">]</span>  <span class="s s-Atom">该元素的迭代器</span>
+        <span class="s s-Atom">应用场景上：</span>
+        <span class="s s-Atom">mapPartitions可以获取返回值，继续在返回RDD上做其他的操作</span>
+         <span class="s s-Atom">foreachPartition因为没有返回值并且是action操作，所以使用它一般都是在程序末尾比如说要落地数据到存储系统中如mysql，es，或者hbase中，</span>
+    <span class="mf">02.</span><span class="s s-Atom">并行度</span>
+            <span class="mf">001.</span><span class="s s-Atom">对于已知的RDD进行重分区</span>
+            <span class="mf">002.</span><span class="s s-Atom">数据混洗操作中，使用参数的方式为混洗后的RDD指定并行度</span>
+<span class="mf">05.</span><span class="s s-Atom">重分区：repartition</span>  <span class="s s-Atom">和</span> <span class="s s-Atom">coalesce</span>
+    <span class="nf">repartition</span><span class="p">()</span> <span class="s s-Atom">把RDD随机打乱并分成设定的分区数目</span>
+    <span class="nf">coalesce</span><span class="p">()</span><span class="s s-Atom">:减少分区--没有打乱</span>
+        <span class="s s-Atom">对RDD的分区进行重新划分，repartition内部调用了coalesce，参数shuffle为true</span>
+          <span class="s s-Atom">扩大分区</span>
+          <span class="s s-Atom">减少分区</span>
+            <span class="s s-Atom">coalesce算子，可以手动减少DataFrame的partition数量，并且不用触发shuffle</span><span class="p">,</span>
+            <span class="s s-Atom">这也是coalesce跟repartition的区别</span>
+            <span class="s s-Atom">repartition一定会触发shuffle</span>
+<span class="mf">06.</span><span class="s s-Atom">广播变量和累加器</span>
+ <span class="nv">SparkContext</span> <span class="nf">通过broadcast</span><span class="p">(</span> <span class="p">)</span> <span class="s s-Atom">方法传递即将被广播的变量-返回Broadcast</span><span class="p">[</span><span class="nv">T</span><span class="p">]</span>
+ <span class="s s-Atom">从Driver</span> <span class="s s-Atom">到任务，单向传播，没有办法更新</span>
+  <span class="nf">通过accumulator</span><span class="p">(</span> <span class="p">)</span><span class="s s-Atom">方法创建一个累加器变量</span>
+<span class="mf">07.</span><span class="s s-Atom">leftOuterJoin连接操作</span>
+</pre></div>
+
+
+<h4>2.数据结构</h4>
+<div class="highlight"><pre><span></span>    <span class="n">RDD</span><span class="err">、</span><span class="n">DataFrame</span><span class="err">、</span><span class="n">Dataset</span><span class="err">全都是</span><span class="n">spark</span><span class="err">平台下的分布式弹性数据集</span>
+     <span class="n">RDD</span>   <span class="n">PairRDDFunctions</span> 
+     <span class="err">三者都有</span><span class="n">partition</span><span class="err">的概念，</span>
+     <span class="err">三者都有惰性机制，在进行创建、转换，</span>
+        <span class="err">如</span><span class="nb">map</span><span class="err">方法时，不会立即执行，只有在遇到</span><span class="n">Action</span><span class="err">如</span><span class="n">foreach</span><span class="err">时，三者才会开始遍历运算</span>
+        <span class="err">对</span><span class="n">DataFrame</span><span class="err">和</span><span class="n">Dataset</span><span class="err">进行操作许多操作都需要这个包进行支持</span><span class="o">-</span>  <span class="kn">import</span> <span class="nn">spark.implicits._</span>
+    <span class="n">DataFrame</span><span class="err">也可以叫</span><span class="n">Dataset</span><span class="p">[</span><span class="n">Row</span><span class="p">],</span>
+            <span class="err">每一行的类型是</span><span class="n">Row</span><span class="err">，不解析，每一行究竟有哪些字段，各个字段又是什么类型都无从得知</span>
+            <span class="n">Dataset</span><span class="err">中每一行是什么类型是不一定的</span>
+</pre></div>
+
+
+<h4>基于DataSet的操作</h4>
+<div class="highlight"><pre><span></span>    DataSet数据类型的转化
+        df.printSchema()
+        foreach   foreachPartition  filter  flatMap  mapPartitions  transform
+        reduce
+        head()  take()  count()  isEmpty  where(
+        collect()  collectAsList()
+        persist()  storageLevel
+        checkpoint()  coalesce  repartition  repartitionByRange(
+        columns
+        orderBy  sortWithinPartitions  sort
+        groupByKey
+        intersect  union 
+        agg  groupBy
+        join
+        explain()
+
+        provide common aggregations such as count(), countDistinct(), avg(), max(), min()
+        UserDefinedAggregateFunction extends Serializable
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-41.html" rel="bookmark"
+                           title="Permalink to Redis的基本概念">Redis的基本概念</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-03-09T20:21:00+08:00">
                 Published: 2019-03-09 20:21:00
@@ -37,88 +218,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>Redis</h3>
-<div class="highlight"><pre><span></span>Redis做一个最基本的了解
-     key-value 
-     keyspace
-redis是内存数据库，一切的数据都是存储到内存中的，同时redis为我们提供持久化功能，提供两种持久化方式，分别是RDB和AOF方式。数据的持久化会相对耗时。
-RDB：snapshotting, 二进制格式 
-AOF：Append Only File, fsync
-</pre></div>
-
-
-<h3>Redis概念</h3>
-<div class="highlight"><pre><span></span>其没有表格的概念，而是以字典（键空间）的方式来管理的，
-这与传统的SQL方式是不大一样的
-01.键空间的类型
-    keyspace notification（ 键空间通知）
-02.结构： key-value存储
-03.redis采用的是定期删除+惰性删除策略。 键到期、键被删除
-  可以设定过期时间：expire key 多少秒：设置多少秒后过期
-04.场景
-用途：可用于缓存，事件发布或订阅，高速队列等场景
-Redis支持多个数据库，并且每个数据库的数据是隔离的不能共享
-    每个数据库对外都是一个从0开始的递增数字命名，Redis默认支持16个数据库
-        01.Redis不支持自定义数据库的名字，每个数据库都以编号命名，
-         开发者必须自己记录哪些数据库存储了哪些数据
-        02.Redis也不支持为每个数据库设置不同的访问密码，所以一个客户端要么可以访问全部数据库，
-         要么连一个数据库也没有权限访问
- //如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
- private static int MAX_ACTIVE = 1024;
- //控制一个pool最多有多少个状态为idle(空闲的)的jedis实例，默认值也是8。
- private static int MAX_IDLE = 200;
- //等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException；
- private static int MAX_WAIT = 10000
-</pre></div>
-
-
-<h3>Redis</h3>
-<div class="highlight"><pre><span></span>Redis的键key   只能为字符串string
-Redis的值value 的数据类型有5种
-String
-List
-Hash          一个string类型的field和value的映射表
-Set          String 类型的无序集合。集合成员是唯一的
-Sorted Set
-</pre></div>
-
-
-<h3>常见命令操作</h3>
-<div class="highlight"><pre><span></span>1. 客户端--启动客户端-命令行
-       redis-cli
-       或者 redis-cli  -h host -p port -a password
-       eg: redis-cli -h 127.0.0.1 -p 6379 -a &quot;mypass&quot;
-
-       查看所有key
-        &gt; keys  *
-        -- 查看可以的类型 查看key的value是什么类型的type 
-        &gt; type keyexample
-        -- 查看可以存活多长时间
-        TTL keyexample
-Redis中  Dbsize 命令用于返回当前数据库的 key 的数量
-查看当前库的所有key ：keys *
-
-
-2.API操作
-MULTI 、 EXEC 、 DISCARD 和 WATCH 是 Redis 事务的基础。
-
-
-3.配置等信息
-Redis 的配置文件位于 Redis 安装目录下，文件名为 redis.conf。
-CONFIG GET CONFIG_SETTING_NAME
-CONFIG SET 命令基本语法：
-Redis监听端口，默认端口为6379
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>http://redisdoc.com/
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>key-value</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-41.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

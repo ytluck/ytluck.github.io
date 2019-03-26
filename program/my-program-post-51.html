@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>不同语言特性初步总结</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-51.html" rel="bookmark"
+           title="Permalink to 不同语言特性初步总结">不同语言特性初步总结</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T19:30:00+08:00">
+                Published: 2019-03-10 19:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>基本的语言特性的总结
+</pre></div>
+
+
+<h4>运算符</h4>
+<div class="highlight"><pre><span></span><span class="s s-Atom">三目运算符</span>
+  <span class="nv">Java和C</span><span class="s s-Atom">++</span>
+    <span class="s s-Atom">x</span> <span class="o">&gt;</span><span class="mi">0</span> <span class="s s-Atom">?</span> <span class="mi">1</span><span class="p">:-</span><span class="mi">2</span> 
+  <span class="nv">Scala</span>
+     <span class="s s-Atom">val</span> <span class="s s-Atom">originalvaule</span> <span class="o">=</span> <span class="nf">if</span> <span class="p">(</span><span class="s s-Atom">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="mi">1</span> <span class="s s-Atom">else</span> <span class="o">-</span><span class="mi">1</span>
+  <span class="nv">Python</span>
+    <span class="s s-Atom">st</span> <span class="o">=</span> <span class="mi">1</span>  <span class="s s-Atom">if</span> <span class="s s-Atom">x</span><span class="o">&gt;</span> <span class="mi">0</span> <span class="s s-Atom">else</span>  <span class="o">-</span><span class="mi">2</span>
+<span class="s s-Atom">操作符：</span> <span class="nf">优先级和结合性</span><span class="p">(</span><span class="s s-Atom">顺序</span><span class="p">)</span>
+    <span class="s s-Atom">一元操作符、二元操作符、三元操作符</span>
+    <span class="s s-Atom">前置操作符、中置操作符、后置操作符</span>
+    <span class="s s-Atom">功能：</span> <span class="s s-Atom">赋值操作符</span>
+</pre></div>
+
+
+<h4>表达式和语句</h4>
+<div class="highlight"><pre><span></span>Java和C
+    表达式 语句
+        表达式有值 3+6
+        语句执行动作 if x &gt;0
+Scala
+    表达式和语句--几乎所有构造出的语法结构都有值
+Python 
+    表达式：表达式操作符
+    语句：
+        赋值语句+ 隐式赋值:import,from,def,class,for,函数参数
+        try/except/finally:捕捉异常
+        控制结构
+
+Java 和C 中的赋值
+    x=y =1;
+Scala中的赋值
+  x=1
+  y=1
+</pre></div>
+
+
+<h4>控制结构</h4>
+<div class="highlight"><pre><span></span><span class="kr">if</span>语句等
+Java和C
+     <span class="kr">switch</span><span class="p">(</span><span class="kp">expression</span><span class="p">){</span>
+             case value <span class="o">://</span>语句
+                <span class="kr">break</span><span class="p">;</span> <span class="o">//</span>可选
+             case value <span class="o">:</span> <span class="o">//</span>语句
+                <span class="kr">break</span><span class="p">;</span> <span class="o">//</span>可选
+             <span class="o">//</span>你可以有任意数量的case语句
+             default <span class="o">:</span> <span class="o">//</span>可选<span class="o">//</span>语句
+         <span class="p">}</span>
+Scala没有
+    模式匹配
+Python
+        <span class="kr">if</span>  elif
+循环<span class="o">-</span>遍历<span class="o">-</span>迭代
+    Java
+        <span class="kr">for</span> <span class="p">(</span>Map.Entry<span class="o">&lt;</span>String<span class="p">,</span> String<span class="o">&gt;</span> entry <span class="o">:</span> map.entrySet<span class="p">())</span> 
+    Scala
+      方式一   <span class="kr">for</span> <span class="p">(</span>name <span class="o">&lt;-</span> <span class="kp">names</span><span class="p">)</span>    使用<span class="o">&lt;-</span>用于循环语义； 相较Java，语法层面来看只是将 <span class="o">:</span>换成<span class="o">&lt;-</span>
+      方式二：采用函数的方式处理 foreach  map
+                val nameList<span class="o">=</span>scores.map<span class="p">(</span>_<span class="m">.</span>_<span class="m">1</span><span class="p">)</span>  nameList.foreach<span class="p">((</span>x<span class="o">:</span>String<span class="p">)</span><span class="o">=&gt;</span><span class="kp">print</span><span class="p">(</span>x<span class="o">+</span><span class="s">&quot; &quot;</span><span class="p">))</span> 
+     Python
+        <span class="kr">for</span> item <span class="kr">in</span> s： 遍历s中的元素
+        <span class="kr">for</span> i <span class="p">,</span> value <span class="kr">in</span> enumerate<span class="p">(</span>s<span class="p">)</span>
+    R语言
+        <span class="kr">for</span><span class="p">(</span>v <span class="kr">in</span> vals<span class="p">)</span>
+
+推导式
+  Java
+    <span class="kr">for</span> <span class="p">(</span>int j <span class="o">=</span> <span class="m">0</span><span class="p">;</span> j <span class="o">&lt;</span> integers.length<span class="p">;</span> j<span class="o">++</span><span class="p">)</span>
+  Scala<span class="o">-</span> <span class="kr">for</span>推导式
+    <span class="kr">for</span><span class="p">(</span>i <span class="o">&lt;-</span> <span class="m">1</span> to <span class="m">10</span> <span class="p">)</span>  yield i%<span class="m">3</span>
+            生成器表达式<span class="p">(</span>Generator Expression<span class="p">)</span> <span class="m">1</span> to <span class="m">10</span>  <span class="m">1</span> until <span class="m">10</span>
+            yield 
+    scala提供了保护式<span class="p">(</span>Guard<span class="p">)</span>守卫
+          <span class="kr">for</span>中的<span class="kr">if</span>
+
+  Python 
+    列表推导式  <span class="p">[</span> <span class="p">]</span>   字典推导式 存在 key 和 value，使用的是 <span class="p">{}</span> 集合推导式
+                gen <span class="o">=</span> <span class="p">[</span> x <span class="o">**</span><span class="m">2</span> <span class="kr">for</span> x <span class="kr">in</span> <span class="kp">range</span><span class="p">(</span><span class="m">10</span><span class="p">)]</span>
+    <span class="c1">## 生成器有状态，使用过之后注意-构造可迭代遍历的对象</span>
+    生成器表达式 <span class="p">(</span> <span class="p">)</span>  gen <span class="o">=</span><span class="p">(</span> x<span class="o">**</span><span class="m">2</span> <span class="kr">for</span> x <span class="kr">in</span> <span class="kp">range</span><span class="p">(</span><span class="m">10</span><span class="p">))</span>
+    生成器
+        def _make_gen<span class="p">()</span><span class="o">:</span>
+                    fro x <span class="kr">in</span> <span class="kp">range</span><span class="p">(</span><span class="m">10</span><span class="p">)</span><span class="o">:</span>
+                        yield x<span class="o">**</span><span class="m">2</span>
+                 gen <span class="o">=</span> _nake_gen<span class="p">()</span>
+
+    初始化
+        声明变量和初始化
+        Java
+        Scala <span class="o">--</span> 惰性求值
+        Python
+</pre></div>
+
+
+<h4>异常处理机制</h4>
+<div class="highlight"><pre><span></span>Java
+  try catch finally
+          throw   throw exception
+  try{}
+  catch(ArrayIndexOutOfBoundsException e){ }
+Scala
+  try {  println(&quot;运行try&quot;)}
+  catch {
+        case e: Exception =&gt; {println(&quot;获取异常信息&quot;) }
+                        }
+   finally{ println(&quot;try结束后的处理，如关闭连接&quot;) }
+Python
+     raise
+    raise RuntimeError(&#39;testError&#39;)
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

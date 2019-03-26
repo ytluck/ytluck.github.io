@@ -26,7 +26,162 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-29.html">不同语言中类中方法的定义</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-50.html">Scala语言自身的一些特性总结</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T20:00:00+08:00">
+                Published: 2019-03-10 20:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Scala中的一些特性--Scala特性，可以从基本语言特征。面向对象特点、并发编程、函数式编程以及自身的特有地方构成。本次主要涉及自身的一些特点
+ 模式匹配
+ 隐式转换
+ 类型系统
+</pre></div>
+
+
+<h3>模式匹配</h3>
+<div class="highlight"><pre><span></span>1.eg：
+       patteh match{
+       case 1 =&gt; println(&#39;1&#39;)
+       case_ =&gt; println(&quot;其他&quot;)
+       }
+match语句匹配的对象，以及case语句加入表达式
+        case 后面接
+                常量                      通常大写，若小写的常量需要使用反括号
+                变量 case  x if(x%2==0)  必须以小写字母开头
+                类型 case x:String            类型多是大写  优先于isInstanceof asInstanceof
+                数组、元组、列表 case()    Array
+                序列模式 Seq        unapplySeq
+                可变参数类表的匹配
+                正则表达式的匹配
+                样例类的匹配-构造函数unapply-样例类case class等
+                变量绑定模式@
+2.模式匹配的原理
+    匹配发生在运行期，Java虚拟机中的泛型类型信息会被擦除，所以不能用类型来匹配特定的Map类型
+    变量是如何绑定到列表或者元组的不同部分--
+析构--访问复杂结构的各组成部分--
+提取器机制 extractor --带有从对象中提取值的unapply或者unapplySeq方法-提取器就是一个带有 unapply 方法的对象
+    Array伴生对象
+    正则表达式--正则表达式对象
+    unapply方法会将对象分解为用以匹配模式的片段，而apply则是为了提供一个把他们组合回去的选择
+    每个样例类都自动具备apply和unapply方法
+    提取任意长度值的序列-unapplySeq
+</pre></div>
+
+
+<h3>隐式转换</h3>
+<div class="highlight"><pre><span></span><span class="n">Scala</span><span class="err">中会默认隐式的引用到每个程序中</span><span class="o">-</span><span class="kn">import</span> <span class="nn">Predef._</span>    <span class="o">//</span> <span class="err">通过</span><span class="n">Predef</span><span class="err">对象自动加载一些隐式对象</span>
+<span class="err">隐式参数和隐式转换</span>
+    <span class="err">隐式转换用于类型之间做转换</span> <span class="n">implicit</span> <span class="n">conversion</span> <span class="n">function</span>
+
+<span class="err">隐式转换规则</span><span class="o">--</span><span class="err">显性定义规则</span><span class="o">-</span><span class="err">作用域规则</span><span class="o">--</span><span class="err">无歧义规则</span>
+    <span class="err">当表达式类型与预期类型不同时</span>
+    <span class="err">当对象访问一个不存在的成员时</span>
+    <span class="err">当对象调用某个方法，而该方法的参数声明与传入参数不匹配时</span>
+
+<span class="err">定义隐式转换函数</span>
+    <span class="n">implicit</span> <span class="k">def</span> <span class="nf">int2float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="n">Int</span><span class="p">)</span> <span class="p">:</span><span class="n">Float</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">toFloat</span>
+     <span class="err">隐式转换与函数名无关</span><span class="o">--</span><span class="err">只与函数签名</span><span class="o">-</span><span class="err">即</span> <span class="err">输入参数类型和返回值类型有关</span>
+<span class="err">隐式类</span><span class="o">-</span><span class="err">隐式对象</span><span class="o">-</span><span class="err">隐式参数</span><span class="o">-</span><span class="err">隐式值</span>
+<span class="err">隐式参数适用的场景</span>
+    <span class="err">执行上下文</span>
+    <span class="err">功能控制</span>
+    <span class="err">限定可用实例</span>
+    <span class="err">隐式证据</span><span class="o">--</span> <span class="err">绕开类型擦除带来的限制</span>
+<span class="err">隐式参数遵循的规则</span>
+    <span class="err">只有最后一个参数列表中允许出现隐式参数</span>
+    <span class="n">implicit</span> <span class="err">关键字必须出现在参数列表的最左边，且只能出现一次</span>
+</pre></div>
+
+
+<h3>类型系统 Type System</h3>
+<div class="highlight"><pre><span></span>类型--类型参数 -- 类型变量
+类型参数- 
+    01.类型泛化-- 带有一个或者多个类型参数的类是泛型
+        泛型类-泛型函数
+    02.对类型做出限制 类型界定（上界、下界、上下文界定、类型约束），
+                                                类型约束： =:=  &lt;:&lt;  =&gt;
+        变异声明 +  - 
+            协变表示某个泛型类的子类型关系 和参数T方向一致 -- 表示输出的类型参数 + 
+            逆变表示方向相反        -- 表示输入的类型参数
+     03.类型通配符
+
+高级类型
+        参数化类型- 抽象类型-结构化类型
+        单例类型-类型投影-类型别名- 结构类型-存在类型-抽象类型-高等 Higher-Kinded类型
+             高阶类型的使用中，有三种变化，分别是顺变、协变及逆变
+        高阶类型是接受其他参数用来构造新类型的，所以又称为“类型构造器
+        路径相关类型-- path-dependent type
+
+类型推断
+  Scala采用的局部的(local)、基于流的(flow-based)类型推断
+</pre></div>
+
+
+<h3>附录：</h3>
+<div class="highlight"><pre><span></span>    中置表达式-- infix- 中置操作符
+        操作符： 优先级和结合性(顺序)
+                        一元操作符、二元操作符、三元操作符
+                        前置操作符、中置操作符、后置操作符
+                        功能： 赋值操作符
+        1 to 10  ==  1.to(10)
+        方法
+            apply   ： 构造对象不用显示使用new
+            unapply
+            update
+    2. match case 
+      catch(){ case e:Exception}
+     3.
+        Predef提供经常使用函数 println()
+        Predef对象定义了经常使用的隐式转换--一些隐式转换规则
+        Predef 定义了若干的类型以及类型别名
+        函数的签名（方法签名）是用来定义一个函数传入参数的类型，顺序和数量的
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Scala常见特性小结 http://ytluck.github.io/program/my-program-post-20.html
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-51.html" rel="bookmark"
+                           title="Permalink to 不同语言特性初步总结">不同语言特性初步总结</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T19:30:00+08:00">
+                Published: 2019-03-10 19:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>循环-异常</p>
+                <a class="readmore" href="/program/my-program-post-51.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-29.html" rel="bookmark"
+                           title="Permalink to 不同语言中类中方法的定义">不同语言中类中方法的定义</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-06-03T20:45:00+08:00">
                 Published: 2017-06-03 20:45:00
@@ -37,153 +192,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/scala.html">Scala</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>本文主要学习了Python-Java-Scala中的类的不同方法以及包导入机制的一些内容
-</pre></div>
-
-
-<h2>一.不同语言中的方法</h2>
-<h3>在Python中的方法</h3>
-<div class="highlight"><pre><span></span>01.实例方法 ---的第一个参数必须是”self
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-    def printInstanceInfo(self):
-        print &quot;%s is %d years old&quot; %(self.name, self.age)
-
-02.静态方法  -----没有参数限制，既不需要实例参数，也不需要类参数，定义的时候使用@staticmethod装饰器
-@staticmethod
-def printClassAttr():
-    print Student.count
-    print Student.books
-
-03.类方法 -----=以cls作为第一个参数，cls表示类本身，定义时使用@classmethod装饰器。通过cls可以访问类的相关属性
-@classmethod
-def printClassInfo(cls):
-    print cls.__name__
-    print dir(cls)
-参数
-    主要区别在于参数，
-    静态方法没有参数限制，既不需要实例参数，也不需要类参数
-使用
-    实例方法被绑定到一个实例，只能通过实例进行调用；
-    但是对于静态方法和类方法，可以通过类名和实例两种方式进行调用。
-</pre></div>
-
-
-<h4>访问控制</h4>
-<div class="highlight"><pre><span></span>访问控制
-Python中没有访问控制的关键字，例如private、protected等等。但是，在Python编码中，有一些约定来进行访问控制。
-单下划线”_”
-    在Python中，通过单下划线”_”来实现模块级别的私有化，一般约定以单下划线”_”开头的变量、函数为模块私有的
-
-双下划线”__”
-</pre></div>
-
-
-<h3>Java中的类方法</h3>
-<div class="highlight"><pre><span></span>    Java 实例方法属于每个对象个体的方法
-    Java中类变量也叫静态变量，也就是在变量前加了static 的变量
-
-    调用--import
-        类名.静态方法名
-        new一个实例，然后实例调用方法
-        继承的方法--直接调用
-        模块名.函数名()
-</pre></div>
-
-
-<h3>scala--中的类</h3>
-<div class="highlight"><pre><span></span>    <span class="kn">import</span> <span class="nn">a_trait</span>
-    <span class="n">extends</span> <span class="n">a_trait</span><span class="o">--</span><span class="err">直接用</span>
-    <span class="nb">apply</span><span class="o">---</span><span class="err">不用</span><span class="n">new</span><span class="err">一个对象，在构造样本类的对象时，可以略去</span><span class="n">new</span><span class="err">关键字，言简意赅，提高了代码的表达力。</span>
-    <span class="n">package</span> <span class="nb">object</span><span class="o">--</span><span class="err">对于包对象，</span><span class="n">import</span><span class="err">之后直接用</span>
-
-
-     <span class="err">包对象可以持有函数和变量</span><span class="o">--</span> <span class="err">引入语句可以出现在任何位置，不限于文件顶部</span>
-     <span class="n">scala</span> <span class="n">import</span><span class="err">引入语句可以引入包、类和对象</span>
-
-     <span class="err">引入包</span><span class="o">.</span><span class="n">_</span> 
-            <span class="err">包下的样例类直接调用，样例类</span><span class="o">--</span><span class="err">样例类有参数</span>
-            <span class="kn">import</span> <span class="nn">org.apache.spark.sql.execution.command._</span>
-             <span class="n">DescribeFunctionCommand</span><span class="p">(</span><span class="n">functionName</span><span class="p">,</span> <span class="n">EXTENDED</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span>
-</pre></div>
-
-
-<h2>二.管理大型程序中的名称--包</h2>
-<h3>Java的包管理</h3>
-<div class="highlight"><pre><span></span><span class="err">包管理机制</span><span class="o">-</span>
-    <span class="err">分层管理</span>
-            <span class="err">不同的包</span>
-            <span class="err">同一个包，不同的主类中</span>
-            <span class="err">同一个主类，不同的的类，接口</span>
-            <span class="err">一个类中</span><span class="o">-----------------------</span><span class="err">内部类</span>
-
-<span class="err">复用类</span><span class="o">--</span><span class="err">类的调用</span>
-        <span class="err">利用现有类型生成新的类型</span><span class="o">--</span><span class="err">代码复用机制</span>
-                <span class="err">组合</span><span class="o">--</span>
-                <span class="err">继承</span><span class="o">--</span>
-                <span class="err">实现</span><span class="o">--</span>    
-    <span class="err">组合</span>
-            <span class="err">首先：</span><span class="kn">import</span>
-            <span class="err">其次：</span>
-    <span class="err">继承</span>
-        <span class="n">extends</span>
-    <span class="err">实现</span>
-        <span class="n">implements</span>
-        <span class="err">一个</span><span class="n">java</span><span class="err">主类中引用另一个类的方法</span>
-                <span class="err">类</span><span class="o">--</span><span class="err">静态类</span>
-<span class="err">类说明</span><span class="o">--</span><span class="err">静态变量和静态方法都属于静态对象</span>
-    <span class="err">静态变量的使用</span><span class="o">--</span><span class="n">static</span> 
-            <span class="kn">import</span> <span class="err">类</span> <span class="o">&lt;</span><span class="err">不同包或者类</span><span class="o">&gt;</span>
-            <span class="err">直接用</span> <span class="err">类名</span><span class="o">.</span><span class="err">静态方法名</span>  <span class="err">或者</span>  <span class="err">类名</span><span class="o">.</span><span class="err">静态变量名就可引用</span>
-            <span class="err">不用使用</span><span class="n">new</span><span class="err">一个实例，然后实例调用方法或者变量</span>
-        <span class="err">域</span>
-        <span class="err">方法</span>
-</pre></div>
-
-
-<h3>Scala的包管理</h3>
-<div class="highlight"><pre><span></span>&lt;1&gt;
-- Scala的单例对象Scala不能定义静态成员,而是代之定义单例对象(singleton object)。以object关键字定义
-
-包可以包含类、对象和特质，但不能包含函数或变量的定义。
-    很不幸，这是Java虚拟机的局限。把工具函数或常量添加到包而不是某个Utils对象，这是更加合理的做法。
-包对象的出现正是为了解决这个局限。每个包都可以有一个包对象。你需要在父包中定义它，且名称与子包一样
-</pre></div>
-
-
-<h3>Python模块及包的导入</h3>
-<div class="highlight"><pre><span></span><span class="n">Python</span><span class="err">的包管理</span>
-<span class="err">包下载</span>    <span class="n">pip</span>  <span class="n">install</span>
-
-<span class="err">导入：</span>
-        <span class="kn">from</span> <span class="o">+</span> <span class="n">import</span><span class="err">来导入包中的部分模块</span>
-        <span class="err">整体模块导入</span>
-        <span class="err">包导入</span>
- <span class="kn">import</span> <span class="err">语句导入的模块共有以下四类</span><span class="p">:</span> 
-                    <span class="err">•使用</span><span class="n">Python</span><span class="err">写的程序</span><span class="p">(</span> <span class="o">.</span><span class="n">py</span><span class="err">文件</span><span class="p">)</span>
-                    <span class="err">•</span><span class="n">C</span><span class="err">或</span><span class="n">C</span><span class="o">++</span><span class="err">扩展</span><span class="p">(</span><span class="err">已编译为共享库或</span><span class="n">DLL</span><span class="err">文件</span><span class="p">)</span>
-                    <span class="err">•包</span><span class="p">(</span><span class="err">包含多个模块</span><span class="p">)</span>
-                    <span class="err">•内建模块</span><span class="p">(</span><span class="err">使用</span><span class="n">C</span><span class="err">编写并已链接到</span><span class="n">Python</span><span class="err">解释器内</span><span class="p">)</span>
-<span class="n">Python</span><span class="err">的包搜索路径</span>    
-            <span class="n">Python</span><span class="err">会在以下路径中搜索它想要寻找的模块：</span>
-            <span class="mf">1.</span> <span class="err">程序所在的文件夹</span>
-            <span class="mf">2.</span> <span class="err">标准库的安装路径</span>
-            <span class="mf">3.</span> <span class="err">操作系统环境变量</span><span class="n">PYTHONPATH</span><span class="err">所包含的路径</span>
-</pre></div>
-
-
-<p>参考：
-         python模块及包的导入 http://blog.csdn.net/zyz511919766/article/details/22678143</p>
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>Scala学习(七)---包和引入 http://www.cnblogs.com/sunddenly/p/4436897.html
-Scala样本类  http://www.jianshu.com/p/c374599ed0c4
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Python-Java-Scala包导入机制和类中方法的定义</p>
+                <a class="readmore" href="/program/my-program-post-29.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

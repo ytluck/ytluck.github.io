@@ -26,7 +26,188 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/data-mining/my-dataming-post-42.html">Hive的执行和优化</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-45.html">Scala函数式编程和Spark的联系</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T20:52:00+08:00">
+                Published: 2019-03-24 20:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Scala中的一些概念是Spark中有相似的地方，在这里总结以下，以作为进一步的巩固
+</pre></div>
+
+
+<h3>Scala的函数式编程</h3>
+<h4>1.基本概念</h4>
+<div class="highlight"><pre><span></span>   匿名函数
+   闭包 (函数和上下文-函数和运行时的数据)
+   函数科里化-柯里化 Curry --只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数
+        带有多参数的函数转化为一系列函数，每个函数都只有一个参数
+   偏函数
+   递归- 尾递归
+   函数式编程中的
+    数据结构
+    数据结构中的常见操作：
+        通用的操作：
+        各自特有的操作：
+            flatter  map    == flatMap
+            折叠：scan scanLeft scanRight-将中间结果放到新的集合，并将中间结果传递给一下函数调用
+                     输入参数： 初始值和运算函数
+                     返回值：中间结果新的集合
+            规约： reduce
+            聚合： sum  实际上调用的是 foldLeft
+                     span 遇到不符合就停止
+                     partition 对所有元素进行断言判断
+            分组：按照条件将元素分组-根据提供的函数生成分组关键字
+</pre></div>
+
+
+<h4>2.通用操作归类</h4>
+<div class="highlight"><pre><span></span>01.映射与遍历 map   flatMap  foreach  Iterator  flatten filter filterNot  filterKeys mapValue
+02.混洗    shuffle&lt;隐式操作-对用户透明&gt;
+03.规约与聚合  fold  reduce  aggregate  max  min
+04.分区和分组  partition  groupBy  grouped
+05.数据变换 zip unzip  zipWithIndex concat   toArray toList  collect range
+06.逻辑判断 empty  isEmpty contains containsSlice
+07.查看  head tail  last init take drop  slice  size  count  find apply 
+            indexOf lastIndexOf indexWhere  lastIndexWhere  indexOfSlice  lastIndexOfSlice
+            startsWith endsWith
+08.其他重要 drop dropWhile  take takeWhile
+            排序： sorted sortWith sortBy 
+            去重： distinct
+            集合操作： diff  union intersect
+            insert append
+            add  remove clear  
+            put  remove  clear   update  keys keySet values 
+            trim
+            pop push  update clear top
+            get getOrElse
+ 09.其他不常见： 转置 transpose  反转 reverse  转换 transform
+    mkString addString stringPrefix  copyToArray clone
+    填充 fill 滑动 sliding
+</pre></div>
+
+
+<h3>Spark 的一些内容</h3>
+<h4>基于RDD的操作</h4>
+<div class="highlight"><pre><span></span><span class="nv">RDD的类型</span><span class="s s-Atom">--</span> <span class="nv">RDD</span> <span class="s s-Atom">pairRDD</span>
+<span class="s s-Atom">函数作用以及返回值类型</span>
+<span class="mf">01.</span> <span class="s s-Atom">foreach</span> <span class="s s-Atom">、map、flatMap</span>
+    <span class="s s-Atom">foreach</span>  <span class="s s-Atom">对集合中每个元素进行操作</span>  <span class="s s-Atom">没有返回值</span>
+    <span class="s s-Atom">map</span>      <span class="s s-Atom">对集合中每个元素进行操作</span>
+    <span class="s s-Atom">flatMap</span>     <span class="s s-Atom">返回的迭代器的所有内容构成新的RDD</span>
+                    <span class="s s-Atom">是一个序列化的数据而不是单个数据项--</span> <span class="s s-Atom">a</span> <span class="nv">Seq</span>
+    <span class="s s-Atom">区别</span>
+            <span class="s s-Atom">map：对集合中每个元素进行操作。</span> 
+            <span class="s s-Atom">flatMap：对集合中每个元素进行操作然后再扁平化。</span>
+<span class="mf">02.</span> <span class="s s-Atom">fold</span> <span class="s s-Atom">以及</span> <span class="s s-Atom">reduce</span>  <span class="s s-Atom">和</span> <span class="s s-Atom">aggragate</span>
+    <span class="s s-Atom">fold</span> <span class="s s-Atom">将中间结果传递给下一次函数调用，返回最后一次函数计算的结果-返回结果是一个单值，其类型与初始值相同</span>
+    <span class="s s-Atom">共同点：返回的数据类型</span> 
+    <span class="s s-Atom">不同点：fold需要提供初始值</span> <span class="s s-Atom">fold</span> <span class="s s-Atom">foldLeft</span>  <span class="s s-Atom">foldRight</span>
+     <span class="s s-Atom">reduce函数和fold</span>  <span class="s s-Atom">函数输入和输出数据类型</span> <span class="s s-Atom">必须一致</span>
+    <span class="s s-Atom">aggragate</span>  <span class="s s-Atom">并不要求返回结果的类型是集合元素类型的父类</span>
+        <span class="s s-Atom">aggregate先对每个分区的元素做聚集，然后对所有分区的结果做聚集</span>
+    <span class="nv">Aggregate</span>
+     <span class="nn">eg</span><span class="p">:</span>
+        <span class="s s-Atom">t</span><span class="p">.</span><span class="nf">reduce</span><span class="p">(</span><span class="k">_</span> <span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
+        <span class="s s-Atom">t</span><span class="p">.</span><span class="nf">fold</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span> <span class="k">_</span> <span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
+        <span class="nf">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span>  <span class="p">(</span><span class="k">_</span><span class="p">,</span><span class="k">_</span><span class="p">)</span><span class="s s-Atom">=&gt;</span><span class="mi">0</span><span class="p">)</span>  <span class="s s-Atom">seqop在遍历分区的时候更新结果，</span> <span class="s s-Atom">combop</span> <span class="s s-Atom">-分区汇总--并行有分区的情况下</span>
+        <span class="nf">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span>  <span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
+<span class="mf">03.</span><span class="s s-Atom">groupByKey</span> <span class="s s-Atom">和reduceByKey</span>
+    <span class="nf">groupByKey</span><span class="p">():-</span><span class="s s-Atom">-作用以及返回值类型</span> <span class="s s-Atom">--对具有相同键的值进行分组</span>
+        <span class="s s-Atom">groupByKey也是对每个key进行操作，但只生成一个sequence</span>
+        <span class="p">[</span><span class="nv">K</span><span class="p">,</span> <span class="nv">Iterable</span><span class="p">[</span><span class="nv">V</span><span class="p">]]</span>
+    <span class="nf">reduceByKey</span><span class="p">()</span>  <span class="s s-Atom">----------------------------</span>   <span class="s s-Atom">合并具有相同键的值</span>
+        <span class="s s-Atom">规约，对具有键相同的值合并起来--返回</span> <span class="s s-Atom">各键以及</span> <span class="s s-Atom">对应键规约出来的结果值</span> <span class="s s-Atom">组成的新的RDD</span>
+        <span class="s s-Atom">对大数据进行复杂计算时，reduceByKey优于groupByKey</span>
+    <span class="nv">AggregateByKey</span> <span class="s s-Atom">根据Key的值来聚合--aggregateByKey调用的就是combineByKey方法</span>
+    <span class="s s-Atom">combineByKey</span>
+        <span class="nf">groupByKey</span><span class="p">()</span><span class="s s-Atom">是对RDD中的所有数据做shuffle</span><span class="p">,</span><span class="s s-Atom">根据不同的Key映射到不同的partition中再进行aggregate</span>
+        <span class="nf">aggregateByKey</span><span class="p">()</span><span class="s s-Atom">是先对每个partition中的数据根据不同的Key进行aggregate，然后将结果进行shuffle，完成各个partition之间的aggregate</span>
+
+    <span class="s s-Atom">grouped</span> <span class="s s-Atom">将对象分成固定大小组，且最后一组之前的组的大小必须相同，最后一组必须小于</span>
+    <span class="s s-Atom">grouped</span> <span class="s s-Atom">是根据元素数量分组</span>
+    <span class="s s-Atom">groupBy</span> <span class="s s-Atom">是根据计算的键值进行分组</span>
+             <span class="p">.</span><span class="nf">reduceByKey</span><span class="p">(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span> <span class="s s-Atom">reduceNum</span><span class="p">)</span>
+<span class="mf">04.</span><span class="s s-Atom">分区执行mapPartitions</span>   <span class="s s-Atom">foreachPartition</span>
+   <span class="nv">Spark提供基于分区的map和foreach</span>
+    <span class="s s-Atom">mapPartitions</span>   <span class="s s-Atom">foreachPartition</span>
+    <span class="s s-Atom">从算子的类型：</span>
+        <span class="s s-Atom">foreachPartition应该属于action运算操作，而</span> <span class="s s-Atom">mapPartitions</span> <span class="s s-Atom">是在Transformation中</span>
+        <span class="s s-Atom">返回值上：mapPartitions</span> <span class="s s-Atom">返回值类型迭代器：</span> <span class="nv">Iterator</span><span class="p">[</span><span class="nv">U</span><span class="p">]</span>  <span class="s s-Atom">该元素的迭代器</span>
+        <span class="s s-Atom">应用场景上：</span>
+        <span class="s s-Atom">mapPartitions可以获取返回值，继续在返回RDD上做其他的操作</span>
+         <span class="s s-Atom">foreachPartition因为没有返回值并且是action操作，所以使用它一般都是在程序末尾比如说要落地数据到存储系统中如mysql，es，或者hbase中，</span>
+    <span class="mf">02.</span><span class="s s-Atom">并行度</span>
+            <span class="mf">001.</span><span class="s s-Atom">对于已知的RDD进行重分区</span>
+            <span class="mf">002.</span><span class="s s-Atom">数据混洗操作中，使用参数的方式为混洗后的RDD指定并行度</span>
+<span class="mf">05.</span><span class="s s-Atom">重分区：repartition</span>  <span class="s s-Atom">和</span> <span class="s s-Atom">coalesce</span>
+    <span class="nf">repartition</span><span class="p">()</span> <span class="s s-Atom">把RDD随机打乱并分成设定的分区数目</span>
+    <span class="nf">coalesce</span><span class="p">()</span><span class="s s-Atom">:减少分区--没有打乱</span>
+        <span class="s s-Atom">对RDD的分区进行重新划分，repartition内部调用了coalesce，参数shuffle为true</span>
+          <span class="s s-Atom">扩大分区</span>
+          <span class="s s-Atom">减少分区</span>
+            <span class="s s-Atom">coalesce算子，可以手动减少DataFrame的partition数量，并且不用触发shuffle</span><span class="p">,</span>
+            <span class="s s-Atom">这也是coalesce跟repartition的区别</span>
+            <span class="s s-Atom">repartition一定会触发shuffle</span>
+<span class="mf">06.</span><span class="s s-Atom">广播变量和累加器</span>
+ <span class="nv">SparkContext</span> <span class="nf">通过broadcast</span><span class="p">(</span> <span class="p">)</span> <span class="s s-Atom">方法传递即将被广播的变量-返回Broadcast</span><span class="p">[</span><span class="nv">T</span><span class="p">]</span>
+ <span class="s s-Atom">从Driver</span> <span class="s s-Atom">到任务，单向传播，没有办法更新</span>
+  <span class="nf">通过accumulator</span><span class="p">(</span> <span class="p">)</span><span class="s s-Atom">方法创建一个累加器变量</span>
+<span class="mf">07.</span><span class="s s-Atom">leftOuterJoin连接操作</span>
+</pre></div>
+
+
+<h4>2.数据结构</h4>
+<div class="highlight"><pre><span></span>    <span class="n">RDD</span><span class="err">、</span><span class="n">DataFrame</span><span class="err">、</span><span class="n">Dataset</span><span class="err">全都是</span><span class="n">spark</span><span class="err">平台下的分布式弹性数据集</span>
+     <span class="n">RDD</span>   <span class="n">PairRDDFunctions</span> 
+     <span class="err">三者都有</span><span class="n">partition</span><span class="err">的概念，</span>
+     <span class="err">三者都有惰性机制，在进行创建、转换，</span>
+        <span class="err">如</span><span class="nb">map</span><span class="err">方法时，不会立即执行，只有在遇到</span><span class="n">Action</span><span class="err">如</span><span class="n">foreach</span><span class="err">时，三者才会开始遍历运算</span>
+        <span class="err">对</span><span class="n">DataFrame</span><span class="err">和</span><span class="n">Dataset</span><span class="err">进行操作许多操作都需要这个包进行支持</span><span class="o">-</span>  <span class="kn">import</span> <span class="nn">spark.implicits._</span>
+    <span class="n">DataFrame</span><span class="err">也可以叫</span><span class="n">Dataset</span><span class="p">[</span><span class="n">Row</span><span class="p">],</span>
+            <span class="err">每一行的类型是</span><span class="n">Row</span><span class="err">，不解析，每一行究竟有哪些字段，各个字段又是什么类型都无从得知</span>
+            <span class="n">Dataset</span><span class="err">中每一行是什么类型是不一定的</span>
+</pre></div>
+
+
+<h4>基于DataSet的操作</h4>
+<div class="highlight"><pre><span></span>    DataSet数据类型的转化
+        df.printSchema()
+        foreach   foreachPartition  filter  flatMap  mapPartitions  transform
+        reduce
+        head()  take()  count()  isEmpty  where(
+        collect()  collectAsList()
+        persist()  storageLevel
+        checkpoint()  coalesce  repartition  repartitionByRange(
+        columns
+        orderBy  sortWithinPartitions  sort
+        groupByKey
+        intersect  union 
+        agg  groupBy
+        join
+        explain()
+
+        provide common aggregations such as count(), countDistinct(), avg(), max(), min()
+        UserDefinedAggregateFunction extends Serializable
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-42.html" rel="bookmark"
+                           title="Permalink to Hive的执行和优化">Hive的执行和优化</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-03-24T20:52:00+08:00">
                 Published: 2019-03-24 20:52:00
@@ -37,180 +218,10 @@
         </address>
 <p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
 <p>tags: <a href="/tag/hive.html">Hive</a> </p>
-</footer><!-- /.post-info --><h3>Hive的调优</h3>
-<div class="highlight"><pre><span></span>选取执行引擎： mr tez spark
-        set hive execution.engine=spark
-选取文件存储的格式：
-优化器的选择：set  hive.cbo.enable=true
-表统计信息的收集： set  hive.stats.autogather=true  &lt;默认开启&gt;
-</pre></div>
-
-
-<h3>数据倾斜：Hive on MapReduce</h3>
-<div class="highlight"><pre><span></span>-- Mapreduce的优化核心在确保每个节点数据分布均匀
-系统层面：
-    1.Job数
-    2. map reduce join groupby的设置
-Hive数据倾斜原因
-       key分布不均匀
-       业务数据本身的特性
-       SQL语句造成数据倾斜
-代码层面：
-    尽量尽早地过滤数据 -- 过滤无效ID以及设置null值
-    不同数据类型关联前的转换
-    列裁剪和分区裁剪
-    将大表放后头
-    Limit语句还是需要执行整个查询语句，然后再返回部分结果。
-      有一个配置属性可以开启，避免这种情况---对数据源进行抽样
-      hive.limit.optimize.enable=true --- 开启对数据源进行采样的功能
-      hive.limit.row.max.size --- 设置最小的采样容量
-      hive.limit.optimize.limit.file --- 设置最大的采样样本数
-</pre></div>
-
-
-<h3>优化方式：</h3>
-<div class="highlight"><pre><span></span>针对单个Job 中单个步骤的优化，针对MR全局的优化
-</pre></div>
-
-
-<h4>1.map阶段的优化：</h4>
-<div class="highlight"><pre><span></span>通过Input和blocksize来决定MR任务的数量
-01.产生的主要原因：上游表文件大小不均匀，且小文件居多
-   解决方案：
-       对上游合并小文件，同时调整map 个数
-    具体设置参数：
-        上游合并小文件
-                合并小文件
-                    hive.merg.mapfiles=true：合并map输出 
-                    hive.merge.mapredfiles=false：合并reduce输出 
-                    hive.merge.size.per.task=256*1000*1000：合并文件的大小 
-                    hive.mergejob.maponly=true：如果支持CombineHiveInputFormat则生成只有Map的任务执行merge 
-                    hive.merge.smallfiles.avgsize=16000000：文件的平均大小小于该值时，会启动一个MR任务执行merge。
-        调整map数
-            map读取文件的大小： set  dfs.block.size
-            map 的个数   set mapred.min.split.size
-                    set mapred.max.split.size
-    02产生原因：map端聚合操作-某个值特别多
-        解决方案：
-            1.代码中 distributed by rand() 将map端分发重新按照随机值进行分发，这样map端只负责数据分发了           
-            2.hive.map.aggr=false  关闭聚合操作放在Map阶段执行，不建议
-             map端聚合-- 指在group by语句之前执行的聚合操作
-</pre></div>
-
-
-<h4>2.reduce端的优化</h4>
-<div class="highlight"><pre><span></span> reduce端--主要对map端梳理后的key-value键值对进行聚合
-    set hive.exec.reducers.bytes.per.reducer
-    set hive.exec.reducer.max
-    reduce端可以直接设置任务数，如果设置了，则直接使用
-        set hive.exce.reduce.tasks
-</pre></div>
-
-
-<h4>3.Join操作倾斜：</h4>
-<div class="highlight"><pre><span></span> Join操作需要参与map和reduce的整个阶段
-分为
-01.每路数据值都要，且空值多-导致 (空值连接)- 将空值过滤掉或者给随机数区间
-02.大小数据--启动mapjoin  -会把小表自动加载到内存中，箱单与mapjoin ，没有shuffle阶段
-    set hive.auto.conver.join= true
-    set hive.mapjoin.smalltable.filesize
-03.Join中有热点数据导致
-    对热点和非热点数据分别处理，然后再合并union
-其余： 设置
-    set hive.optimize.skewjoin=true
-</pre></div>
-
-
-<h4>4.Group造成的倾斜</h4>
-<div class="highlight"><pre><span></span>    hive.map.aggr=true 在map端做部分聚合
-默认该参数的值为false，表示不启用，要启用时，可以set hive.groupby.skewindata=ture;进行启用
-</pre></div>
-
-
-<h3>针对多个Job - job的并行</h3>
-<div class="highlight"><pre><span></span>其中 set hive.exec.parallel=true,可以开启并发执行。可以控制一个sql中多个可并行执行的job的运行方式，提高job的并发
-其中 hive.exec.parallel.thread.number 表示同时运行的job的个数--减少job数
-</pre></div>
-
-
-<h3>Hive执行过程--驱动器：Driver</h3>
-<div class="highlight"><pre><span></span>调用Driver中的run方法开始执行编译，解析，分析(通过元数据)生成hive.jar交给hadoop执行，添加task线程启动线程，
-   最后通过Runtime类在jvm中执行并返回结果。
-1.语法解析器  将SQL抽象为 语法树                解析器（SQL Parser）
-2.语义分析    将AST抽象为  单元查询块        编译器（Physical Plan）
-3.将单元查询快转换为操作树                      编译器（Physical Plan）
-4.逻辑优化器对操作树进行优化                 优化器（Query Optimizer）
-5.将优化的操作树翻译为Mapreduce任务
-6.Hive物理优化器-优化MR任务--生成执行计划
-7.执行MR任务
-</pre></div>
-
-
-<h3>Hive中的操作</h3>
-<div class="highlight"><pre><span></span>查看执行计划
-    explain 结果会有三部分
-         AST
-         the Dependencies Graph
-         STAGEthe plans of each stage
-基于代价的优化器  CBO
-基于rule的优化器    CRO
-一个hive任务分为一个或多个stage阶段。
-不同的stage阶段会存在依赖关系，越复杂的sql会产生越多的stage,通常也需要越多的时间
-</pre></div>
-
-
-<h4>MR- MapReduce：</h4>
-<div class="highlight"><pre><span></span>MR有两个阶段组成：Map和Reduce，用户只需实现map()和reduce()两个函数，即可实现分布式计算
-shuffle：
-    多个map任务的输出，按照不同的分区，通过网络copy到不同的reduce节点上。
-    Spark较之MR快在哪里
-Spark对MapReduce进行优化
- 01.减少磁盘ID
-    Map端将中间数据输出和结果存储在磁盘中
-    reduce端要从磁盘读写中间结构
- 02.增加并行度
-    Spark把不同的环节抽象为stage，允许多个stage既可以串行也可以并行
- 03.可选的Shuffle排序
-     MapReduce在shuffle之前有固定的排序，Spark可以选择在Map端还是reduce端排序
- 04.Spark的内存管理策略
-</pre></div>
-
-
-<h3>.Hive开发UDF</h3>
-<div class="highlight"><pre><span></span>  UDF   UDAF (用户自定义聚合函数) ， UDTF ( 用户自定义表生成函数 )
-    UDF(user-defined functions) 
-    UDAF(user-defined aggregation functions) 
-    UDTF(user-defined table-generating functions)
-</pre></div>
-
-
-<h3>Hive的配置</h3>
-<div class="highlight"><pre><span></span>Hive的配置管理参数时，
-    参数分为四类：
-        Hive管理参数、
-        Hive元存储（Metastore）管理参数、
-        与Hadoop交互的管理参数、
-        用于传递运行时信息的参数
-    01.Hive管理参数
-         hive.execution.engin           hive的计算引擎   
-         控制hive任务的reduce数、内存
-    02.Hive元存储（Metastore）管理参数：
-        MetaStore：metastore是个独立的关系数据库，用来持久化schema和系统元数据--元存储服务器
-        meta数据存储方式：元存储服务器
-            本地derby-- 内嵌式元存储
-            本地mysql
-            远端mysql--存储方式需要在远端服务器运行一个mysql服务器，并且需要在Hive服务器启动meta服务
-                        元数据服务器和客户端之间使用Thrift协议通信
-        客户端的配置为：
-                   hive.metastore.uris                  Thrift元存储服务器的主机和端口号
-               hive.metastore.warehouse.dir    数据仓库的位置，默认是/user/hive/warehouse；
-     其他：UDF的使用
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Mapreduce</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-42.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -473,6 +484,50 @@ Spark对MapReduce进行优化
 <p>tags: <a href="/tag/java.html">JAVA</a> </p>
 </footer><!-- /.post-info -->                <p>Object的方法与Comparable Iterable</p>
                 <a class="readmore" href="/program/my-program-post-44.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-50.html" rel="bookmark"
+                           title="Permalink to Scala语言自身的一些特性总结">Scala语言自身的一些特性总结</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T20:00:00+08:00">
+                Published: 2019-03-10 20:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>模式匹配 隐式转换 类型系统</p>
+                <a class="readmore" href="/program/my-program-post-50.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-51.html" rel="bookmark"
+                           title="Permalink to 不同语言特性初步总结">不同语言特性初步总结</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T19:30:00+08:00">
+                Published: 2019-03-10 19:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->                <p>循环-异常</p>
+                <a class="readmore" href="/program/my-program-post-51.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

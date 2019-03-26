@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Scala语言自身的一些特性总结</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-50.html" rel="bookmark"
+           title="Permalink to Scala语言自身的一些特性总结">Scala语言自身的一些特性总结</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-10T20:00:00+08:00">
+                Published: 2019-03-10 20:00:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/scala.html">Scala</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Scala中的一些特性--Scala特性，可以从基本语言特征。面向对象特点、并发编程、函数式编程以及自身的特有地方构成。本次主要涉及自身的一些特点
+ 模式匹配
+ 隐式转换
+ 类型系统
+</pre></div>
+
+
+<h3>模式匹配</h3>
+<div class="highlight"><pre><span></span>1.eg：
+       patteh match{
+       case 1 =&gt; println(&#39;1&#39;)
+       case_ =&gt; println(&quot;其他&quot;)
+       }
+match语句匹配的对象，以及case语句加入表达式
+        case 后面接
+                常量                      通常大写，若小写的常量需要使用反括号
+                变量 case  x if(x%2==0)  必须以小写字母开头
+                类型 case x:String            类型多是大写  优先于isInstanceof asInstanceof
+                数组、元组、列表 case()    Array
+                序列模式 Seq        unapplySeq
+                可变参数类表的匹配
+                正则表达式的匹配
+                样例类的匹配-构造函数unapply-样例类case class等
+                变量绑定模式@
+2.模式匹配的原理
+    匹配发生在运行期，Java虚拟机中的泛型类型信息会被擦除，所以不能用类型来匹配特定的Map类型
+    变量是如何绑定到列表或者元组的不同部分--
+析构--访问复杂结构的各组成部分--
+提取器机制 extractor --带有从对象中提取值的unapply或者unapplySeq方法-提取器就是一个带有 unapply 方法的对象
+    Array伴生对象
+    正则表达式--正则表达式对象
+    unapply方法会将对象分解为用以匹配模式的片段，而apply则是为了提供一个把他们组合回去的选择
+    每个样例类都自动具备apply和unapply方法
+    提取任意长度值的序列-unapplySeq
+</pre></div>
+
+
+<h3>隐式转换</h3>
+<div class="highlight"><pre><span></span><span class="n">Scala</span><span class="err">中会默认隐式的引用到每个程序中</span><span class="o">-</span><span class="kn">import</span> <span class="nn">Predef._</span>    <span class="o">//</span> <span class="err">通过</span><span class="n">Predef</span><span class="err">对象自动加载一些隐式对象</span>
+<span class="err">隐式参数和隐式转换</span>
+    <span class="err">隐式转换用于类型之间做转换</span> <span class="n">implicit</span> <span class="n">conversion</span> <span class="n">function</span>
+
+<span class="err">隐式转换规则</span><span class="o">--</span><span class="err">显性定义规则</span><span class="o">-</span><span class="err">作用域规则</span><span class="o">--</span><span class="err">无歧义规则</span>
+    <span class="err">当表达式类型与预期类型不同时</span>
+    <span class="err">当对象访问一个不存在的成员时</span>
+    <span class="err">当对象调用某个方法，而该方法的参数声明与传入参数不匹配时</span>
+
+<span class="err">定义隐式转换函数</span>
+    <span class="n">implicit</span> <span class="k">def</span> <span class="nf">int2float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="n">Int</span><span class="p">)</span> <span class="p">:</span><span class="n">Float</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">toFloat</span>
+     <span class="err">隐式转换与函数名无关</span><span class="o">--</span><span class="err">只与函数签名</span><span class="o">-</span><span class="err">即</span> <span class="err">输入参数类型和返回值类型有关</span>
+<span class="err">隐式类</span><span class="o">-</span><span class="err">隐式对象</span><span class="o">-</span><span class="err">隐式参数</span><span class="o">-</span><span class="err">隐式值</span>
+<span class="err">隐式参数适用的场景</span>
+    <span class="err">执行上下文</span>
+    <span class="err">功能控制</span>
+    <span class="err">限定可用实例</span>
+    <span class="err">隐式证据</span><span class="o">--</span> <span class="err">绕开类型擦除带来的限制</span>
+<span class="err">隐式参数遵循的规则</span>
+    <span class="err">只有最后一个参数列表中允许出现隐式参数</span>
+    <span class="n">implicit</span> <span class="err">关键字必须出现在参数列表的最左边，且只能出现一次</span>
+</pre></div>
+
+
+<h3>类型系统 Type System</h3>
+<div class="highlight"><pre><span></span>类型--类型参数 -- 类型变量
+类型参数- 
+    01.类型泛化-- 带有一个或者多个类型参数的类是泛型
+        泛型类-泛型函数
+    02.对类型做出限制 类型界定（上界、下界、上下文界定、类型约束），
+                                                类型约束： =:=  &lt;:&lt;  =&gt;
+        变异声明 +  - 
+            协变表示某个泛型类的子类型关系 和参数T方向一致 -- 表示输出的类型参数 + 
+            逆变表示方向相反        -- 表示输入的类型参数
+     03.类型通配符
+
+高级类型
+        参数化类型- 抽象类型-结构化类型
+        单例类型-类型投影-类型别名- 结构类型-存在类型-抽象类型-高等 Higher-Kinded类型
+             高阶类型的使用中，有三种变化，分别是顺变、协变及逆变
+        高阶类型是接受其他参数用来构造新类型的，所以又称为“类型构造器
+        路径相关类型-- path-dependent type
+
+类型推断
+  Scala采用的局部的(local)、基于流的(flow-based)类型推断
+</pre></div>
+
+
+<h3>附录：</h3>
+<div class="highlight"><pre><span></span>    中置表达式-- infix- 中置操作符
+        操作符： 优先级和结合性(顺序)
+                        一元操作符、二元操作符、三元操作符
+                        前置操作符、中置操作符、后置操作符
+                        功能： 赋值操作符
+        1 to 10  ==  1.to(10)
+        方法
+            apply   ： 构造对象不用显示使用new
+            unapply
+            update
+    2. match case 
+      catch(){ case e:Exception}
+     3.
+        Predef提供经常使用函数 println()
+        Predef对象定义了经常使用的隐式转换--一些隐式转换规则
+        Predef 定义了若干的类型以及类型别名
+        函数的签名（方法签名）是用来定义一个函数传入参数的类型，顺序和数量的
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Scala常见特性小结 http://ytluck.github.io/program/my-program-post-20.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
