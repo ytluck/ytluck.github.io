@@ -26,7 +26,247 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-45.html">Scala函数式编程和Spark的联系</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-46.html">Antlr4和Spark SQL的联系介绍</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-05-25T20:55:00+08:00">
+                Published: 2019-05-25 20:55:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>目前在数据分析中，大数据中SQL分析师常用的一种，了解相应的SQL执行过程，是加深应用的一种方式。在这里主要了解SparkSQL的相关内容。
+而Antlr4除了在SQL解析中使用外，在一些风控规则以及和一些业务专业人员进行使用时，也有很大的优势。即可以定义规则，然后生成相应的代码，也可以去读取配置等
+</pre></div>
+
+
+<h3>Antlr4介绍</h3>
+<div class="highlight"><pre><span></span>Antrl ANTLR是ANother Tool for Language Recognition的缩写
+ 0.编程语言的通用模式：计算机语言模式
+   序列  sequence
+   选择  choice
+   词法符号依赖  token dependency
+   嵌套结构      nested phrase
+  处理语言规则：语法解析难点在于规则的循环处理以及分支选择，还有递归调用和复杂的计算表达式等。
+  处理优先级-左递归和结合性
+  划定词法分析器和语法分析器--
+</pre></div>
+
+
+<h4>1.Antlr4的语法等信息</h4>
+<div class="highlight"><pre><span></span> <span class="mf">1.</span><span class="err">基本信息</span>
+  <span class="mf">01.</span><span class="err">保留字：</span>
+    <span class="n">grammar</span>  <span class="n">lexer</span>   <span class="n">parse</span>
+    <span class="kn">import</span>   <span class="nn">tokens</span>  <span class="nn">options</span>
+    <span class="n">throws</span>   <span class="n">catch</span>   <span class="k">finally</span>
+    <span class="nb">locals</span>   <span class="n">fragment</span> <span class="n">mode</span>
+  <span class="mf">02.</span><span class="err">符号</span>
+    <span class="err">引号</span> <span class="s1">&#39;&#39;</span>
+    <span class="err">分号</span> <span class="p">;</span>
+    <span class="err">……等</span>
+  <span class="mf">03.</span><span class="err">语法结构</span>
+    <span class="mf">001.</span><span class="err">文本常量：单引号括起来的字符串</span>
+    <span class="mf">002.</span><span class="err">词法符号</span><span class="o">-</span><span class="err">将相关的词法符号归类</span><span class="o">-</span><span class="err">词法规则</span><span class="o">-</span><span class="err">以大写字母开头</span>  
+       <span class="err">不能包含参数</span><span class="o">-</span><span class="err">返回值</span><span class="o">-</span><span class="err">以及局部变量</span>
+       <span class="err">词法规则递归</span>
+       <span class="err">符号类型</span> <span class="err">以及</span> <span class="err">词法符号对应的文本</span>
+    <span class="mf">003.</span><span class="err">文法</span><span class="o">-</span><span class="err">文法规则</span><span class="o">-</span><span class="err">以小写字母开头</span> <span class="o">-</span><span class="err">分析树</span> <span class="n">syntax</span> <span class="n">tree</span> <span class="err">或者</span> <span class="n">parse</span> <span class="n">tree</span>
+      <span class="err">规则名</span> <span class="err">标签</span> <span class="err">内嵌代码</span> <span class="err">规则上下文</span> <span class="err">规则元素</span>
+       <span class="err">规则以及属性</span>
+        <span class="n">text</span>  <span class="n">ctx</span>  <span class="n">start</span>  <span class="n">stop</span>
+       <span class="err">语法分析树</span> <span class="o">-</span><span class="err">从分析树中提取</span>
+     <span class="mf">004.</span><span class="err">左递归</span><span class="o">-</span> <span class="err">在某个备选分支的起始位置调用自身</span><span class="o">-</span><span class="err">优先级</span>
+     <span class="err">文件名</span> <span class="n">demo</span><span class="o">.</span><span class="n">g4</span> <span class="err">以下三种</span>
+        <span class="err">混合词法和语法</span> <span class="n">gramar</span> <span class="n">demo</span>
+        <span class="err">纯词法</span> <span class="n">lexer</span> <span class="n">gramar</span> <span class="n">demo</span>  <span class="err">可以包含</span> <span class="n">mode</span>
+        <span class="err">纯文法</span> <span class="n">parse</span> <span class="n">grammr</span> <span class="n">demo</span>
+      <span class="mf">005.</span><span class="err">内嵌代码</span><span class="o">-</span> <span class="nd">@header</span>  <span class="nd">@member</span> <span class="err">具名动作</span>
+     <span class="n">Lexer</span><span class="err">定义词法分析规则；</span>
+     <span class="n">Parser</span> <span class="err">定义语法分析规则；</span>
+     <span class="n">Tree</span><span class="err">用于遍历语法分析树；</span>
+     <span class="n">Combine</span><span class="err">既可以定义语法分析规则，也可定义词法分析规则，规则名称遵循上述规则；</span>
+     <span class="kn">import</span> <span class="err">用于导入语法规则。使用</span><span class="n">Import</span><span class="err">语法规则分类，可以使语法规则更加清晰；</span>
+        <span class="err">并且可以采用面向对象的思想设计规则文件，</span>
+        <span class="err">使其具有多态及继承的思想。值得注意的是，当前规则的优先级高于导入规则。</span>
+      <span class="n">options</span> <span class="p">{</span><span class="n">language</span><span class="o">=</span><span class="err">?</span><span class="p">;}</span> <span class="err">来改变目标语言</span>
+ <span class="mf">2.</span><span class="err">运行时的</span><span class="n">API</span>
+   <span class="err">输入流：</span><span class="n">instream</span>
+   <span class="n">lexer</span>
+   <span class="n">CommonTokenStream</span>
+   <span class="err">监听以及访问者</span>
+   <span class="err">处理非法输入的机制</span>
+   <span class="err">错误以及异常处理机制</span>
+ <span class="mf">3.</span><span class="err">应用案例：</span>
+   <span class="err">案例：一般步骤：</span>
+   <span class="mf">01.</span><span class="err">对一个语法运行</span><span class="n">ANTLR</span>
+   <span class="mf">02.</span><span class="err">将生成的代码于</span><span class="n">jar</span><span class="err">包中运行库一起编译</span><span class="o">-</span><span class="err">通过调用</span><span class="n">API</span><span class="err">实现相应的功能</span>
+   <span class="mf">03.</span><span class="err">将编译好的代码和运行库一起运行</span>
+ <span class="mf">4.</span> <span class="err">术语</span>
+    <span class="err">语言</span>  <span class="n">language</span>  <span class="err">语句</span>    <span class="n">sentence</span>
+    <span class="err">词组</span>  <span class="n">phrase</span>   <span class="err">子词组</span>    <span class="n">subphrase</span>
+    <span class="err">词汇符号</span>    <span class="n">vocabulary</span>  
+    <span class="n">Antlr</span><span class="err">元语言</span>    <span class="n">Antlr</span> <span class="n">meta</span><span class="o">-</span><span class="n">language</span>
+    <span class="err">语法分析器</span>   <span class="n">parser</span>
+    <span class="err">句法分析器</span>   <span class="n">syntax</span> <span class="n">analyzer</span>
+    <span class="err">语法</span>      <span class="n">grammar</span>     <span class="err">句法</span>  <span class="n">syntax</span>
+    <span class="err">词法符号</span>    <span class="n">token</span>       <span class="err">词法符号化</span>   <span class="n">tokenizing</span>
+    <span class="err">词法分析</span>    <span class="n">lexical</span> <span class="n">analysis</span>
+    <span class="err">词法分析器</span>   <span class="n">lexer</span>   
+    <span class="err">语法分析树</span>   <span class="n">parse</span> <span class="n">tree</span>
+    <span class="err">树的遍历</span>    <span class="n">tree</span> <span class="n">walk</span>
+    <span class="err">遍历器的实现</span><span class="o">-</span><span class="err">监听器</span>  <span class="n">Listener</span>
+    <span class="err">遍历器的实现</span><span class="o">-</span><span class="err">访问者</span>  <span class="n">Visitor</span>
+    <span class="err">解释器</span> <span class="n">interpreter</span> <span class="err">翻译器</span> <span class="n">translator</span>
+</pre></div>
+
+
+<h4>2.Antlr安装和编译等</h4>
+<div class="highlight"><pre><span></span> 安装
+  01.下载依赖包：
+     antlr-4.7.2-complete.jar
+  02.前提设置：
+    01.安装好Java并设置好java的环境变量
+    02.系统中安装部署antlr-4.7.2-complete.jar
+    03.添加antlr-4.7。2-complete.jar到系统环境变量CLASSPATH中
+    要具体到该文件名C:\ConfigFiles\Antlr\antlr-4.7.2-complete.jar
+    如果报错提示：找不到文件或加载主类org.antlr.v4.Tool
+  001.说明:设置三个环境变量：JAVA_HOME、PATH 和 CLASSPATH
+    PATH使得系统可以在任何路径下识别java命令-- 系统路径变量PATH
+    JAVA_HOME指明JDK安装路径
+    CLASSPATH值：CLASSPATH为java加载类(class or lib)路径
+    CLASSPATH C:\ConfigFiles\Antlr\antlr-4.7.2-complete.jar
+    类似：idea中 mark Directory as source root
+ 03.如使用ANTLR Intellij插件来运行ANTLR工具
+   001.安装插件： antlr-intellij-plugin-v4-1.9.zip
+      添加ANTLR4插件 --本地安装-重启-然后点选 antlr v4 grammar plugin
+   002.在pom.xml文件添加运行库的依赖
+   <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.antlr<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>antlr4-runtime<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>4.7.3<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+04. 1.ANTLR代码生成配置
+       Hello.g4文件，点击“Configure ANTLR…”，然后便会弹出
+       Output directory where all output is generated”表示指定随后生成的java代码所存放的路径
+       在这里还有两个选项-默认生成监听器模式，访问器模式要自己勾选
+    2.Hello.g4的ANTLR代码生成
+     “Generate ANTLR Recognizer”。随后便会在app目录下看到生成的各种.java 文件等。
+    (上一步配置中我们设置了代码生成的目标路径为app目录)
+   通过调用API实现相应的功能，以及实现相应的访问器等
+</pre></div>
+
+
+<h3>Spark SQL模块以及与Antlr4</h3>
+<div class="highlight"><pre><span></span> 1.目前大数据在使用的
+   Flink使用Apache Calcite,
+       而Calcite的解析器是使用JavaCC实现的,javaCC 是一个能生成语法和词法分析器的生成程序 
+   Hive使用了Antlr3实现了自己的HQL, 
+   Spark2.x以后采用了Antlr4 实现自己的解析器
+      Antrl：Spark SQL的语法规则文件是：SqlBase.g4
+    Presto是使用Antlr4
+</pre></div>
+
+
+<h4>1.Spark SQL解析过程</h4>
+<div class="highlight"><pre><span></span>   解析过程 -- 逻辑阶段 -- 优化阶段 -- 物理执行计划
+   0.用户提交SQL文本
+   1.：基于Antlr 4 框架对 sql解析，生成抽象语法树。AST是源代码语法结构的一种抽象表示。它以树状的形式表现编程语言的语法结
+       使用 AstBuilder（ AstBuilder.scala）将ANTLR 4语法树结构转换成catalyst表达式逻辑计划logical plan
+       主要使用访问者类SparkSqlAstBuilder，但也使用了监听器辅助类 PostProcessor来处理转换格式
+       文法规则statement是SQL解析的核心规则
+   2.parser；将antlr的tree转成LogicPlan 逻辑计划
+   3.analyzer；通过分析器，结合Catalog，把logical plan和实际的数据绑定起来
+   4.Optimizer：logical plan优化，基于规则的优化；优化规则参考Optimizer，优化执行器RuleExecutor
+   Antlr4         SQL-- AST
+   AstBuilder  -- Unsolved  LogicalPlan
+   Analyzed  LogicalPlan
+   Optimized LogicalPlan
+   5.Planner再将优化后的逻辑计划根据预先设定的映射逻辑转换为物理执行计划  PhysicalPlan-- prepareForExecution
+   6.execute
+</pre></div>
+
+
+<h4>Spark SQL源码模块</h4>
+<div class="highlight"><pre><span></span>Spark core
+Spark SQL 模块四个子模块
+    01.- Catalyst (sql/catalyst) - An implementation-agnostic framework for
+                    manipulating trees of relational operators and expressions.
+    02.- Execution (sql/core) - A query planner / execution engine for translating Catalyst&#39;s logical query plans into Spark RDDs.  
+                  This component also includes a new public interface, SQLContext, 
+                   that allows users to execute SQL or LINQ statements against existing RDDs and Parquet files.
+    03.- Hive Support (sql/hive) - Includes an extension of SQLContext called HiveContext that 
+         allows users to write queries using a subset of HiveQL and access data from a Hive Metastore using Hive SerDes.
+        There are also wrappers that allows users to run queries that include Hive UDFs, UDAFs, and UDTFs.
+    04.- HiveServer and CLI support (sql/hive-thriftserver) - Includes support for the SQL CLI (bin/spark-sql) and a HiveServer2 (for JDBC/ODBC) compatible server.
+</pre></div>
+
+
+<h4>HiveSQL-FlinkSQL</h4>
+<div class="highlight"><pre><span></span>  <span class="nt">01</span><span class="nc">.Hive</span><span class="err">是如何将</span><span class="nt">SQL</span><span class="err">转化为</span><span class="nt">MapReduce</span><span class="err">任务</span>
+   <span class="err">使用</span><span class="nt">ANTLR</span><span class="err">作为</span><span class="nt">SQL</span><span class="err">解析的引擎，根据</span> <span class="nt">DDL-</span><span class="o">&gt;</span><span class="nt">TCL-</span><span class="o">&gt;</span><span class="nt">DAL</span><span class="err">–</span><span class="o">&gt;</span><span class="nt">DCL-</span><span class="o">&gt;</span><span class="nt">DML</span><span class="err">–</span><span class="o">&gt;</span><span class="nt">DQL</span><span class="err">这个顺序，依次查看解析引擎</span>
+   <span class="nt">Hive</span><span class="nc">.g</span><span class="err">拆成了</span><span class="nt">5</span><span class="err">个文件，</span>
+      <span class="err">词法规则</span>
+          <span class="nt">HiveLexer</span><span class="nc">.g</span>
+      <span class="err">语法规则的</span><span class="nt">4</span><span class="err">个文件</span> 
+        <span class="nt">SelectClauseParser</span><span class="nc">.g</span>
+        <span class="nt">FromClauseParser</span><span class="nc">.g</span>
+        <span class="nt">IdentifiersParser</span><span class="nc">.g</span>
+        <span class="nt">HiveParser</span><span class="nc">.g</span>
+  <span class="nt">02</span><span class="nc">.Flink</span> <span class="nt">SQL</span>
+    <span class="nt">SQL</span> <span class="nt">query</span> <span class="err">会经过</span> <span class="nt">Calcite</span> <span class="err">解析器</span> <span class="err">转变成</span> <span class="nt">SQL</span> <span class="err">节点树，通过</span><span class="nt">validate</span><span class="err">验证</span><span class="nt">sql</span><span class="err">语法</span><span class="o">(</span><span class="err">结合</span><span class="nt">catalog</span><span class="o">)</span><span class="err">。</span> 
+    <span class="err">而</span><span class="nt">Calcite</span><span class="err">的解析器是使用</span><span class="nt">JavaCC</span><span class="err">实现的</span><span class="o">,</span><span class="nt">javaCC</span> <span class="err">是一个能生成语法和词法分析器的生成程序</span> 
+    <span class="err">最后构建成</span> <span class="nt">Calcite</span> <span class="err">的抽象语法树（也就是</span> <span class="nt">Logical</span> <span class="nt">Plan</span><span class="err">）</span>
+    <span class="err">源码结构：</span>
+    <span class="nt">Flink</span><span class="err">的</span><span class="nt">core</span> <span class="nt">API</span><span class="err">和引擎的所有改进都会自动应用到</span><span class="nt">Table</span> <span class="nt">API</span><span class="err">和</span><span class="nt">SQL</span><span class="err">上</span>
+    <span class="nt">Flink</span> <span class="nt">Table</span> <span class="nt">API</span><span class="o">&amp;</span><span class="nt">SQL</span> <span class="err">为流式数据和静态数据的关系查询保留统一的接口，而且利用了</span><span class="nt">Calcite</span><span class="err">的查询优化框架和</span><span class="nt">SQL</span> <span class="nt">parser</span>
+       <span class="nt">flink</span><span class="o">/</span><span class="nt">flink-table</span><span class="o">/</span>
+        <span class="nt">sql</span><span class="err">完全依靠</span><span class="nt">calcite</span><span class="err">（</span><span class="nt">sql</span> <span class="nt">parser</span><span class="err">）去做语法解析，</span><span class="nt">validate</span><span class="err">后生成</span><span class="nt">calcite</span> <span class="nt">logical</span> <span class="nt">plan</span><span class="o">.</span> <span class="err">而</span><span class="nt">Table</span> <span class="nt">API</span><span class="err">先自己生成</span><span class="nt">table</span> <span class="nt">API</span><span class="err">的</span><span class="nt">logical</span> <span class="nt">plan</span><span class="err">，再通过</span><span class="nt">calcite</span> <span class="nt">relbuilder</span> <span class="nt">translation</span><span class="err">成</span><span class="nt">calcite</span> <span class="nt">logical</span> <span class="nt">plan</span><span class="err">。</span>
+          <span class="nt">table</span> <span class="nt">api</span> <span class="nt">parser</span><span class="o">:</span> <span class="nt">flink</span><span class="err">会把</span><span class="nt">table</span> <span class="nt">api</span><span class="err">表达的计算逻辑也表示成一颗树，用</span><span class="nt">treeNode</span><span class="err">去表式</span>
+          <span class="nt">Sql</span> <span class="nt">Parser</span><span class="o">:</span> <span class="err">将</span><span class="nt">sql</span><span class="err">语句通过</span><span class="nt">java</span> <span class="nt">cc</span><span class="err">解析成</span><span class="nt">AST</span><span class="o">(</span><span class="err">语法树</span><span class="o">),</span><span class="err">在</span><span class="nt">calcite</span><span class="err">中用</span><span class="nt">SqlNode</span><span class="err">表示</span><span class="nt">AST</span><span class="o">;</span>
+<span class="err">源码结构：</span>
+    <span class="nt">flink-sql-client</span>    
+    <span class="nt">flink-sql-parser</span>
+    <span class="nt">flink-table-common</span>
+    <span class="nt">flink-table-planner</span>
+    <span class="nt">flink-table-planner-blink</span>
+    <span class="nt">flink-table-api-java-bridge</span> 
+    <span class="nt">flink-table-api-scala-bridge</span>
+    <span class="nt">flink-table-api-java</span>
+    <span class="nt">flink-table-api-scala</span>
+    <span class="nt">flink-table-runtime-blink</span>
+    <span class="nt">flink-table-ube</span>
+    <span class="nt">pom</span><span class="nc">.xml</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>关于安装以及构建
+ ANTLR4的IntelliJ IDEA配置 https://www.cnblogs.com/solvit/p/10097453.html
+Spark 源码 https://github.com/apache/spark/tree/master/sql
+Flink SQL源码 https://github.com/apache/flink/tree/master/flink-table
+Antlr4权威指南
+Flink SQL 解析流程 https://www.jianshu.com/p/3191b5b91d38
+Apache Calcite是什么东东 https://www.cnblogs.com/029zz010buct/p/10142264.html
+【Flink SQL引擎】：Calcite 功能简析及在 Flink 的应用 http://www.pianshen.com/article/9486258228/
+Blink SQL优化点 https://blog.csdn.net/r02221/article/details/85231267
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-45.html" rel="bookmark"
+                           title="Permalink to Scala函数式编程和Spark的联系">Scala函数式编程和Spark的联系</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-03-24T20:52:00+08:00">
                 Published: 2019-03-24 20:52:00
@@ -37,169 +277,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Scala中的一些概念是Spark中有相似的地方，在这里总结以下，以作为进一步的巩固
-</pre></div>
-
-
-<h3>Scala的函数式编程</h3>
-<h4>1.基本概念</h4>
-<div class="highlight"><pre><span></span>   匿名函数
-   闭包 (函数和上下文-函数和运行时的数据)
-   函数科里化-柯里化 Curry --只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数
-        带有多参数的函数转化为一系列函数，每个函数都只有一个参数
-   偏函数
-   递归- 尾递归
-   函数式编程中的
-    数据结构
-    数据结构中的常见操作：
-        通用的操作：
-        各自特有的操作：
-            flatter  map    == flatMap
-            折叠：scan scanLeft scanRight-将中间结果放到新的集合，并将中间结果传递给一下函数调用
-                     输入参数： 初始值和运算函数
-                     返回值：中间结果新的集合
-            规约： reduce
-            聚合： sum  实际上调用的是 foldLeft
-                     span 遇到不符合就停止
-                     partition 对所有元素进行断言判断
-            分组：按照条件将元素分组-根据提供的函数生成分组关键字
-</pre></div>
-
-
-<h4>2.通用操作归类</h4>
-<div class="highlight"><pre><span></span>01.映射与遍历 map   flatMap  foreach  Iterator  flatten filter filterNot  filterKeys mapValue
-02.混洗    shuffle&lt;隐式操作-对用户透明&gt;
-03.规约与聚合  fold  reduce  aggregate  max  min
-04.分区和分组  partition  groupBy  grouped
-05.数据变换 zip unzip  zipWithIndex concat   toArray toList  collect range
-06.逻辑判断 empty  isEmpty contains containsSlice
-07.查看  head tail  last init take drop  slice  size  count  find apply 
-            indexOf lastIndexOf indexWhere  lastIndexWhere  indexOfSlice  lastIndexOfSlice
-            startsWith endsWith
-08.其他重要 drop dropWhile  take takeWhile
-            排序： sorted sortWith sortBy 
-            去重： distinct
-            集合操作： diff  union intersect
-            insert append
-            add  remove clear  
-            put  remove  clear   update  keys keySet values 
-            trim
-            pop push  update clear top
-            get getOrElse
- 09.其他不常见： 转置 transpose  反转 reverse  转换 transform
-    mkString addString stringPrefix  copyToArray clone
-    填充 fill 滑动 sliding
-</pre></div>
-
-
-<h3>Spark 的一些内容</h3>
-<h4>基于RDD的操作</h4>
-<div class="highlight"><pre><span></span><span class="nv">RDD的类型</span><span class="s s-Atom">--</span> <span class="nv">RDD</span> <span class="s s-Atom">pairRDD</span>
-<span class="s s-Atom">函数作用以及返回值类型</span>
-<span class="mf">01.</span> <span class="s s-Atom">foreach</span> <span class="s s-Atom">、map、flatMap</span>
-    <span class="s s-Atom">foreach</span>  <span class="s s-Atom">对集合中每个元素进行操作</span>  <span class="s s-Atom">没有返回值</span>
-    <span class="s s-Atom">map</span>      <span class="s s-Atom">对集合中每个元素进行操作</span>
-    <span class="s s-Atom">flatMap</span>     <span class="s s-Atom">返回的迭代器的所有内容构成新的RDD</span>
-                    <span class="s s-Atom">是一个序列化的数据而不是单个数据项--</span> <span class="s s-Atom">a</span> <span class="nv">Seq</span>
-    <span class="s s-Atom">区别</span>
-            <span class="s s-Atom">map：对集合中每个元素进行操作。</span> 
-            <span class="s s-Atom">flatMap：对集合中每个元素进行操作然后再扁平化。</span>
-<span class="mf">02.</span> <span class="s s-Atom">fold</span> <span class="s s-Atom">以及</span> <span class="s s-Atom">reduce</span>  <span class="s s-Atom">和</span> <span class="s s-Atom">aggragate</span>
-    <span class="s s-Atom">fold</span> <span class="s s-Atom">将中间结果传递给下一次函数调用，返回最后一次函数计算的结果-返回结果是一个单值，其类型与初始值相同</span>
-    <span class="s s-Atom">共同点：返回的数据类型</span> 
-    <span class="s s-Atom">不同点：fold需要提供初始值</span> <span class="s s-Atom">fold</span> <span class="s s-Atom">foldLeft</span>  <span class="s s-Atom">foldRight</span>
-     <span class="s s-Atom">reduce函数和fold</span>  <span class="s s-Atom">函数输入和输出数据类型</span> <span class="s s-Atom">必须一致</span>
-    <span class="s s-Atom">aggragate</span>  <span class="s s-Atom">并不要求返回结果的类型是集合元素类型的父类</span>
-        <span class="s s-Atom">aggregate先对每个分区的元素做聚集，然后对所有分区的结果做聚集</span>
-    <span class="nv">Aggregate</span>
-     <span class="nn">eg</span><span class="p">:</span>
-        <span class="s s-Atom">t</span><span class="p">.</span><span class="nf">reduce</span><span class="p">(</span><span class="k">_</span> <span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
-        <span class="s s-Atom">t</span><span class="p">.</span><span class="nf">fold</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span> <span class="k">_</span> <span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
-        <span class="nf">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span>  <span class="p">(</span><span class="k">_</span><span class="p">,</span><span class="k">_</span><span class="p">)</span><span class="s s-Atom">=&gt;</span><span class="mi">0</span><span class="p">)</span>  <span class="s s-Atom">seqop在遍历分区的时候更新结果，</span> <span class="s s-Atom">combop</span> <span class="s s-Atom">-分区汇总--并行有分区的情况下</span>
-        <span class="nf">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span>  <span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">)</span>
-<span class="mf">03.</span><span class="s s-Atom">groupByKey</span> <span class="s s-Atom">和reduceByKey</span>
-    <span class="nf">groupByKey</span><span class="p">():-</span><span class="s s-Atom">-作用以及返回值类型</span> <span class="s s-Atom">--对具有相同键的值进行分组</span>
-        <span class="s s-Atom">groupByKey也是对每个key进行操作，但只生成一个sequence</span>
-        <span class="p">[</span><span class="nv">K</span><span class="p">,</span> <span class="nv">Iterable</span><span class="p">[</span><span class="nv">V</span><span class="p">]]</span>
-    <span class="nf">reduceByKey</span><span class="p">()</span>  <span class="s s-Atom">----------------------------</span>   <span class="s s-Atom">合并具有相同键的值</span>
-        <span class="s s-Atom">规约，对具有键相同的值合并起来--返回</span> <span class="s s-Atom">各键以及</span> <span class="s s-Atom">对应键规约出来的结果值</span> <span class="s s-Atom">组成的新的RDD</span>
-        <span class="s s-Atom">对大数据进行复杂计算时，reduceByKey优于groupByKey</span>
-    <span class="nv">AggregateByKey</span> <span class="s s-Atom">根据Key的值来聚合--aggregateByKey调用的就是combineByKey方法</span>
-    <span class="s s-Atom">combineByKey</span>
-        <span class="nf">groupByKey</span><span class="p">()</span><span class="s s-Atom">是对RDD中的所有数据做shuffle</span><span class="p">,</span><span class="s s-Atom">根据不同的Key映射到不同的partition中再进行aggregate</span>
-        <span class="nf">aggregateByKey</span><span class="p">()</span><span class="s s-Atom">是先对每个partition中的数据根据不同的Key进行aggregate，然后将结果进行shuffle，完成各个partition之间的aggregate</span>
-
-    <span class="s s-Atom">grouped</span> <span class="s s-Atom">将对象分成固定大小组，且最后一组之前的组的大小必须相同，最后一组必须小于</span>
-    <span class="s s-Atom">grouped</span> <span class="s s-Atom">是根据元素数量分组</span>
-    <span class="s s-Atom">groupBy</span> <span class="s s-Atom">是根据计算的键值进行分组</span>
-             <span class="p">.</span><span class="nf">reduceByKey</span><span class="p">(</span><span class="k">_</span><span class="s s-Atom">+</span><span class="k">_</span><span class="p">,</span> <span class="s s-Atom">reduceNum</span><span class="p">)</span>
-<span class="mf">04.</span><span class="s s-Atom">分区执行mapPartitions</span>   <span class="s s-Atom">foreachPartition</span>
-   <span class="nv">Spark提供基于分区的map和foreach</span>
-    <span class="s s-Atom">mapPartitions</span>   <span class="s s-Atom">foreachPartition</span>
-    <span class="s s-Atom">从算子的类型：</span>
-        <span class="s s-Atom">foreachPartition应该属于action运算操作，而</span> <span class="s s-Atom">mapPartitions</span> <span class="s s-Atom">是在Transformation中</span>
-        <span class="s s-Atom">返回值上：mapPartitions</span> <span class="s s-Atom">返回值类型迭代器：</span> <span class="nv">Iterator</span><span class="p">[</span><span class="nv">U</span><span class="p">]</span>  <span class="s s-Atom">该元素的迭代器</span>
-        <span class="s s-Atom">应用场景上：</span>
-        <span class="s s-Atom">mapPartitions可以获取返回值，继续在返回RDD上做其他的操作</span>
-         <span class="s s-Atom">foreachPartition因为没有返回值并且是action操作，所以使用它一般都是在程序末尾比如说要落地数据到存储系统中如mysql，es，或者hbase中，</span>
-    <span class="mf">02.</span><span class="s s-Atom">并行度</span>
-            <span class="mf">001.</span><span class="s s-Atom">对于已知的RDD进行重分区</span>
-            <span class="mf">002.</span><span class="s s-Atom">数据混洗操作中，使用参数的方式为混洗后的RDD指定并行度</span>
-<span class="mf">05.</span><span class="s s-Atom">重分区：repartition</span>  <span class="s s-Atom">和</span> <span class="s s-Atom">coalesce</span>
-    <span class="nf">repartition</span><span class="p">()</span> <span class="s s-Atom">把RDD随机打乱并分成设定的分区数目</span>
-    <span class="nf">coalesce</span><span class="p">()</span><span class="s s-Atom">:减少分区--没有打乱</span>
-        <span class="s s-Atom">对RDD的分区进行重新划分，repartition内部调用了coalesce，参数shuffle为true</span>
-          <span class="s s-Atom">扩大分区</span>
-          <span class="s s-Atom">减少分区</span>
-            <span class="s s-Atom">coalesce算子，可以手动减少DataFrame的partition数量，并且不用触发shuffle</span><span class="p">,</span>
-            <span class="s s-Atom">这也是coalesce跟repartition的区别</span>
-            <span class="s s-Atom">repartition一定会触发shuffle</span>
-<span class="mf">06.</span><span class="s s-Atom">广播变量和累加器</span>
- <span class="nv">SparkContext</span> <span class="nf">通过broadcast</span><span class="p">(</span> <span class="p">)</span> <span class="s s-Atom">方法传递即将被广播的变量-返回Broadcast</span><span class="p">[</span><span class="nv">T</span><span class="p">]</span>
- <span class="s s-Atom">从Driver</span> <span class="s s-Atom">到任务，单向传播，没有办法更新</span>
-  <span class="nf">通过accumulator</span><span class="p">(</span> <span class="p">)</span><span class="s s-Atom">方法创建一个累加器变量</span>
-<span class="mf">07.</span><span class="s s-Atom">leftOuterJoin连接操作</span>
-</pre></div>
-
-
-<h4>2.数据结构</h4>
-<div class="highlight"><pre><span></span>    <span class="n">RDD</span><span class="err">、</span><span class="n">DataFrame</span><span class="err">、</span><span class="n">Dataset</span><span class="err">全都是</span><span class="n">spark</span><span class="err">平台下的分布式弹性数据集</span>
-     <span class="n">RDD</span>   <span class="n">PairRDDFunctions</span> 
-     <span class="err">三者都有</span><span class="n">partition</span><span class="err">的概念，</span>
-     <span class="err">三者都有惰性机制，在进行创建、转换，</span>
-        <span class="err">如</span><span class="nb">map</span><span class="err">方法时，不会立即执行，只有在遇到</span><span class="n">Action</span><span class="err">如</span><span class="n">foreach</span><span class="err">时，三者才会开始遍历运算</span>
-        <span class="err">对</span><span class="n">DataFrame</span><span class="err">和</span><span class="n">Dataset</span><span class="err">进行操作许多操作都需要这个包进行支持</span><span class="o">-</span>  <span class="kn">import</span> <span class="nn">spark.implicits._</span>
-    <span class="n">DataFrame</span><span class="err">也可以叫</span><span class="n">Dataset</span><span class="p">[</span><span class="n">Row</span><span class="p">],</span>
-            <span class="err">每一行的类型是</span><span class="n">Row</span><span class="err">，不解析，每一行究竟有哪些字段，各个字段又是什么类型都无从得知</span>
-            <span class="n">Dataset</span><span class="err">中每一行是什么类型是不一定的</span>
-</pre></div>
-
-
-<h4>基于DataSet的操作</h4>
-<div class="highlight"><pre><span></span>    DataSet数据类型的转化
-        df.printSchema()
-        foreach   foreachPartition  filter  flatMap  mapPartitions  transform
-        reduce
-        head()  take()  count()  isEmpty  where(
-        collect()  collectAsList()
-        persist()  storageLevel
-        checkpoint()  coalesce  repartition  repartitionByRange(
-        columns
-        orderBy  sortWithinPartitions  sort
-        groupByKey
-        intersect  union 
-        agg  groupBy
-        join
-        explain()
-
-        provide common aggregations such as count(), countDistinct(), avg(), max(), min()
-        UserDefinedAggregateFunction extends Serializable
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Scala-Spark-RDD-DataSet</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-45.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
