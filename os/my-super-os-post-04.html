@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>服务器安装操作系统和配置</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li class="active"><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/os/my-super-os-post-04.html" rel="bookmark"
+           title="Permalink to 服务器安装操作系统和配置">服务器安装操作系统和配置</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-24T21:04:00+08:00">
+                Published: 2016-11-24 21:04:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/os/index.html">OS</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h2>1.计算机硬件了解：</h2>
+<div class="highlight"><pre><span></span>    服务器
+    处理器：
+    内存： 32G
+    硬盘： 1T   磁盘数-  RAID 配置等级以及磁盘数
+
+RAID--将多个小的磁盘整合成为一个大的磁盘&lt;需要在阵列卡里配置好RAID，分出逻辑盘来，系统再加载正确的驱动就能认到了。&gt;
+    磁盘的型号，容量以及个数
+            RAID卡配置涉及的一些名称解释：
+            Disk Group ：磁盘组，这里相当于是阵列，例如配置了一个Raid 1 ，就是一个磁盘组；
+            VD（virtual Disk）：虚拟磁盘，虚拟磁盘可以不使用阵列的全部容量，也就是说一个可以分为多个VD；
+            PD（physical disk）：故名思义，主是物理硬盘；
+        HS：Hot Spare ，热备盘
+
+第一个关键问题，明确服务器的配置。服务器的磁盘容量是要考虑的一个问题。
+通常在2T内的话，一般比较容易，超过这个数据就要注意磁盘的安装与操作，另外是否要设置磁盘阵列也需要考虑
+
+接着确定自己的启动模式，方法是进入BIOS，然后你会发现有一项叫&quot;boot mode&quot;，
+选中&quot;UEFI boot&quot;就是UEFI启动模式，
+选中&quot;Legacy boot&quot;就是Legacy启动模式。    
+（1） UEFI启动模式与 legacy启动模式
+legacy启动模式： 就是这么多年来PC一直在使用的启动方式（从MBR中加载启动程序）
+    开机--&gt; BIOS初始化--&gt; BIOD自检 ---&gt; 引导操作系统 ---&gt; 进入系统
+UEFI启动模式：UEFI BIOS下新的启动技术。UEFI BIOS作为一种新的BIOS自然也应该兼容legacy的启动方式。
+    开机 --&gt; UEFI初始化--&gt; 引导操作系统---&gt; 进入系统
+MBR不支持大于2T的硬盘空间，只有GPT支持。可以通过将启动模式设置成EFI做到
+随后是引导程序，引导程序一般是grub
+ root
+ kernel
+ initrd
+然后boot
+解决方案：将BIOS模式设置成legancy
+
+安装方式
+  PXEBOOT 
+     PXE(Pre-boot Execution Environment)是由Intel设计的协议，它可以使计算机通过网络启动。
+     协议分为client和server两端，PXE client在网卡的ROM中，当计算机引导时，BIOS把PXE client调入内存执行，并显示出命令菜单，经用户选择后，
+     PXE client将放置在远端的操作系统通过网络下载到本地运行
+光盘
+硬盘
+U盘
+</pre></div>
+
+
+<h2>2.计算机操作系统分区方案：</h2>
+<div class="highlight"><pre><span></span>安装版本：
+安装的版本以及内核版本&lt;注意位数&gt;
+硬盘分区方案：
+    /data  分的大一些
+    服务器安装操作系统
+     集成导航模式
+     阵列没有创建好导致的无法安装
+</pre></div>
+
+
+<h2>3.网络配置：</h2>
+<div class="highlight"><pre><span></span>查看网线，注意网口，服务器一般会有多个网口，注意是使用的哪个网口
+配置网络地址
+    IP地址：172.19.100.121
+    掩码： 255.255.255.0
+    网关： 172.19.100.254
+iptables，防火墙
+    1) 重启后生效 
+    开启： chkconfig iptables on 
+    关闭： chkconfig iptables off
+
+    2) 即时生效，重启后失效 
+    开启： service iptables start 
+    关闭： service iptables stop 
+ssh服务是否安装，如果没有安装，则安装
+    查看 service status ssh
+</pre></div>
+
+
+<h2>4.查看版本以及配置：</h2>
+<div class="highlight"><pre><span></span><span class="x">查看硬件内容：</span>
+<span class="x">            cat /proc/version</span>
+<span class="x">            cat /proc/cpuinfo</span>
+<span class="x">            cat /proc/meminfo</span>
+<span class="x">            df -m</span>
+<span class="x">            cat /etc/issue</span>
+<span class="x">            cat /etc/passwd</span>
+<span class="x">查看路径设置：echo </span><span class="p">$</span><span class="nv">PATH</span><span class="x"></span>
+<span class="x">查看网络：   ifconfig   ping  netstat</span>
+<span class="x">查看运行的服务 service --status-all</span>
+<span class="x">查看内核模块：lsmod</span>
+<span class="x">查看host配置：cat /etc/hosts</span>
+<span class="x">连接用户设置：who</span>
+</pre></div>
+
+
+<h2>5.备份</h2>
+<div class="highlight"><pre><span></span>安装好操作系统后，对操作系统进行备份，以便将来使用时直接恢复到当前状态即可
+</pre></div>
+
+
+<h2>6.虚拟机</h2>
+<div class="highlight"><pre><span></span>如果使用虚拟机来搭建集群，而且还是使用root权限的话，一定要注意宿主机分给/root的磁盘大小。
+问题：虚拟机启动不了
+Document is empty.
+Location: &#39;/home/ron/VirtualBox VMs/Semios Win7 /Semios Win7 .vbox&#39;, line 1 (0), column 1.
+/home/vbox/vbox-5.0.12/src/VBox/Main/src-server/MachineImpl.cpp[740] (nsresult Machine::i_registeredInit()).
+Result Code: 
+NS_ERROR_FAILURE (0x80004005)
+Component: 
+MachineWrap
+Interface: 
+IMachine {f30138d4-e5ea-4b3a-8858-a059de4c93fd}
+解决方法：   
+参考：http://askubuntu.com/questions/724083/why-is-my-virtual-machine-inaccessible
+
+出现错误：
+ntpd[1946]: 0.0.0.0 0628 08 no_sys_peer
+ kernel: device em1 left promiscuous mode
+ NetworkManager[1706]: &lt;warn&gt; error saving timestamp: Failed to write file &#39;/var/lib/NetworkManager/timestamps.VWXGRY&#39;: fflush() failed: No space left on device
+
+原因：文件夹分配存储空间不足，而把虚拟机安装在了主目录
+    输入命令看
+    du -sh /root
+    备:linux 系统全部安装 /
+
+在宿主机中中，root目录分配了50G的硬盘，在一般情况下是够用的，但是安装了多个虚拟机，而且是在宿主机的root目录下，导致，磁盘空间不足，进而导致了虚拟机的暂停。
+错误文件所在地址 /var/log/message
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

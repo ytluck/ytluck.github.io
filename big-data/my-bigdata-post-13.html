@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Hbase数据通过Spark到MySQL</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-13.html" rel="bookmark"
+           title="Permalink to Hbase数据通过Spark到MySQL">Hbase数据通过Spark到MySQL</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-04-14T13:14:00+08:00">
+                Published: 2018-04-14 13:14:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h2>处理流程：</h2>
+<div class="highlight"><pre><span></span>&lt;1&gt;MySQL 设置用户以及密码创建数据库以及待处理的数据表
+&lt;2&gt;Spark从HBase中读取数据，写到MySQL中
+&lt;3&gt;R/Python 读取MySQL中数据，进行数据探索并将得出的结论以及图标数据进行保存
+</pre></div>
+
+
+<h2>&lt;1&gt;设置MySQL数据库,创建表</h2>
+<div class="highlight"><pre><span></span>    登录主机
+     用户名 root密码 ****    
+    安装数据库：
+    rpm -ivh MySQL-server-community.rpm 
+    登录
+    mysql  -h localhost -u root  .  
+    登录状态修改密码
+    mysql&gt; SET PASSWORD FOR &#39;root&#39;@&#39;localhost&#39; = PASSWORD(&#39;****&#39;);
+    mysql&gt; FLUSH PRIVILEGES
+    重新登录
+    mysql -u root -p 输入密码登录
+    在登录状态创建数据库
+        show tables;
+        mysql&gt;
+        create database UNIX_DATEST;
+        use  UNIX_DATEST
+        CREATE TABLE Lasy(userID VARCHAR(20) primary key ,sex VARCHAR(2), name VARCHAR(16) )
+        DESC Lasy
+        select * from Lasy limit 3;
+        select count(*) from Lasy;
+
+     删除字段中内容
+        delect from Lasy where userID = &quot;9561&quot;;
+     删除字段
+        alter table Lasy drop column userID;
+     清除表数据
+        delect from Lasy;
+     删除表
+        DROP TABLE IF EXISTS Lasy;
+     //授予访问权限，我登录的主机IP地址是39，所以设置如下
+        GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;172.15.10.39&#39; IDENTIFIED BY &#39;test&#39;;
+
+    主机IP：   172.15.10.30
+    MySQL端口：    3306
+    用户名：    root
+    密码：     test
+    数据库：    UNIX_DATEST
+    数据表：    Lasy
+        //val sql = &quot;insert into Lasy(userID , sex，name ) values (?, ?,?)&quot;
+</pre></div>
+
+
+<h2>&lt;2&gt;Spark读取Hbase,并将数据存储到MySQL</h2>
+<div class="highlight"><pre><span></span> MySQL的JDBC URL编写方式：jdbc:mysql://主机名称：连接端口/数据库的名称?参数=值[用户名 密码]
+Maven依赖
+     <span class="c">&lt;!-- mysql驱动包 --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>mysql<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>mysql-connector-java<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>5.1.38<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+
+配置文件
+    #hbase连接配置
+    hbase.zookeeper.quorum=172.15.10.191,172.15.10.192,172.15.10.193
+    hbase.zookeeper.znode.parent=/hbase-unsecure
+    hbase.zookeeper.property.clientPort=2181
+    hbase.master.port=60000
+
+    #hbase表名映射--测试表
+    hbase.UNIX.test=first_test
+
+    #MySQL数据库配置
+     URL.MySQL=jdbc:mysql://172.15.10.30:3306/UNIX_DATEST
+     USERNAME.MySQL=root
+     ASSWORD.MySQL=test
+
+ //建立mysql数据库连接
+ def getMysqlConnection : Connection = {
+ Class.forName(&quot;com.mysql.jdbc.Driver&quot;)
+ DriverManager.getConnection(&quot;url&quot;,&quot;username&quot;,  &quot;password&quot;)
+   }
+    conn = getMysqlConnection
+    sql =&#39;show tables&#39;
+    ps = conn.prepareStatement(sql)
+    ps.executeBatch()
+    conn.commit()
+    ps.close()
+    conn.close()
+
+      /**
+    * Hbase数据库转换到MySQL数据库
+    */
+
+package com.UNIX.analysis   
+import java.sql.{Connection, DriverManager, PreparedStatement}
+
+import com.UNIX.util.UtilsTrait
+import org.apache.hadoop.hbase.{HBaseConfiguration, HConstants}
+import org.apache.hadoop.hbase.client.Result
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat
+import org.apache.hadoop.hbase.util.Bytes
+import org.apache.spark.mllib.stat.Statistics
+import org.apache.spark.{SparkConf, SparkContext}
+/**
+  * Created by first on 2016/11/23.
+  */
+object readHBase extends UtilsTrait {
+
+    def main(args: Array[String]) {
+
+        //第一步：创建SparkConf对象配置一些通用的属性，并且基于这个创建一个SparkContext对象setMaster(&quot;local[2]&quot;)
+        val SparkConf = new SparkConf().setMaster(&quot;local[2]&quot;).setAppName(&quot;CountingTest&quot;).set(&quot;spark.executor.memory&quot;, &quot;1g&quot;)
+        //使用SparkContext对象中的textFile函数将输入文件转换为一个RDD ，SparkContext对象代表对计算机集群的一个连接
+        val sc = new SparkContext(SparkConf)
+
+        val hbaseConf = HBaseConfiguration.create()
+        //设置zooKeeper集群地址，也可以通过将hbase-site.xml导入classpath，本例在程序里设置
+        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, getProperties(&quot;hbase.zookeeper.quorum&quot;))
+        hbaseConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, getProperties(&quot;hbase.zookeeper.znode.parent&quot;))
+        hbaseConf.set(HConstants.ZOOKEEPER_CLIENT_PORT, getProperties(&quot;hbase.zookeeper.property.clientPort&quot;))
+        hbaseConf.set(HConstants.MASTER_PORT, getProperties(&quot;hbase.master.port&quot;))
+
+        //扫描表，表名
+        hbaseConf.set(TableInputFormat.INPUT_TABLE, getProperties(&quot;hbase.UNIX.test&quot;))
+        //通过Hadoop输入格式 访问HBase，输入数据类型是HBase，输入命令是调用SparkContext.newAPTHadoopRDD
+        //调用命令中的参数hbaseConf包含了Zookeeper设置以及Hbase设置，TableInputFormat中包含了多个可以用来优化对Hbase的读取设置项
+        //返回值类型是键值对，其中键的类型是ImmutableBytesWritable，值得类型是Result
+        val HBase_DATARDD = sc.newAPIHadoopRDD(hbaseConf, classOf[TableInputFormat], classOf[ImmutableBytesWritable], classOf[Result])
+        //脚手架语句，查看结果
+        println(HBase_DATARDD.count())
+        HBase_DATARDD.foreach(println(_))
+
+        //读取的Hbase的RDD形式
+        //  conn = DriverManager.getConnection(&quot;jdbc:mysql://localhost:3306/spark_testdb&quot;, &quot;root&quot;, &quot;111111&quot;)
+        //&quot;insert into Lasy(userID, sex) values (?, ?)&quot; INSERT INTO table_name (列1, 列2,...) VALUES (值1, 值2,....)
+
+
+       HBase_DATARDD.map(o =&gt; {
+        val strs = new Array[String](7)
+        try {
+            //strs(1) = new String(o._2.getRow)
+            strs(1) = new String(o._1.get())
+            try {
+                strs(2) = new String(o._2.getValue(&quot;it&quot;.getBytes(), &quot;sex&quot;.getBytes()))
+            } catch {
+                case e: Exception =&gt; strs(2) = &quot;0&quot;
+            }
+            try {
+                strs(3) = new String(o._2.getValue(&quot;it&quot;.getBytes(), &quot;dltcode&quot;.getBytes()))
+            } catch {
+                case e: Exception =&gt; strs(3) = &quot;0&quot;
+            }
+
+        } catch {
+            case e: Exception =&gt;
+                System.err.println(e.getStackTrace)
+        }
+        strs
+
+    }).foreachPartition(o =&gt; {
+        var conn: Connection = null
+        var ps: PreparedStatement = null
+        val sql = &quot;insert into Lasy(userID , sex，name ) values (?, ?,?)&quot;
+        println(sql)
+
+        //数据转换一定要查看转换是否正确toString，还是toInt
+        val ageRDD = HBase_DATARDD.map(
+            o =&gt; Bytes.toString(o._2.getValue(&quot;it&quot;.getBytes, &quot;sex&quot;.getBytes))
+        ).map(o =&gt; o.toDouble)
+        ageRDD.foreach(println(_))
+        println(ageRDD.count())
+
+        val nameRDD = HBase_DATARDD.map(
+            o =&gt; Bytes.toString(o._2.getValue(&quot;it&quot;.getBytes, &quot;name&quot;.getBytes))
+        ).map(o =&gt; o.toDouble)
+        nameRDD.foreach(println(_))
+        println(nameRDD.count())
+
+        //相关性分析Correlations
+        //输入数据 ：类型是连续型数据，two RDD[Double]s，两个RDD必须要有相同的长度.同一列的数据不能完全相同
+        //函数以及参数：    calculate the correlation matrix using Pearson&#39;s method. Use &quot;spearman&quot; for Spearman&#39;s method.
+        //输出是the output will be a Double or the correlation Matrix respectively
+        //出现NaN
+        val correlation: Double = Statistics.corr(ageRDD, nameRDD, &quot;pearson&quot;) //计算不同数据的　皮尔逊相关系数
+        println(correlation)    
+        sc.stop()
+    }
+}
+</pre></div>
+
+
+<h3>&lt;3&gt; R/Python 读取MySQL中数据</h3>
+<div class="highlight"><pre><span></span><span class="err">进行数据探索并将得出的结论以及图标数据进行保存</span>
+    <span class="o">&lt;</span><span class="mo">01</span><span class="o">&gt;</span> <span class="n">R</span> <span class="err">从</span><span class="n">MySQL</span><span class="err">以及</span><span class="n">Orcale</span><span class="err">等关系型数据库中读取数据</span>
+        <span class="c1">##本机需要安装和配置好MySQL的客户端</span>
+        <span class="err">流程：</span>
+                <span class="err">安装并引入</span><span class="n">RMySQL</span>
+                <span class="err">使用</span><span class="n">dbConnect</span><span class="err">函数打开数据库的连接</span>
+                <span class="err">使用</span><span class="n">dbGetQuery</span><span class="err">函数发起一个</span><span class="n">select</span><span class="err">语句，并返回结果集</span>
+                <span class="err">读取结束后，使用</span><span class="n">dbDisconnect</span><span class="err">函数终止与数据库的连接</span><span class="mi">3</span>
+         <span class="c1">#install.packages(&quot;RMySQL&quot;)</span>
+        <span class="n">library</span><span class="p">(</span><span class="n">RMySQL</span><span class="p">)</span>
+        <span class="n">con</span> <span class="o">&lt;-</span> <span class="n">dbConnect</span><span class="p">(</span><span class="n">MySQL</span><span class="p">(),</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;****&quot;</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;172.15.10.***&quot;</span><span class="p">)</span>
+        <span class="n">sql</span> <span class="o">&lt;-</span> <span class="s2">&quot; select  userID,sex,dltcode from UNIX_DATEST.Lasy&quot;</span>
+        <span class="n">rows</span> <span class="o">&lt;-</span> <span class="n">dbGetQuery</span><span class="p">(</span><span class="n">con</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">dbMoreRessylts</span><span class="p">(</span><span class="n">con</span><span class="p">))</span> <span class="n">dbNextResult</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
+        <span class="n">dbDisconnect</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
+
+    <span class="o">&lt;</span><span class="mo">02</span><span class="o">&gt;</span><span class="n">Python</span><span class="err">从</span><span class="n">MySQL</span><span class="err">和</span><span class="n">Orcale</span><span class="err">等关系型数据库中读取数据</span>     
+    <span class="err">安装</span><span class="n">MySQLdb</span>
+    <span class="err">使用流程：</span>
+        <span class="err">引入</span> <span class="n">API</span> <span class="err">模块。</span>
+        <span class="err">获取与数据库的连接。</span>
+        <span class="err">执行</span><span class="n">SQL</span><span class="err">语句和存储过程。</span>
+        <span class="err">关闭数据库连接。</span>
+<span class="c1">#!/usr/bin/python</span>
+<span class="c1"># -*- coding: UTF-8 -*-</span>
+<span class="kn">import</span> <span class="nn">MySQLdb</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="c1"># 打开数据库连接</span>
+<span class="c1">#port:MySQL服务使用的TCP端口.默认是3306.</span>
+<span class="c1">#charset:数据库编码 charset=&quot;utf8&quot;</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">MySQLdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;172.15.10.30&quot;</span><span class="p">,</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="n">passwd</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span><span class="n">db</span><span class="o">=</span><span class="s2">&quot;UNIX_DATEST&quot;</span><span class="p">)</span>
+<span class="c1"># 创建数据表SQL语句  占位符 %s</span>
+<span class="n">MySQLsql</span> <span class="o">=</span> <span class="s2">&quot;select * from Lasy&quot;</span>
+<span class="c1"># 使用cursor()方法获取操作游标 </span>
+<span class="c1"># 执行sql语句</span>
+<span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="c1">#cursor对象提供方法包括两大类:1.执行命令,2.接收返回值</span>
+<span class="c1">#第一类方法：执行命令</span>
+<span class="c1">#execute(self, query, args):执行单条sql语句,接收的参数为sql语句本身和使用的参数列表,返回值为受影响的行数 </span>
+<span class="c1">#executemany(self, query, args):执行单条sql语句,但是重复执行参数列表里的参数,返回值为受影响的行数 </span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">MySQLsql</span><span class="p">)</span>
+
+<span class="c1">##第二类方法 接收返回值</span>
+<span class="c1">#使用 fetchone() 方法获取单条数据, 使用fetchall() 方法获取多条数据</span>
+<span class="c1">#fetchmany(self, size=None):接收size条返回结果行.如果size的值大于返回的结果行的数量,则会返回</span>
+<span class="c1">#使用 fetchone() 方法获取一条数据</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">data</span>
+<span class="k">print</span>  <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1">##fetchall() 方法取余下的数据</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+    <span class="k">print</span> <span class="n">row</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">r</span>
+<span class="c1">#Pandas读取Mysql数据</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">MySQLsql</span><span class="p">,</span><span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">df</span>
+<span class="c1">#需要分别的关闭指针对象和连接对象</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
+<span class="c1"># 关闭数据库连接</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="err">关于安装</span><span class="n">Python</span><span class="err">安装数据库</span>
+    <span class="c1">#MySQLdb 是用于Python链接Mysql数据库的接口，它实现了 Python 数据库 API 规范</span>
+    <span class="c1">#pip install MySQL-python  </span>
+    <span class="n">MySQL</span><span class="o">-</span><span class="n">Python</span> <span class="mf">1.2</span><span class="o">.</span><span class="mi">5</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">support</span> <span class="n">Python</span> <span class="mf">3.0</span><span class="o">+</span> <span class="n">yet</span>
+</pre></div>
+
+
+<h2>概念：</h2>
+<div class="highlight"><pre><span></span>时间戳是指格林威治时间1970年01月01日00时00分00秒(北京时间1970年01月01日08时00分00秒)起至现在的总秒数
+Unix时间戳(Unix timestamp)，或称Unix时间(Unix time)、POSIX时间(POSIX time)，是一种时间表示方式
+时间戳：
+    Unix时间戳记是从&#39;1970-01-01 00:00:00&#39;GMT开始的秒数     
+    MySQL中“完整”TIMESTAMP格式是14位，
+        TIMESTAMP值可以从1970的某时的开始一直到2037年，精度为一秒，其值作为数字显示。
+        0000-00-00 00:00:00     
+    Orcale 获得当前时间的，精确到毫秒，可以指定精确豪秒的位数
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>MySQLdb用户指南: http://mysql-python.sourceforge.net/MySQLdb.html 
+MySQLdb文档: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/public/MySQLdb-module.html
+python下的MySQLdb使用 http://blog.csdn.net/vincent_czz/article/details/7697039/
+十分钟搞定pandas http://pandas.pydata.org/pandas-docs/stable/dsintro.html#dsintro
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

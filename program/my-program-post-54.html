@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python和R语言批量重命名文件</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-54.html" rel="bookmark"
+           title="Permalink to Python和R语言批量重命名文件">Python和R语言批量重命名文件</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-05-18T21:30:00+08:00">
+                Published: 2019-05-18 21:30:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <hr />
+<h3>Python代码</h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">listdir</span>
+<span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">sub</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copy</span>
+
+<span class="c1"># 存储文件全路径以及文件名 get_all_file 中使用</span>
+<span class="n">all_path</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_name</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">def</span> <span class="nf">get_all_file</span><span class="p">(</span><span class="n">file_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; 获取多层目录下所有文件 &quot;&quot;&quot;</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">listdir</span><span class="p">(</span><span class="n">file_dir</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">:</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="c1"># 判断是否是文件夹，如果是文件夹则递归调用函数</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="n">get_all_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="c1"># 如果是文件，保存到列表中</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="n">all_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">all_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_name</span><span class="p">,</span> <span class="n">all_path</span>
+
+
+<span class="k">def</span> <span class="nf">get_local_file</span><span class="p">(</span><span class="n">file_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; 获取本层目录下所有文件-不包含文件夹  输入是文件路 String，返回值是列表&quot;&quot;&quot;</span>
+    <span class="c1"># 存储文件全路径以及文件名</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">local_name</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">listdir</span><span class="p">(</span><span class="n">file_dir</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">:</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="c1"># 如果是文件，保存文件路径及文件名到列表中</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="n">local_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">local_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">local_name</span>
+
+
+<span class="k">def</span> <span class="nf">rename_local_file</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">original_name</span><span class="p">):</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">.txt&#39;</span>
+    <span class="c1"># re模块提供了re.sub用于替换字符串中的匹配项</span>
+    <span class="n">file_replace_name</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">original_name</span><span class="p">)</span>
+    <span class="c1"># 构建新的文件名</span>
+    <span class="n">sql_file_name</span> <span class="o">=</span> <span class="s1">&#39;特征学习_&#39;</span> <span class="o">+</span> <span class="n">file_replace_name</span><span class="o">+</span><span class="s1">&#39;.sql&#39;</span>
+    <span class="c1"># 将路径与文件名分开 ,并取路径名</span>
+    <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">original_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># 构建文件路径</span>
+    <span class="n">result_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">sql_file_name</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result_file_path</span><span class="p">)</span>
+    <span class="c1"># 重新命名</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">result_file_path</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">copy_rename_local_file</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">original_name</span><span class="p">,</span> <span class="n">des_dir</span><span class="p">):</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">.sql&#39;</span>
+    <span class="c1"># re模块提供了re.sub用于替换字符串中的匹配项</span>
+    <span class="n">file_replace_name</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">original_name</span><span class="p">)</span>
+    <span class="c1"># 构建新的文件名</span>
+    <span class="n">sql_file_name</span> <span class="o">=</span> <span class="s1">&#39;特征学习_&#39;</span> <span class="o">+</span> <span class="n">file_replace_name</span><span class="o">+</span><span class="s1">&#39;.sql&#39;</span>
+
+    <span class="c1"># 构建文件路径</span>
+    <span class="n">result_file_mid_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">des_dir</span><span class="p">,</span> <span class="s1">&#39;new&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">result_file_mid_path</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">result_file_mid_path</span> <span class="o">+</span> <span class="s1">&#39;目录已存在&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">result_file_mid_path</span> <span class="o">+</span> <span class="s1">&#39;目录不存在，创建目录&#39;</span><span class="p">)</span>
+        <span class="c1"># os.mkdir(result_file_mid_path) 只能创建一级目录</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">result_file_mid_path</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">result_file_mid_path</span><span class="p">)</span>
+    <span class="c1"># 重新命名</span>
+    <span class="n">result_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_file_mid_path</span><span class="p">,</span> <span class="n">sql_file_name</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result_file_path</span><span class="p">)</span>
+    <span class="n">copy</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">result_file_path</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">filedir</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">my</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">任务&#39;</span>
+    <span class="c1"># 输入文件的名称</span>
+    <span class="n">dest_dir</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">my</span><span class="se">\\</span><span class="s1">Desktop</span><span class="se">\\</span><span class="s1">SQL&#39;</span>
+    <span class="n">files</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="n">get_local_file</span><span class="p">(</span><span class="n">filedir</span><span class="p">)</span>
+    <span class="k">for</span> <span class="nb">file</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="n">copy_rename_local_file</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
+<hr />
+<h3>R语言代码</h3>
+<div class="highlight"><pre><span></span>folder <span class="o">&lt;-</span> <span class="s">&quot;C:\\Users\\my\\Desktop\\task&quot;</span>
+files <span class="o">&lt;-</span> <span class="kp">list.files</span><span class="p">(</span>folder<span class="p">)</span>
+<span class="kr">for</span><span class="p">(</span>f <span class="kr">in</span> files<span class="p">){</span>
+  <span class="c1"># 去掉txt之后的文件名</span>
+  matchname <span class="o">&lt;-</span> <span class="kp">sub</span><span class="p">(</span><span class="s">&#39;\\.txt&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">,</span>f<span class="p">)</span>
+  <span class="c1"># 重新命名的后缀</span>
+  newname <span class="o">&lt;-</span> <span class="kp">paste0</span><span class="p">(</span>matchname<span class="p">,</span><span class="s">&quot;_1.sql&quot;</span><span class="p">,</span>sep<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+  <span class="kp">print</span><span class="p">(</span> <span class="kp">paste0</span><span class="p">(</span>folder<span class="p">,</span><span class="s">&#39;/&#39;</span><span class="p">,</span>f<span class="p">))</span>
+  <span class="kp">print</span><span class="p">(</span><span class="kp">paste0</span><span class="p">(</span>folder<span class="p">,</span><span class="s">&#39;/&#39;</span><span class="p">,</span>newname<span class="p">))</span>
+  <span class="c1"># 重命名</span>
+  <span class="kp">file.rename</span><span class="p">(</span><span class="kp">paste0</span><span class="p">(</span>folder<span class="p">,</span><span class="s">&#39;/&#39;</span><span class="p">,</span>f<span class="p">),</span><span class="kp">paste0</span><span class="p">(</span>folder<span class="p">,</span><span class="s">&#39;/&#39;</span><span class="p">,</span>newname<span class="p">))</span>
+<span class="p">}</span>
+ <span class="kp">list.files</span><span class="p">(</span>folder<span class="p">)</span>
+</pre></div>
+
+
+<h3>参考</h3>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

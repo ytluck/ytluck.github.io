@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>实时计算架构-消息传输层</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-47.html" rel="bookmark"
+           title="Permalink to 实时计算架构-消息传输层">实时计算架构-消息传输层</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-05-26T19:55:00+08:00">
+                Published: 2019-05-26 19:55:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>架构：消息传输层-流处理层
+消息传输层：
+   01.Kafka 的出现，直接解决了replayable的数据框架的问题。建造和分析分布式数据处理系统的思维体系
+     持久化：kafka文件存储
+     偏移offset管理
+   02.Pulsar 是pub-sub模式的分布式消息平台：为了解决吞吐等问题，Pulsar和Kafka一样，采用了分区（Partition）的机制
+   持久化-Pulsar通过 BookKeeper 来存储消息，保证消息不会丢失-服务和数据是分离的-存储和计算的分离
+   - Pulsar Broker 是无状态的，与存储相互分离
+     Broker：提供发布和订阅的服务（Pulsar的组件）
+     Bookie：提供存储能力（BookKeeper的存储组件）
+     支持消息TTL  Time-to-Live(TTL)
+流处理层：
+  Flink
+  Spark Streaming/ Structure Streaming
+</pre></div>
+
+
+<h3>消息传输层：</h3>
+<h4>Kafka</h4>
+<div class="highlight"><pre><span></span>01.使用
+  Producer  Consumer   Broker Topic Message Partition  Log LogSegment  Relica  Rebalance
+  offset  ZooKeeper
+
+02.管控：
+  Topic：Topic的名字
+  Partition：Topic包含的分区
+    Partition以及Partition副本由一系列的Segment和索引文件组成
+kafka消费信息lag 
+   logsize: 已经写到该分区的消息数
+   offset : Kafka Consumer已经消费分区上的消息数
+   lag    :还有多少消息未读取（Lag = logSize - Offset）
+  offset代表数据消费能力 logsize代表进入速度 lag 数据积压情况-Lag（延迟) 如果lag量持续增长说明系统出现问题。
+  生产数据 msg/s -- 集群的吞吐量(msg/s)
+      每秒产生的消息数（mps）和每个消息的字节大小（bpm）
+  Message :Kafka中的一条记录或数据单位。每条消息都有一个键和对应的一个值，有时还会有可选的消息头。
+  恢复正常所需要的时间，取决于Consumer每秒能够应对的消息速度
+  time=messages/(consume rate per second - produce rate per second)
+</pre></div>
+
+
+<h4>使用案例：</h4>
+<div class="highlight"><pre><span></span><span class="nt">Flink</span><span class="err">实时计算</span><span class="nt">--Flink</span><span class="err">集成</span><span class="nt">Kafka</span>
+  <span class="nt">Flink</span> 
+   <span class="nt">01</span><span class="nc">.connector</span>
+      <span class="err">内嵌的</span><span class="nt">Source</span>
+      <span class="nt">Custom</span> <span class="nt">Source</span>
+          <span class="nt">addSource</span> 
+    <span class="nt">02</span><span class="nc">.Data</span> <span class="nt">Enrichment</span> <span class="nt">via</span> <span class="nt">Async</span> <span class="nt">I</span><span class="o">/</span><span class="nt">O</span>
+  <span class="err">连接</span><span class="nt">Kafka</span>
+   <span class="nt">Flink</span><span class="err">’</span><span class="nt">s</span> <span class="nt">Kafka</span> <span class="nt">consumer</span> <span class="nt">is</span> <span class="nt">called</span> <span class="nt">FlinkKafkaConsumer08</span>
+                                    <span class="nt">FlinkKafkaConsumer</span>    <span class="nt">for</span> <span class="nt">Kafka</span> <span class="o">&gt;=</span> <span class="nt">1</span><span class="nc">.0.0</span> <span class="nt">versions</span><span class="o">)</span>
+   <span class="nt">1</span><span class="nc">.5</span>   <span class="nt">flink-connector-kafka-0</span><span class="nc">.8_2.11</span>       <span class="nt">Kafka</span> <span class="err">版本：</span><span class="nt">0</span><span class="nc">.8.x</span>
+ <span class="err">代码示例：</span>
+
+   <span class="nt">Properties</span> <span class="nt">properties</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">Properties</span><span class="o">();</span>
+   <span class="nt">properties</span><span class="nc">.setProperty</span><span class="o">(</span><span class="s2">&quot;bootstrap.servers&quot;</span><span class="o">,</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="o">);</span>
+   <span class="o">//</span> <span class="nt">only</span> <span class="nt">required</span> <span class="nt">for</span> <span class="nt">Kafka</span> <span class="nt">0</span><span class="nc">.8</span>
+   <span class="nt">properties</span><span class="nc">.setProperty</span><span class="o">(</span><span class="s2">&quot;zookeeper.connect&quot;</span><span class="o">,</span> <span class="s2">&quot;localhost:2181&quot;</span><span class="o">);</span>
+   <span class="nt">properties</span><span class="nc">.setProperty</span><span class="o">(</span><span class="s2">&quot;group.id&quot;</span><span class="o">,</span> <span class="s2">&quot;test&quot;</span><span class="o">);</span>
+   <span class="nt">DataStream</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">&gt;</span> <span class="nt">stream</span> <span class="o">=</span> <span class="nt">env</span>
+    <span class="nc">.addSource</span><span class="o">(</span><span class="nt">new</span> <span class="nt">FlinkKafkaConsumer08</span><span class="o">&lt;&gt;(</span><span class="s2">&quot;topic&quot;</span><span class="o">,</span> <span class="nt">new</span> <span class="nt">SimpleStringSchema</span><span class="o">(),</span> <span class="nt">properties</span><span class="o">));</span>
+<span class="o">//</span><span class="nt">SimpleStringSchema</span> <span class="err">来反系列化</span><span class="nt">message</span><span class="err">，这个类是实现了</span> <span class="nt">DeserializationSchema</span> <span class="err">接口，并重写了</span><span class="nt">T</span> <span class="nt">deserialize</span><span class="o">(</span><span class="nt">byte</span><span class="cp">[]</span> <span class="nt">message</span><span class="o">)</span><span class="err">函数</span>
+<span class="o">//</span> <span class="nt">SerializationSchema</span>
+</pre></div>
+
+
+<h4>Pulsar</h4>
+<div class="highlight"><pre><span></span>基本情况：高性能流式处理（Apache Kafka所追求的）和灵活的传统队列（RabbitMQ所追求的）
+   Producer  Consumer  Topic    Cursors
+   Subscription
+   Bookkeeper
+分层抽象：
+ Topic (主题)   Subscription (订阅)  Cursors (游标)
+   Apache Pulsar使用游标来跟踪偏移量，
+    Subscription 订阅来消费Topic中的消息。订阅是游标(跟踪偏移量)的逻辑实体，订阅不包含消息的数据，只包含元数据和游标
+    Apache Pulsar中的分区也是Topic
+ Bookkeeper- 每个Bookkeeper节点称为Bookie。
+   Pulsar和Bookkeeper都使用Apache Zookeeper来存储元数据和监控节点健康状况
+   如果Zookeeper不可用整个Pulsar将不可用。
+    ledgers流  子日志(Ledgers)  Ledger作为最小的删除单元  Ledgers本身也被分解为多个Fragment。
+    Ledger有三个关键配置： Ensemble Size (E)  Write Quorum Size (Qw)   Ack Quorum Size (Qa)
+      Ensemble Size (E) 决定了 Pulsar 写入 Ledger 可用的 Bookies 池的大小。
+      Write Quorum (Qw) 是 Pulsar 将要写入的实际的 Bookies 数量
+    Fragment是Bookkeeper集群中最小的分布单元
+    Entries
+    数据恢复协议
+  Broker缓存尾部消息日志，可以非常高效的为尾部读取操作提供服务
+  journal(日志)
+分阶段：
+  结合到一个统一的消息传递模型和API
+  Apache Pulsar 内部构成： Pulsar Broker  / Apache BookKeeper / Pulsar Functions / ZooKeeper集群
+  消息部分由     Pulsar Broker 来负责； 
+       提供了基于 Stream 和 Queue 的统一的消费模式
+       主题 Topic (租户 (Tenant) ，命名空间（namespace）和 Topic 名字)、生产者 Producer 和消费者 Consumer
+       消费模式： exclusive、failover 和 shared 三种订阅类型
+           shared 的消费模式，它属于 Queue 的模式，常见的 RabbitMQ、ActiveMQ 均属于这种模式
+  存储部分使用了 Apache BookKeeper，通用的分布式日志存储解决方案
+       Bookie 节点  Segment
+  计算部分由    Pulsar Functions 来负责。
+      设计基于 Serverless 的，由消息来驱动的“Stream-native”的 Pulsar Functions
+      提供两种 API，
+       第一种是 SDK less 的 API，用户不用依赖 Pulsar 的 sdk，只用实现 java.util.function.Function 的接口。
+       第二种借助 Pulsar SDK 的 API，通过 Context 来和 Pulsar 交互和定制
+      提供了 Stream-native 的轻量级计算框架，保证了数据的即时流式处理
+使用
+  通过多种方式融合使用 Pulsar 和 Flink。
+  例如，在 Flink DataStream 应用程序中，Pulsar 可以作为流数据源和流接收器
+  PulsarSourceBuilder&lt;String&gt;builder = PulsarSourceBuilder.builder(new SimpleStringSchema())
+                                               .serviceUrl(serviceUrl)
+                                               .topic(inputTopic)
+                                               .subscriptionName(subscription);
+     SourceFunction&lt;String&gt; src = builder.build();
+     DataStream&lt;String&gt; input = env.addSource(src);
+Pulsar应用： 多接入边缘计算（multi-access edge computing）  边缘计算（Edge Computing）
+  雾计算（Fog Computing）
+  云计算（Cloud Computing
+</pre></div>
+
+
+<h3>附录-版本历史：</h3>
+<div class="highlight"><pre><span></span>01.消息传输层
+ 001.Kafka  -    商业 Confluent 公司
+    0.7.0   Release  2012-01-04
+    0.8.x， 版本     2015-02-02
+    0.9.x   版本     2015-11-23  Uses the new Consumer API Kafka.
+    0.10.x  版本     0.10.0.x，0.10.1.x，0.10.2.x，0.11.0.x，
+    1.0.x   版本     2017-11-01
+    1.1.x   版本     2018-03-28
+    2.0.0   版本     2018-07-30
+    2.1.0   版本     2018-11-20
+    2.2.x   版本     2019-03-22
+    2.3.x   版本     2019-09-25
+ 002. Pulsar
+    1.14  —  2016-08-31
+    2.2.0    2018-10-24
+    2.3.0    2019-02-20
+    2.3.2    2019-05-30
+
+02.流处理层   
+  Flink版本 
+     Flink 0.8.0 - 2015-01-22
+     Flink 1.4.2 - 2018-03-08
+     Flink 1.5.0 - 2018-05-25
+     Flink 1.5.6 - 2018-12-21
+     Flink 1.6.0 - 2018-08-08
+     Flink 1.6.4 - 2019-02-25
+     Flink 1.7.0 - 2018-11-30
+     Flink 1.7.2 - 2019-02-15
+     Flink 1.8.0 - 2019-04-20 
+  Spark版本
+     Spark 0.6.0    2012-1-15
+     Spark 2.0.0    2016-07-26
+     Spark 2.2.0    2017-07-11
+     Spark 2.3.3    2019-02-15
+     Spark 2.4.0    2018-11-02
+     Spark 2.4.3    2019-05-07
+
+说明：
+     Flink 商业化公司 Data Artisans
+     Spark 商业化公司 Databricks
+     Kafka 商业化公司 Confluent  
+其他：
+ Apache Flink State Backends
+    RocksDB   --高性能的Key-Value数据库
+      所有的数据在引擎中是有序存储，可以支持Get(key)、Put（Key）、Delete（Key）和NewIterator()。
+      RocksDB的基本组成是memtable、sstfile和logfile
+Bookies读取逻辑如下：Write Cache -&gt; Read Cache -&gt; Log Entry Files(RocksDB 作为索引)
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>https://flink.apache.org/zh/downloads.html
+http://spark.apache.org/news/index.html
+http://kafka.apache.org/downloads  
+http://pulsar.apache.org/en/release-notes/
+Apache Kafka Connecto https://ci.apache.org/projects/flink/flink-docs-release-1.8/dev/connectors/kafka.html
+https://www.jianshu.com/p/83cccc14e0b8
+https://flink.apache.org/2019/05/03/pulsar-flink.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

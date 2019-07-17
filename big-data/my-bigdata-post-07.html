@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>本地库源安装Ambari</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-07.html" rel="bookmark"
+           title="Permalink to 本地库源安装Ambari">本地库源安装Ambari</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-11-24T21:29:00+08:00">
+                Published: 2016-11-24 21:29:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <p>创建yum源，本地安装Ambari</p>
+<h2>环境：</h2>
+<div class="highlight"><pre><span></span>在之前的介绍中，已经将防火墙关闭，selinux关闭了。
+设置了主机的ip地址以及对应的用户名hosts，
+同时也openSSL无密码登录等，配置时间服务器，在这里就不详细介绍了
+</pre></div>
+
+
+<h2>准备工作：</h2>
+<div class="highlight"><pre><span></span>取一台 CentOS操作系统的机器作为源服务器，在这里取得是172.19.100.190
+&lt;1&gt;开启httpd服务 &lt;安装&gt;yum install httpd    &lt;启动&gt;service httpd start
+rpm 服务，一般都有
+可查看配置文件: /etc/httpd/conf/httpd.conf  了解httpd相关配置信息 
+    系统会给定一个缺省的文件根目录，修改了配置文件以后，应重新启 动 Apache Service
+这里我们配置的文档根目录为：/var/www/html/ 端口: Listen 80
+    vi /etc/httpd/conf/httpd.conf
+    DocumentRoot &quot;/var/www/html/&quot;
+
+    确认服务启动，浏览器访问： http://172.19.100.190:80 出现apache页
+&lt;2&gt;安装源制作工具，命令：yum -y install createrepo  ##createrepo是linux下的创建仓库的软件包
+</pre></div>
+
+
+<h2>主要资源：</h2>
+<div class="highlight"><pre><span></span>CentOS release 6.6x86_64 镜像   |Linux version 2.6.32-504.el6.x86_64
+ambari-2.2.1.0
+HDP-2.4.0.0
+HDP-UTILS-1.1.0.20
+</pre></div>
+
+
+<h2>开始步骤：</h2>
+<div class="highlight"><pre><span></span>1.在目录 /var/www/html/ 下建立文件夹，把准备的 RPM包放到里面
+                    cd /var/www/html/
+                    mkdir  ambari
+                    createrepo ./ambari ##初始化repodata信息：目录下会看到一个repodata目录，这个就是yum源的Meta数据，
+
+                    cd /var/www/html/
+                    mkdir  hdp
+                    createrepo ./hdp
+
+                    cd /var/www/html/
+                    mkdir  CentOS
+
+2.1将 ISO 文件 copy 到服务器上，并在文件夹: /var/www/html/ 下创建文件夹 CentOS
+  cp /media/unix/CentOS-6.6-x86_64-bin-DVD1.iso  /var/www/html/CentOS-6.6-x86_64-bin-DVD1.iso  ##这个是从U盘拷入
+    将 ISO文件挂载至文件夹 /var/www/html/CentOS 
+    mount -o loop /var/www/html/CentOS-6.6-x86_64-bin-DVD1.iso /var/www/html/CentOS       
+      #(取消挂载 umount /var/www/html/CentOS)
+
+2.2 下载资源包，采用P2P下载工具（如迅雷等）下载上述主要资源的完整包，再上传到本地源服务器
+资源版本参见：http://docs.hortonworks.com/HDPDocuments/Ambari-2.2.1.0/bk_Installing_HDP_AMB/content/_ambari_repositories.html
+        ambari安装包 http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.2.1.0/ambari-2.2.1.0-centos6.tar.gz
+        HDP（Hortonworks Data Platform---包含所有hadoop软件）。
+        http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.4.0.0/HDP-2.4.0.0-centos6-rpm.tar.gz
+        http://public-repo-1.hortonworks.com/HDP-UTILS-1.1.0.20/repos/centos6/HDP-UTILS-1.1.0.20-centos6.tar.gz
+        下载后，将HDP-2.1和HDP-UTILS-1.1.0.17并解压到/var/www/html/hdp
+                                Ambari-1.5.1并解压到/var/www/ambari
+                        解压后的目录下的内容
+                        ambari-2.2.1.0-centos6\AMBARI-2.2.1.0\centos6\2.2.1.0-161\ambari
+                        ambari-2.2.1.0-centos6\AMBARI-2.2.1.0\centos6\2.2.1.0-161\repodata
+                        ambari-2.2.1.0-centos6\AMBARI-2.2.1.0\centos6\2.2.1.0-161\RPM-GPG-KEY
+                          只提取\centos6\2.2.1.0-161\RPM-GPG-KEY和\centos6\2.2.1.0-161\ambari文件夹以及其中的内容，拷贝到ambari下
+
+        还有方式二，采用reposync直接同步公共源,reposync&lt;不推荐使用&gt;，可自行参考网上其他资源。
+使用源：在本机或其他机器上，进入文件夹：/etc/yum.repos.d/   将其中的文件移除掉
+
+3.配置本地repo文件，使之使用自建的yum源。ambari.repo和hdp.repo复制到/etc/yum.repo.d/下面并将其中所有的域名改为你的服务器IP地址
+        本地的/etc/yum.repos.d目录下新建一个配置文件文件（也可配置语句添加到已经存在文件中），以.repo为文件名后缀
+        说明：
+        vim /etc/yum.repos.d/ambaril.repo  修改为下内容
+                [ambari-2.4]
+                name=Ambari 2.4
+                baseurl=http://172.19.100.190/ambari/centos6/2.2.1.0-161/ambari
+                gpgcheck=http://172.19.100.190/ambari/centos6/2.2.1.0-161/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+                enabled=1
+
+        vim /etc/yum.repos.d/hdp.repo，修改为以下内容
+                [HDP-UTILS-1.1.0.16]
+                name=Hortonworks Data Platform Utils Version - HDP-UTILS-1.1.0.16
+                baseurl=http://172.19.100.190/hdp/
+                gpgcheck=0
+                enabled=1
+
+                [Updates-ambari-1.4.1.25]
+                name=ambari-1.4.1.25 - Updates
+                baseurl=http://172.19.100.190/hdp/
+                gpgcheck=0
+                enabled=1
+
+        其中的内容解释：
+        [ambari-2.4]：是repo id。
+        name：仓库的描述。
+        baseurl：仓库的位置。
+        enabled：是否启用这个仓库，1为起用，0为禁用。
+        gpgcheck：是否检查gpg签名，1为检查，0为不检查
+
+yum clean  清除yum源缓存
+yum repolist 列出可用yum源
+
+4.执行安装ambari：
+    yum -y install ambari-server
+            如果上述不可以的话，试着执行：yum install ambari-server -j /usr/local/jvm/openjdk-1.7/jrm 。反正就是centos自带的jdk目录，路径不写bin文件夹。
+            JAVA_HOME
+
+    ambari-server setup
+    ambari-server start
+
+    ###yum -y groupinstall &quot;Development tools&quot; 有资料说要安装这个，不清楚……
+5.Ambari的安装过程中
+    1.安装过程中，把安装
+    http://unix191/hdp/HDP-UTILS-1.1.0.20/repos/centos6
+    http://unix191/hdp/HDP/centos6/2.x/updates/2.4.0.0
+    注意，这里应该是hostname，而不是IP地址！！！！！！
+
+    2.Provide your SSH Private Key to automatically register hosts
+    cat /root/.ssh/id_rsa  #将内容复制到
+</pre></div>
+
+
+<h2>附录说明：</h2>
+<div class="highlight"><pre><span></span>yum工具能根据repository(软件仓库)中rpm包的各种header信息，自动安装依赖的包，解决依赖性问题。在linux下使用yum的添加/删除/更改rpm包十分方便！
+为什么要把挂载的ISO镜像中的文件复制到本地磁盘：须重新生成repository的相关配置文件，而挂载的iso文件系统是不可写的，所以必须复制到本地磁盘中去。
+
+（1）、在httpd.conf文件中，有这么一段
+        <span class="nt">&lt;Directory/&gt;</span> # 这里的目录为自己的目录          
+        Options FollowSymLinks          
+        AllowOverride None          
+        Order deny,allow            
+        Deny from all
+        <span class="nt">&lt;/Directory&gt;</span>            
+        可以尝试把Deny改成Allow，然后重启apache服务，访问页面，看问题是否解
+setup_repo.sh
+    repo脚本是作为整个repo工具的入口，负责repo环境的初始化和克隆repo库
+
+cat /etc/sysconfig/network
+cat /etc/hosts
+
+重新安装除了要删除Ambari还要
+    由于是重新安装，所以在使用/etc/init.d/postgresql  initdb初始化数据库的时候会出现这个错误，所以需要
+    先用yum –y remove postgresql*命令把postgresql卸载
+    然后把/var/lib/pgsql/data目录下的文件全部删除
+    然后再配置postgresql数据库
+    然后再次安装
+</pre></div>
+
+
+<h2>解决问题思路：</h2>
+<div class="highlight"><pre><span></span>1. 出现错误，要学会查看日志和利用搜索引擎  
+2. 向有相关经验的人请教，但不要盲从
+3.  关于软件
+        安装软件：一定要确定版本以及位数，防止出现版本冲突问题。&lt;安装和升级都要确定相关依赖，形成文档&gt;
+        变更软件版本：做出版本改变要做记录，并找其他人确认，以防止出现错误。
+        删除软件：注意要删除完全了
+4.关键性操作要明确完成的依据是什么?即时反馈，查看当即操作的结果。在关键性操作时，重复上述完成依据。
+5.错误进行分类，逐步排除。安装错误，配置错误，使用不当以及软件本身的bug
+</pre></div>
+
+
+<h2>参考：</h2>
+<div class="highlight"><pre><span></span>http://docs.hortonworks.com/HDPDocuments/Ambari-2.2.1.0/bk_Installing_HDP_AMB/content/_ambari_repositories.html 2.2.1版本
+http://www.tuicool.com/articles/INNjuy  离线安装Ambari
+https://my.oschina.net/u/1461927/blog/372147 CentOS搭建本地yum源（http方式）
+http://www.toxingwang.com/hadoop/hadoop-hadoop/2429.html 玩转Ambari之二：本地yum源建立
+http://www.itnose.net/detail/6488358.html 离线centos6下安装Ambari2.2.1和HDP2.4
+http://www.ibm.com/developerworks/cn/opensource/os-cn-bigdata-ambari/ Ambari——大数据平台的搭建利器
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

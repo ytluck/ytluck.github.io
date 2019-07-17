@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Spark程序入口以及不同层级的API</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-49.html" rel="bookmark"
+           title="Permalink to Spark程序入口以及不同层级的API">Spark程序入口以及不同层级的API</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-06-08T18:21:00+08:00">
+                Published: 2019-06-08 18:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <h3>1.SparkContext 以及 SparkSession</h3>
+<div class="highlight"><pre><span></span>SparkSession和SparkContext之间的关系，以便使用RDD和Dataset(row)
+命名习惯：
+使用Spark-Shell的时候，Spark会自动帮助我们建立好了
+  一个名字为spark的SparkSesson和
+  一个名字为sc   的SparkContext
+</pre></div>
+
+
+<h4>01.基于SparkSession创建 SparkSession</h4>
+<div class="highlight"><pre><span></span> * Start a new session with isolated SQL configurations, temporary tables, registered functions are isolated, 
+ * but sharing the underlying `SparkContext` and cached data.
+spark.cloneSession()
+spark.newSession()
+spark.getDefaultSession()
+</pre></div>
+
+
+<h4>02.基于 SparkSession 创建  SparkContext</h4>
+<div class="highlight"><pre><span></span>　SparkSession可以通过建造者模式创建。
+  如果SparkContext存在，那么SparkSession将会重用它；
+  但是如果SparkContext不存在，则创建它
+  val spark = SparkSession
+   .builder()
+   .appName(&quot;SQL-JSON&quot;)
+   .master(&quot;local[4]&quot;)
+  // .enableHiveSupport()
+   .getOrCreate()
+  // 它创建RDD或者是管理集群资源：
+  val sc =   spark.sparkContext     
+   sc.broadcast()
+</pre></div>
+
+
+<h4>03.基于 SparkContext 创建  SparkSession</h4>
+<div class="highlight"><pre><span></span> 显式地创建SparkConf, SparkContext 
+  val conf = new SparkConf().setMaster(&quot;master&quot;).setAppName(&quot;appName1&quot;)
+  val sc = new SparkContext(conf)
+</pre></div>
+
+
+<h3>2 数据类型变换</h3>
+<h4>01.比较：RDD 以及Dataset、 DataFrame 区别与联系</h4>
+<div class="highlight"><pre><span></span>  DataFrame 比 RDD 多了一个表头信息（Schema）-SchemaRDD
+      organized as columns with column name and types info
+      dataframe APIs does not support compile-time error.
+  Dataset 提供了强类型支持，也是在RDD的每行数据加了类型约束。
+    相比DataFrame，Dataset提供了编译时类型检查 offers compile-time type safety
+  RDD转换DataFrame后不可逆，但RDD转换Dataset是可逆的
+  DataSet 和 DataFrame 都使用 Spark’s Catalyst optimizer
+</pre></div>
+
+
+<h4>02.RDD和DataSet的相互转换</h4>
+<div class="highlight"><pre><span></span>  <span class="n">I</span><span class="o">-</span><span class="n">A</span><span class="o">.</span><span class="err">把</span><span class="n">RDD</span><span class="err">变为</span><span class="n">DataSet</span><span class="err">的方法</span><span class="o">-</span><span class="n">converting</span>  <span class="n">RDDs</span> <span class="n">into</span> <span class="n">Datasets</span>
+      <span class="n">Inferring</span> <span class="n">the</span> <span class="n">Schema</span> <span class="n">Using</span> <span class="n">Reflection</span><span class="err">和</span> <span class="n">Programmatically</span> <span class="n">Specifying</span> <span class="n">the</span> <span class="n">Schema</span>
+   <span class="mf">01.</span><span class="n">automatically</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">RDD</span> <span class="n">containing</span> <span class="n">case</span> <span class="n">classes</span> <span class="n">to</span> <span class="n">a</span> <span class="n">DataFrame</span>
+     <span class="kn">import</span> <span class="nn">spark.implicits._</span>  <span class="p">(</span><span class="n">case</span> <span class="n">class</span><span class="err">最多支持</span><span class="mi">22</span><span class="err">个字段</span><span class="p">)</span> <span class="err">本方法的</span><span class="n">schema</span><span class="err">其实定义在了</span><span class="n">case</span> <span class="n">class</span><span class="err">里面</span>
+         <span class="o">.</span><span class="n">toDF</span><span class="p">()</span>
+             <span class="n">toDF</span><span class="p">()</span>
+        <span class="err">使用</span><span class="n">toDF</span><span class="p">()</span><span class="err">方法将</span><span class="n">RDD</span><span class="err">转换为</span><span class="n">DataFrame</span>
+       <span class="err">本地</span><span class="n">seq</span> <span class="o">+</span> <span class="n">toDF</span><span class="err">创建</span><span class="n">DataFrame</span> <span class="err">如果直接用</span><span class="n">toDF</span><span class="p">()</span><span class="err">而不指定列名字，那么默认列名为</span><span class="s2">&quot;_1&quot;</span><span class="p">,</span> <span class="s2">&quot;_2&quot;</span><span class="p">,</span>
+   <span class="mf">02.</span><span class="err">步骤</span><span class="o">--</span>
+      <span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="err">根据需求从源</span><span class="n">RDD</span><span class="err">转化成</span><span class="n">RDD</span> <span class="n">of</span> <span class="n">rows</span><span class="o">.</span>
+      <span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="err">创建由符合在骤</span><span class="mi">1</span><span class="err">中创建的</span><span class="n">RDD</span><span class="err">中的</span><span class="n">Rows</span><span class="err">结构的</span><span class="n">StructType</span><span class="err">表示的模式。</span>
+      <span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="err">通过</span><span class="n">SparkSession</span><span class="err">提供的</span><span class="n">createDataFrame</span><span class="err">方法将模式应用于行的</span><span class="n">RDD</span><span class="o">.</span>
+ <span class="mf">03.</span><span class="err">直接产生数据</span>
+     <span class="n">create</span> <span class="n">DataFrames</span> <span class="kn">from</span> <span class="nn">an</span> <span class="nn">existing</span> <span class="nn">RDD</span><span class="p">,</span> 
+                       <span class="kn">from</span> <span class="nn">a</span> <span class="nn">Hive</span> <span class="nn">table</span><span class="p">,</span> 
+                    <span class="ow">or</span> <span class="kn">from</span> <span class="nn">Spark</span> <span class="nn">data</span> <span class="nn">sources.</span>  <span class="nn">based</span> <span class="nn">on</span> <span class="nn">the</span> <span class="nn">content</span> <span class="nn">of</span> <span class="nn">a</span> <span class="nn">JSON</span> <span class="nn">file</span>
+
+ <span class="n">II</span><span class="o">-</span><span class="n">B</span><span class="o">.</span><span class="err">把</span><span class="n">DataSet</span><span class="err">变为</span><span class="n">RDD</span>
+      <span class="o">//</span> <span class="n">spark</span><span class="err">不是某个包下面的东西，而是</span><span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span><span class="err">对应的变量值</span>
+       <span class="kn">import</span> <span class="nn">spark.implicits._</span>
+       <span class="n">val</span> <span class="n">sourceDF</span><span class="p">:</span><span class="n">Dataset</span><span class="p">[</span><span class="n">Row</span><span class="p">]</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">querySQL</span><span class="p">)</span>
+       <span class="n">val</span> <span class="n">sourceRDD</span>  <span class="o">=</span> <span class="n">sourceDF</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span>
+</pre></div>
+
+
+<h4>03.不同类型RDD的转换</h4>
+<div class="highlight"><pre><span></span>Scala中的隐式类型转换
+显式转换
+</pre></div>
+
+
+<h3>3.DataSet中视图</h3>
+<div class="highlight"><pre><span></span>View的类型
+判断了 viewType 的类型val viewType = if (global) GlobalTempView else LocalTempView
+ LocalTempView的意思是会话范围的本地临时视图。
+  *它的生命周期是创建它的会话的生命周期
+  * 当会话终止时它将被自动删除。
+  * 它没有绑定到任何数据库，即我们不能使用db1.view1引用一个本地临时视图
+ GlobalTempView意味着跨会话全局临时视图。
+  *它的生命周期是Spark应用程序的生命周期，
+  * 即当应用程序终止时，它将自动删除。
+  *它绑定到一个保存数据库“global_temp”的系统，我们必须使用限定名来引用全局临时视图，
+   例如 SELECT * FROM global_temp.view1。
+   即：GlobalTempView :跨会话 LocalTempView ：不跨会话
+    org.apache.spark.sql.execution.command.views.scala
+       case class CreateViewCommand
+  停止使用
+     spark.catalog.dropTempView(&quot;tempViewName&quot;)
+     spark.catalog.dropGlobalTempView(&quot;tempViewName&quot;)
+   不同sessions 之间共享数据并保持活动直到application结束时，此功能非常有用
+ 应用：
+  01.写入到Hive表中--全量表-更新-采用
+   resultDF
+  .coalesce(1)
+  .write
+  .mode(&quot;overwrite&quot;)
+  .saveAsTable(TableName)
+  02.分区表写入-采用视图-然后执行SQL的insert overwrite
+   resultDF.createOrReplaceTempView(&quot;table1&quot;)
+   val sqlText = &quot;insert overwrite table  databasename.table2   partition(partitionfield = &quot;2019-06-15&quot;） select * from table1&quot;
+   spark.sql(sqlText)
+</pre></div>
+
+
+<h3>4.RDD中的的共享变量</h3>
+<div class="highlight"><pre><span></span><span class="err">共享变量</span><span class="o">-</span><span class="err">广播变量</span><span class="o">--</span><span class="kn">import</span> <span class="nn">org.apache.spark.broadcast.Broadcast</span>
+  <span class="n">broadcast</span>
+   <span class="err">条件：只读比较大的值，广播出去的变量没法再修改</span>
+        <span class="n">scala</span><span class="err">中一切可序列化的对象都是可以进行广播</span>
+  <span class="err">每个</span> <span class="n">task</span> <span class="err">是一个线程，而且同在一个进程运行</span> <span class="n">tasks</span> <span class="err">都属于同一个</span> <span class="n">application</span><span class="err">。</span>
+  <span class="err">因此每个节点（</span><span class="n">executor</span><span class="err">）上放一份就可以被所有</span> <span class="n">task</span> <span class="err">共享</span>
+  <span class="o">//</span><span class="err">要广播的数据</span>
+  <span class="n">val</span> <span class="n">data</span> <span class="o">=</span> <span class="n">List</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+  <span class="o">//</span><span class="err">声明为广播变量</span>
+  <span class="n">val</span> <span class="n">sc</span> <span class="o">=</span>   <span class="n">spark</span><span class="o">.</span><span class="n">sparkContext</span>     
+  <span class="n">val</span> <span class="n">bdata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="o">//</span><span class="err">其他的</span><span class="n">RDD</span><span class="err">使用广播变量</span>
+   <span class="o">//</span> <span class="n">bdata</span><span class="o">.</span><span class="n">value</span>  <span class="n">bdata</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">size</span>
+
+ <span class="err">广播变量：底层有两种广播机制：</span> <span class="n">HttpBroadast</span> <span class="err">和</span> <span class="n">TorrentBroadcast</span>
+  <span class="n">HttpBroadast</span>  
+   <span class="n">HttpBroadcast</span> <span class="err">是通过传统的</span> <span class="n">http</span> <span class="err">协议和</span> <span class="n">httpServer</span> <span class="err">去传</span> <span class="n">data</span>
+   <span class="n">driver</span> <span class="err">单点网络瓶颈的问题</span>
+  <span class="n">TorrentBroadcast</span>
+    <span class="err">基本思想就是将</span> <span class="n">data</span> <span class="err">分块成</span> <span class="n">data</span> <span class="n">blocks</span><span class="err">，然后假设有</span> <span class="n">executor</span> <span class="n">fetch</span> <span class="err">到了一些</span> <span class="n">data</span> <span class="n">blocks</span><span class="err">，</span>
+       <span class="err">那么这个</span> <span class="n">executor</span> <span class="err">就可以被当作</span> <span class="n">data</span> <span class="n">server</span> <span class="err">了，随着</span> <span class="n">fetch</span> <span class="err">的</span> <span class="n">executor</span> <span class="err">越来越多，</span>
+      <span class="err">有更多的</span> <span class="n">data</span> <span class="n">server</span> <span class="err">加入，</span><span class="n">data</span> <span class="err">就很快能传播到全部的</span> <span class="n">executor</span> <span class="err">那里去</span>
+<span class="err">更新广播变量的基本思路：</span>
+  <span class="err">广播变量是在</span><span class="n">driver</span><span class="err">端初始化</span><span class="p">,</span><span class="err">在</span><span class="n">excetors</span><span class="err">端获取这个变量</span><span class="p">,</span><span class="err">但是不能修改</span><span class="p">,</span><span class="err">所以</span><span class="p">,</span><span class="err">我们可以在</span><span class="n">driver</span><span class="err">端进行更新这个变量</span>
+    <span class="err">将老的广播变量删除（</span><span class="n">unpersist</span><span class="err">），</span>
+    <span class="err">然后重新广播一遍新的广播变量</span>
+<span class="err">共享变量</span><span class="o">--</span><span class="err">累加器</span>
+  <span class="err">累加器</span>
+  <span class="err">自定义累加器</span>
+  <span class="err">累加器</span><span class="o">-</span><span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">AccumulatorV2</span> <span class="p">}</span>
+</pre></div>
+
+
+<h3>5相关的一些内容</h3>
+<h4>01.存储级别</h4>
+<div class="highlight"><pre><span></span>MEMORY_ONLY : 将 RDD 以反序列化 Java 对象的形式存储在 JVM 中
+  cache() 方法是使用默认存储级别的快捷设置方法，默认的存储级别是 StorageLevel.MEMORY_ONLY
+  StorageLevel 对象给 persist() 方法
+MEMORY_ONLY_SER : 将 RDD 以序列化的 Java 对象的形式进行存储（每个分区为一个 byte 数组）。
+  这种方式会比反序列化对象的方式节省很多空间，尤其是在使用 fast serializer时会节省更多的空间，
+  但是在读取时会增加 CPU 的计算负担。
+MEMORY_AND_DISK : 将 RDD 以反序列化 Java 对象的形式存储在 JVM 中。如果内存空间不够，将未缓存的数据分区存储到磁盘
+DISK_ONLY
+</pre></div>
+
+
+<h4>02.缓存机制：</h4>
+<div class="highlight"><pre><span></span>SparkCore 的 CacheManager
+ Spark 的存储级别的选择，核心问题是在内存使用率和 CPU 效率之间进行权衡-直接连续调用cache()或者persist()
+   RDD 可以使用 persist() 方法或 cache() 方法进行持久化，
+     persist 会把数据以序列化的形式在JVM的 堆空间
+     cache()调用的persist()，是使用默认存储级别的快捷设置方法
+   缓存数据较多的时候，采用LRU-最近最少使用的缓存策略将最老的分区从内存中移除
+   unpersist
+ Spark的 checkpoint 机制（保存在hdfs中）
+    （checkpoint和cache都属于transformation 需要action才能执行
+ SparkSQL 的  CacheManager
+    Spark SQL使用内存式列式存储
+    SparkSQL 的缓存管理最终依靠RDD的Storage.Level来缓存数据
+</pre></div>
+
+
+<h4>03.故障恢复：</h4>
+<div class="highlight"><pre><span></span> 01.RDD出现问题可以由它的依赖也就是Lineage信息可以用来故障恢复
+
+ 02.对RDD做Checkpoint处理，检查RDD是否被物化或计算，并将结果持久化到磁盘或HDFS。
+  SparkContext      def setCheckpointDir(directory: String)
+  StreamingContext  def checkpoint(directory: String)
+  1. Checkpoint会把当前RDD保存到一个目录中。 
+  2. Checkpoint的时候，会把所有依赖的父级rdd信息清除掉。 
+  3. Checkpoint不会马上执行，要触发action操作的时候才会执行。 
+  4. 因为 Checkpoint会清除父级RDD的信息，所以在Checkpoint应该先做persist（持久化）操作，否则就要重新计算一遍。 
+  5. 一般来说，Lineage链较长、宽依赖的RDD需要采用检查点机制。 
+区别与联系
+  cache缓存数据由executor管理，当executor消失了，被cache的数据将被清除，RDD重新计算，
+  而checkpoint将数据保存到磁盘或HDFS，job可以从checkpoint点继续计算
+适用场景：
+  01.一块是在spark core中对RDD做checkpoint，可以切断做checkpoint RDD的依赖关系，
+    将RDD数据保存到可靠存储（如HDFS）以便数据恢复；
+  02.另外一块是应用在spark streaming中，使用checkpoint用来保存DStreamGraph以及相关配置信息
+</pre></div>
+
+
+<h4>DataFrame和SQL在底层的执行过程</h4>
+<div class="highlight"><pre><span></span><span class="err">逻辑计划和物理计划两个阶段</span>
+ <span class="err">逻辑计划阶段</span>
+  <span class="mf">01.</span><span class="n">Parser</span> <span class="err">解析</span> <span class="n">SQL</span><span class="err">，生成</span><span class="n">AST</span><span class="err">，并将</span><span class="n">AST</span><span class="err">最终转化成</span> <span class="n">Unresolved</span> <span class="n">Logical</span> <span class="n">Plan</span>
+  <span class="mf">02.</span><span class="err">由</span> <span class="n">Analyzer</span> <span class="err">结合</span> <span class="n">Catalog</span> <span class="err">信息生成</span> <span class="n">Resolved</span> <span class="n">Logical</span> <span class="n">Plan</span>
+  <span class="mf">03.</span><span class="n">Optimizer</span><span class="err">根据预先定义好的规则对</span> <span class="n">Resolved</span> <span class="n">Logical</span> <span class="n">Plan</span> <span class="err">进行优化并生成</span> <span class="n">Optimized</span> <span class="n">Logical</span> <span class="n">Plan</span>
+ <span class="err">物理计划阶段</span>
+  <span class="mf">04.</span><span class="n">Query</span> <span class="n">Planner</span> <span class="err">将</span> <span class="n">Optimized</span> <span class="n">Logical</span> <span class="n">Plan</span> <span class="err">转换成多个</span><span class="n">Iterator</span><span class="p">[</span><span class="n">Physical</span> <span class="n">Plan</span><span class="p">]</span>
+  <span class="mf">05.</span><span class="n">CBO</span> <span class="err">根据</span> <span class="n">Cost</span> <span class="n">Model</span> <span class="err">算出每个</span> <span class="n">Physical</span> <span class="n">Plan</span> <span class="err">的代价并选取代价最小的</span> <span class="n">Physical</span> <span class="n">Plan</span> <span class="err">作为最终的</span> <span class="n">Physical</span> <span class="n">Plan</span>
+  <span class="mf">06.</span><span class="n">Spark</span> <span class="err">对选取的物理算子树进行提交前的准备并以</span> <span class="n">DAG</span> <span class="err">的方法执行上述</span> <span class="n">Physical</span> <span class="n">Plan</span>
+ <span class="err">转换过程在集群的</span><span class="n">Driver</span><span class="err">端进行，不涉及分布式环境</span>
+  <span class="mf">07.</span><span class="err">在执行</span> <span class="n">DAG</span> <span class="err">的过程中，</span><span class="n">Adaptive</span> <span class="n">Execution</span> <span class="err">根据运行时信息动态调整执行计划从而提高执行效率</span>
+  <span class="err">自适应执行引擎：</span> <span class="err">执行阶段</span><span class="o">-</span><span class="err">自动设置</span><span class="n">shuffle</span> <span class="n">partition</span><span class="err">数，动态调整执行计划，动态处理数据倾斜等等。</span>
+</pre></div>
+
+
+<h3>源码：</h3>
+<h4>SparkSession源码</h4>
+<div class="highlight"><pre><span></span> SparkSession.builder 来创建一个 SparkSession 的实例 spark, 并通过 stop 或者close() 函数来停止 
+ org.apache.spark.sql.SparkSession
+ object SparkSession {
+ def newSession(): SparkSession = {new SparkSession(sparkContext, Some(sharedState), parentSessionState = None, extensions)}
+ }
+ SparkSession  override def close(): Unit = stop()
+</pre></div>
+
+
+<h4>View源码</h4>
+<div class="highlight"><pre><span></span> org.apache.spark.sql.DataSet
+ createOrReplaceTempView
+     def createOrReplaceTempView(viewName: String): Unit = withPlan {
+     createTempViewCommand(viewName, replace = true, global = false)
+      }
+ createTempView
+   def createTempView(viewName: String): Unit = withPlan {
+     createTempViewCommand(viewName, replace = false, global = false)
+   }
+    如果视图已经存在，则更新或者抛出异常
+    replace if true,  and if the view already exists, updates it; 
+            if false, and if the view already exists, throws analysis exception.
+ createGlobalTempView
+   def createGlobalTempView(viewName: String): Unit = withPlan {
+     createTempViewCommand(viewName, replace = false, global = true)
+   }
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Spark踩坑记：共享变量 https://www.cnblogs.com/liuliliuli2017/p/6782687.html
+spark中动态广播变量的使用 https://blog.csdn.net/xianpanjia4616/article/details/82914443
+Spark SQL / Catalyst 内部原理 与 RBO http://www.jasongj.com/spark/rbo/
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

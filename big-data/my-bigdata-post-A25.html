@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Hbase数据库备份和恢复</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-A25.html" rel="bookmark"
+           title="Permalink to Hbase数据库备份和恢复">Hbase数据库备份和恢复</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-14T20:46:00+08:00">
+                Published: 2017-05-14 20:46:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>使用 HBase本身提供的接口进行数据的导入和导出
+</pre></div>
+
+
+<h3>操作步骤：</h3>
+<div class="highlight"><pre><span></span>        1.##导出数据
+        ### hdfs 用户执行如下命令 su hdfs 
+        hbase org.apache.hadoop.hbase.mapreduce.Export TEST_Hbase  /tmp/TEST_Hbase
+        hbase org.apache.hadoop.hbase.mapreduce.Export TEST_HbaseTest /tmp/TEST_HbaseTest
+
+        2.### 将hdfs 文件取本地Linux
+        hadoop fs -get /tmp/TEST_Hbase  /opt/
+        hadoop fs -get /tmp/TEST_HbaseTest   /opt/
+
+        --传输---
+
+        03.### 将导出的Linux本地文件压缩发到HDFS文件系统下                 /tmp/ 路径下
+            hadoop fs -put  /opt/TEST_HbaseTest   /tmp/TEST_HbaseTest
+            hadoop fs -put  /opt/TEST_Hbase   /tmp/TEST_Hbase
+
+        04.##建表--然后导入数据
+        ###导入数据 格式./hbase org.apache.hadoop.hbase.mapreduce.Export 表名    数据文件位置
+        hbase org.apache.hadoop.hbase.mapreduce.Import TEST_HbaseTest   /tmp/TEST_HbaseTest
+        hbase org.apache.hadoop.hbase.mapreduce.Import TEST_Hbase   /tmp/TEST_Hbase
+</pre></div>
+
+
+<h3>HBase数据的导入导出</h3>
+<div class="highlight"><pre><span></span>            <span class="mi">1</span><span class="err">、导出：</span>
+            <span class="n">hbase</span> <span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hadoop</span><span class="o">.</span><span class="n">hbase</span><span class="o">.</span><span class="n">mapreduce</span><span class="o">.</span><span class="n">Driver</span> <span class="n">export</span> <span class="err">表名</span> <span class="err">导出存放路径</span>
+            <span class="err">其中数据文件位置可为本地文件目录，也可以分布式文件系统</span><span class="n">hdfs</span><span class="err">的路径。</span>
+            <span class="err">当其为前者时，直接指定即可，也可以加前缀</span><span class="nb">file</span><span class="p">:</span><span class="o">///</span>
+            <span class="err">而当其为后者时，必须明确指明</span><span class="n">hdfs</span><span class="err">的路径，例如</span><span class="n">hdfs</span><span class="p">:</span><span class="o">//</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">1.200</span><span class="p">:</span><span class="mi">9000</span><span class="o">/</span><span class="n">path</span><span class="c1">#HDFS连接 default.FS对应的地址</span>
+                <span class="n">fs</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">name</span>
+            <span class="mi">2</span><span class="err">、导入：表必须事先创建完成</span>
+            <span class="n">hbase</span> <span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hadoop</span><span class="o">.</span><span class="n">hbase</span><span class="o">.</span><span class="n">mapreduce</span><span class="o">.</span><span class="n">Driver</span> <span class="kn">import</span> <span class="err">表名</span> <span class="err">要导入的文件路径</span>
+            <span class="err">同上，其中数据文件位置可为本地文件目录，也可以分布式文件系统</span><span class="n">hdfs</span><span class="err">的路径。</span>
+            <span class="err">另外，该接口类还提供了一些其它的方法，例如表与表之间的数据拷贝，导入</span><span class="n">tsv</span><span class="err">文件等，可回车键查看</span>
+            <span class="o">/</span><span class="n">hbase</span> <span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">hadoop</span><span class="o">.</span><span class="n">hbase</span><span class="o">.</span><span class="n">mapreduce</span><span class="o">.</span><span class="n">Driver</span> <span class="kn">import</span> <span class="s2">&quot;action:useraction&quot;</span> <span class="s2">&quot;hdfs://172.19.100.191:8020/tmp/TEST_USERACTIONLEVEL_SPARK/part-m-00000&quot;</span>
+
+            <span class="mf">3.</span><span class="err">说明</span>
+                <span class="n">Export</span><span class="err">，</span><span class="n">fs</span><span class="err">的参数为</span><span class="n">hdfs</span><span class="err">上的路径时，该路径必须不能已经存在，否则会报错</span>
+                <span class="n">Import</span><span class="err">的表必须是</span><span class="n">hbase</span><span class="err">中已经创建好的，否则会报错。</span>
+                <span class="n">Import</span><span class="err">操作必须是使用</span><span class="n">Export</span><span class="err">出的数据才可以，要不然会报错</span> <span class="ow">not</span> <span class="n">a</span> <span class="n">SequenceFile</span><span class="err">。</span>
+</pre></div>
+
+
+<h3>附录：</h3>
+<div class="highlight"><pre><span></span>    01.打包--压缩--Linux命令
+        tar
+            压缩  gzip    bzip2   compress 
+            压缩命名
+
+            解压缩命令
+                tar   -xzvf   TEST_USER.tar.gz
+
+                        -x是解开
+                        -z这个参数来调用gzip    -j：有bz2属性的 
+                        -v：显示所有过程 
+                        -f指定包的文件名--放在最后
+        02.Hbase表操作
+        查看数据导入是否成功
+            hbase shell
+            list
+            describe &#39;TEST_HbaseTest&#39;  
+            scan &quot;TEST_HbaseTest&quot;,{LIMIT=&gt;5}
+            count  &quot;TEST_HbaseTest&quot; , {INTERVAL =&gt; 1000, CACHE =&gt; 5000}
+
+        清空表
+            truncate   &quot;TEST_HbaseTest&quot;
+
+        hbase删除表
+                首先
+                        disable &#39;lj_test&#39;，
+                然后
+                        drop &#39;lj_test&#39;                      
+        hbase创建表
+            create &#39;TEST_HbaseTest&#39;,{NAME=&gt;&#39;info&#39;,COMPRESSION=&gt;&#39;SNAPPY&#39;}
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>HBase数据的导入导出 http://blog.csdn.net/baolibin528/article/details/46064721
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
