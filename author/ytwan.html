@@ -26,7 +26,262 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-50.html">Spark分区进一步探究</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-52.html">Flink和Kafka以及Kafka生产者</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-07-08T22:10:00+08:00">
+                Published: 2019-07-08 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info --><h3>1.Kafka版本说明：</h3>
+<div class="highlight"><pre><span></span>01.Producer： Kafka 0.8.2, Producer被重新设计，
+   新版生产者：
+      org.apache.kafka.clients
+       org.apache.kafka.clients.producer.KafkaProducer;
+   旧版的生产者：
+      旧版本（0.8Scala版本）  kafka.javaapi.producer.Producer;
+02.Consumer
+   Kafka 0.9 则重新设计了Consumer接口。它不再区分high-level
+   consumer API和low-level consumer API，而是提供了一个统一的consumer API
+   Kafka 消费者总共有 3 种 API，新版 API、旧版高级 API、旧版低级 API，
+     新版 API 是在 kafka 0.9 版本后增加的，推荐使用新版 API，但由于旧版低级 API 可以对消息进行更加灵活的控制
+  新版：
+    Consumer    org.apache.kafka.clients.consumer.KafkaConsumer;
+  旧版Consumer
+    High Level Consumer API 入口类： ConsumerConnector  kafka.javaapi.consumer.ConsumerConnector;    
+    Lower Level Consumer API入口类： SimpleConsumer     kafka.javaapi.consumer.SimpleConsumer; 
+  新版 Consumer
+ 03.Connect -Kafka Connect
+   Kafka Connect是到0.9版本才提供的并极大的简化了其他系统与Kafka的集成
+</pre></div>
+
+
+<h3>2.Kafka配置信息</h3>
+<div class="highlight"><pre><span></span>Kafka 提供内置客户端以及二进制连接协议
+1.使用场景评估：
+     01.每个消息都很重要，是否允许丢失一小部分消息
+     02.出现重复消息是否可以接受
+     03.是否有严格的延迟和吞吐量要求
+2.依据场景进行配置
+    类型，时间，大小，次数
+  配置的评估
+   client.id
+     识别消息来源
+   acks 参数指定了必须要有多少个区分副本收到消息，生产者才会认为消息写入成功
+    消息丢失的可能性：
+     acks=0  acks=1  acks=all
+   buffer.memory
+     设置生产者内存缓冲区的大小
+   compression.type
+      snappy gzip
+   retries
+     决定了生产者重发消息的次数 默认间隔时间 100ms
+     retry.backoff.ms 参数来改变时间间隔
+   batch.size
+     同一个批次可以使用的内存大小，按照字节数计算，而不是消息个数
+   linger.ms
+     发送之前等待更多消息加入批次的时间
+     KafkaProducer 会根据批次填满  batch.size 或者批次等待时间时间达到上限 linger.ms 将批次发送出去
+
+   时间：
+     timeout.ms
+     request.timeout.ms
+     matadata.fetch.timeout.ms
+    阻塞时间
+     max.block.ms
+    大小：
+     max.request.size
+     receive.buffer.bytes
+     send.buffer.bytes
+    顺序保证：
+       max.in.flight.requests.per.connection
+</pre></div>
+
+
+<h3>3.开发过程：</h3>
+<div class="highlight"><pre><span></span>   A: 创建生产者，生产者要把键值对象序列化成字节数组-三个必选属性
+       bootstrap.servers   key.serializer  value.serializer
+   B: 创建一个 ProducerRecord  对象，该对象包含目标主题和要发送的内容，还可以指定键或者分区
+       两种线程： 单线程和多线程
+       三种发送消息的方式：
+         同步发送    send() 发送消息，返回Future对象
+         异步发送    send() 方法，并指定一个回调函数
+         发送并忘记： fire and forget          
+   C：消息成功写入Kafka会返回一个 RecordMetadata  对象，写入失败则会返回一个错误。
+      收到错误还会尝试，几次失败后，就返回错误信息。
+   说明： key.serializer 实现了 org.apache.kafka.common.serialization.Serializer接口的类
+      Kafka默认提供三种 StringSerializer IntegerSerializer  ByteSerializer 
+  01.pom.xml依赖
+     开发版本
+         <span class="nt">&lt;groupId&gt;</span>org.apache.kafka<span class="nt">&lt;/groupId&gt;</span>
+         <span class="nt">&lt;artifactId&gt;</span>kafka-clients<span class="nt">&lt;/artifactId&gt;</span>
+         <span class="nt">&lt;version&gt;</span>0.8.2.2<span class="nt">&lt;/version&gt;</span>
+  示例代码：
+    // 步骤1 新建一个 Properties对象-并配置三个必选属性
+     Properties kafkaProps = new Properties();
+      kafkaProps.put(&quot;bootstrap.servers&quot;, &quot;broker1:9092,broker2:9092&quot;);
+      kafkaProps.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+      kafkaProps.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+   // 步骤2 创建新的生产者对象 KafkaProducer ，并把设置好的 Properties 对象传给它
+     Producer<span class="nt">&lt;String</span><span class="err">,</span> <span class="err">String</span><span class="nt">&gt;</span>  producer=  new KafkaProducer<span class="nt">&lt;String</span><span class="err">,String</span><span class="nt">&gt;</span>(kafkaProps);
+   // 步骤3 开始发送消息，生产者将 ProducerRecord 对象作为参数发送，使用send() 方法发送
+     ProducerRecord<span class="nt">&lt;String</span><span class="err">,</span> <span class="err">String</span><span class="nt">&gt;</span> record = new ProducerRecord<span class="nt">&lt;String</span><span class="err">,</span> <span class="err">String</span><span class="nt">&gt;</span>(&quot;&quot;, &quot;&quot;, &quot;&quot;);
+     Future<span class="nt">&lt;RecordMetadata&gt;</span> kafkaFuture = producer.send(record);
+  // 同步发送消息调用get 方法等待Kafka相应，运行正常则返回一个 RecordMetadata 对象
+   // 一般会发生两类错误，一类是可重试错误，一类无法通过重试解决，比如消息太大等
+   try {   kafkaFuture.get();
+    } catch (Exception e) {
+       e.printStackTrace;
+    }
+    // 异步发送--回调支持
+    producer.send(record, new DemoProducerCallback());
+    // private class  DemoProducerCallback implements Callback{ onCpmpletion(RecordMetadata )}
+扩展：
+  Producer端，需要自己创造多线程并发环境才能提高客户端的出口吞吐量
+</pre></div>
+
+
+<h3>Flink向kafka发送数据</h3>
+<div class="highlight"><pre><span></span>Kafka sink connector（FlinkKafkaProducer）
+  Flink里面支持Kafka 0.8、0.9、0.10、0.11.
+pom.xml依赖
+ <span class="nt">&lt;dependency&gt;</span>
+   <span class="nt">&lt;groupId&gt;</span>org.apache.flink<span class="nt">&lt;/groupId&gt;</span>
+   <span class="nt">&lt;artifactId&gt;</span>flink-connector-kafka-0.11_2.11<span class="nt">&lt;/artifactId&gt;</span>
+   <span class="nt">&lt;version&gt;</span><span class="cp">${</span><span class="n">flink</span><span class="o">.</span><span class="n">version</span><span class="cp">}</span><span class="nt">&lt;/version&gt;</span>
+ <span class="nt">&lt;/dependency&gt;</span>
+执行：
+ // 添加数据源addSource
+  DataStreamSource<span class="nt">&lt;String&gt;</span> student = env.addSource(new FlinkKafkaConsumer011<span class="err">&lt;</span>&gt;(
+            READ_TOPIC,   //这个 kafka topic 需要和上面的工具类的 topic 一致
+            new SimpleStringSchema(),
+            props)).setParallelism(1);
+
+  // 创建kafka数据流
+ //  Producer 传了三个参数：brokerList、topicId、serializationSchema（序列化）
+ student.addSink(new FlinkKafkaProducer011<span class="err">&lt;</span>&gt;(
+            &quot;localhost:9092&quot;,
+            &quot;student-write&quot;,
+            new SimpleStringSchema()
+    )).name(&quot;flink-connectors-kafka&quot;)
+            .setParallelism(5);
+Flink Kafka Consumer 的运行机制
+</pre></div>
+
+
+<h3>JSON作为消息</h3>
+<div class="highlight"><pre><span></span><span class="nt">JSON</span> <span class="nt">-</span> <span class="o">(</span><span class="nt">JavaScript</span> <span class="nt">Object</span> <span class="nt">Notation</span><span class="o">)</span>
+<span class="err">数据类型：</span>      
+    <span class="nt">JSON</span><span class="err">只定义了两种数据结构，即数组</span><span class="cp">[]</span><span class="err">和对象</span><span class="p">{}</span><span class="err">。对象是一组键值对</span>
+    <span class="nt">JSON</span><span class="err">的键</span><span class="o">:</span> <span class="nt">String</span>
+    <span class="nt">JSON</span><span class="err">的值</span><span class="o">:</span> <span class="nt">1</span><span class="o">.</span><span class="err">数字（整数或浮点数）</span>    <span class="nt">2</span><span class="o">.</span><span class="err">字符串（在双引号中）</span>
+         <span class="nt">3</span><span class="o">.</span><span class="err">逻辑值（</span><span class="nt">true</span> <span class="err">或</span> <span class="nt">false</span><span class="err">）</span> <span class="nt">4</span><span class="nc">.null</span>
+         <span class="nt">5</span><span class="o">.</span><span class="err">数组（在方括号中）</span>      <span class="nt">6</span><span class="o">.</span><span class="err">对象（在花括号中）</span>
+    <span class="err">符号：</span> <span class="err">花括弧，方括弧，冒号和逗号</span>
+<span class="nt">JSON</span><span class="err">解析</span>
+<span class="nt">fasterjson</span> <span class="err">是一个</span><span class="nt">JSON</span><span class="err">解析器。它直接解析</span><span class="nt">JSON</span><span class="err">文本，调用注册的事件函数，快速访问</span><span class="nt">JSON</span><span class="err">中感兴趣的内容</span>
+<span class="nt">Fastjson</span> <span class="nt">API</span><span class="err">入口类是</span><span class="nt">com</span><span class="nc">.alibaba.fastjson.JSON</span>
+ <span class="nt">eg</span><span class="o">:</span>  <span class="nt">JSONObject</span> <span class="nt">jsObj</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">JSONObject</span><span class="o">();</span>
+<span class="err">类型：</span>
+   <span class="nt">JSONObject</span>  <span class="nt">JSONArray</span>   <span class="nt">Object</span>  <span class="nt">List</span>  <span class="nt">String</span> 
+<span class="err">方法：</span>
+    <span class="nt">parse</span> <span class="nt">parseObject</span> <span class="nt">parseArray</span>
+    <span class="nt">toJSON</span>  <span class="nt">toJSONString</span>
+<span class="err">注意事项：</span>
+ <span class="nt">JSONObject</span> <span class="err">是一个</span><span class="nt">json</span>
+<span class="nt">JSONArray</span><span class="nc">.toJSONString</span><span class="o">()</span> <span class="err">之后不是一个</span><span class="nt">json</span><span class="err">，而是</span><span class="nt">json</span><span class="err">中的一个数组</span>
+<span class="nt">JSON</span><span class="nc">.toJSONString</span><span class="o">()</span> <span class="err">不可多次使用，（最好转义一次）</span> <span class="err">因为每次调用</span><span class="nt">JSON</span><span class="nc">.toJSONString</span><span class="err">的时候，</span>
+     <span class="err">在</span><span class="nt">key</span><span class="err">和</span><span class="nt">value</span><span class="err">前后都会加上&quot;的转义符\&#39;。多次使用</span><span class="nt">toJSONString</span><span class="err">了之后</span><span class="o">,</span><span class="nt">json</span><span class="err">的每个</span><span class="nt">key</span><span class="err">和</span><span class="nt">value</span><span class="err">有多个转义符</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Kafka权威指南
+Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-51.html" rel="bookmark"
+                           title="Permalink to Flink数据类型和Tuple">Flink数据类型和Tuple</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-07-08T21:10:00+08:00">
+                Published: 2019-07-08 21:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>类型推断 Type_Information DataStreaming Table</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-51.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-56.html" rel="bookmark"
+                           title="Permalink to Java序列化">Java序列化</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-06-30T21:22:00+08:00">
+                Published: 2019-06-30 21:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>序列化  Serializable</p>
+                <a class="readmore" href="/program/my-program-post-56.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-55.html" rel="bookmark"
+                           title="Permalink to Python赋值和复制">Python赋值和复制</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-06-29T22:15:00+08:00">
+                Published: 2019-06-29 22:15:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>绑定 拷贝</p>
+                <a class="readmore" href="/program/my-program-post-55.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-50.html" rel="bookmark"
+                           title="Permalink to Spark分区进一步探究">Spark分区进一步探究</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-06-08T22:10:00+08:00">
                 Published: 2019-06-08 22:10:00
@@ -37,279 +292,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>1.基本概念：</h3>
-<div class="highlight"><pre><span></span>rdd.partitioner
-rdd.partitions.length
-分区的策略以及分区的数目
-1.分区：是RDD内部并行计算的一个计算单元，RDD的数据集在逻辑上被划分为多个分片，每一个分片称为分区。并行任务task的个数，也是由 RDD分区partition的个数决定的
-stage 的划分是根据宽依赖
-2.分区器- partitioner：分区策略- Spark内部提供了HashPartitioner和RangePartitioner两种分区策，
-Spark中分区器直接决定了RDD中分区 numPartitions的个数；也决定了RDD中每条数据经过Shuffle过程属于哪个分区；
-也决定了Reduce的个数。RDD的分区方式主要包含两种（HashPartitioner和RangePartitioner），
-这两种分区类型都是针对Key-Value类型的数据。如是非Key-Value类型，则分区为None。
-Hash是以key作为分区条件的散列分布，分区数据不连续，极端情况也可能散列到少数几个分区上，导致数据不均等；
-Range按Key的排序平衡分布，分区内数据连续，大小也相对均等。
-分区器的使用：
-  01.没有分区器
-  02.自动为RDD生成分区器
-  03.主动使用分区器
-  04.自定义分区器：自定义分区策略
-</pre></div>
-
-
-<h4>01.没有分区器</h4>
-<div class="highlight"><pre><span></span>一般而言，对于初始读入的数据是不具有任何的数据分区方式的
-对RDD进行查询，println(pairsRDD.partitioner) 返回None值，即没有使用分区器
-</pre></div>
-
-
-<h4>02.自动使用分区器</h4>
-<div class="highlight"><pre><span></span>没有显式指定分区器，则会调用org.apache.spark包下伴生对象Partitioner的defaultPartitioner静态方法返回的分区器作为默认分区器。
-尝试利用父RDD的partitioner，如果父RDD没有partitioner，则会查看sparkConf中是否定义了 spark.default.parallelism 配置参数，
-如果定义了就返回new HashPartitioner(rdd.context.defaultParallelism) 作为默认分区器，
-如果没定义就返回new HashPartitioner(rdds.map(_.partitions.length).max)作为默认分区器
-</pre></div>
-
-
-<h4>03.主动使用分区器</h4>
-<div class="highlight"><pre><span></span>  提前对key根据某种规则来分配到相同的分区，减少后续操作的网络传输=RDD的分区方式主要包含两种（HashPartitioner和RangePartitioner），这两种分区类型都是针对Key-Value类型的数据。如是非Key-Value类型，则分区为None
-使用场景：partitionBy
-  rdd2.partitionBy(new org.apache.spark.HashPartitioner(10))
-  partitionBy-partitionBy 只能用于 PairRdd
-使用场景：reduceByKey
-  执行reduceByKey任务，我们可以显式的指定分区器
-使用场景
-  repartitionAndSortWithinPartitions
- 使用说明：
-    HashPartitioner takes a single argument which defines number of partitions -- numPartitions 
- 使用的分区器有两种HashPartitioner 和 RangePartitioner
-</pre></div>
-
-
-<h5>HashPartitioner</h5>
-<div class="highlight"><pre><span></span>* HashPartitioner 最大的弊端是：数据倾斜！！！极端情况下某（几）个分区拥有RDD的所有数据。 同时HashPartitioner存在 分区碰撞问题，即不同的值可能计算出来的分区是一样
-实现原理： 对于给定的key，计算其hashCode，并除于分区的个数取余，如果余数小于0，则用余数+分区的个数，最后返回的值就是这个key所属的分区ID。实现原理可以看出，其结果可能导致每个分区中数据量的不均匀，极端情况下会导致某些分区拥有RDD的全部数据
-</pre></div>
-
-
-<h5>RangePartitioner</h5>
-<div class="highlight"><pre><span></span>*RangePartitioner 最为重要的是尽量保证每个Partition中的数据量是均匀的。 同时分区与分区之间是有序的，也就是说一个分区中的元素肯定都是比另一个分区内的元素小或者大；
-但是分区内的元素是不能保证顺序的即RangePartitioner主要是依赖的RDD的数据划分成不同的分区，且不同的分区之间是有序的。
-应用：
-// 元组的第一个元素是当前处理的分区的index，元组的第二个元素是当前处理的分区元素组成的Iterator
-val filteRDD = shuffRDD.mapPartitionsWithIndex {
-  (partid:Int, iter:Iterator[(String,String)]) =&gt; {
-    iter.map(partValue =&gt; (partid ,partValue ))
-  }
-}//.filter(line =&gt; line._1 &gt;= 2)
-spark的mapPartitionsWithIndex中iterator尽量不要使用toList，
- 原因iterator是流式的处理，处理完一条记录才会去读取下一条记录并且会丢弃已读的记录，无法重复使用；
- 而iterator.toList会将所有的记录进行缓存，便于重复使用-toList相当于将迭代数据进行了缓存，容易导致OutOfMemory的异常
- scala中iterator只能执行一次迭代，如果需要多次执行同一个迭代体，建议调用iterator.toList等方法，将迭代体转化为集合
-  val filteRDD = shuffRDD.mapPartitionsWithIndex {
-  (partid:Int, iter:Iterator[(String,String)]) =&gt; {
-    iter.toList.map(partValue =&gt; (partid ,partValue )).iterator
-  }
- }.filter(line =&gt; line._1&gt; 2)
-
-方式
-var rdd2 = rdd1.mapPartitionsWithIndex{
-    (x,iter) =&gt; {
-      var result = List[String]()
-        var i = 0
-        while(iter.hasNext){
-          i += iter.next()
-        }
-        result.::(x + &quot;|&quot; + i).iterator
-
-    }
-  }
- 注释：
-  迭代器（Iterator）不是一个集合，是构建了一种访问集合的方法。
-  当构建一个集合需要很大的开销时（比如把文件得所有行都读取到内存），迭代器就发挥了很好的作用。
-迭代器有两个操作，next 和hasNext。next返回迭代器的下一个元素，hasNext用于检查是否还有下一个元素。
- 注意： range分区的数目与 pairRDD中key值得去重数目，如果大于的话，分区数目不一定是range的给的数目。
- sortByKey底层使用的数据分区器就是RangePartitioner分区器
-</pre></div>
-
-
-<h4>04.自定义分区</h4>
-<div class="highlight"><pre><span></span>自定义Partitioner也是解决数据倾斜问题的手段之一，分区数在shuffle操作会变化
-Partitioner必须满足两个前提，1、RDD是k-v形式，如RDD[(K, V)]，2、有shuffle操作。
-自定义分区需要继承Partitioner，并实现三个方法
-    numPartitions
-    getPartition  
-    equals
-</pre></div>
-
-
-<h3>2.分区相关操作：</h3>
-<h4>01.配置中的并行度：</h4>
-<div class="highlight"><pre><span></span>spark.sql.shuffle.partitions 和 spark.default.parallelism
-spark.default.parallelism   在处理RDD时 
-spark.sql.shuffle.partitions 则是对Spark SQL的设置
-</pre></div>
-
-
-<h4>02.一些API比较</h4>
-<div class="highlight"><pre><span></span>一些常用的函数和方法
-getPartition  获取分区
-foreachPartition
-mapPartitions
-mapPartitionsWithIndex
-mapPartitionsWithIndexInternal
-zipPartitions
-001.Map和 MapPartitions比较    
- map操作通常不会导致内存的OOM异常。
- 但是MapPartitions操作，对于大量数据来说，比如甚至一个partition，100万数据，一次传入一个function以后，那么可能一下子内存不够，但是又没有办法去腾出内存空间来，可能就OOM，内存溢出。
-002.foreachPartition 与mapPartitions 以及 mapPartitionsWithIndex()的比较
-  01.从算子的类型：
-    foreachPartition 属于action运算操作，而 
-    mapPartitions 是在Transformation中
-  02.返回值上：
-    foreachPartition 没有返回值
-    mapPartitions    返回值类型迭代器： Iterator[U]  该元素的迭代器
-  03.应用场景上：
-     mapPartitions   可以获取返回值，继续在返回RDD上做其他的操作
-     foreachPartition 因为没有返回值并且是action操作，
-     所以使用foreachPartition一般都是在程序末尾比如说要落地数据到存储系统中如mysql，es，clcikhouse或者hbase中
-003.mapPartitionsWithIndex和mapPartitions
-  mapPartitionsWithIndex 和 mapPartitions 类似，只是其参数多了个分区索引号
-  mapPartitionsWithIndex 既可以拿到分区的迭代器,又可以拿到分区编号
-  mapPartitionsWithContext
-分区的其他操作：
-def zipWithUniqueId(): RDD[(T, Long)]
-   该函数将RDD中元素和一个唯一ID组合成键/值对，该唯一ID生成算法如下：
-   每个分区中第一个元素的唯一ID值为：该分区索引号，
-   每个分区中第N个元素的唯一ID值为：(前一个元素的唯一ID值) + (该RDD总的分区数)
-zipPartitions
-  zipPartitions函数将多个RDD按照partition组合成为新的RDD，
-  该函数需要组合的RDD具有相同的分区数，但对于每个分区内的元素数量没有要求。 
-def zipWithIndex(): RDD[(T, Long)]
-   该函数将RDD中的元素和这个元素在RDD中的ID（索引号）组合成键/值对。
- mapPartitionsWithIndex
- 宽依赖（发生shuffle）和窄依赖（不发生shuffle）
-</pre></div>
-
-
-<h4>03.重分区repartition 和coalesce</h4>
-<div class="highlight"><pre><span></span>repartition对数据进行重新分区，默认是使用 HashPartitioner
-      repartition 使用了一个随机生成的数来当做 Key，而不是使用原来的 Key
-repartition只是coalesce接口中shuffle为true的简易实现
- repartition(numPartitions:Int):RDD[T]
- coalesce(numPartitions:Int，shuffle:Boolean=false):RDD[T]
-coalesce
- 减少分区的时候，使用coalesce(),coalesce结合现有分区以避免完全洗牌。你将1000个分区转换成100个分区，这个过程不会发生shuffle，
- 增加分区比如Rdd的分区是100，设置成1000，如果shuffle为false，并不会起作用。这时候就需要设置shuffle为true
-repartition方法可用于增加或减少DataFrame中的分区数
-</pre></div>
-
-
-<h4>过程</h4>
-<div class="highlight"><pre><span></span>Map阶段  Shuffle阶段  Reduce阶段
-  Shuffle阶段： 在Spark Shuffle阶段中，共分为Shuffle Write阶段和Shuffle Read阶段
-     Shuffle Write阶段中，Shuffle 对Map Task数据进行处理产生中间数据，然后再根据数据分区方式对中间数据进行分区。
-  最终Shffle Read阶段中的 Shuffle Read Task会拉取Shuffle Write阶段中产生的并已经分好区的中间数据
-</pre></div>
-
-
-<h3>3.源码</h3>
-<h4>01.分区器相关的源码位置</h4>
-<div class="highlight"><pre><span></span><span class="n">Spark</span><span class="err">\</span><span class="n">core</span><span class="err">\</span><span class="n">src</span><span class="err">\</span><span class="n">main</span><span class="err">\</span><span class="n">scala</span><span class="err">\</span><span class="n">org</span><span class="err">\</span><span class="n">apache</span><span class="err">\</span><span class="n">spark</span>
-<span class="n">trait</span> <span class="n">Partition</span> <span class="n">extends</span> <span class="n">Serializable</span>
-<span class="n">abstract</span> <span class="k">class</span> <span class="n">Partitioner</span> <span class="n">extends</span> <span class="n">Serializable</span> <span class="p">{</span>
-   <span class="n">def</span> <span class="nl">numPartitions</span><span class="p">:</span> <span class="n">Int</span>
-   <span class="n">def</span> <span class="n">getPartition</span><span class="p">(</span><span class="nl">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span><span class="o">:</span> <span class="n">Int</span>
-   <span class="p">}</span>
-<span class="n">object</span> <span class="n">Partitioner</span>
-     <span class="n">defaultPartitioner</span>
-<span class="k">class</span> <span class="n">HashPartitioner</span><span class="p">(</span><span class="nl">partitions</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="n">extends</span> <span class="n">Partitioner</span>
-<span class="k">class</span> <span class="n">RangePartitioner</span><span class="p">[</span><span class="nl">K</span> <span class="p">:</span> <span class="nl">Ordering</span> <span class="p">:</span> <span class="n">ClassTag</span><span class="p">,</span> <span class="n">V</span><span class="p">]</span>
-<span class="n">private</span><span class="p">[</span><span class="n">spark</span><span class="p">]</span> <span class="n">object</span> <span class="n">RangePartitioner</span> 
-  <span class="n">Reservoir</span> <span class="n">sampling</span><span class="err">（水塘抽样）</span>
-</pre></div>
-
-
-<h4>02.Repartition和coalesce源码位置</h4>
-<div class="highlight"><pre><span></span>repartition()
-位置：org.apache.spark.rdd
- def repartition(numPartitions: Int)(implicit ord: Ordering[T] = null): RDD[T] = withScope {
-      coalesce(numPartitions, shuffle = true)
-  }
- coalesce()
-def coalesce(numPartitions: Int, shuffle: Boolean = false,
-           partitionCoalescer: Option[PartitionCoalescer] = Option.empty)
-          (implicit ord: Ordering[T] = null)
-  : RDD[T]
-      new HashPartitioner(numPartitions)),
-repartition对数据进行重新分区，默认是使用 HashPartitioner
-repartition 使用了一个随机生成的数来当做 Key，而不是使用原来的 Key
-</pre></div>
-
-
-<h4>03.DataSet 分区源码位置</h4>
-<div class="highlight"><pre><span></span><span class="na">.config</span><span class="p">(</span><span class="s">&quot;spark.default.parallelism&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<span class="err">使用</span><span class="nf">hash</span> <span class="err">分区</span>
-<span class="nf">The</span> <span class="no">resulting</span> <span class="no">Dataset</span> <span class="no">is</span> <span class="no">hash</span> <span class="no">partitioned.This</span> <span class="no">is</span> <span class="no">the</span> <span class="no">same</span> <span class="no">operation</span> <span class="no">as</span> <span class="err">&quot;</span><span class="no">DISTRIBUTE</span> <span class="no">BY</span><span class="err">&quot;</span> <span class="no">in</span> <span class="no">SQL</span> <span class="p">(</span><span class="no">Hive</span> <span class="no">QL</span><span class="p">).</span>
-<span class="nf">org.apache.spark.sql.Dataset.scala</span>  
- <span class="no">def</span> <span class="no">repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span><span class="p">):</span> <span class="no">Dataset</span><span class="p">[</span><span class="no">T</span><span class="p">]</span> <span class="err">=</span> <span class="no">withTypedPlan</span> <span class="err">{</span>
-    <span class="nf">Repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">,</span> <span class="no">shuffle</span> <span class="err">=</span> <span class="no">true</span><span class="p">,</span> <span class="no">logicalPlan</span><span class="p">)</span>
-    <span class="err">}</span>
-<span class="nf">def</span> <span class="no">repartition</span><span class="p">(</span><span class="no">partitionExprs</span><span class="p">:</span> <span class="no">Column</span><span class="p">*):</span> <span class="no">Dataset</span><span class="p">[</span><span class="no">T</span><span class="p">]</span> <span class="err">=</span> <span class="no">withTypedPlan</span> <span class="err">{</span>
-  <span class="nf">RepartitionByExpression</span><span class="p">(</span>
-  <span class="nf">partitionExprs.map</span><span class="p">(</span><span class="no">_.expr</span><span class="p">),</span> <span class="no">logicalPlan</span><span class="p">,</span> <span class="no">sparkSession.sessionState.conf.numShufflePartitions</span><span class="p">)</span>
-  <span class="err">}</span>
-
- <span class="nf">def</span> <span class="no">coalesce</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span><span class="p">):</span> <span class="no">Dataset</span><span class="p">[</span><span class="no">T</span><span class="p">]</span> <span class="err">=</span> <span class="no">withTypedPlan</span> <span class="err">{</span>
-   <span class="nf">Repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">,</span> <span class="no">shuffle</span> <span class="err">=</span> <span class="no">false</span><span class="p">,</span> <span class="no">logicalPlan</span><span class="p">)</span>
-  <span class="err">}</span>
-
-<span class="nf">org.apache.spark.sql.catalyst.plans.logical.basicLogicalOperators.scala</span>
-<span class="nf">case</span> <span class="no">class</span> <span class="no">Repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span><span class="p">,</span> <span class="no">shuffle</span><span class="p">:</span> <span class="no">Boolean</span><span class="p">,</span> <span class="no">child</span><span class="p">:</span> <span class="no">LogicalPlan</span><span class="p">)</span>
-<span class="nf">extends</span> <span class="no">RepartitionOperation</span> <span class="err">{</span>
-   <span class="nf">require</span><span class="p">(</span><span class="no">numPartitions</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="no">s</span><span class="err">&quot;</span><span class="no">Number</span> <span class="no">of</span> <span class="no">partitions</span> <span class="p">(</span><span class="no">$numPartitions</span><span class="p">)</span> <span class="no">must</span> <span class="no">be</span> <span class="no">positive.</span><span class="err">&quot;</span><span class="p">)</span>
-  <span class="err">}</span>
-<span class="nf">abstract</span> <span class="no">class</span> <span class="no">RepartitionOperation</span> <span class="no">extends</span> <span class="no">UnaryNode</span> <span class="err">{</span>
- <span class="nf">def</span> <span class="no">shuffle</span><span class="p">:</span> <span class="no">Boolean</span>
- <span class="nf">def</span> <span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span>
- <span class="nf">override</span> <span class="no">def</span> <span class="no">output</span><span class="p">:</span> <span class="no">Seq</span><span class="p">[</span><span class="no">Attribute</span><span class="p">]</span> <span class="err">=</span> <span class="no">child.output</span>
-<span class="err">}</span>
-</pre></div>
-
-
-<h4>04.rangePartitioner</h4>
-<div class="highlight"><pre><span></span>Google的面试题：如何在一个不确定数据规模的范围内进行排序？ （rangePartitioner的水塘抽样算法）
-总数不知道的情况下如何等概率地从中抽取一行
-水塘抽样算法（Reservoir Sampling）
-在不知道文件总行数的情况下，如何从文件中随机的抽取一行？
-org.apache.spark.Partitioner.scala
-  RangePartitioner.sketch
-org.apache.spark.util.random.SamplingUtils.scala
-  SamplingUtils.reservoirSampleAndCount
-private var rangeBounds: Array[K] = {
-   val sampleSizePerPartition = math.ceil(3.0 * sampleSize / rdd.partitions.length).toInt
-   }
-*源码中SampleSize 乘以3的目的是保证在数据量特别小的分区能够抽取到足够的数据，同时保证数据量特别大的分区能够二次采样。-------------------- 水塘抽样，它是一系列的随机算法
-新建一个k大小的数组reservoir，如果元数据中数据少于k，直接返回原数据数组和原数据个数。
-如果大于，则对接下来的元素进行比较，随机生成一个数i，
-如果这个数小于k，则替换数组reservoir中第i个数，直至没有元素，则返回reservoir的copy数组。确定每个partition中要抽取的样本数量
-依赖于数组变量rangeBounds: Array[K] ，数组存放的是排序好的（K类型进行的排序）一序列K值，根据这些值来确定RDD中每一个元素shuffle后的存放的partition
-</pre></div>
-
-
-<h3>4.参考</h3>
-<div class="highlight"><pre><span></span>Fast Filtering with Spark PartitionFilters and PushedFilters
-https://www.mungingdata.com/apache-spark/partition-filters-pushed-filters
-Spark分区方式详解  https://blog.csdn.net/dmy1115143060/article/details/82620715
-https://stackoverflow.com/questions/41474175/spark-mappartitionswithindex-handling-empty-partitions
-https://stackoverflow.com/questions/44501995/spark-mappartitionswithindex-identify-a-partition
-Spark之深入理解RDD结构  https://blog.csdn.net/u011094454/article/details/78992293
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Spark</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-50.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -2359,6 +2345,28 @@ Spark之深入理解RDD结构  https://blog.csdn.net/u011094454/article/details/
 
             <li><article class="hentry">
                 <header>
+                    <h1><a href="/program/my-program-post-01.html" rel="bookmark"
+                           title="Permalink to Java虚拟机与JAVA内存管理">Java虚拟机与JAVA内存管理</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-01T10:22:00+08:00">
+                Published: 2017-05-01 10:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">JAVA</a> </p>
+</footer><!-- /.post-info -->                <p>Java Memory Model</p>
+                <a class="readmore" href="/program/my-program-post-01.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
                     <h1><a href="/items/my-item-post-13.html" rel="bookmark"
                            title="Permalink to 了解数据以及看什么数据">了解数据以及看什么数据</a></h1>
                 </header>
@@ -3808,50 +3816,6 @@ Spark之深入理解RDD结构  https://blog.csdn.net/u011094454/article/details/
 <p>tags: <a href="/tag/java.html">JAVA</a> </p>
 </footer><!-- /.post-info -->                <p>标准的Java接口</p>
                 <a class="readmore" href="/program/my-program-post-03.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/program/my-program-post-01.html" rel="bookmark"
-                           title="Permalink to JAVA内存以及线程">JAVA内存以及线程</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-10-16T10:22:00+08:00">
-                Published: 2016-10-16 10:22:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/program/index.html">Program</a>.</p>
-<p>tags: <a href="/tag/java.html">JAVA</a> </p>
-</footer><!-- /.post-info -->                <p>Java Memory Model</p>
-                <a class="readmore" href="/program/my-program-post-01.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/program/my-program-post-02.html" rel="bookmark"
-                           title="Permalink to JAVA多线程">JAVA多线程</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-10-16T10:12:00+08:00">
-                Published: 2016-10-16 10:12:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/program/index.html">Program</a>.</p>
-<p>tags: <a href="/tag/java.html">JAVA</a> </p>
-</footer><!-- /.post-info -->                <p>Java 多线程</p>
-                <a class="readmore" href="/program/my-program-post-02.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

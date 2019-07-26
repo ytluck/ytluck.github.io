@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Flink数据类型和Tuple</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-51.html" rel="bookmark"
+           title="Permalink to Flink数据类型和Tuple">Flink数据类型和Tuple</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-07-08T21:10:00+08:00">
+                Published: 2019-07-08 21:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->      <h3>1.Flink Type_Information</h3>
+<div class="highlight"><pre><span></span>DataType
+  每一个数据类型都有其对应序列化器,flink有自身的序列化器和kryo序列化器   
+类型推断
+ 类型自动推断
+  函数调用的输入类型 通常可以由之前操作的结果类型来推断
+    TypeExtractror 的类，可以利用方法签名、子类信息等蛛丝马迹，自动提取和恢复类型信息
+ 类型手动返回
+  可以实现 ResultTypeQueryable 接口，通过输入格式和函数来告诉API它们确切的返回类型
+ 用到类型的情况：
+   使用类型信息来生成序列化器和比较器,并提供语义检查
+   函数调用的输入类型 通常可以由之前操作的结果类型来推断
+   Mapping of Data Types to Table Schema       
+    TypeConverters 提供了 DataType 和 Typeinformation 之间的相互转化。
+   自定义的类型信息
+     TypeSerializer
+类型擦除解决方式：
+  将数据类型传递给TypeInformation构造函数：
+    对于非泛型数据类型，你可以传递Class：
+    对于泛型数据类型，你需要通过TypeHint来捕获数据类型
+</pre></div>
+
+
+<h3>2.Flink中数据</h3>
+<div class="highlight"><pre><span></span>Java类型信息
+1.Basci 基本类型：所有的Java基本类型和装箱类型以及void，String，Date，BigDecimal，和BigInteger。
+The data type of the resulting DataStream or DataSet, 
+   01.原生数据类型 Atomic Type
+     Integer, String 和 Double等
+   02.值类型
+     Flink预定义的值类型与原生数据类型是一一对应的
+2.BasciArray
+3.Composite 复合类型
+   03.POJO (Java and Scala)
+   04.泛型类      
+   05.Scala的case class类(Scala的Tuple也是一种特殊的case class)，是一个复合类型，
+   包含了固定数量的不同类型的字段
+      Tuple字段用1到偏移位置坐标记
+    也可以根据字段名称来获取
+    Tuples (Scala and Java) and Case Classes (Scala only)
+    Row
+其他
+   4.通用类型：这些不会被Flink本身序列化，而是由Kryo序列化
+   5.辅助类型（选项，任一，列表，Map，......）
+</pre></div>
+
+
+<h3>3.Flink的数据类型</h3>
+<div class="highlight"><pre><span></span>不同层级之间的数据类型以及操作的不同，以及之间的相互转化
+DataStreaming数据流类型：
+    DataStream  
+     KeyedStream 
+     WindowedStream  AllWindowedStream
+     JoinedStreams  CoGroupedStreams ConnectedStreams
+Table层级 --// register a Table
+    StreamTableEnvironment TableSource Table  TableSink
+    操作：
+      数据类型
+        registerTable registerExternalCatalog
+        registerTableSource registerTableSink
+      操作：
+        SQLQuery:   sqlQuery  sqlUpdate
+        Table API:  scan  select insertInto filter groupBy  where unionAll explain                     
+不同API之间的转换
+   01.Convert a DataStream or DataSet into a Table：
+   02.Convert a Table into a DataStream or DataSet
+  操作：
+
+  数据： Mapping of Data Types to Table Schema
+      based on the field positions or 
+      based on the field names.
+</pre></div>
+
+
+<h3>4.类型</h3>
+<div class="highlight"><pre><span></span>泛型 - 参数化类型，将类型当作参数传递给一个类或者是方法
+  编程时：
+  编译时：泛型又提供了一种类型检测的机制，只有相匹配的数据才能正常的赋值，否则编译器就不通过。
+  所以说，它是一种类型安全检测机制
+类型转换
+
+类型擦除
+  泛型信息只存在于代码编译阶段，在进入 JVM 之前，与泛型相关的信息会被擦除掉，专业术语叫做类型擦除。
+  类型擦除是泛型能够与之前的 java 版本代码兼容共存的原因
+类型推断：
+  Java 需要通过上下文细节来推断该类型
+  局部变量类型推断(local-variable type inference)
+  推断的局限性
+</pre></div>
+
+
+<h3>5.Flink Java Tuples</h3>
+<div class="highlight"><pre><span></span> (Flink Java API的一部分)：最多25个字段，空字段不支持
+构建者模式：
+Builder:         为创建Product对象的各个部件指定抽象接口。
+ConcreteBuilder: 实现Builder的接口以构造和装配该产品的各个部件，定义并明确它所创建的表示，并提供一个检索产品的接口。
+Director:        构造一个使用Builer接口的对象。
+Product:         表示被构造的复杂对象。
+   ConcreteBuilder创建该产品的内部表示并定义它的装配过程，包含定义组成部件的类，以及将这些部件装配成最终产品的接口。
+</pre></div>
+
+
+<h3>Tuple 的构建：</h3>
+<div class="highlight"><pre><span></span><span class="mi">01</span><span class="p">.</span> <span class="nx">Tuple</span>  <span class="o">--</span><span class="nx">抽象Build类</span><span class="o">-</span><span class="nx">构建与产品类相关的部件</span>
+<span class="kr">public</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">Tuple</span> <span class="kr">implements</span> <span class="nx">java</span><span class="p">.</span><span class="nx">io</span><span class="p">.</span><span class="nx">Serializable</span><span class="p">{</span>
+  <span class="kr">public</span> <span class="kr">static</span> <span class="kr">final</span> <span class="kr">int</span>
+  <span class="kr">public</span> <span class="kr">abstract</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="nx">T</span> <span class="nx">getField</span><span class="p">(</span><span class="kr">int</span> <span class="nx">pos</span><span class="p">);</span>
+  <span class="kr">public</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="nx">T</span> <span class="nx">getFieldNotNull</span><span class="p">(</span><span class="kr">int</span> <span class="nx">pos</span><span class="p">){}</span>
+  <span class="kr">public</span> <span class="kr">abstract</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="k">void</span> <span class="nx">setField</span><span class="p">(</span><span class="nx">T</span> <span class="nx">value</span><span class="p">,</span> <span class="kr">int</span> <span class="nx">pos</span><span class="p">);</span>
+  <span class="kr">public</span> <span class="kr">abstract</span> <span class="kr">int</span> <span class="nx">getArity</span><span class="p">();</span>
+  <span class="kr">public</span> <span class="kr">abstract</span> <span class="o">&lt;</span><span class="nx">T</span> <span class="kr">extends</span> <span class="nx">Tuple</span><span class="o">&gt;</span> <span class="nx">T</span> <span class="nx">copy</span><span class="p">();</span>
+  <span class="kr">public</span> <span class="kr">static</span> <span class="nx">Class</span><span class="cp">&lt;?</span> <span class="k">extends</span> <span class="nx">Tuple</span><span class="o">&gt;</span> <span class="nx">getTupleClass</span><span class="p">(</span><span class="nx">int</span> <span class="nx">arity</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="nx">Tuple</span> <span class="nx">newInstance</span><span class="p">(</span><span class="nx">int</span> <span class="nx">arity</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="nx">Class</span><span class="o">&lt;</span><span class="cp">?&gt;</span><span class="p">[]</span> <span class="nx">CLASSES</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Class</span><span class="cp">&lt;?</span><span class="o">&gt;</span><span class="p">[]</span> <span class="p">{}</span>
+  <span class="p">}</span>
+
+<span class="mf">02.</span> <span class="nx">Tuple2</span>  <span class="o">--</span><span class="nx">抽象Build的实现类</span><span class="o">-</span><span class="nx">真正构建产品的类</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Tuple2</span><span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;</span> <span class="k">extends</span> <span class="nx">Tuple</span><span class="p">{</span>
+
+    <span class="k">public</span> <span class="nx">T0</span> <span class="nx">f0</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nx">T1</span> <span class="nx">f1</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nx">Tuple2</span><span class="p">()</span> <span class="p">{}</span>
+    <span class="k">public</span> <span class="nx">int</span> <span class="nx">getArity</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="nx">T</span> <span class="nx">getField</span><span class="p">(</span><span class="nx">int</span> <span class="nb">pos</span><span class="p">)</span>
+    <span class="k">public</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="nx">void</span> <span class="nx">setField</span><span class="p">(</span><span class="nx">T</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">int</span> <span class="nb">pos</span><span class="p">)</span>
+    <span class="k">public</span> <span class="nx">void</span> <span class="nx">setFields</span><span class="p">(</span><span class="nx">T0</span> <span class="nx">value0</span><span class="p">,</span> <span class="nx">T1</span> <span class="nx">value1</span><span class="p">)</span> <span class="p">{}</span>
+    <span class="k">public</span> <span class="nx">String</span> <span class="nx">toString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="nx">boolean</span> <span class="nx">equals</span><span class="p">(</span><span class="nx">Object</span> <span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="nx">int</span> <span class="nx">hashCode</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;</span> <span class="nx">Tuple2</span><span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;</span> <span class="nx">of</span> <span class="p">(</span><span class="nx">T0</span> <span class="nx">value0</span><span class="p">,</span> <span class="nx">T1</span> <span class="nx">value1</span><span class="p">){</span>
+     <span class="k">return</span> <span class="k">new</span> <span class="nx">Tuple2</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="nx">value0</span><span class="p">,</span><span class="nx">value1</span><span class="p">);</span>
+     <span class="p">}</span>   
+<span class="p">}</span>
+
+<span class="mf">03.</span><span class="nx">Tuple2Builder</span>   <span class="nx">Director</span> <span class="o">--</span><span class="nx">将builder构建的产品部件组装成产品</span><span class="p">,</span><span class="nx">对外隐藏内部组装细节</span>   
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Tuple2Builder</span><span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">List</span><span class="o">&lt;</span><span class="nx">Tuple2</span><span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;&gt;</span> <span class="nx">tuples</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+    <span class="k">public</span> <span class="nx">Tuple2Builder</span><span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;</span> <span class="nx">add</span><span class="p">(</span><span class="nx">T0</span> <span class="nx">value0</span><span class="p">,</span> <span class="nx">T1</span> <span class="nx">value1</span><span class="p">){</span>
+        <span class="nx">tuples</span><span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="k">new</span> <span class="nx">Tuple2</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="nx">value0</span><span class="p">,</span> <span class="nx">value1</span><span class="p">));</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="o">@</span><span class="nx">SuppressWarnings</span><span class="p">(</span><span class="s2">&quot;unchecked&quot;</span><span class="p">)</span>
+    <span class="k">public</span> <span class="nx">Tuple2</span><span class="o">&lt;</span><span class="nx">T0</span><span class="p">,</span> <span class="nx">T1</span><span class="o">&gt;</span><span class="p">[]</span> <span class="nx">build</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="nx">tuples</span><span class="o">.</span><span class="nx">toArray</span><span class="p">(</span><span class="k">new</span> <span class="nx">Tuple2</span><span class="p">[</span><span class="nx">tuples</span><span class="o">.</span><span class="nx">size</span><span class="p">()]);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="mf">04.</span><span class="nx">main</span>  <span class="nx">使用</span>
+ <span class="k">List</span><span class="o">&lt;</span><span class="nx">Tuple2</span><span class="o">&lt;</span><span class="nx">String</span><span class="p">,</span> <span class="nx">Integer</span><span class="o">&gt;&gt;</span> <span class="nx">input1</span> <span class="o">=</span> <span class="nx">Arrays</span><span class="o">.</span><span class="nx">asList</span><span class="p">(</span>
+                    <span class="k">new</span> <span class="nx">Tuple2Builder</span><span class="o">&lt;</span><span class="nx">String</span><span class="p">,</span> <span class="nx">Integer</span><span class="o">&gt;</span><span class="p">()</span>
+                            <span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;foobar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">.</span><span class="nx">build</span><span class="p">()</span>    
+<span class="nx">updateEmpty</span> <span class="o">=</span> <span class="nx">mapOf</span><span class="p">(</span><span class="nx">Tuple2</span><span class="o">.</span><span class="nx">of</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">),</span> <span class="nx">Tuple2</span><span class="o">.</span><span class="nx">of</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">),</span> <span class="nx">Tuple2</span><span class="o">.</span><span class="nx">of</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="k">null</span><span class="p">),</span> <span class="nx">Tuple2</span><span class="o">.</span><span class="nx">of</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">));</span>
+
+<span class="nx">说明：</span>
+    <span class="nx">面对的场景：</span>
+     <span class="nx">各个子对象组合出这个复杂对象的过程相对来说比较稳定，但是子对象的创建过程各不相同并且可能面临变化</span>
+    <span class="nx">解决的方式</span>
+      <span class="nx">将配置从目标类中隔离出来，避免作为过多的setter方法</span>
+      <span class="nx">Builder模式比较常见的实现形式是通过链式调用</span>
+    <span class="o">--</span> <span class="nx">复杂对象的</span> <span class="nx">构建</span> <span class="nx">与它的</span> <span class="nx">表示</span> <span class="nx">分离</span>
+</pre></div>
+
+
+<h3>TupleTypeInfo</h3>
+<div class="highlight"><pre><span></span>      <span class="kr">public</span> <span class="kr">final</span> <span class="kr">class</span> <span class="nx">TupleTypeInfo</span><span class="o">&lt;</span><span class="nx">T</span> <span class="kr">extends</span> <span class="nx">Tuple</span><span class="o">&gt;</span> <span class="kr">extends</span> <span class="nx">TupleTypeInfoBase</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+        <span class="kr">public</span> <span class="nx">TupleTypeInfo</span><span class="p">(</span><span class="nx">TypeInformation</span><span class="cp">&lt;?</span><span class="o">&gt;...</span> <span class="nx">types</span><span class="p">)</span> <span class="p">{</span>
+         <span class="k">this</span><span class="p">((</span><span class="nx">Class</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="nx">Tuple</span><span class="o">.</span><span class="nx">getTupleClass</span><span class="p">(</span><span class="nx">types</span><span class="o">.</span><span class="nx">length</span><span class="p">),</span> <span class="nx">types</span><span class="p">);</span>
+          <span class="p">}</span>
+          <span class="nx">getFieldNames</span>
+          <span class="nx">getFieldIndex</span>
+          <span class="nx">createSerializer</span>
+         <span class="k">private</span> <span class="k">class</span> <span class="nc">TupleTypeComparatorBuilder</span>
+         <span class="nx">getGenericParameters</span>
+         <span class="nx">getBasicTupleTypeInfo</span>
+         <span class="nx">getBasicAndBasicValueTupleTypeInfo</span>
+       <span class="p">}</span>
+    <span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">TupleTypeInfoBase</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="k">extends</span> <span class="nx">CompositeType</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> 
+    <span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">CompositeType</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="k">extends</span> <span class="nx">TypeInformation</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> 
+    <span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">TypeInformation</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="k">implements</span> <span class="nx">Serializable</span> 
+<span class="nx">TupleSerializer</span>
+     <span class="k">public</span> <span class="k">class</span> <span class="nc">TupleSerializer</span><span class="o">&lt;</span><span class="nx">T</span> <span class="k">extends</span> <span class="nx">Tuple</span><span class="o">&gt;</span> <span class="k">extends</span> <span class="nx">TupleSerializerBase</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="k">implements</span> <span class="nx">SelfResolvingTypeSerializer</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="nx">TupleSerializerBase</span> 
+    <span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">TupleSerializerBase</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="k">extends</span> <span class="nx">TypeSerializer</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+
+<span class="nx">Tuple：</span>
+     <span class="nx">Flink</span> <span class="nx">tuples</span> <span class="nx">是固定长度固定类型的Java</span> <span class="nx">Tuple实现</span>
+     <span class="nx">TupleTypeInfo</span> <span class="nx">任意的Flink</span> <span class="nx">tuple</span> <span class="nx">类型</span><span class="p">(</span><span class="nx">支持Tuple1</span> <span class="nx">to</span> <span class="nx">Tuple25</span><span class="p">)</span>
+     <span class="nx">package</span> <span class="nx">org</span><span class="o">.</span><span class="nx">apache</span><span class="o">.</span><span class="nx">flink</span><span class="o">.</span><span class="nx">api</span><span class="o">.</span><span class="nx">java</span><span class="o">.</span><span class="nx">tuple</span><span class="p">;</span>
+     <span class="nx">package</span> <span class="nx">org</span><span class="o">.</span><span class="nx">apache</span><span class="o">.</span><span class="nx">flink</span><span class="o">.</span><span class="nx">api</span><span class="o">.</span><span class="nx">java</span><span class="o">.</span><span class="nx">typeutils</span><span class="p">;</span>
+     <span class="nx">package</span> <span class="nx">org</span><span class="o">.</span><span class="nx">apache</span><span class="o">.</span><span class="nx">flink</span><span class="o">.</span><span class="nx">api</span><span class="o">.</span><span class="nx">common</span><span class="o">.</span><span class="nx">typeutils</span><span class="p">;</span>
+     <span class="nx">package</span> <span class="nx">org</span><span class="o">.</span><span class="nx">apache</span><span class="o">.</span><span class="nx">flink</span><span class="o">.</span><span class="nx">api</span><span class="o">.</span><span class="nx">common</span><span class="o">.</span><span class="nx">typeinfo</span><span class="p">;</span>
+<span class="nx">Java</span> <span class="nx">和Scala</span>
+<span class="nx">CaseClassTypeInfo</span><span class="o">:</span> <span class="nx">任意的</span> <span class="nx">Scala</span> <span class="nx">CaseClass</span><span class="p">(</span><span class="nx">包括</span> <span class="nx">Scala</span> <span class="nx">tuples</span><span class="p">)</span><span class="nx">。</span>
+<span class="nx">Flink的TypeInformation类</span>
+<span class="nx">TypeInformation类是所有类型描述类的基类，它揭示了数据类型的一些基础属性，并产生序列化器在默写特殊情况下生成类型比较器</span>
+</pre></div>
+
+
+<h3>相关语法</h3>
+<div class="highlight"><pre><span></span>三元运算符
+ @Override
+ public int hashCode() {
+    int result = f0 != null ? f0.hashCode() : 0;
+    return result;
+ }
+
+ @Override
+ public int hashCode() {
+    int result = f0 != null ? f0.hashCode() : 0;
+    result = 31 * result + (f1 != null ? f1.hashCode() : 0);
+    return result;
+ }
+
+ @Override
+ public int hashCode() {
+    int result = f0 != null ? f0.hashCode() : 0;
+    result = 31 * result + (f1 != null ? f1.hashCode() : 0);
+    result = 31 * result + (f2 != null ? f2.hashCode() : 0);
+    return result;
+ }
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>flink-annotations源码分析 https://blog.csdn.net/hxcaifly/article/details/84558346
+http://wuchong.me/
+https://ci.apache.org/projects/flink/flink-docs-release-1.8/dev/table/common.html
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

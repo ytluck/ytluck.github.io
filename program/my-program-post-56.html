@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java序列化</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-56.html" rel="bookmark"
+           title="Permalink to Java序列化">Java序列化</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-06-30T21:22:00+08:00">
+                Published: 2019-06-30 21:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->      <h3>序列化：</h3>
+<div class="highlight"><pre><span></span>     序列化：把对象转换 为 字节序列 的过程称为对象的 序列化。
+   反序列化：把字节序列 恢复为 对象 的过程称为对象的 反序列化。
+   以便存储或传输的机制
+场景：把对象的状态信息通过网络进行传输
+</pre></div>
+
+
+<h3>序列化一些概念</h3>
+<div class="highlight"><pre><span></span>api 文档里面关于接口 Serializable 的描述
+01. java.io.Serializable 
+ public interface Serializable
+序列化接口 没有方法或字段，仅用于标识可序列化的语义
+是在告诉JVM此类可被序列化，可被默认的序列化机制序列化
+02.implements Serializable
+ 类通过实现 java.io.Serializable 接口以启用其序列化功能
+ 可序列化类的所有子类型本身都是可序列化的
+ 一个类要序列化，它的父类不一定要实现Serializable接口 - Object是每个类的超类，它没有实现 Serializable接口
+   那么 这个子类是可以序列化的，但是在反序列化的过程 中会调用 父类 的无参构造函数，
+   所以在其直接父类（注意是直接父类）中必须有一个无参的构造函数。   
+03.未实现此接口的类将无法使其任何状态序列化或反序列化
+ 001.序列化的时候的一个关键字：transient（临时的）。它声明的变量实行序列化操作的时候不会写入到序列化文件中去
+ 002.静态static的属性，静态成员变量属于类不属于对象所以不参与序列化的过程
+04.serialVersionUID 
+001.如果可序列化类未显式声明 serialVersionUID，则序列化运行时将基于该类的各个方面计算该类的默认 serialVersionUID 值
+ 通过一个类的类名，成员，包名，工程名算出来的一个数字
+002.显式声明：private  静态 (static)、最终 (final) 的 long 型字段
+   private static final long serialVersionUID = 1L;
+该序列号在反序列化过程中用于验证序列化对象的发送者和接收者是否为该对象加载了与序列化兼容的类。
+ 如果接收者加载的该对象的类的 serialVersionUID 与对应的发送者的类的版本号不同，
+ 则反序列化将会导致 InvalidClassException
+003.数组类不能声明一个明确的 serialVersionUID，因此它们总是具有默认的计算值，
+ 但是数组类没有匹配 serialVersionUID 值的要求
+</pre></div>
+
+
+<h3>序列化</h3>
+<div class="highlight"><pre><span></span>01.public class BillBean implements Serializable
+  bean 要实现Serializable接口
+02.Java  RMI
+02.对象的输入输出流 : 主要的作用是用于写入对象信息与读取对象信息
+  ObjectOutputStream , ObjectInputStream
+   writeObject()
+   readObject()
+</pre></div>
+
+
+<h3>常见问题</h3>
+<div class="highlight"><pre><span></span>为什么要实现序列化
+ 有利于内存中的对象写入硬盘
+ 有利于用套接字在网络上进行对象的传输
+ 有利于通过RMI调用对象 即： RMI ：Remote Method Invocation， 远程方法调用-在一个JVM调用另外一个JVM对象）
+</pre></div>
+
+
+<h3>Java中数据类型</h3>
+<div class="highlight"><pre><span></span>01.POJO - JavaBean
+Plain Ordinary Java Object，简单的Java对象，普通的javaBean。除了getter、setter，不能有其他业务方法
+  public class--class必须是public的
+  所有属性必须 private，属性必须 setter getter等 public 方法
+  至少存在一个public无参构造方法
+  运行时类型信息(Run-Time Type Information)
+02.Java 中类与对象
+   类：方法和实例域
+    对象：类的实例
+      某个对象属于某个类，可以利用Java中的的 instanceof   isInstance
+   类之前的关系： is-a  has-a  uses-a
+       is-a : 继承   classa.isAssignableFrom(classb) 可以判断B是否继承于A
+       has-a: 聚合 类A的对象包含类B的对象
+      uses-a: 依赖 一个类的方法操作另外一个类的对象
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>详解java序列化（二） https://blog.csdn.net/moreevan/article/details/6698529
+Java 之 Serializable 序列化和反序列化的概念,作用的通俗易懂的解释 https://blog.csdn.net/u013870094/article/details/82765907
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

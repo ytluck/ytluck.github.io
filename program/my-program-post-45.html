@@ -42,19 +42,63 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/java.html">JAVA</a> </p>
-</footer><!-- /.post-info -->      <p>1.并发基础-线程基本概念
-    01.线程
-        ID以及Name
-    02.线程状态
-        new  Runnable  Blocked  terminated
-                waiting<br />
-                Time  waiting
-    03.线程属性：
-          线程组 - 线程优先级(优先级从1到10，默认是5)
-          守护线程
-          处理未捕获异常的处理器
-    04.线程方法
-        sleep   yield  join 等方法</p>
+</footer><!-- /.post-info -->      <h2>多线程背景</h2>
+<div class="highlight"><pre><span></span>1.硬件：
+ 单处理器
+   单任务阻塞、事件驱动程序
+ 多处理器
+2.软件：
+ 系统级的并发
+ 应用级的并发
+3背景内容
+  并发的开发语言
+    将并发任务彼此隔离：函数型语言
+    JAVA在顺序的基础上提供对线程的支持
+进程：  
+   程序的执行过程，持有资源&lt;共享内存，共享文件&gt;和线程
+   线程：进程的最小执行单元
+   线程交互：互斥  同步
+线程机制，底层机制是切分CPU时间
+    协作式
+    抢占式
+JAVA的线程机制：抢占式
+       继承java.lang.Thread   类
+       实现java.lang.Runnable 接口
+    线程互斥：synchronize
+    线程同步： wait  notifyAll
+    Round_robin轮转法调度
+    线程的生命周期：
+        new Thread  创建线程 new Thread()----start() 
+        Runnable    就绪
+        Blocked     堵塞
+        run     运行
+        Dead        消亡
+    sleep()
+线   程：用户线程
+      守护线程：例如：垃圾回收线程
+        设置守护线程 Thread.setDaemon
+            必须在start()之前
+            守护线程中的新线程是守护线程
+            不是所有的线程都可以设置为守护线程，读写、计算逻辑等
+</pre></div>
+
+
+<h3>1.并发基础-线程基本概念</h3>
+<div class="highlight"><pre><span></span>01.线程
+    ID以及Name
+02.线程状态
+    new  Runnable  Blocked  terminated
+            waiting  
+            Time  waiting
+03.线程属性：
+      线程组 - 线程优先级(优先级从1到10，默认是5)
+      守护线程
+      处理未捕获异常的处理器
+04.线程方法
+    sleep   yield  join 等方法
+</pre></div>
+
+
 <p>2.并发基础-线程中的一些问题
     01.创建和启动</p>
 <div class="highlight"><pre><span></span>02.竞争访问同一资源-安全竞争同一资源的机制
@@ -83,20 +127,21 @@
 </pre></div>
 
 
-<p>3.并发包和并发容器
-    01.java.util.concurrent
-        原子变量--包含一些以原子方式实现组合操作的方法
-           AtomicBoolean 、AtomicInteger  AtomicLong<br />
-           AtomicLongArray  AtomicReferenceArray
-           AtomicReference
-         方法：
-            compareAndSet 该方法
-        原子变量的更新逻辑是：非阻塞式的
-    02.非阻塞是容器
-        ConcurrentSkipListMap   ConcurrentSkipListSet
-        ConcurrentLinkedQueue  ConcurrentLinkedDeque
-        ConcurrentHashMap</p>
-<div class="highlight"><pre><span></span>03.异步任务执行服务
+<h3>3.并发包和并发容器</h3>
+<div class="highlight"><pre><span></span>01.java.util.concurrent
+    原子变量--包含一些以原子方式实现组合操作的方法
+       AtomicBoolean 、AtomicInteger  AtomicLong  
+       AtomicLongArray  AtomicReferenceArray
+       AtomicReference
+     方法：
+        compareAndSet 该方法
+    原子变量的更新逻辑是：非阻塞式的
+02.非阻塞是容器
+    ConcurrentSkipListMap   ConcurrentSkipListSet
+    ConcurrentLinkedQueue  ConcurrentLinkedDeque
+    ConcurrentHashMap
+
+03.异步任务执行服务
     任务的提交和任务的执行相分离-- 任务提交者关注 提交任务、获取结果以及取消任务
         Runnable 和Callable
         Executor 和ExecutorService
@@ -107,68 +152,141 @@
 </pre></div>
 
 
-<p>4.代码示例
-    创建和使用方式
-        集成Thread 类/实现Runnable接口
-            01.集成Thread 类
-                public class AThread extends Thread{
-                  @Override
-                  public void run(){ }
-                  }
-                  Thread  testThread = new  AThread();
-                  testThread.start
-          02.实现Runnable接口
-                    public class BThread implements Runnable{
-                  @Override
-                  public void run(){ }
-                  }
-                  Thread  testThread = new  Thread( new  BThread());
-                  testThread.start</p>
-<p>5.一些概念
-    阻塞式和非阻塞式
-    锁  乐观锁和悲观锁 显示锁
-    synchronized 和显示锁
-    wait/notigy   和显示条件 Condition表示条件变量
-    同步和异步
-    原子操作
-    CAS（Compare And Set）比较并交换
-            CAS操作包含三个操作数——内存位置（V）、预期原值（A）、新值(B)
-             java.util.concurrent包中借助CAS实现了区别于synchronouse同步锁的一种乐观锁
-             CAS采用的是一种非阻塞算法（nonblocking algorithms），
-                     一个线程的失败或者挂起不应该影响其他线程的失败或挂起的算法
-            synchronouse是一种悲观锁，它会导致其他所有需要锁的线程挂起。
-    AQS 是AbustactQueued Synchronizer 的简称，它是一个Java提高的底层同步工具类
-    阻塞和非阻塞，同步和异步
-        阻塞和非阻塞是指进程访问的数据如果尚未就绪，进程是否需要等待
-        同步和异步是指访问数据的机制,
-             同步一般指主动请求并等待I/O操作完毕的方式,当数据就绪后在读写的时候必须阻塞,
-            异步则指主动请求数据后便可以继续处理其它任务,随后等待I/O,操作完毕的通知,这可以使进程在数据读写时也不阻塞。
-        synchronous IO
-            同步阻塞 bloking IO   同步非阻塞   non-blocking IO  多路复用IO（multiplexing IO） 信号驱动式IO（signal-driven IO）
-        异步IO（asynchronous IO） 异步阻塞 异步非阻塞
-    乐观锁
-        每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据
-        版本号机制和CAS算法实现。乐观锁适用于多读的应用类型，这样可以提高吞吐量
-        java.util.concurrent.atomic包下面的原子变量类就是使用了乐观锁的一种实现方式CAS实现的。
-        compare and swap（比较与交换），是一种有名的无锁算法，一般情况下是一个自旋操作，即不断的重试。
-    悲观锁
-            共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程
-            做操作之前先上锁，Java中synchronized和ReentrantLock等独占锁
-    ArrayList是非线程安全的，Vector是线程安全的
-    HashMap是非线程安全的，HashTable是线程安全的
-        线程安全
-            线程安全就是多线程访问时，采用了加锁机制
-                是多线程操作同一个对象不会有问题
-                线程安全是通过线程同步控制来实现的，也就是synchronized关键字
-        线程不安全
-            如果是每个线程中new一个ArrayList，而这个ArrayList只在这一个线程中使用，那么肯定是没问题的
-                解决方法：
-                    （1）同步代码块
-                    （2）同步方法
-                    （3）锁机制（Lock）</p>
-<div class="highlight"><pre><span></span>只允许一个线程拥有同步锁，谁拿到锁就进入代码块，其他线程只能在外面等
+<h3>4.代码示例</h3>
+<div class="highlight"><pre><span></span>创建和使用方式
+    集成Thread 类/实现Runnable接口
+        01.集成Thread 类
+            public class AThread extends Thread{
+              @Override
+              public void run(){ }
+              }
+              Thread  testThread = new  AThread();
+              testThread.start
+      02.实现Runnable接口
+                public class BThread implements Runnable{
+              @Override
+              public void run(){ }
+              }
+              Thread  testThread = new  Thread( new  BThread());
+              testThread.start
+</pre></div>
+
+
+<h3>5.一些概念</h3>
+<div class="highlight"><pre><span></span>阻塞式和非阻塞式
+锁  乐观锁和悲观锁 显示锁
+synchronized 和显示锁
+wait/notigy   和显示条件 Condition表示条件变量
+同步和异步
+原子操作
+CAS（Compare And Set）比较并交换
+        CAS操作包含三个操作数——内存位置（V）、预期原值（A）、新值(B)
+         java.util.concurrent包中借助CAS实现了区别于synchronouse同步锁的一种乐观锁
+         CAS采用的是一种非阻塞算法（nonblocking algorithms），
+                 一个线程的失败或者挂起不应该影响其他线程的失败或挂起的算法
+        synchronouse是一种悲观锁，它会导致其他所有需要锁的线程挂起。
+AQS 是AbustactQueued Synchronizer 的简称，它是一个Java提高的底层同步工具类
+阻塞和非阻塞，同步和异步
+    阻塞和非阻塞是指进程访问的数据如果尚未就绪，进程是否需要等待
+    同步和异步是指访问数据的机制,
+         同步一般指主动请求并等待I/O操作完毕的方式,当数据就绪后在读写的时候必须阻塞,
+        异步则指主动请求数据后便可以继续处理其它任务,随后等待I/O,操作完毕的通知,这可以使进程在数据读写时也不阻塞。
+    synchronous IO
+        同步阻塞 bloking IO   同步非阻塞   non-blocking IO  多路复用IO（multiplexing IO） 信号驱动式IO（signal-driven IO）
+    异步IO（asynchronous IO） 异步阻塞 异步非阻塞
+乐观锁
+    每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据
+    版本号机制和CAS算法实现。乐观锁适用于多读的应用类型，这样可以提高吞吐量
+    java.util.concurrent.atomic包下面的原子变量类就是使用了乐观锁的一种实现方式CAS实现的。
+    compare and swap（比较与交换），是一种有名的无锁算法，一般情况下是一个自旋操作，即不断的重试。
+悲观锁
+        共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程
+        做操作之前先上锁，Java中synchronized和ReentrantLock等独占锁
+ArrayList是非线程安全的，Vector是线程安全的
+HashMap是非线程安全的，HashTable是线程安全的
+    线程安全
+        线程安全就是多线程访问时，采用了加锁机制
+            是多线程操作同一个对象不会有问题
+            线程安全是通过线程同步控制来实现的，也就是synchronized关键字
+    线程不安全
+        如果是每个线程中new一个ArrayList，而这个ArrayList只在这一个线程中使用，那么肯定是没问题的
+            解决方法：
+                （1）同步代码块
+                （2）同步方法
+                （3）锁机制（Lock）
+
+只允许一个线程拥有同步锁，谁拿到锁就进入代码块，其他线程只能在外面等
 使用synchronized修饰的方法叫做同步方法，保证该线程执行该方法的时候，其他线程只能等着
     synchronized不能修饰run方法
+</pre></div>
+
+
+<h3>扩展：</h3>
+<div class="highlight"><pre><span></span>Java Memory Model
+        线程共享变量
+            工作内存
+            主内存
+        线程对共享变量的所有操作都必须在自己的工作内存中进行，不能直接从主内存中读写
+        不同线程之间无法直接访问其他线程的工作内存的变量，线程间变量值的传递需要主内存来完成
+            可见性实现原理
+            工作内存1刷新到主内存，更新到工作内存2
+                synchronized:实现可见性，原子性&lt;同步&gt;
+                volatile:通过加入内存屏障和禁止重排序优化实现的
+        获取互斥锁，清空工作内存，从主内存拷贝变量到工作内存，执行代码，更改后的变量值刷新到主内存，释放互斥锁
+         不可见的原因：
+            线程的交叉执行                     解决-原子性
+            重排序结合线程交叉执行                 解决--原子性
+            共享变量更新后的值没在工作内存与主内存间及时更新    解决--可见性
+
+        指令重排序，代码书写顺序和实际执行的顺序不同
+    编译器         编译器优化
+    指令级并行       处理器优化
+    内存系统的重排序    内存的
+    as-if-serial 单线程下遵循as-if-serical
+
+ Locks &amp; Condition 类 锁机制和等待条件
+ JAVA的安全性  可见性编程
+ DeadLocks
+ 多线程编程常见的交互模式
+Producer-consumer
+Read-Write Lock
+Worker Thread
+Future
+ JAVA 中并发编程工具
+java.util.concurrent
+    线程池
+  《Java并发编程实践》Java concurrency in practice
+ Java自带的性能监测工具——jstack、jconsole、jinfo、jmap、jdb、jsta、jvisualvm
+</pre></div>
+
+
+<h3>线程竞争</h3>
+<div class="highlight"><pre><span></span>解决共享资源竞争
+序列化访问资源：
+序列化访问资源，在给定的时刻只允许一个任务访问共享资源。实现方式：在代码前添加一条锁语句。因为锁语句会
+ 产生相互排斥的效果。  mutex   互斥量
+ synchronized  各种互斥技术
+        java.util.coucurrent
+ 同步控制块
+  可视性
+    volatile
+根除对变量的共享
+  线程本地存储：一种自动化机制，可以为使用相同变量的每个不同的线程都创造不同的存储
+    java.lang.ThreadLocal
+</pre></div>
+
+
+<h2>线程之间的协作</h2>
+<div class="highlight"><pre><span></span> 握手：
+   wait() notify() notifyAll() 错失信号
+ 同步队列
+并发问题
+ 死锁
+   产生原因：
+     互斥条件
+ 至少一任务必须持有资源且正在等待
+   不被抢占
+ 循环等待
 </pre></div>
     </div><!-- /.entry-content -->
 
