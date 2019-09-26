@@ -26,7 +26,238 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-52.html">Flink和Kafka以及Kafka生产者</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-54.html">Flink状态计算概述</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-09-08T21:10:00+08:00">
+                Published: 2019-09-08 21:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info --><h3>Flink状态基本轮廓</h3>
+<div class="highlight"><pre><span></span>01.状态一致性
+ at-most-once at-least-once  exactly-once
+02.状态计算： 
+  Key State 和 Operator state
+03.状态存储和恢复
+  checkpoint：checkpoint的机制
+  savepoint
+ 恢复机制：    
+04.状态管理
+  state backkend(分类-配置等)
+  State Processor API(Flink 1.9版本)
+05.状态查看
+  Query
+</pre></div>
+
+
+<h2>Flink状态具体介绍</h2>
+<h3>1.状态一致性</h3>
+<div class="highlight"><pre><span></span>State Consistency
+ at-most-once at-least-once  exactly-once
+fault tolerance 容错
+</pre></div>
+
+
+<h3>2.状态计算-stateful</h3>
+<div class="highlight"><pre><span></span>Stateful operators may maintain information about the events they have received before
+01.Key State  应用于 KeyStream
+  Manged State
+      使用 StateDescription 来获取相应的State的操作类
+       RichFunction中可用的RuntimeContext具有访问状态的方
+      定义状态的名称，数据类型信息，状态自定义函数
+        ValueState          ValueStateDescription    value()/update()
+        ListState           ListStateDescription     get()/ update()/add()/addAll()
+        MapState            MapStateDescription      get()/put()/keys()/values()/entries()
+        ReducingState       ReducingStateDescription  get()/add() 
+        AggregatingState    AggregatingStateDescription get()/add() 
+     eg: 在RichFlatmapFunction中使用ValueState
+       步骤：01.创建ValueStateDescription，02.使用getRuntimeContext.getState() 03.使用value()方法
+     生命周期TTL
+  Raw State
+     raw state是被应用程序自己管理，flink会调用相应的接口方法来实现状态的restore和snapshot
+02.Non-key State == operator state
+  Manged State
+     Checkpointed-Function
+     ListCheckpoint
+    001. Broadcast State是Flink支持的一种Operator State
+       01.首先会创建一个Keyed或Non-Keyed的Data Stream 
+       02.然后再创建一个 Broadcasted Stream 
+       03.最后通过Data Stream来连接（调用connect方法）到Broadcasted Stream上，
+       这样实现将Broadcast State广播到Data Stream下游的每个Task中
+  状态数据重分布说明：
+    Event-Split Redistribute
+    Union Redistribution
+  Raw State
+03其他：状态数据的划分和动态扩容
+   keyed State 动态扩展 当并发度改变时，Group在Task之间重新分配
+</pre></div>
+
+
+<h3>3.状态数据的备份和恢复</h3>
+<div class="highlight"><pre><span></span>01.原理： Checkpoint的执行流程是按照Chandy-Lamport算法实现的
+     Initiating a snapshot: 也就是开始创建 snapshot，可以由系统中的任意一个进程发起
+     Propagating a snapshot: 系统中其他进程开始逐个创建 snapshot 的过程
+     Terminating a snapshot: 算法结束条件
+    Flink核心思想是在 input source 端插入 barrier 来替代 Chandy-Lamport 算法中的 Marker，
+    通过控制 barrier 的同步来实现 snapshot 的备份和 exactly-once 语义
+
+02.配置
+  检查点 Checkpointing --CheckpointConfig
+   启动检查点机制
+       public StreamExecutionEnvironment enableCheckpointing(long interval)
+       public StreamExecutionEnvironment enableCheckpointing(long interval, CheckpointingMode mode)
+       public StreamExecutionEnvironment enableCheckpointing(long interval, CheckpointingMode mode, boolean force)
+      public class CheckpointConfig implements java.io.Serializable {}
+    01.checkpointing mode 
+        Checkpointing(检查点)模式(exactly-once vs. at-least-once)
+       EXACTLY_ONCE, AT_LEAST_ONCE
+       使用：  CheckpointingMode.EXACTLY_ONCE
+               CheckpointingMode.AT_LEAST_ONCE
+               其中： DEFAULT_MODE = CheckpointingMode.EXACTLY_ONCE
+    02.checkpointInterval 缺省值 -1，不开启
+       设置检查点的步长- interval  ms
+          check.point.interval = 6000
+    03.checkpointTimeout 超时时间  缺省值： 10 minutes
+        如果超过这个时间checkpoint还没结束，就会被认为是失败的
+    04.设置checkpoint的并发度
+      并发度为1
+         setMinPauseBetweenCheckpoints 缺省值为 0
+      并发度：
+         setMaxConcurrentCheckpoints  缺省值为 1
+          默认情况下，在一个checkpoint正在执行的过程中，系统不会触发另一个checkpoint
+          当定义了相邻checkpoint最小间隔时间时，不能使用此选项
+    05.checkpoint执行过程中出现失败或者错误，
+        FailOnCheckpointingErrors  任务是否同时关闭-默认值是True
+        setFailOnCheckpointingErrors
+        enableExternalizedCheckpoints
+          deleteOnCancellation
+          DELETE_ON_CANCELLATION
+          RETAIN_ON_CANCELLATION               
+    06.获取信息
+       判断是否启用检查点
+        getCheckpointInterval
+          Returns the checkpointing interval or -1 if checkpointing is disabled.
+        isCheckpointingEnabled
+        isFailOnCheckpointingErrors
+        isExternalizedCheckpointsEnabled
+        getExternalizedCheckpointCleanup
+    07. State recovery 恢复的机制
+       RestartStrategies job失败后如何重启
+         noRestart           无重启策略
+         fallBackRestart
+         fixedDelayRestart
+         failureRateRestart  失败率重启策略
+        配置说明：
+           01.如果checkpoint未启动，就会采用no restart策略，
+           02.如果启动了checkpoint机制，但是未指定重启策略的话，就会采用 fixed-delay 策略，重试Integer.MAX_VALUE 次
+             可以在配置文件中配置设置： 固定延迟重启策略(Fixed Delay Restart Strategy)
+            env.setRestartStrategy
+               (RestartStrategies.fixedDelayRestart( 3, // 尝试重启次数
+                              Time.of(10, TimeUnit.SECONDS) // 延迟时间间隔)
+        );
+Savepoint：
+   用户手动触发Checkpoint,并将结果持久化到指定的存储路径中
+   常用的场景： 升级中保存系统的状态数据，保证实现端到端的Excatly-Once语义保证
+    Operator ID
+</pre></div>
+
+
+<h3>4.状态管理 State management</h3>
+<div class="highlight"><pre><span></span>作用： 存储和管理checkpoint过程的状态数据
+三种类型的状态管理器
+  基于内存的   MemoryStateBackend   存储在JVM对内存中特点：快速高效但容量有限制
+  基于文件的       FsStateBackend
+  基于RocksDB RocksDBStateBackend   增量checkpoint，通过JNI方式进行数据交互，有大小限制2G
+StateBackend 来存储和管理Checkpoints过程的状态数据
+    说明：
+      默认情况下，状态保存在TaskManager的内存中，checkpoint存储在JobManager的内存中。
+        为了适配大状态的持久化，Flink支持在其它后端状态中存储和checkpoint状态
+         CHECKPOINTS_DIRECTORY
+      Flink目前只对没有迭代的作业提供处理保证。在迭代作业中进行checkpointing会导致异常发生，
+         如果用户强制要在迭代应用中启用checkpoint，则需要设置env.enableCheckpointing(interval, force = true)
+         但这也不能保证处在循环边界上的数据和状态不会丢失。
+    在内存级别的查看
+</pre></div>
+
+
+<h3>5.状态查看</h3>
+<div class="highlight"><pre><span></span>架构 Querable State
+    QuerableStateServer
+    QueryableStateClient
+    QueryableStateClientProxy
+ 开启可查询的状态服务
+   01.集群层面： 引入jar包 flink-queryable-state-runtime.jar
+   02.代码层面： StateDescription 中调用 setQueryable() 方法 -配置可查询状态服务
+   03.通过外部应用查询状态数据
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span>Flink使用 Broadcast State 实现流处理配置实时更新 http://ju.outofmemory.cn/entry/371335
+https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/stream/state/broadcast_state.html
+Apache Flink 零基础入门教程（六）：状态管理及容错机制 https://juejin.im/post/5d8367c36fb9a06b2a20785a
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/items/my-item-post-21.html" rel="bookmark"
+                           title="Permalink to 数据仓库基本内容框架">数据仓库基本内容框架</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-08-31T18:32:00+08:00">
+                Published: 2019-08-31 18:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>Kimball维度建模 数据分层 元数据管理</p>
+                <a class="readmore" href="/items/my-item-post-21.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-mining/my-dataming-post-43.html" rel="bookmark"
+                           title="Permalink to Python案例-Pandas数据处理">Python案例-Pandas数据处理</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-08-10T21:52:00+08:00">
+                Published: 2019-08-10 21:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>DataFrame 时间操作 关联操作</p>
+                <a class="readmore" href="/data-mining/my-dataming-post-43.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-52.html" rel="bookmark"
+                           title="Permalink to Flink和Kafka以及Kafka生产者">Flink和Kafka以及Kafka生产者</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-07-08T22:10:00+08:00">
                 Published: 2019-07-08 22:10:00
@@ -37,177 +268,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h3>1.Kafka版本说明：</h3>
-<div class="highlight"><pre><span></span>01.Producer： Kafka 0.8.2, Producer被重新设计，
-   新版生产者：
-      org.apache.kafka.clients
-       org.apache.kafka.clients.producer.KafkaProducer;
-   旧版的生产者：
-      旧版本（0.8Scala版本）  kafka.javaapi.producer.Producer;
-02.Consumer
-   Kafka 0.9 则重新设计了Consumer接口。它不再区分high-level
-   consumer API和low-level consumer API，而是提供了一个统一的consumer API
-   Kafka 消费者总共有 3 种 API，新版 API、旧版高级 API、旧版低级 API，
-     新版 API 是在 kafka 0.9 版本后增加的，推荐使用新版 API，但由于旧版低级 API 可以对消息进行更加灵活的控制
-  新版：
-    Consumer    org.apache.kafka.clients.consumer.KafkaConsumer;
-  旧版Consumer
-    High Level Consumer API 入口类： ConsumerConnector  kafka.javaapi.consumer.ConsumerConnector;    
-    Lower Level Consumer API入口类： SimpleConsumer     kafka.javaapi.consumer.SimpleConsumer; 
-  新版 Consumer
- 03.Connect -Kafka Connect
-   Kafka Connect是到0.9版本才提供的并极大的简化了其他系统与Kafka的集成
-</pre></div>
-
-
-<h3>2.Kafka配置信息</h3>
-<div class="highlight"><pre><span></span>Kafka 提供内置客户端以及二进制连接协议
-1.使用场景评估：
-     01.每个消息都很重要，是否允许丢失一小部分消息
-     02.出现重复消息是否可以接受
-     03.是否有严格的延迟和吞吐量要求
-2.依据场景进行配置
-    类型，时间，大小，次数
-  配置的评估
-   client.id
-     识别消息来源
-   acks 参数指定了必须要有多少个区分副本收到消息，生产者才会认为消息写入成功
-    消息丢失的可能性：
-     acks=0  acks=1  acks=all
-   buffer.memory
-     设置生产者内存缓冲区的大小
-   compression.type
-      snappy gzip
-   retries
-     决定了生产者重发消息的次数 默认间隔时间 100ms
-     retry.backoff.ms 参数来改变时间间隔
-   batch.size
-     同一个批次可以使用的内存大小，按照字节数计算，而不是消息个数
-   linger.ms
-     发送之前等待更多消息加入批次的时间
-     KafkaProducer 会根据批次填满  batch.size 或者批次等待时间时间达到上限 linger.ms 将批次发送出去
-
-   时间：
-     timeout.ms
-     request.timeout.ms
-     matadata.fetch.timeout.ms
-    阻塞时间
-     max.block.ms
-    大小：
-     max.request.size
-     receive.buffer.bytes
-     send.buffer.bytes
-    顺序保证：
-       max.in.flight.requests.per.connection
-</pre></div>
-
-
-<h3>3.开发过程：</h3>
-<div class="highlight"><pre><span></span>   A: 创建生产者，生产者要把键值对象序列化成字节数组-三个必选属性
-       bootstrap.servers   key.serializer  value.serializer
-   B: 创建一个 ProducerRecord  对象，该对象包含目标主题和要发送的内容，还可以指定键或者分区
-       两种线程： 单线程和多线程
-       三种发送消息的方式：
-         同步发送    send() 发送消息，返回Future对象
-         异步发送    send() 方法，并指定一个回调函数
-         发送并忘记： fire and forget          
-   C：消息成功写入Kafka会返回一个 RecordMetadata  对象，写入失败则会返回一个错误。
-      收到错误还会尝试，几次失败后，就返回错误信息。
-   说明： key.serializer 实现了 org.apache.kafka.common.serialization.Serializer接口的类
-      Kafka默认提供三种 StringSerializer IntegerSerializer  ByteSerializer 
-  01.pom.xml依赖
-     开发版本
-         <span class="nt">&lt;groupId&gt;</span>org.apache.kafka<span class="nt">&lt;/groupId&gt;</span>
-         <span class="nt">&lt;artifactId&gt;</span>kafka-clients<span class="nt">&lt;/artifactId&gt;</span>
-         <span class="nt">&lt;version&gt;</span>0.8.2.2<span class="nt">&lt;/version&gt;</span>
-  示例代码：
-    // 步骤1 新建一个 Properties对象-并配置三个必选属性
-     Properties kafkaProps = new Properties();
-      kafkaProps.put(&quot;bootstrap.servers&quot;, &quot;broker1:9092,broker2:9092&quot;);
-      kafkaProps.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
-      kafkaProps.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
-   // 步骤2 创建新的生产者对象 KafkaProducer ，并把设置好的 Properties 对象传给它
-     Producer<span class="nt">&lt;String</span><span class="err">,</span> <span class="err">String</span><span class="nt">&gt;</span>  producer=  new KafkaProducer<span class="nt">&lt;String</span><span class="err">,String</span><span class="nt">&gt;</span>(kafkaProps);
-   // 步骤3 开始发送消息，生产者将 ProducerRecord 对象作为参数发送，使用send() 方法发送
-     ProducerRecord<span class="nt">&lt;String</span><span class="err">,</span> <span class="err">String</span><span class="nt">&gt;</span> record = new ProducerRecord<span class="nt">&lt;String</span><span class="err">,</span> <span class="err">String</span><span class="nt">&gt;</span>(&quot;&quot;, &quot;&quot;, &quot;&quot;);
-     Future<span class="nt">&lt;RecordMetadata&gt;</span> kafkaFuture = producer.send(record);
-  // 同步发送消息调用get 方法等待Kafka相应，运行正常则返回一个 RecordMetadata 对象
-   // 一般会发生两类错误，一类是可重试错误，一类无法通过重试解决，比如消息太大等
-   try {   kafkaFuture.get();
-    } catch (Exception e) {
-       e.printStackTrace;
-    }
-    // 异步发送--回调支持
-    producer.send(record, new DemoProducerCallback());
-    // private class  DemoProducerCallback implements Callback{ onCpmpletion(RecordMetadata )}
-扩展：
-  Producer端，需要自己创造多线程并发环境才能提高客户端的出口吞吐量
-</pre></div>
-
-
-<h3>Flink向kafka发送数据</h3>
-<div class="highlight"><pre><span></span>Kafka sink connector（FlinkKafkaProducer）
-  Flink里面支持Kafka 0.8、0.9、0.10、0.11.
-pom.xml依赖
- <span class="nt">&lt;dependency&gt;</span>
-   <span class="nt">&lt;groupId&gt;</span>org.apache.flink<span class="nt">&lt;/groupId&gt;</span>
-   <span class="nt">&lt;artifactId&gt;</span>flink-connector-kafka-0.11_2.11<span class="nt">&lt;/artifactId&gt;</span>
-   <span class="nt">&lt;version&gt;</span><span class="cp">${</span><span class="n">flink</span><span class="o">.</span><span class="n">version</span><span class="cp">}</span><span class="nt">&lt;/version&gt;</span>
- <span class="nt">&lt;/dependency&gt;</span>
-执行：
- // 添加数据源addSource
-  DataStreamSource<span class="nt">&lt;String&gt;</span> student = env.addSource(new FlinkKafkaConsumer011<span class="err">&lt;</span>&gt;(
-            READ_TOPIC,   //这个 kafka topic 需要和上面的工具类的 topic 一致
-            new SimpleStringSchema(),
-            props)).setParallelism(1);
-
-  // 创建kafka数据流
- //  Producer 传了三个参数：brokerList、topicId、serializationSchema（序列化）
- student.addSink(new FlinkKafkaProducer011<span class="err">&lt;</span>&gt;(
-            &quot;localhost:9092&quot;,
-            &quot;student-write&quot;,
-            new SimpleStringSchema()
-    )).name(&quot;flink-connectors-kafka&quot;)
-            .setParallelism(5);
-Flink Kafka Consumer 的运行机制
-</pre></div>
-
-
-<h3>JSON作为消息</h3>
-<div class="highlight"><pre><span></span><span class="nt">JSON</span> <span class="nt">-</span> <span class="o">(</span><span class="nt">JavaScript</span> <span class="nt">Object</span> <span class="nt">Notation</span><span class="o">)</span>
-<span class="err">数据类型：</span>      
-    <span class="nt">JSON</span><span class="err">只定义了两种数据结构，即数组</span><span class="cp">[]</span><span class="err">和对象</span><span class="p">{}</span><span class="err">。对象是一组键值对</span>
-    <span class="nt">JSON</span><span class="err">的键</span><span class="o">:</span> <span class="nt">String</span>
-    <span class="nt">JSON</span><span class="err">的值</span><span class="o">:</span> <span class="nt">1</span><span class="o">.</span><span class="err">数字（整数或浮点数）</span>    <span class="nt">2</span><span class="o">.</span><span class="err">字符串（在双引号中）</span>
-         <span class="nt">3</span><span class="o">.</span><span class="err">逻辑值（</span><span class="nt">true</span> <span class="err">或</span> <span class="nt">false</span><span class="err">）</span> <span class="nt">4</span><span class="nc">.null</span>
-         <span class="nt">5</span><span class="o">.</span><span class="err">数组（在方括号中）</span>      <span class="nt">6</span><span class="o">.</span><span class="err">对象（在花括号中）</span>
-    <span class="err">符号：</span> <span class="err">花括弧，方括弧，冒号和逗号</span>
-<span class="nt">JSON</span><span class="err">解析</span>
-<span class="nt">fasterjson</span> <span class="err">是一个</span><span class="nt">JSON</span><span class="err">解析器。它直接解析</span><span class="nt">JSON</span><span class="err">文本，调用注册的事件函数，快速访问</span><span class="nt">JSON</span><span class="err">中感兴趣的内容</span>
-<span class="nt">Fastjson</span> <span class="nt">API</span><span class="err">入口类是</span><span class="nt">com</span><span class="nc">.alibaba.fastjson.JSON</span>
- <span class="nt">eg</span><span class="o">:</span>  <span class="nt">JSONObject</span> <span class="nt">jsObj</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">JSONObject</span><span class="o">();</span>
-<span class="err">类型：</span>
-   <span class="nt">JSONObject</span>  <span class="nt">JSONArray</span>   <span class="nt">Object</span>  <span class="nt">List</span>  <span class="nt">String</span> 
-<span class="err">方法：</span>
-    <span class="nt">parse</span> <span class="nt">parseObject</span> <span class="nt">parseArray</span>
-    <span class="nt">toJSON</span>  <span class="nt">toJSONString</span>
-<span class="err">注意事项：</span>
- <span class="nt">JSONObject</span> <span class="err">是一个</span><span class="nt">json</span>
-<span class="nt">JSONArray</span><span class="nc">.toJSONString</span><span class="o">()</span> <span class="err">之后不是一个</span><span class="nt">json</span><span class="err">，而是</span><span class="nt">json</span><span class="err">中的一个数组</span>
-<span class="nt">JSON</span><span class="nc">.toJSONString</span><span class="o">()</span> <span class="err">不可多次使用，（最好转义一次）</span> <span class="err">因为每次调用</span><span class="nt">JSON</span><span class="nc">.toJSONString</span><span class="err">的时候，</span>
-     <span class="err">在</span><span class="nt">key</span><span class="err">和</span><span class="nt">value</span><span class="err">前后都会加上&quot;的转义符\&#39;。多次使用</span><span class="nt">toJSONString</span><span class="err">了之后</span><span class="o">,</span><span class="nt">json</span><span class="err">的每个</span><span class="nt">key</span><span class="err">和</span><span class="nt">value</span><span class="err">有多个转义符</span>
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>Kafka权威指南
-Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Producer  Flink向kafka发送数据</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-52.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -228,6 +292,28 @@ Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
 </footer><!-- /.post-info -->                <p>类型推断 Type_Information DataStreaming Table</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-51.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-53.html" rel="bookmark"
+                           title="Permalink to 基于Spark的机器学习和数据挖掘">基于Spark的机器学习和数据挖掘</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-07-06T22:10:00+08:00">
+                Published: 2019-07-06 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>特征工程 机器学习 Mlib</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-53.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
@@ -497,7 +583,7 @@ Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/data-mining/my-dataming-post-43.html" rel="bookmark"
+                    <h1><a href="/big-data/my-bigdata-post-43.html" rel="bookmark"
                            title="Permalink to Spark的执行机制和优化">Spark的执行机制和优化</a></h1>
                 </header>
 
@@ -510,10 +596,10 @@ Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
         </address>
-<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
-<p>tags: <a href="/tag/hive.html">Hive</a> </p>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>Spark SQL</p>
-                <a class="readmore" href="/data-mining/my-dataming-post-43.html">read more</a>
+                <a class="readmore" href="/big-data/my-bigdata-post-43.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
@@ -629,7 +715,7 @@ Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/data-mining/my-dataming-post-44.html" rel="bookmark"
+                    <h1><a href="/big-data/my-bigdata-post-44.html" rel="bookmark"
                            title="Permalink to HDFS和YARN的进一步介绍">HDFS和YARN的进一步介绍</a></h1>
                 </header>
 
@@ -642,10 +728,10 @@ Flink 写入数据到 Kafka https://www.jianshu.com/p/c94317de9692
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
         </address>
-<p>In <a href="/data-mining/index.html">Data Mining</a>.</p>
-<p>tags: <a href="/tag/hive.html">Hive</a> </p>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>HDFS-YARN</p>
-                <a class="readmore" href="/data-mining/my-dataming-post-44.html">read more</a>
+                <a class="readmore" href="/big-data/my-bigdata-post-44.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

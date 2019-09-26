@@ -26,7 +26,301 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-50.html">Spark分区进一步探究</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-53.html">基于Spark的机器学习和数据挖掘</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-07-06T22:10:00+08:00">
+                Published: 2019-07-06 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>特征工程 One-Hot编码  Mlib  Pipeline 混淆矩阵
+</pre></div>
+
+
+<h3>机器学习和数据挖掘</h3>
+<div class="highlight"><pre><span></span> 基本数据的查看-描述性分析
+ 数据特征的确认
+ 机器学习/数据挖掘模型的展开
+ 模型评估和参数调整
+</pre></div>
+
+
+<h3>1.基本数据特性：</h3>
+<div class="highlight"><pre><span></span>      属性 attribute
+      属性类型
+    01.测量标度类型
+      标称(nominal)、序数(ordinal)、 区间(interval)和比率(ratio)
+       标称和序数属性统称定性的(qualitative) 或分类 的(categorical)属性  
+       区间和比率    统称定量的(quantitative)或数值 的(numeric)属性  
+    02.值的个数
+       用值的个数描述属性：离散的（discrete）和连续的（continuous）   
+    两者之间关系：
+            计数属性（count attribute）是离散的，也是 比率属性
+       非对称的属性（asymmetric attribute），出现非零属性值才是重要的
+数据：
+    初步了解数据
+     基本情况： 查看数据的基本字段，字段的含义以及字段的顺序
+     特征：     字段的数据类型以及可用的各种变换
+     常规处理： 各个字段是否有缺失值，值的范围，数据是否有重复值，数据不一致情况
+                缺失数据处理    
+         数据和数据的对应关系    
+     数据量的问题：数据量-数据不不均衡的情况
+</pre></div>
+
+
+<h3>2.特征工程</h3>
+<div class="highlight"><pre><span></span>  连续数据映射变化
+  连续变量离散化
+  离散变量编码
+</pre></div>
+
+
+<h5>特征工程-数据的处理</h5>
+<div class="highlight"><pre><span></span>01. 映射-
+    一些数学函数，将原始值进行映射
+    归一化处理
+    离差标准化   |min-max标准化(Min-max normalization)  
+       对原始数据的线性变换，使结果落到[0,1]  x ＝ (x - min)/(max - min)
+    标准差标准化 | z-score 0均值标准化(zero-mean normalization)
+      x = (x - u)/σ
+02.One-Hot编码
+    离散变量
+       定类-标称（nominal）： 离散特征的取值之间没有大小的意义，比如color：[red,blue],那么就使用one-hot编码  
+         定序-序数（ordinal）：离散特征的取值有大小的意义，比如size:[X,XL,XXL],那么就使用数值的映射{X:1,XL:2,XXL:3}
+    进行one-hot编码或哑变量编码 连续数据离散化
+      　虚拟变量又称虚设变量、名义变量或哑变量，用以反映质的属性的一个人工变量,是量化了的质变量，通常取值为0或1。
+        Dummy Variable
+    one-hot编码-一位有效编码，
+        其方法是使用N位状态寄存器来对N个状态进行编码，每个状态都由他独立的寄存器位，并且在任意时候，其中只有一位有效
+       one-hot在提取文本特征上的
+    好处主要有：
+       解决了分类器不好处理属性数据的问题，在一定程度上也起到了扩充特征的作用       
+03.连续特征的离散化处理
+  GBDT
+  分箱-Binning_数据分箱    
+    分箱就是将连续变量离散化，将多状态的离散变量合并成少状态
+         对连续变量进行离散化，离散化通常采用分箱法   
+    分箱方法分为无监督分箱和有监督分箱
+        无监督分箱 
+           等频分箱，等距分箱和聚类分箱。
+        有监督分箱
+             best-ks分箱和卡方分箱
+    具体的分箱
+      等频分箱
+        区间的边界值要经过选择,使得每个区间包含大致相等的实例数量。
+          比如说 N=10 ,每个区间应该包含大约10%的实例。
+
+      等距分箱
+        从最小值到最大值之间,均分为 N 等份。
+        如果 A,B 为最小最大值, 则每个区间的长度为 W=(B−A)/N , 则区间边界值为A+W,A+2W,….A+(N−1)W 。
+        这里只考虑边界，每个等份的实例数量可能不等
+
+      卡方分箱
+         卡方分箱是自底向上的(即基于合并的)数据离散化方法。
+         它依赖于卡方检验:具有最小卡方值的相邻区间合并在一起,直到满足确定的停止准则。
+         基本思想:对于精确的离散化，相对类频率在一个区间内应当完全一致。
+             因此,如果两个相邻的区间具有非常类似的类分布，则这两个区间可以合并；
+           否则，它们应当保持分开。而低卡方值表明它们具有相似的类分布
+04.离散特征连续化
+    分类变量转化为连续变量
+      离散特征连续化的处理方法是独热编码 one-hot encoding
+      特征嵌入embedding
+</pre></div>
+
+
+<h5>特征工程-数据集处理：</h5>
+<div class="highlight"><pre><span></span>样本数据量： 
+正样本和负样本的数据量以及比例关系
+
+有监督学习数据不平衡问题
+  二分类中正负样本差两个及以上数量级情况下的数据不平衡问题  
+ Imbalanced  解决方式：
+  数据采样
+     a）过抽样：通过复制少数类样本 -- 上采样（Oversampling）
+     b）欠抽样：删除多数类样本  -- 下采样（Undersampling）
+  数据合成
+  加权
+  正负样本极不均匀的问题，使用异常检测，或者一分类问题，也是一个思路。
+</pre></div>
+
+
+<h3>基于Spark Mlib-机器学习实现</h3>
+<h5>01.Spark Mlib的架构</h5>
+<div class="highlight"><pre><span></span>API
+算法库
+底层基础
+说明：
+  01.底层基础：
+    线性代数库 Breeze  
+        breeze.linalg
+    支持密集向量-稀疏向量-标量向量
+    支持矩阵 --RowMatrix IndexedRowMatrix CoordinateMatrix
+      org.apache.spark.ml.linalg.Vectors
+          object Vectors {}
+       org.apache.spark.ml.linalg.
+          object Matrices {}
+          sealed trait Matrix extends Serializable {}
+Spark Mlib的版本说明
+Machine Learning Library (MLlib)
+ The MLlib DataFrame-based API is primary API          the spark.ml package
+ The MLlib RDD-based API is now in maintenance mode    the spark.mllib package
+</pre></div>
+
+
+<h5>02.Spark ML Pipeline 的设计思想和基本概念</h5>
+<div class="highlight"><pre><span></span>若干个过程
+  1、源数据ETL
+  2、数据预处理
+  3、特征选取
+  4、模型训练与验证
+ MLlib提供标准的接口来使联合多个算法到单个的管道或者工作流
+ Pieline 相关的概念有: DataFrame 、 Transformer 、Estimator、Parameter等
+   DataFrame    : DataFrame can use ML Vector types
+   Transformer  : one DataFrame into another DataFrame
+             a method transform()
+   Estimator    ：a DataFrame to produce a Transformer
+               a method fit(), which accepts a DataFrame and produces a Model, which is a Transformer.
+   an ML model is a Transformer 
+   Pipeline: A Pipeline chains multiple Transformers and Estimators together to specify an ML workflow.
+   Parameter: All Transformers and Estimators now share a common API for specifying parameters
+   方法：
+      LogisticRegression is an Estimator calling fit() trains a LogisticRegressionModel  - Transformer
+    一些数据
+       Pipeline  PipelineModel
+       Predictor 类 (Estimator 的子类)
+</pre></div>
+
+
+<h5>03.Spark ML Pipeline具体概念</h5>
+<div class="highlight"><pre><span></span>标签数据（一般是字符串）转化成整数索引，而在计算结束又需要把  整数索引还原为标签。
+  这就涉及到几个转换器：
+    StringIndexer   StringIndexerModel
+    VectorIndexer
+    IndexToString  
+    OneHotEncoder 
+      针对类别特征的索引
+特征目前多为string类型，而机器学习则要求其特征为numerical类型，在此需要对特征做转换，包括类型转换和缺失值的处理
+    对categorical类型的特征进行numerical转换
+VectorAssembler ：
+    VectorAssembler 是一个transformer ，将多列数据转化为单列的向量列
+
+stage为Transformer和Estimator。
+ Transformer 主要是用来操作一个DataFrame 数据并生成另外一个DataFrame 数据，
+     比如svm模型、一个特征提取工具，都可以抽象为一个Transformer。
+ Estimator 则主要是用来做模型拟合用的，用来生成一个Transformer
+</pre></div>
+
+
+<h5>04.具体案例：</h5>
+<div class="highlight"><pre><span></span>    /**
+  * LogisticRegression 模型
+  * setMaxIter 设置最大迭代次数(默认100),具体迭代次数可能在不足最大迭代次数停止
+  * setTol 设置容错(默认1e-6),每次迭代会计算一个误差,误差值随着迭代次数增加而减小,当误差小于设置容错,则停止迭代
+  * setRegParam 设置正则化项系数(默认0),正则化主要用于防止过拟合现象,如果数据集较小,特征维数又多,易出现过拟合,考虑增大正则化系数
+  * setElasticNetParam 正则化范式比(默认0),正则化有两种方式:L1(Lasso)和L2(Ridge),L1用于特征的稀疏化,L2用于防止过拟合
+  * setPredictionCol 设置预测列
+  * setThreshold 设置二分类阈值
+  */
+   // 将数据随机划分为 train set 和 Test set集（30%进行测试）
+   val Array(trainingDF, testDF) = vecDF.randomSplit(Array(0.7, 0.3))
+   val  lr = new LogisticRegression()
+                .setMaxIter(12)   //最大迭代次数
+                .setRegParam(0.3) //正则化主要用于防止过拟合现象,如果数据集较小,特征维数又多,易出现过拟合,考虑增大正则化系数
+                .setFamily(&quot;auto&quot;) //binomial(二分类)/multinomial(多分类)/auto，默认为auto。设为auto时，会根据schema或者样本中实际的class情况设置是二分类还是多分类，最好明确设置
+                .setFeaturesCol(&quot;feature_colunms&quot;)//特征列
+                .setLabelCol(&quot;label__colunm&quot;) //标签列
+                .setThreshold(0.5) //设置二分类阈值
+    //  .setStages(new PipelineStage[] {labelIndexer, featureIndexer, rf, labelConverter});
+     // 构建完成一个 stage piple
+      val lrPipeline = new Pipeline().setStages(Array(g_encoder,a_encoder,assembler, lr))
+
+
+      // Fit the pipeline to training documents.
+      val lrModel = lrPipeline.fit(train_data);
+      //  Now we can optionally save the fitted pipeline to disk
+      lrModel.write().overwrite().save(&quot;/mymodel);
+
+源码中的案例：
+ //Scala
+ // val pipeline = new Pipeline().setStages(Array(tokenizer, stopWordsRemover, countVectorizer))
+ //Java
+ // Pipeline pipeline = new Pipeline().setStages(new PipelineStage[] {tokenizer, hashingTF, lr});
+ 源码： 
+    abstract class Estimator[M &lt;: Model[M]] extends PipelineStage
+
+其他：
+Dataset&lt;Row&gt; df = spark.createDataFrame(data, schema);
+OneHotEncoderEstimator encoder = new OneHotEncoderEstimator()
+          .setInputCols(new String[] {&quot;categoryIndex1&quot;, &quot;categoryIndex2&quot;})
+          .setOutputCols(new String[] {&quot;categoryVec1&quot;, &quot;categoryVec2&quot;});
+
+ OneHotEncoderModel model = encoder.fit(df);
+ Dataset&lt;Row&gt; encoded = model.transform(df);
+
+a method fit(), which accepts a DataFrame and produces a Model, which is a Transformer.  an ML model is a Transformer 
+A learning model&lt;a Transformer&gt; might take a DataFrame  -- output a new DataFrame with predicted labels appended as a column
+
+A feature transformer might take a DataFrame
+</pre></div>
+
+
+<h3>3.模型调参</h3>
+<div class="highlight"><pre><span></span>模型调参，
+ 第一步是要找准目标：我们要做什么？
+ 一般来说，这个目标是提升某个模型评估指标
+  模型评估： 
+模型评估
+基本概念：
+模型在未知数据上的准确率的指标，叫做泛化误差（Genelization error）。 
+可视化工具
+准确率 (Accuracy)
+  Accuracy = (TP+TN)/(TP+FN+FP+TN)
+   真正(True Positive , TP)：被模型预测为正的正样本。
+   真负(True Negative , TN)：被模型预测为负的负样本   
+召回率 (Recall)-- 查全率
+  Recall = TP/(TP+FN)，即正确预测的正例数 /实际正例总数
+
+混淆矩阵
+矩阵中的每一行代表实例的预测类别，每一列代表实例的真实类别
+ROC曲线
+  横坐标为False Positive Rate(FPR假正率)， FPR=FP/(FP+TN)，即被 预测为正的负样本数 /负样本实际数
+  纵坐标为True Positive Rate(TPR真正率)    TPR=TP/(TP+FN)，即被预测为正的正样本数 /正样本实际数
+ ROC曲线中的四个点和一条线:
+     点(0,1)：即FPR=0, TPR=1，意味着FN＝0且FP＝0，将所有的样本都正确分类。
+     点(1,0)：即FPR=1，TPR=0，最差分类器，避开了所有正确答案。
+     点(0,0)：即FPR=TPR=0，FP＝TP＝0，分类器把每个实例都预测为负类。
+     点(1,1)：分类器把每个实例都预测为正类。
+  ROC曲线越接近左上角，该分类器的性能越好
+ AUC（Area Under Curve）被定义为ROC曲线下的面积(ROC的积分)，
+    通常大于0.5小于1。随机挑选一个正样本以及一个负样本，
+    分类器判定正样本的值高于负样本的概率就是 AUC 值。AUC值(面积)越大的分类器，性能越好
+</pre></div>
+
+
+<h3>4.参考：</h3>
+<div class="highlight"><pre><span></span>如何解决机器学习中数据不平衡问题 https://www.cnblogs.com/zhaokui/p/5101301.html
+Spark入门：标签和索引的转化：StringIndexer- IndexToString-VectorIndexer
+http://dblab.xmu.edu.cn/blog/1297-2/ 
+ML Pipelines  http://spark.apache.org/docs/latest/ml-pipeline.html
+ML
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-50.html" rel="bookmark"
+                           title="Permalink to Spark分区进一步探究">Spark分区进一步探究</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-06-08T22:10:00+08:00">
                 Published: 2019-06-08 22:10:00
@@ -37,279 +331,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/things.html">things</a> </p>
-</footer><!-- /.post-info --><h3>1.基本概念：</h3>
-<div class="highlight"><pre><span></span>rdd.partitioner
-rdd.partitions.length
-分区的策略以及分区的数目
-1.分区：是RDD内部并行计算的一个计算单元，RDD的数据集在逻辑上被划分为多个分片，每一个分片称为分区。并行任务task的个数，也是由 RDD分区partition的个数决定的
-stage 的划分是根据宽依赖
-2.分区器- partitioner：分区策略- Spark内部提供了HashPartitioner和RangePartitioner两种分区策，
-Spark中分区器直接决定了RDD中分区 numPartitions的个数；也决定了RDD中每条数据经过Shuffle过程属于哪个分区；
-也决定了Reduce的个数。RDD的分区方式主要包含两种（HashPartitioner和RangePartitioner），
-这两种分区类型都是针对Key-Value类型的数据。如是非Key-Value类型，则分区为None。
-Hash是以key作为分区条件的散列分布，分区数据不连续，极端情况也可能散列到少数几个分区上，导致数据不均等；
-Range按Key的排序平衡分布，分区内数据连续，大小也相对均等。
-分区器的使用：
-  01.没有分区器
-  02.自动为RDD生成分区器
-  03.主动使用分区器
-  04.自定义分区器：自定义分区策略
-</pre></div>
-
-
-<h4>01.没有分区器</h4>
-<div class="highlight"><pre><span></span>一般而言，对于初始读入的数据是不具有任何的数据分区方式的
-对RDD进行查询，println(pairsRDD.partitioner) 返回None值，即没有使用分区器
-</pre></div>
-
-
-<h4>02.自动使用分区器</h4>
-<div class="highlight"><pre><span></span>没有显式指定分区器，则会调用org.apache.spark包下伴生对象Partitioner的defaultPartitioner静态方法返回的分区器作为默认分区器。
-尝试利用父RDD的partitioner，如果父RDD没有partitioner，则会查看sparkConf中是否定义了 spark.default.parallelism 配置参数，
-如果定义了就返回new HashPartitioner(rdd.context.defaultParallelism) 作为默认分区器，
-如果没定义就返回new HashPartitioner(rdds.map(_.partitions.length).max)作为默认分区器
-</pre></div>
-
-
-<h4>03.主动使用分区器</h4>
-<div class="highlight"><pre><span></span>  提前对key根据某种规则来分配到相同的分区，减少后续操作的网络传输=RDD的分区方式主要包含两种（HashPartitioner和RangePartitioner），这两种分区类型都是针对Key-Value类型的数据。如是非Key-Value类型，则分区为None
-使用场景：partitionBy
-  rdd2.partitionBy(new org.apache.spark.HashPartitioner(10))
-  partitionBy-partitionBy 只能用于 PairRdd
-使用场景：reduceByKey
-  执行reduceByKey任务，我们可以显式的指定分区器
-使用场景
-  repartitionAndSortWithinPartitions
- 使用说明：
-    HashPartitioner takes a single argument which defines number of partitions -- numPartitions 
- 使用的分区器有两种HashPartitioner 和 RangePartitioner
-</pre></div>
-
-
-<h5>HashPartitioner</h5>
-<div class="highlight"><pre><span></span>* HashPartitioner 最大的弊端是：数据倾斜！！！极端情况下某（几）个分区拥有RDD的所有数据。 同时HashPartitioner存在 分区碰撞问题，即不同的值可能计算出来的分区是一样
-实现原理： 对于给定的key，计算其hashCode，并除于分区的个数取余，如果余数小于0，则用余数+分区的个数，最后返回的值就是这个key所属的分区ID。实现原理可以看出，其结果可能导致每个分区中数据量的不均匀，极端情况下会导致某些分区拥有RDD的全部数据
-</pre></div>
-
-
-<h5>RangePartitioner</h5>
-<div class="highlight"><pre><span></span>*RangePartitioner 最为重要的是尽量保证每个Partition中的数据量是均匀的。 同时分区与分区之间是有序的，也就是说一个分区中的元素肯定都是比另一个分区内的元素小或者大；
-但是分区内的元素是不能保证顺序的即RangePartitioner主要是依赖的RDD的数据划分成不同的分区，且不同的分区之间是有序的。
-应用：
-// 元组的第一个元素是当前处理的分区的index，元组的第二个元素是当前处理的分区元素组成的Iterator
-val filteRDD = shuffRDD.mapPartitionsWithIndex {
-  (partid:Int, iter:Iterator[(String,String)]) =&gt; {
-    iter.map(partValue =&gt; (partid ,partValue ))
-  }
-}//.filter(line =&gt; line._1 &gt;= 2)
-spark的mapPartitionsWithIndex中iterator尽量不要使用toList，
- 原因iterator是流式的处理，处理完一条记录才会去读取下一条记录并且会丢弃已读的记录，无法重复使用；
- 而iterator.toList会将所有的记录进行缓存，便于重复使用-toList相当于将迭代数据进行了缓存，容易导致OutOfMemory的异常
- scala中iterator只能执行一次迭代，如果需要多次执行同一个迭代体，建议调用iterator.toList等方法，将迭代体转化为集合
-  val filteRDD = shuffRDD.mapPartitionsWithIndex {
-  (partid:Int, iter:Iterator[(String,String)]) =&gt; {
-    iter.toList.map(partValue =&gt; (partid ,partValue )).iterator
-  }
- }.filter(line =&gt; line._1&gt; 2)
-
-方式
-var rdd2 = rdd1.mapPartitionsWithIndex{
-    (x,iter) =&gt; {
-      var result = List[String]()
-        var i = 0
-        while(iter.hasNext){
-          i += iter.next()
-        }
-        result.::(x + &quot;|&quot; + i).iterator
-
-    }
-  }
- 注释：
-  迭代器（Iterator）不是一个集合，是构建了一种访问集合的方法。
-  当构建一个集合需要很大的开销时（比如把文件得所有行都读取到内存），迭代器就发挥了很好的作用。
-迭代器有两个操作，next 和hasNext。next返回迭代器的下一个元素，hasNext用于检查是否还有下一个元素。
- 注意： range分区的数目与 pairRDD中key值得去重数目，如果大于的话，分区数目不一定是range的给的数目。
- sortByKey底层使用的数据分区器就是RangePartitioner分区器
-</pre></div>
-
-
-<h4>04.自定义分区</h4>
-<div class="highlight"><pre><span></span>自定义Partitioner也是解决数据倾斜问题的手段之一，分区数在shuffle操作会变化
-Partitioner必须满足两个前提，1、RDD是k-v形式，如RDD[(K, V)]，2、有shuffle操作。
-自定义分区需要继承Partitioner，并实现三个方法
-    numPartitions
-    getPartition  
-    equals
-</pre></div>
-
-
-<h3>2.分区相关操作：</h3>
-<h4>01.配置中的并行度：</h4>
-<div class="highlight"><pre><span></span>spark.sql.shuffle.partitions 和 spark.default.parallelism
-spark.default.parallelism   在处理RDD时 
-spark.sql.shuffle.partitions 则是对Spark SQL的设置
-</pre></div>
-
-
-<h4>02.一些API比较</h4>
-<div class="highlight"><pre><span></span>一些常用的函数和方法
-getPartition  获取分区
-foreachPartition
-mapPartitions
-mapPartitionsWithIndex
-mapPartitionsWithIndexInternal
-zipPartitions
-001.Map和 MapPartitions比较    
- map操作通常不会导致内存的OOM异常。
- 但是MapPartitions操作，对于大量数据来说，比如甚至一个partition，100万数据，一次传入一个function以后，那么可能一下子内存不够，但是又没有办法去腾出内存空间来，可能就OOM，内存溢出。
-002.foreachPartition 与mapPartitions 以及 mapPartitionsWithIndex()的比较
-  01.从算子的类型：
-    foreachPartition 属于action运算操作，而 
-    mapPartitions 是在Transformation中
-  02.返回值上：
-    foreachPartition 没有返回值
-    mapPartitions    返回值类型迭代器： Iterator[U]  该元素的迭代器
-  03.应用场景上：
-     mapPartitions   可以获取返回值，继续在返回RDD上做其他的操作
-     foreachPartition 因为没有返回值并且是action操作，
-     所以使用foreachPartition一般都是在程序末尾比如说要落地数据到存储系统中如mysql，es，clcikhouse或者hbase中
-003.mapPartitionsWithIndex和mapPartitions
-  mapPartitionsWithIndex 和 mapPartitions 类似，只是其参数多了个分区索引号
-  mapPartitionsWithIndex 既可以拿到分区的迭代器,又可以拿到分区编号
-  mapPartitionsWithContext
-分区的其他操作：
-def zipWithUniqueId(): RDD[(T, Long)]
-   该函数将RDD中元素和一个唯一ID组合成键/值对，该唯一ID生成算法如下：
-   每个分区中第一个元素的唯一ID值为：该分区索引号，
-   每个分区中第N个元素的唯一ID值为：(前一个元素的唯一ID值) + (该RDD总的分区数)
-zipPartitions
-  zipPartitions函数将多个RDD按照partition组合成为新的RDD，
-  该函数需要组合的RDD具有相同的分区数，但对于每个分区内的元素数量没有要求。 
-def zipWithIndex(): RDD[(T, Long)]
-   该函数将RDD中的元素和这个元素在RDD中的ID（索引号）组合成键/值对。
- mapPartitionsWithIndex
- 宽依赖（发生shuffle）和窄依赖（不发生shuffle）
-</pre></div>
-
-
-<h4>03.重分区repartition 和coalesce</h4>
-<div class="highlight"><pre><span></span>repartition对数据进行重新分区，默认是使用 HashPartitioner
-      repartition 使用了一个随机生成的数来当做 Key，而不是使用原来的 Key
-repartition只是coalesce接口中shuffle为true的简易实现
- repartition(numPartitions:Int):RDD[T]
- coalesce(numPartitions:Int，shuffle:Boolean=false):RDD[T]
-coalesce
- 减少分区的时候，使用coalesce(),coalesce结合现有分区以避免完全洗牌。你将1000个分区转换成100个分区，这个过程不会发生shuffle，
- 增加分区比如Rdd的分区是100，设置成1000，如果shuffle为false，并不会起作用。这时候就需要设置shuffle为true
-repartition方法可用于增加或减少DataFrame中的分区数
-</pre></div>
-
-
-<h4>过程</h4>
-<div class="highlight"><pre><span></span>Map阶段  Shuffle阶段  Reduce阶段
-  Shuffle阶段： 在Spark Shuffle阶段中，共分为Shuffle Write阶段和Shuffle Read阶段
-     Shuffle Write阶段中，Shuffle 对Map Task数据进行处理产生中间数据，然后再根据数据分区方式对中间数据进行分区。
-  最终Shffle Read阶段中的 Shuffle Read Task会拉取Shuffle Write阶段中产生的并已经分好区的中间数据
-</pre></div>
-
-
-<h3>3.源码</h3>
-<h4>01.分区器相关的源码位置</h4>
-<div class="highlight"><pre><span></span><span class="n">Spark</span><span class="err">\</span><span class="n">core</span><span class="err">\</span><span class="n">src</span><span class="err">\</span><span class="n">main</span><span class="err">\</span><span class="n">scala</span><span class="err">\</span><span class="n">org</span><span class="err">\</span><span class="n">apache</span><span class="err">\</span><span class="n">spark</span>
-<span class="n">trait</span> <span class="n">Partition</span> <span class="n">extends</span> <span class="n">Serializable</span>
-<span class="n">abstract</span> <span class="k">class</span> <span class="n">Partitioner</span> <span class="n">extends</span> <span class="n">Serializable</span> <span class="p">{</span>
-   <span class="n">def</span> <span class="nl">numPartitions</span><span class="p">:</span> <span class="n">Int</span>
-   <span class="n">def</span> <span class="n">getPartition</span><span class="p">(</span><span class="nl">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span><span class="o">:</span> <span class="n">Int</span>
-   <span class="p">}</span>
-<span class="n">object</span> <span class="n">Partitioner</span>
-     <span class="n">defaultPartitioner</span>
-<span class="k">class</span> <span class="n">HashPartitioner</span><span class="p">(</span><span class="nl">partitions</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="n">extends</span> <span class="n">Partitioner</span>
-<span class="k">class</span> <span class="n">RangePartitioner</span><span class="p">[</span><span class="nl">K</span> <span class="p">:</span> <span class="nl">Ordering</span> <span class="p">:</span> <span class="n">ClassTag</span><span class="p">,</span> <span class="n">V</span><span class="p">]</span>
-<span class="n">private</span><span class="p">[</span><span class="n">spark</span><span class="p">]</span> <span class="n">object</span> <span class="n">RangePartitioner</span> 
-  <span class="n">Reservoir</span> <span class="n">sampling</span><span class="err">（水塘抽样）</span>
-</pre></div>
-
-
-<h4>02.Repartition和coalesce源码位置</h4>
-<div class="highlight"><pre><span></span>repartition()
-位置：org.apache.spark.rdd
- def repartition(numPartitions: Int)(implicit ord: Ordering[T] = null): RDD[T] = withScope {
-      coalesce(numPartitions, shuffle = true)
-  }
- coalesce()
-def coalesce(numPartitions: Int, shuffle: Boolean = false,
-           partitionCoalescer: Option[PartitionCoalescer] = Option.empty)
-          (implicit ord: Ordering[T] = null)
-  : RDD[T]
-      new HashPartitioner(numPartitions)),
-repartition对数据进行重新分区，默认是使用 HashPartitioner
-repartition 使用了一个随机生成的数来当做 Key，而不是使用原来的 Key
-</pre></div>
-
-
-<h4>03.DataSet 分区源码位置</h4>
-<div class="highlight"><pre><span></span><span class="na">.config</span><span class="p">(</span><span class="s">&quot;spark.default.parallelism&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<span class="err">使用</span><span class="nf">hash</span> <span class="err">分区</span>
-<span class="nf">The</span> <span class="no">resulting</span> <span class="no">Dataset</span> <span class="no">is</span> <span class="no">hash</span> <span class="no">partitioned.This</span> <span class="no">is</span> <span class="no">the</span> <span class="no">same</span> <span class="no">operation</span> <span class="no">as</span> <span class="err">&quot;</span><span class="no">DISTRIBUTE</span> <span class="no">BY</span><span class="err">&quot;</span> <span class="no">in</span> <span class="no">SQL</span> <span class="p">(</span><span class="no">Hive</span> <span class="no">QL</span><span class="p">).</span>
-<span class="nf">org.apache.spark.sql.Dataset.scala</span>  
- <span class="no">def</span> <span class="no">repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span><span class="p">):</span> <span class="no">Dataset</span><span class="p">[</span><span class="no">T</span><span class="p">]</span> <span class="err">=</span> <span class="no">withTypedPlan</span> <span class="err">{</span>
-    <span class="nf">Repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">,</span> <span class="no">shuffle</span> <span class="err">=</span> <span class="no">true</span><span class="p">,</span> <span class="no">logicalPlan</span><span class="p">)</span>
-    <span class="err">}</span>
-<span class="nf">def</span> <span class="no">repartition</span><span class="p">(</span><span class="no">partitionExprs</span><span class="p">:</span> <span class="no">Column</span><span class="p">*):</span> <span class="no">Dataset</span><span class="p">[</span><span class="no">T</span><span class="p">]</span> <span class="err">=</span> <span class="no">withTypedPlan</span> <span class="err">{</span>
-  <span class="nf">RepartitionByExpression</span><span class="p">(</span>
-  <span class="nf">partitionExprs.map</span><span class="p">(</span><span class="no">_.expr</span><span class="p">),</span> <span class="no">logicalPlan</span><span class="p">,</span> <span class="no">sparkSession.sessionState.conf.numShufflePartitions</span><span class="p">)</span>
-  <span class="err">}</span>
-
- <span class="nf">def</span> <span class="no">coalesce</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span><span class="p">):</span> <span class="no">Dataset</span><span class="p">[</span><span class="no">T</span><span class="p">]</span> <span class="err">=</span> <span class="no">withTypedPlan</span> <span class="err">{</span>
-   <span class="nf">Repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">,</span> <span class="no">shuffle</span> <span class="err">=</span> <span class="no">false</span><span class="p">,</span> <span class="no">logicalPlan</span><span class="p">)</span>
-  <span class="err">}</span>
-
-<span class="nf">org.apache.spark.sql.catalyst.plans.logical.basicLogicalOperators.scala</span>
-<span class="nf">case</span> <span class="no">class</span> <span class="no">Repartition</span><span class="p">(</span><span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span><span class="p">,</span> <span class="no">shuffle</span><span class="p">:</span> <span class="no">Boolean</span><span class="p">,</span> <span class="no">child</span><span class="p">:</span> <span class="no">LogicalPlan</span><span class="p">)</span>
-<span class="nf">extends</span> <span class="no">RepartitionOperation</span> <span class="err">{</span>
-   <span class="nf">require</span><span class="p">(</span><span class="no">numPartitions</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="no">s</span><span class="err">&quot;</span><span class="no">Number</span> <span class="no">of</span> <span class="no">partitions</span> <span class="p">(</span><span class="no">$numPartitions</span><span class="p">)</span> <span class="no">must</span> <span class="no">be</span> <span class="no">positive.</span><span class="err">&quot;</span><span class="p">)</span>
-  <span class="err">}</span>
-<span class="nf">abstract</span> <span class="no">class</span> <span class="no">RepartitionOperation</span> <span class="no">extends</span> <span class="no">UnaryNode</span> <span class="err">{</span>
- <span class="nf">def</span> <span class="no">shuffle</span><span class="p">:</span> <span class="no">Boolean</span>
- <span class="nf">def</span> <span class="no">numPartitions</span><span class="p">:</span> <span class="no">Int</span>
- <span class="nf">override</span> <span class="no">def</span> <span class="no">output</span><span class="p">:</span> <span class="no">Seq</span><span class="p">[</span><span class="no">Attribute</span><span class="p">]</span> <span class="err">=</span> <span class="no">child.output</span>
-<span class="err">}</span>
-</pre></div>
-
-
-<h4>04.rangePartitioner</h4>
-<div class="highlight"><pre><span></span>Google的面试题：如何在一个不确定数据规模的范围内进行排序？ （rangePartitioner的水塘抽样算法）
-总数不知道的情况下如何等概率地从中抽取一行
-水塘抽样算法（Reservoir Sampling）
-在不知道文件总行数的情况下，如何从文件中随机的抽取一行？
-org.apache.spark.Partitioner.scala
-  RangePartitioner.sketch
-org.apache.spark.util.random.SamplingUtils.scala
-  SamplingUtils.reservoirSampleAndCount
-private var rangeBounds: Array[K] = {
-   val sampleSizePerPartition = math.ceil(3.0 * sampleSize / rdd.partitions.length).toInt
-   }
-*源码中SampleSize 乘以3的目的是保证在数据量特别小的分区能够抽取到足够的数据，同时保证数据量特别大的分区能够二次采样。-------------------- 水塘抽样，它是一系列的随机算法
-新建一个k大小的数组reservoir，如果元数据中数据少于k，直接返回原数据数组和原数据个数。
-如果大于，则对接下来的元素进行比较，随机生成一个数i，
-如果这个数小于k，则替换数组reservoir中第i个数，直至没有元素，则返回reservoir的copy数组。确定每个partition中要抽取的样本数量
-依赖于数组变量rangeBounds: Array[K] ，数组存放的是排序好的（K类型进行的排序）一序列K值，根据这些值来确定RDD中每一个元素shuffle后的存放的partition
-</pre></div>
-
-
-<h3>4.参考</h3>
-<div class="highlight"><pre><span></span>Fast Filtering with Spark PartitionFilters and PushedFilters
-https://www.mungingdata.com/apache-spark/partition-filters-pushed-filters
-Spark分区方式详解  https://blog.csdn.net/dmy1115143060/article/details/82620715
-https://stackoverflow.com/questions/41474175/spark-mappartitionswithindex-handling-empty-partitions
-https://stackoverflow.com/questions/44501995/spark-mappartitionswithindex-identify-a-partition
-Spark之深入理解RDD结构  https://blog.csdn.net/u011094454/article/details/78992293
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Spark</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-50.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -418,6 +443,50 @@ Spark之深入理解RDD结构  https://blog.csdn.net/u011094454/article/details/
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>Scala-Spark-RDD-DataSet</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-45.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-43.html" rel="bookmark"
+                           title="Permalink to Spark的执行机制和优化">Spark的执行机制和优化</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-24T20:50:00+08:00">
+                Published: 2019-03-24 20:50:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>Spark SQL</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-43.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-44.html" rel="bookmark"
+                           title="Permalink to HDFS和YARN的进一步介绍">HDFS和YARN的进一步介绍</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-03-23T20:52:00+08:00">
+                Published: 2019-03-23 20:52:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/things.html">things</a> </p>
+</footer><!-- /.post-info -->                <p>HDFS-YARN</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-44.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据仓库基本内容框架</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li class="active"><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/items/my-item-post-21.html" rel="bookmark"
+           title="Permalink to 数据仓库基本内容框架">数据仓库基本内容框架</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-08-31T18:32:00+08:00">
+                Published: 2019-08-31 18:32:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/items/index.html">Items</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <h3>数据仓库</h3>
+<div class="highlight"><pre><span></span>数据仓库Data Warehouse 实质是系统集成项目，要工作是把所需的数据仓库工具集成在一起，
+   完成数据的抽取、转换和加载，OLAP分析和数据挖掘--最大的特点就是它的集成性
+   中间一些工具或者流程包含软件开发项目
+1、技术型面对问题
+  01.实现： 功能实现
+  02.优化：性能优化，流程优化
+      易于维护，方便扩展
+  03.管控：大数据治理，质量管理，安全管控，审计
+2.涉及内容：
+    维度建模
+    数据分层
+    元数据管理-标准以及工具
+    ETL开发 
+3.数据获取-数据存储与管理-数据访问
+</pre></div>
+
+
+<h4>维度建模</h4>
+<div class="highlight"><pre><span></span>Kimball-dimensional modeling-互联网行业的数据仓库建设指南
+基本概念：
+    事实表： 事务事实表、周期快照事实表、累积快照事实表
+           粒度：原子粒度是最低级别的粒度
+    维度表  维度的层次(Hierarchy)和级别(Level)
+        水平拆分和垂直拆分
+          水平拆分，按照类别或类型进行拆
+          垂直拆分，根据维度属性的分类进行拆分
+        维度合并
+          相同范围
+    缓慢变化维: 反映维度的历史变化
+        类型0 原样保留
+        类型1 重写
+        类型2 增加新行    1）行有效的日期/时间戳列；（2）行截止日期/时间戳列；（3）当前行标识
+        类型3 增加新属性  在维度表上增加新属性以保存原来的属性值。
+    数据仓库总线结构矩阵:
+       一致性维度   一致性事实
+    建模方式： 星型模型 雪花型  星座型
+
+过程： 
+    01.选取业务过程，确定事实表类型
+    02.定义粒度
+    03.确定维度
+    04.确定事实
+说明：
+  将度量称为“事实”，将环境描述称为“维度”，
+   单事务事实表与多事务事实表
+  维度是用于分析事实所需要的多样环境，维度的作用一般是查询约束、分类汇总以及排序
+  维度退化：常用维度属性退化至事实表中，方便使用
+ 02.快照维度表
+    拉链表
+</pre></div>
+
+
+<h4>数据分层：</h4>
+<div class="highlight"><pre><span></span>应用数据层（ADS）
+公共层（CDM） ：汇总数据区（DWS） 
+                明细数据区（DWD  DWD: data warehouse detail）、
+                DIM（统一维度区）
+操作数据存储层 ODS）：Operational Data Store
+
+说明：
+ 01.TMP ：每一层的计算都会有很多临时表，注意要区分出来
+   eg：临时表-表名首个字段加上_tmp字段
+ 02.“数据仓库更多代表的是一种对数据的管理和使用的方式
+  数据分层是数据仓库非常重要的一个环节，
+  它决定的不仅仅是一个层次的问题，
+  还直接影响到后续的血缘分析、特征自动生成、元数据管理等一系列的建设。
+  因此要尽早考虑”
+ 03.每层根据实际场景采用不同的建设方案
+</pre></div>
+
+
+<h4>元数据管理</h4>
+<div class="highlight"><pre><span></span>元数据驱动数据仓库的开发
+ 元数据类型：
+      业务元数据 
+      技术元数据
+      管理元数据
+ 元数据架构
+   元数据获取
+   元数据存储
+   元数据功能和应用：
+      血缘分析-同步检查-影响分析
+      数据质量管理-数据安全管理-数据标准管理-ETL自动化管理
+</pre></div>
+
+
+<h4>ETL：</h4>
+<div class="highlight"><pre><span></span>ETL，是英文Extract-Transform-Load的缩写，用来描述将数据从来 源端
+经过抽取（extract）、转换（transform）、加载（load）至 目的端 的过程
+ETL是数据仓库的后台，主要包含抽取、清洗、规范化、提交四个步骤
+   数据清洗：是发现数据质量问题并纠正数据的过程
+      定义数据质量需求，根据业务需求和数据剖析结果确定数据质量需求的优先级。
+      制定数据质量测量类型
+开发：
+   任务类型： 
+     批量计算任务：每日定时任务型，周期计算，一次性任务
+       回刷
+     实时数据
+</pre></div>
+
+
+<h4>其他：</h4>
+<div class="highlight"><pre><span></span>System Integration 系统集成的本质就是最优化的综合统筹设计
+  系统集成所要达到的目标-整体性能最优，
+  即所有部件和成分合在一起后不但能工作，
+  而且全系统是低成本的、高效率的、性能匀称的、可扩充性和可维护的系统
+ 管理：
+   进度管理-质量管理-文档管理-技术管理
+   客户关系管理-利益相关方协调
+ 思考问题： 认真思考你现在需要什么、未来需要什么
+     容错、恢复、弹性、监测、性能管理能力都是集成解决方案中重要的附加项
+ 技术服务-产品开发
+ 传统数仓建设-.传统数仓有较为稳定的业务场景和相对可靠的数据质量，同时也有较为稳定的需求
+ 在互联网行业数仓：基于大数据的数仓建设一般是基于非商业、开源的技术，需要自己维护更多的技术框架。   
+   数仓模型的设计更关注灵活、快速响应和应对多变的市场环境，更加以快速解决业务、运营问题为导向
+数据平台：调度平台 数据可视化平台
+</pre></div>
+
+
+<h4>参考</h4>
+<div class="highlight"><pre><span></span>大数据环境下该如何优雅地设计数据分层 https://www.jianshu.com/p/849db358ec61
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

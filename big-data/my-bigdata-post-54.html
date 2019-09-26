@@ -2,7 +2,7 @@
 <html lang="zh_cn">
 <head>
         <meta charset="utf-8" />
-        <title>ytluck—For you - Flink</title>
+        <title>Flink状态计算概述</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -16,17 +16,22 @@
                 <nav><ul>
                     <li><a href="http://ytluck.github.io/">Home</a></li>
                     <li><a href="/About me.html">About Me</a></li>
-                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
                     <li><a href="/data-mining/index.html">Data Mining</a></li>
                     <li><a href="/items/index.html">Items</a></li>
                     <li><a href="/os/index.html">OS</a></li>
                     <li><a href="/program/index.html">Program</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-54.html" rel="bookmark"
+           title="Permalink to Flink状态计算概述">Flink状态计算概述</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-54.html">Flink状态计算概述</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-09-08T21:10:00+08:00">
                 Published: 2019-09-08 21:10:00
@@ -37,7 +42,7 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h3>Flink状态基本轮廓</h3>
+</footer><!-- /.post-info -->      <h3>Flink状态基本轮廓</h3>
 <div class="highlight"><pre><span></span>01.状态一致性
  at-most-once at-least-once  exactly-once
 02.状态计算： 
@@ -200,58 +205,11 @@ StateBackend 来存储和管理Checkpoints过程的状态数据
 <div class="highlight"><pre><span></span>Flink使用 Broadcast State 实现流处理配置实时更新 http://ju.outofmemory.cn/entry/371335
 https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/stream/state/broadcast_state.html
 Apache Flink 零基础入门教程（六）：状态管理及容错机制 https://juejin.im/post/5d8367c36fb9a06b2a20785a
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</pre></div>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-52.html" rel="bookmark"
-                           title="Permalink to Flink和Kafka以及Kafka生产者">Flink和Kafka以及Kafka生产者</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-07-08T22:10:00+08:00">
-                Published: 2019-07-08 22:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>Producer  Flink向kafka发送数据</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-52.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-51.html" rel="bookmark"
-                           title="Permalink to Flink数据类型和Tuple">Flink数据类型和Tuple</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-07-08T21:10:00+08:00">
-                Published: 2019-07-08 21:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>类型推断 Type_Information DataStreaming Table</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-51.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>
