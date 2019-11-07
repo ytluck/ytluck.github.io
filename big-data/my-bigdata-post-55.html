@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Flink数据类型之POJO和Table中的Row</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-55.html" rel="bookmark"
+           title="Permalink to Flink数据类型之POJO和Table中的Row">Flink数据类型之POJO和Table中的Row</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-09-15T22:10:00+08:00">
+                Published: 2019-09-15 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->      <h3>Flink数据类型支持</h3>
+<div class="highlight"><pre><span></span>TypeInformation主要是为Flink系统内有效的对数据结构类型进行管理，
+对数据的类型进行管理和推断
+   原生数据类型
+   复合类型
+     元组 tuple -Java和Scala
+     样例类 -Scala
+     POJOs类型
+     Flink Value类型 ： org.apache.flink.types.Value
+</pre></div>
+
+
+<h3>POJO类型</h3>
+<div class="highlight"><pre><span></span>一个POJO类型：
+1、class是public的且是独立的(不是非static内部类)The class is public and standalone (no non-static inner class)
+2、class有public 无参构造函数
+3、所有 class 中的
+   01.非静态的、非局部字段是private类型
+   02.或者非静态的、非局部字段是private类型，且public类型的getter和setter方法
+4.字段类型须是Flink支持的
+ eg：本例中采用的是字段是private，且有public类型的getter和setter方法
+ public class Person implements Serializable {
+    private String name;
+    private int age;
+
+    /**
+     * public constructor to make it a Flink POJO
+    */
+    public Person() {
+    }
+
+    public  String getName() {
+        return name;
+    }
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String name) {
+        this.name= name;
+    }
+    public void setAge(int age) {
+        this.age= age;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Person{&quot; + &quot;name=&quot; + name + &quot;, age=&#39;&quot; + age + &#39;\&#39;&#39;  + &#39;}&#39;;
+    }
+
+  }
+ 在程序中的使用
+   //DataStream 造数据
+    Person userA = new Person();
+    userA.setName(&quot;Happy&quot;);
+    userA.setAge(19);
+    Person userB = new Person();
+    userB.setName(&quot;Lucky&quot;);
+    userB.setAge(20);
+    DataStream&lt;Person&gt; orderAStream = env.fromElements(
+            userB,
+            userA
+         );
+    orderAStream.keyBy(&quot;age&quot;)
+</pre></div>
+
+
+<h3>Flink Table&amp;SQL中</h3>
+<div class="highlight"><pre><span></span>关系型API：Table和SQL
+    Table API提供LINQ（:Language Integrated Quer）语言集成查询，是Scala和Java的LINQ
+    SQL      提供结构化查询语言(Structured Query Language)
+Row ：具有任意数量字段的元组并支持空字段
+Row 和 BinaryRow
+ org.apache.flink.types.Row
+ 说明： /**  
+    * A Row can have arbitrary number of fields and contain a set of fields,
+    * which may all be different types. 
+    * The fields in Row can be null. Due to Row is not strongly typed, Flink&#39;s
+    * type extraction mechanism can&#39;t extract correct field types. So that users should manually
+    * tell Flink the type information via creating a {@link RowTypeInfo}.
+    * The fields in the Row can be accessed by position (zero-based) {@link #getField(int)}. And can
+    * set fields by {@link #setField(int, Object)}.
+    * Row is in principle serializable. However, it may contain non-serializable fields,
+    * in which case serialization will fail.
+示例：
+   *  Row.of(&quot;hello&quot;, true, 1L);}
+   * Or
+   *  Row row = new Row(3);
+   *  row.setField(0, &quot;hello&quot;);
+   *  row.setField(1, true);
+   *  row.setField(2, 1L);
+Flink 1.9- 1.10的数据类型 BinaryRow
+   org.apache.flink.table.dataformat.BinaryRow  
+     A Row has two part: Fixed-length part and variable-length part.
+     A special row which is backed by MemorySegment instead of Object
+Table API and SQL 中的数据类型
+     1.兼容性-  Time types, array types, and the decimal type need special attention
+     JVM Types Java Expression String
+     org.apache.flink.table.api.Types
+     org.apache.flink.table.api.DataTypes
+     SQL standard’s data type
+     Flink 1.9
+      import static org.apache.flink.table.api.DataTypes.*;
+        DataType t = DataTypes.ARRAY(DataTypes.INT().notNull()).bridgedTo(int[].class);
+    eg：
+    SQL_DATE SQL_DATE()  DATE().bridgedTo(java.sql.Date.class)
+</pre></div>
+
+
+<h4>StreamTableEnvironment和TableEnvironment</h4>
+<div class="highlight"><pre><span></span> public abstract class StreamExecutionEnvironment {
+  fromCollection(java.util.Collection, org.apache.flink.api.common.typeinfo.TypeInformation)
+  public <span class="nt">&lt;OUT&gt;</span> DataStreamSource<span class="nt">&lt;OUT&gt;</span> 
+      fromCollection(Collection<span class="nt">&lt;OUT&gt;</span> data, TypeInformation<span class="nt">&lt;OUT&gt;</span> typeInfo)
+
+   public <span class="nt">&lt;OUT&gt;</span> DataStreamSource<span class="nt">&lt;OUT&gt;</span> 
+       fromCollection(Iterator<span class="nt">&lt;OUT&gt;</span> data, Class<span class="nt">&lt;OUT&gt;</span> type) {
+    return fromCollection(data, TypeExtractor.getForClass(type));
+     }
+      typeInfo.getTypeClass()
+      typeInfo.createSerializer(getConfig())
+   *Because the iterator will remain unmodified until the actual execution happens,
+    * the type of data returned by the iterator must be given explicitly in the form of the type
+    * class (this is due to the fact that the Java compiler erases the generic type information)
+    }
+
+
+    object StreamTableEnvironment {
+      def fromDataStream[T](dataStream: DataStream[T], fields: String):
+    }
+
+各个类的之间区别和联系
+      StreamTableEnvironment 和 TableEnvironment
+        flink-table-planner
+         org.apache.flink.table.api.java.StreamTableEnvironment
+          abstract class StreamTableEnvironment(private[flink] val execEnv: StreamExecutionEnvironment,config: TableConfig)
+                         extends TableEnvironment(config) {}
+        org.apache.flink.table.api.TableEnvironment
+          * The abstract base class for batch and stream TableEnvironments
+          abstract class TableEnvironment(val config: TableConfig) 
+          持有对ExecutionEnvironment 或StreamExecutionEnvironment的引用
+        Blink规划器将多个接收器优化为一个DAG（仅在TableEnvironment上支持，而不在StreamTableEnvironment上支持）。
+          旧规划器将始终将每个接收器优化为新的DAG，其中所有DAG彼此独立
+
+类的方法的区别
+  TableEnvironment
+   getTableEnvironment @deprecated
+   create
+  Table 数据的元数据存储介质 CataLog
+</pre></div>
+
+
+<h3>Data Types &amp; Serialization</h3>
+<div class="highlight"><pre><span></span>Flink 会试图去推断出在分布式计算过程中交换和存储的数据的类型信息
+Flink的 TypeInformation 类，TypeInformation类是所有类型描述类的基类，
+    它揭示了数据类型的一些基础属性，并产生序列化器在默写特殊情况下生成类型比较器
+    Flink 内部实现了名为 TypeExtractror 的类，可以利用方法签名、子类信息等蛛丝马迹，自动提取和恢复类型信息
+TypeHint 的原理
+    是创建匿名子类， type hints
+   运行时 TypeExtractor 可以通过 getGenericSuperclass(). getActualTypeArguments() 方法获取保存的实际类型
+   TypeHints in the form of returns(new TypeHint&lt;Tuple2&lt;Integer, SomeType&gt;&gt;(){}). 
+   The TypeHint class 
+       can capture generic type information and preserve it for the runtime (via an anonymous subclass).
+ Flink 自带了很多 TypeSerializer 子类，大多数情况下各种自定义类型都是常用类型的排列组合，因而可以直接复用
+     如果不能满足，那么可以继承 TypeSerializer 及其子类以实现自己的序列化器。
+ Flink应对类型擦除
+  01.Flink通过Java反射机制尽可能重构类型信息
+  02.借助类型提示来告诉系统函数传入的参数类型信息和输出参数信息
+    //Java中
+    // 对于非泛型数据类型，你可以传递Class：
+        TypeInformation.of(String.class);
+    // 对于泛型数据类型，你需要通过TypeHint来捕获数据累心：
+       TypeInformation.of(new TypeHint&lt;Tuple2&lt;String, Integer&gt;&gt;(){}
+</pre></div>
+
+
+<h3>其他：</h3>
+<div class="highlight"><pre><span></span>泛型
+ Java泛型之类型参数：
+  E              - Element (在集合中使用，因为集合中存放的是元素)
+  T               - Type（Java 类）
+  K               - Key（键）
+  V               - Value（值）
+  N               - Number（数值类型）
+  ?               -  表示不确定的java类型
+  &lt; ? extends E&gt;  -上界通配符
+  &lt; ? super E&gt;    -下界通配符 
+  S、U、V  - 2nd、3rd、4th types
+
+ Flink
+     T
+     O
+    IN1
+    OUT
+    ACC
+ 数据类型
+    数组
+    枚举  
+     enum
+     Enumeration
+     Spliterator  * @since 1.8
+     Arrays
+    Properties
+ Java集合框架 - Java Collections Framework 
+  * @param &lt;E&gt; the type of elements in this collection
+  *  Set
+  *  List
+  *  Map
+  *  SortedSet
+  *  SortedMap
+  *  HashSet
+  *  TreeSet
+  *  ArrayList
+  *  LinkedList
+  *  Vector
+  *  Collections
+  *  Arrays
+  *  AbstractCollection
+  * @since 1.2
+</pre></div>
+
+
+<h3>迭代器</h3>
+<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">JVM</span>
+ <span class="mf">01.j</span><span class="n">ava</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Iterator</span>   
+  <span class="n">hasNext</span> <span class="nb">next</span>  <span class="n">remove</span>
+   <span class="nd">@since</span> <span class="mf">1.8</span>
+   <span class="kn">import</span> <span class="nn">java.util.function.Consumer</span><span class="p">;</span>
+       <span class="n">default</span> <span class="n">void</span> <span class="n">forEachRemaining</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="err">?</span> <span class="nb">super</span> <span class="n">E</span><span class="o">&gt;</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+           <span class="n">Objects</span><span class="o">.</span><span class="n">requireNonNull</span><span class="p">(</span><span class="n">action</span><span class="p">);</span>
+           <span class="k">while</span> <span class="p">(</span><span class="n">hasNext</span><span class="p">())</span>
+               <span class="n">action</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="nb">next</span><span class="p">());</span>
+       <span class="p">}</span>
+  <span class="n">foreach</span><span class="err">与</span><span class="n">forEachRemaining</span><span class="err">是可以依托于迭代器通过</span><span class="n">Lamdba</span><span class="err">遍历的，</span>
+  <span class="err">其中</span><span class="n">forEachRemaining</span><span class="err">只能用一次</span>
+ <span class="mf">02.j</span><span class="n">ava</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Iterable</span>
+   <span class="n">public</span> <span class="n">interface</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">iterator</span><span class="p">();</span>
+   <span class="o">*</span> <span class="nd">@since</span> <span class="mf">1.8</span>
+     <span class="o">*/</span>
+    <span class="n">default</span> <span class="n">void</span> <span class="n">forEach</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;</span><span class="err">?</span> <span class="nb">super</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Objects</span><span class="o">.</span><span class="n">requireNonNull</span><span class="p">(</span><span class="n">action</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">T</span> <span class="n">t</span> <span class="p">:</span> <span class="n">this</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">action</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+        <span class="p">}</span>
+ <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ListIterator</span>
+  <span class="o">*</span> <span class="nd">@since</span> <span class="mf">1.8</span> 
+ <span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Spliterator</span>
+  <span class="err">除了支持顺序遍历之外，添加了</span><span class="n">Java</span> <span class="mi">8</span><span class="err">对于并行的支持</span>
+   <span class="n">tryAdvance</span>
+ <span class="n">Stream</span>  
+     <span class="n">public</span> <span class="n">interface</span> <span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">extends</span> <span class="n">BaseStream</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;</span> 
+ <span class="n">Java8</span><span class="err">新功能</span>
+   <span class="err">行为参数化</span><span class="o">-</span><span class="n">Lambda</span><span class="err">表达式</span>
+   <span class="n">Java8</span> <span class="err">加入默认方法</span>
+   <span class="err">方法引用</span>
+<span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">function</span>
+   <span class="n">Function</span><span class="p">:</span> <span class="err">接收参数，并返回结果，主要方法</span> <span class="n">R</span> <span class="nb">apply</span><span class="p">(</span><span class="n">T</span> <span class="n">t</span><span class="p">)</span>
+   <span class="n">Consumer</span><span class="p">:</span> <span class="err">接收参数，无返回结果</span><span class="p">,</span> <span class="err">主要方法为</span> <span class="n">void</span> <span class="n">accept</span><span class="p">(</span><span class="n">T</span> <span class="n">t</span><span class="p">)</span>
+  <span class="n">Supplier</span><span class="p">:</span> <span class="err">不接收参数，但返回结构，主要方法为</span> <span class="n">T</span> <span class="n">get</span><span class="p">()</span>
+  <span class="n">Predicate</span><span class="p">:</span> <span class="err">接收参数，返回</span><span class="n">boolean</span><span class="err">值，主要方法为</span> <span class="n">boolean</span> <span class="n">test</span><span class="p">(</span><span class="n">T</span> <span class="n">t</span><span class="p">)</span>
+<span class="mf">2.</span><span class="n">Flink</span>
+<span class="n">org</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">flink</span><span class="o">.</span><span class="n">util</span>
+ <span class="n">SplittableIterator</span>
+  <span class="n">public</span> <span class="n">abstract</span> <span class="k">class</span> <span class="nc">SplittableIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">implements</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Serializable</span> <span class="p">{</span>
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>Flink原理优化
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

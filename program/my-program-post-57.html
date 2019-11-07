@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Python生成SQL脚本造数据-重构</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-57.html" rel="bookmark"
+           title="Permalink to Python生成SQL脚本造数据-重构">Python生成SQL脚本造数据-重构</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-05-18T22:22:00+08:00">
+                Published: 2019-05-18 22:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>在Python中，对于多次用到的功能，代码需要不断的优化，采用可扩展和可维护的方式。增加代码的可用性
+</pre></div>
+
+
+<h3>1.输入数据示例</h3>
+<div class="highlight"><pre><span></span>student_id     
+201901                 
+201902
+</pre></div>
+
+
+<h3>2.具体代码</h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<span class="c1"># 函数名一律小写，如有多个单词，用下划线隔开，私有函数在函数前加一个下划线_</span>
+<span class="k">def</span> <span class="nf">create_sql_command</span><span class="p">(</span><span class="n">filedir</span><span class="p">,</span> <span class="n">inputfile</span><span class="p">,</span> <span class="n">tablename</span><span class="p">,</span> <span class="n">config_string</span><span class="p">):</span>
+<span class="sd">&quot;&quot;&quot; 创建SQL执行命令脚本 -无返回值void functionn&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileobj</span><span class="p">:</span>
+        <span class="c1"># 文件对象提供的 readlines 返回一个列表(list)变量</span>
+        <span class="n">stringlist</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="c1"># 列表[] 变为字符串，列表是可变的 join接收字符串列表并拼接每个元素，</span>
+        <span class="c1">#  split将字符串拆成单词列表，list函数将字符串拆成单个字母的列表</span>
+        <span class="n">outputfile</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">filedir</span><span class="p">,</span> <span class="n">tablename</span><span class="o">+</span><span class="s1">&#39;.sql&#39;</span><span class="p">])</span>
+        <span class="n">fsavefile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;------------------------------------------start---------------------------------- </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">config_string</span><span class="p">)</span>
+        <span class="c1"># len() 方法返回列表元素个数- len() 方法返回对象(字符、列表、元组等)长度或项目个数</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stringlist</span><span class="p">)</span>
+        <span class="c1"># 遍历-循环</span>
+        <span class="c1"># enumerate() 函数用于将一个可遍历的数据对象(如列表、元组或字符串)</span>
+        <span class="c1"># 组合为一个索引序列，同时列出数据和数据下标,start -- 下标起始位置。</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stringlist</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">student_id</span> <span class="o">=</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;&#39; as student_id&quot;</span> 
+            <span class="c1"># 随机值</span>
+            <span class="n">grade_code</span> <span class="o">=</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;&#39; as grade_code&quot;</span>
+            <span class="c1"># 递增值</span>
+            <span class="c1"># grade_code = &quot;&#39;&quot; + str(i) + &quot;&#39; as grade_code&quot;</span>
+            <span class="c1"># 数值型数据的类型</span>
+            <span class="n">class_id</span> <span class="o">=</span> <span class="s2">&quot; 2 as class_id&quot;</span>
+            <span class="n">update_time</span> <span class="o">=</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s2">&quot;2019-05-11 12:00:00&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39; as update_time&quot;</span>
+            <span class="c1"># 创建元组，字段顺序需要和插入放入表顺序一致 ，元组field_set（元素均为字符串）</span>
+            <span class="n">field_set</span> <span class="o">=</span> <span class="p">(</span><span class="n">student_id</span><span class="p">,</span> <span class="n">grade_code</span><span class="p">,</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">label_nm</span><span class="p">,</span><span class="n">update_time</span><span class="p">)</span>
+            <span class="c1"># 元组field_set（元素均为字符串）转为字符串</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">field_set</span><span class="p">)</span>
+            <span class="n">line_sql</span> <span class="o">=</span> <span class="s2">&quot;select &quot;</span> <span class="o">+</span> <span class="n">field</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">pure_line_sql</span> <span class="o">=</span> <span class="n">line_sql</span> <span class="o">+</span> <span class="s2">&quot; union all &quot;</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&amp;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">K</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">pure_line_sql</span><span class="p">)</span>
+                <span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pure_line_sql</span><span class="p">)</span>
+                <span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="n">K</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">line_sql</span><span class="p">)</span>
+                <span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line_sql</span><span class="p">)</span>
+                <span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;) t1 </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">fsavefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;------------------------------------------end----------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">fsavefile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1"># __name__是内置变量</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="c1"># 需要给出 输入的文件位置，文件名， 表名以及是否是分区表，和分区表的分区字段</span>
+<span class="n">file_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="n">F</span><span class="p">:</span><span class="o">/</span><span class="n">PythonProject</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="n">Data</span><span class="s1">&#39;</span>
+<span class="c1"># 输入文件的名称</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;TestData.txt&#39;</span>
+<span class="n">input_file</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">file_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;输入文件名: &quot;</span> <span class="o">+</span> <span class="n">input_file</span><span class="p">)</span>
+<span class="c1"># 变量名尽量小写, 如有多个单词，用下划线隔开，常量采用全大写，如有多个单词，使用下划线隔开</span>
+<span class="n">table_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="n">base</span><span class="o">.</span><span class="n">example_type_d</span><span class="s1">&#39;</span>
+<span class="c1"># 分区表 True  以及分区字段 如果不是分区表 则设置 partiton_flag= False</span>
+<span class="c1"># （0，空字符串，空列表、空字典、空元组、None, False）</span>
+<span class="n">partiton_flag</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">partiton_string</span> <span class="o">=</span> <span class="s2">&quot; partition(partition_date = &#39;20191007&#39;) </span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="c1"># 条件表达式 - 先执行中间的if，如果返回True，就是左边，False是右边。</span>
+<span class="n">partiton</span> <span class="o">=</span> <span class="n">partiton_string</span> <span class="k">if</span> <span class="n">partiton_flag</span> <span class="ow">is</span> <span class="bp">True</span> <span class="k">else</span> <span class="s2">&quot; </span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">configString</span> <span class="o">=</span> <span class="s1">&#39;insert into  table  &#39;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="n">partiton</span> <span class="o">+</span> <span class="s2">&quot;select * from  ( </span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="c1"># 无返回值函数会返回一个特殊值 None</span>
+<span class="n">create_sql_command</span><span class="p">(</span><span class="n">file_dir</span><span class="p">,</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">configString</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
+<h3>3.说明</h3>
+<div class="highlight"><pre><span></span>01.对于会在不同位置多次出现的变量，修改一处，其余部分也会修改，所以，尽量在一处变动，而后续的代码不影响其功能，相同的部分提取出来
+ 本次修改，对于字段只需要修改其定义和在元组中的顺序，把是否是分区的情况提取出来，修改的功能量变小了，有助于提高通用性。
+02.关于Python的一些问题，会使用，也要理解背后的原理，能表述出来
+ with方法打开处理文件帮我我们做了什么？
+   常规的方法try,except,finally，with 实现了finally中f.close
+   try..except..else没有捕获到异常，执行else语句
+   try..except..finally不管是否捕获到异常，都执行finally语句
+ r、r+、rb、rb+文件打开模式区别
+03.随机数
+  random.randint(a,b),生成区间内的整数
+04.  r  表示需要原始字符串，不转义特殊字符
+     引号 否能不带转义显示单、双引号，以及多行的情况 单引号，双引号，三引号以及r
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

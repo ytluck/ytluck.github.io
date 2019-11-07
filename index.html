@@ -26,7 +26,222 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-54.html">Flink状态计算概述</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-58.html">Flink与其他流式计算系统的比较</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-10-20T23:10:00+08:00">
+                Published: 2019-10-20 23:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info --><h4>流计算</h4>
+<div class="highlight"><pre><span></span>Dataflow编程模型： 清晰的定义这些问题，并针对性的在模型框架层面加以解决
+01.概念一
+      bounded data(processing)
+    unbounded data(processing)
+02.概念二 ： Event time和 Process time
+    常见的流式计算框架中的［key，value］两元组tuple形式的信息数据，
+                  变换成了［key,value, event time, window ］这样的四元组模型
+    多数基于Process time定义的固定窗口或滑动窗口模型，并没有特别强调窗口触发这样一个概念
+03.Dataflow提供了可自定义的窗口触发模型
+04.网络流控是为了在上下游速度不匹配的情况下，防止下游出现过载
+</pre></div>
+
+
+<h3>Storm</h3>
+<div class="highlight"><pre><span></span>01.容错方式
+   at least once(实现采用record-level acknowledgments)，可能存在重复发送的情况
+    Trident可以支持storm 提供exactly once语义。
+   ACK机制 ：对每个消息进行全链路跟踪，失败或超时进行重发
+ 状态管理
+02. 无状态，需用户自行进行状态管理
+03 
+04
+05.  feedback 机制 
+     Storm 在每一个 Bolt 都会有一个监测反压的线程（Backpressure Thread）
+</pre></div>
+
+
+<h3>Spark</h3>
+<h4>Spark Streaming</h4>
+<div class="highlight"><pre><span></span> 01. 端到端的exactly-once 容错-- failure detector 以及 failover处理
+      Write-Ahead Logs
+      Configuring write-ahead logs 
+        spark.streaming.receiver.writeAheadLog.enable
+        spark.streaming.receiver.writeAheadLog.closeFileAfterWrite    
+02. 状态计算
+        updateStateByKey  reduceByKeyAndWindow 
+03.Event time 以及乱序和迟到数据 
+        水印
+04.窗口和触发模型
+
+05. 网络限速
+  001. Setting the max receiving rate
+        spark.streaming.receiver.maxRate 
+        spark.streaming.kafka.maxRatePerPartition
+  002.backpressure
+            spark.streaming.backpressure.enabled 
+            spark.streaming.backpressure.initialRate
+        Fecher 会实时的从 Buffer、Processing 这样的节点收集一些指标
+ 然后通过 Controller 把速度接收的情况再反馈到 Receiver，实现速率的匹配
+06.执行流程
+  Driver - Executor
+  Master -worker
+  任务调度： DAG stage task
+</pre></div>
+
+
+<h4>Spark Structure Streaming</h4>
+<div class="highlight"><pre><span></span>01. end-to-end exactly-once fault-tolerance guarantees 
+       通过 checkpointing and Write-Ahead Logs
+02. Stateful Stream Processing 
+          mapGroupsWithState  和 flatMapGroupsWithState
+03.Event time 以及乱序和迟到数据 
+        水印
+04.窗口和触发模型
+
+05. 网络限速
+</pre></div>
+
+
+<h3>Flink</h3>
+<div class="highlight"><pre><span></span>Flink  checkpointing 和 Two phase commit
+    Phase 1: Pre-commit
+    Phase 2:Commit
+02. 状态计算
+
+03.Event time 以及乱序和迟到数据 
+     水印
+
+04.窗口和触发模型
+
+05. 网络限速  
+   1.5之前 Flink TCP-based 
+     基于 TCP 流控 + bounded buffer 实现反压
+   1.5之后 Credit-based flow control 基于信用度的流量传输控制
+     Credit 可以类比为 TCP 的 Window 机制，实现了自己托管的 credit - based 流控机制，在应用层模拟 TCP 的流控机制
+ 默认情况下，jobmanager会每隔50ms采集对每个task采集100个stack trace来决定是否有反压。
+    如果是0.01只表明100个采样中，有1个很慢
+     OK  LOW HIGH
+      配置 
+        jobmanager.web.backpressure.refresh-interval ： web默认是60s采集一次反压值
+        jobmanager.web.backpressure.num-samples ： 采集样本的数量决定反压，默认值是100
+        jobmanager.web.backpressure.num-samples ： 采集样本的数量决定反压，默认值是100
+06.网络通信
+   Apache Flink 在 Dispatcher、JobMaster、ResourceManager、TaskExecutor 几大组件之间采用 akka 进行通信
+ Task之间的通信Netty
+   Flink的这个Buffer接口主要是一种flink层面用于传输数据和事件的统一抽象，其实现类是NetworkBuffer，是对MemorySegment的包装
+   为了方便管理NetworkBuffer，Flink提供了BufferPoolFactory，并且提供了唯一实现NetworkBufferPool
+ 执行流程
+   Jobmanager TaskManger   dispatcher  resourceManager
+   进程master和worker
+   任务调度： StreamGraph JobGraph ExecutionGraph
+</pre></div>
+
+
+<h4>各个性能</h4>
+<div class="highlight"><pre><span></span>功能：
+   功能完整性
+性能指标：
+   稳定性
+   吞吐量（Throughput）
+   延迟（Latency）
+ 其他概念
+   幂等 f(f(x)) = f(x)
+   非幂等
+     幂等：多次重复操作和一次操作产生的影响是一样的。
+   非幂等：多次重复操作和一次操作产生的影响是不一样的。
+      WriteAheadLog()      WAL机制支持非幂等业务请求场景  或者exactly once业务场景
+      HBase的Write Ahead Log (WAL)提供了一种高并发、持久化的日志保存与回放机制。
+          每一个业务数据的写入操作（PUT / DELETE）执行前，都会记账在WAL中。
+   过程 commit  abort 
+附录：
+   当一个特定时间窗口被触发以后，后续晚到的数据如何处理，如何对之前触发结算的结果进行修正
+  三种策略 丢弃  累计  累计并更正
+
+   ProcessFunction函数是低级别的流处理操作，可访问所有（非循环）流应用程序的基本构建块(basic building blocks)，比如：
+      a、Events (stream elements)
+      b、State (fault tolerant, consistent)
+      c、Timers (event time and processing time)
+   ProcessFunction可以看作是一个可访问keyed state和定时器(timers)的FlatMapFunction
+ 网络流控
+    网络流控的实现：
+      01.静态限速 传统的做法可以在 Producer 端实现一个类似 Rate Limiter 这样的静态限流
+      02.动态反馈（自动反压）的机制：
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>谷歌DataFlow编程模型以及Spark/Flink/StreamCQL的相关实现 https://blog.csdn.net/colorant/article/details/74923577
+Apache Flink进阶（七）：网络流控及反压剖析 https://cloud.tencent.com/developer/news/467888
+A Deep-Dive into Flink&#39;s Network Stack https://flink.apache.org/2019/06/05/flink-network-stack.html
+http://www.liaojiayi.com/
+</pre></div>
+
+
+<h4>他山之玉</h4>
+<div class="highlight"><pre><span></span>面对未知概念的时候，我们首先根据已经理解的概念去理解，但是在理解达到了某种程度后，我们必须放弃对旧概念的依赖。进行类比是对相近的事务理解的途径，如果和我们所知道的不一样，怎么去理解，有待重新认识
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-59.html" rel="bookmark"
+                           title="Permalink to Flink参数传递以及配置读取">Flink参数传递以及配置读取</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-10-20T21:10:00+08:00">
+                Published: 2019-10-20 21:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>ParameterTool Configuration broadcast</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-59.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-55.html" rel="bookmark"
+                           title="Permalink to Flink数据类型之POJO和Table中的Row">Flink数据类型之POJO和Table中的Row</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-09-15T22:10:00+08:00">
+                Published: 2019-09-15 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>POJO类型  BinaryRow TypeHint</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-55.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-54.html" rel="bookmark"
+                           title="Permalink to Flink状态计算概述">Flink状态计算概述</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-09-08T21:10:00+08:00">
                 Published: 2019-09-08 21:10:00
@@ -37,175 +252,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h3>Flink状态基本轮廓</h3>
-<div class="highlight"><pre><span></span>01.状态一致性
- at-most-once at-least-once  exactly-once
-02.状态计算： 
-  Key State 和 Operator state
-03.状态存储和恢复
-  checkpoint：checkpoint的机制
-  savepoint
- 恢复机制：    
-04.状态管理
-  state backkend(分类-配置等)
-  State Processor API(Flink 1.9版本)
-05.状态查看
-  Query
-</pre></div>
-
-
-<h2>Flink状态具体介绍</h2>
-<h3>1.状态一致性</h3>
-<div class="highlight"><pre><span></span>State Consistency
- at-most-once at-least-once  exactly-once
-fault tolerance 容错
-</pre></div>
-
-
-<h3>2.状态计算-stateful</h3>
-<div class="highlight"><pre><span></span>Stateful operators may maintain information about the events they have received before
-01.Key State  应用于 KeyStream
-  Manged State
-      使用 StateDescription 来获取相应的State的操作类
-       RichFunction中可用的RuntimeContext具有访问状态的方
-      定义状态的名称，数据类型信息，状态自定义函数
-        ValueState          ValueStateDescription    value()/update()
-        ListState           ListStateDescription     get()/ update()/add()/addAll()
-        MapState            MapStateDescription      get()/put()/keys()/values()/entries()
-        ReducingState       ReducingStateDescription  get()/add() 
-        AggregatingState    AggregatingStateDescription get()/add() 
-     eg: 在RichFlatmapFunction中使用ValueState
-       步骤：01.创建ValueStateDescription，02.使用getRuntimeContext.getState() 03.使用value()方法
-     生命周期TTL
-  Raw State
-     raw state是被应用程序自己管理，flink会调用相应的接口方法来实现状态的restore和snapshot
-02.Non-key State == operator state
-  Manged State
-     Checkpointed-Function
-     ListCheckpoint
-    001. Broadcast State是Flink支持的一种Operator State
-       01.首先会创建一个Keyed或Non-Keyed的Data Stream 
-       02.然后再创建一个 Broadcasted Stream 
-       03.最后通过Data Stream来连接（调用connect方法）到Broadcasted Stream上，
-       这样实现将Broadcast State广播到Data Stream下游的每个Task中
-  状态数据重分布说明：
-    Event-Split Redistribute
-    Union Redistribution
-  Raw State
-03其他：状态数据的划分和动态扩容
-   keyed State 动态扩展 当并发度改变时，Group在Task之间重新分配
-</pre></div>
-
-
-<h3>3.状态数据的备份和恢复</h3>
-<div class="highlight"><pre><span></span>01.原理： Checkpoint的执行流程是按照Chandy-Lamport算法实现的
-     Initiating a snapshot: 也就是开始创建 snapshot，可以由系统中的任意一个进程发起
-     Propagating a snapshot: 系统中其他进程开始逐个创建 snapshot 的过程
-     Terminating a snapshot: 算法结束条件
-    Flink核心思想是在 input source 端插入 barrier 来替代 Chandy-Lamport 算法中的 Marker，
-    通过控制 barrier 的同步来实现 snapshot 的备份和 exactly-once 语义
-
-02.配置
-  检查点 Checkpointing --CheckpointConfig
-   启动检查点机制
-       public StreamExecutionEnvironment enableCheckpointing(long interval)
-       public StreamExecutionEnvironment enableCheckpointing(long interval, CheckpointingMode mode)
-       public StreamExecutionEnvironment enableCheckpointing(long interval, CheckpointingMode mode, boolean force)
-      public class CheckpointConfig implements java.io.Serializable {}
-    01.checkpointing mode 
-        Checkpointing(检查点)模式(exactly-once vs. at-least-once)
-       EXACTLY_ONCE, AT_LEAST_ONCE
-       使用：  CheckpointingMode.EXACTLY_ONCE
-               CheckpointingMode.AT_LEAST_ONCE
-               其中： DEFAULT_MODE = CheckpointingMode.EXACTLY_ONCE
-    02.checkpointInterval 缺省值 -1，不开启
-       设置检查点的步长- interval  ms
-          check.point.interval = 6000
-    03.checkpointTimeout 超时时间  缺省值： 10 minutes
-        如果超过这个时间checkpoint还没结束，就会被认为是失败的
-    04.设置checkpoint的并发度
-      并发度为1
-         setMinPauseBetweenCheckpoints 缺省值为 0
-      并发度：
-         setMaxConcurrentCheckpoints  缺省值为 1
-          默认情况下，在一个checkpoint正在执行的过程中，系统不会触发另一个checkpoint
-          当定义了相邻checkpoint最小间隔时间时，不能使用此选项
-    05.checkpoint执行过程中出现失败或者错误，
-        FailOnCheckpointingErrors  任务是否同时关闭-默认值是True
-        setFailOnCheckpointingErrors
-        enableExternalizedCheckpoints
-          deleteOnCancellation
-          DELETE_ON_CANCELLATION
-          RETAIN_ON_CANCELLATION               
-    06.获取信息
-       判断是否启用检查点
-        getCheckpointInterval
-          Returns the checkpointing interval or -1 if checkpointing is disabled.
-        isCheckpointingEnabled
-        isFailOnCheckpointingErrors
-        isExternalizedCheckpointsEnabled
-        getExternalizedCheckpointCleanup
-    07. State recovery 恢复的机制
-       RestartStrategies job失败后如何重启
-         noRestart           无重启策略
-         fallBackRestart
-         fixedDelayRestart
-         failureRateRestart  失败率重启策略
-        配置说明：
-           01.如果checkpoint未启动，就会采用no restart策略，
-           02.如果启动了checkpoint机制，但是未指定重启策略的话，就会采用 fixed-delay 策略，重试Integer.MAX_VALUE 次
-             可以在配置文件中配置设置： 固定延迟重启策略(Fixed Delay Restart Strategy)
-            env.setRestartStrategy
-               (RestartStrategies.fixedDelayRestart( 3, // 尝试重启次数
-                              Time.of(10, TimeUnit.SECONDS) // 延迟时间间隔)
-        );
-Savepoint：
-   用户手动触发Checkpoint,并将结果持久化到指定的存储路径中
-   常用的场景： 升级中保存系统的状态数据，保证实现端到端的Excatly-Once语义保证
-    Operator ID
-</pre></div>
-
-
-<h3>4.状态管理 State management</h3>
-<div class="highlight"><pre><span></span>作用： 存储和管理checkpoint过程的状态数据
-三种类型的状态管理器
-  基于内存的   MemoryStateBackend   存储在JVM对内存中特点：快速高效但容量有限制
-  基于文件的       FsStateBackend
-  基于RocksDB RocksDBStateBackend   增量checkpoint，通过JNI方式进行数据交互，有大小限制2G
-StateBackend 来存储和管理Checkpoints过程的状态数据
-    说明：
-      默认情况下，状态保存在TaskManager的内存中，checkpoint存储在JobManager的内存中。
-        为了适配大状态的持久化，Flink支持在其它后端状态中存储和checkpoint状态
-         CHECKPOINTS_DIRECTORY
-      Flink目前只对没有迭代的作业提供处理保证。在迭代作业中进行checkpointing会导致异常发生，
-         如果用户强制要在迭代应用中启用checkpoint，则需要设置env.enableCheckpointing(interval, force = true)
-         但这也不能保证处在循环边界上的数据和状态不会丢失。
-    在内存级别的查看
-</pre></div>
-
-
-<h3>5.状态查看</h3>
-<div class="highlight"><pre><span></span>架构 Querable State
-    QuerableStateServer
-    QueryableStateClient
-    QueryableStateClientProxy
- 开启可查询的状态服务
-   01.集群层面： 引入jar包 flink-queryable-state-runtime.jar
-   02.代码层面： StateDescription 中调用 setQueryable() 方法 -配置可查询状态服务
-   03.通过外部应用查询状态数据
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>Flink使用 Broadcast State 实现流处理配置实时更新 http://ju.outofmemory.cn/entry/371335
-https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/stream/state/broadcast_state.html
-Apache Flink 零基础入门教程（六）：状态管理及容错机制 https://juejin.im/post/5d8367c36fb9a06b2a20785a
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>状态一致 状态计算 状态管理</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-54.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -468,6 +518,28 @@ Apache Flink 零基础入门教程（六）：状态管理及容错机制 https:
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>Antrl4与Spark SQL-FlinkSQL-HiveSQL</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-46.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-57.html" rel="bookmark"
+                           title="Permalink to Python生成SQL脚本造数据-重构">Python生成SQL脚本造数据-重构</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-05-18T22:22:00+08:00">
+                Published: 2019-05-18 22:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info -->                <p>重构  条件表达式</p>
+                <a class="readmore" href="/program/my-program-post-57.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
@@ -2338,6 +2410,28 @@ Apache Flink 零基础入门教程（六）：状态管理及容错机制 https:
 <p>tags: <a href="/tag/java.html">Java</a> </p>
 </footer><!-- /.post-info -->                <p>R-Python以及Spark在业务模型级别的部署</p>
                 <a class="readmore" href="/program/my-program-post-22.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-56.html" rel="bookmark"
+                           title="Permalink to Hive字符串和时间处理函数(二）">Hive字符串和时间处理函数(二）</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-02T22:10:00+08:00">
+                Published: 2017-05-02 22:10:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>COALESCE  CONCAT_WS  时间格式变换 Hive存储格式</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-56.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
