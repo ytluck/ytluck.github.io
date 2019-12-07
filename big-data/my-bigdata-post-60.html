@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Flink失败恢复重启和KeySelector</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-60.html" rel="bookmark"
+           title="Permalink to Flink失败恢复重启和KeySelector">Flink失败恢复重启和KeySelector</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-10-26T20:05:00+08:00">
+                Published: 2019-10-26 20:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->      <h3>重启方式：</h3>
+<div class="highlight"><pre><span></span>RestartStrategyConfigurations
+    无重启           (No restart)
+    固定间隔延迟重启 (Fixed delay)
+    失败率           (Failure rate)    
+    备选     (Fallback )
+Fallback 后备重启策略，即所谓的默认重启策略；Cluster level default restart strategy
+      集群中如果没有在配置文件（flink-conf.yaml）中显示的配置重启策略，
+      也没有在编程中配置重启策略，在检查点机制开启的情况下
+-- NoOrFixedIfCheckpointingEnabledRestartStrategyFactory
+    Default restart strategy that resolves 
+    either to {@link NoRestartStrategy} or {@link FixedDelayRestartStrategy}
+    depending if checkpointing was enabled.
+    如果没有启用 checkpointing，则使用无重启 (no restart) 策略。
+    如果启用了 checkpointing，但没有配置重启策略，则使用固定间隔 (fixed-delay) 策略，其中 Integer.MAX_VALUE 参数是尝试重启次数
+</pre></div>
+
+
+<h4>重启的源码：</h4>
+<div class="highlight"><pre><span></span>RestartStrategyConfiguration是个抽象类，它定义了getDescription抽象方法，
+它有NoRestartStrategyConfiguration、
+    FallbackRestartStrategyConfiguration
+    FixedDelayRestartStrategyConfiguration、
+    FailureRateRestartStrategyConfiguration、
+具体示例：
+    NoRestartStrategyConfiguration extends RestartStrategyConfiguration
+    00. RestartStrategyConfiguration   // Abstract configuration for restart strategies.
+    01.
+    02.FallbackRestartStrategyConfiguration
+          Cluster level default restart strategy
+
+使用案例：
+    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.of(10L, TimeUnit.SECONDS)));
+     //NANOSECONDS   纳秒，符号ns（英语： nanoseconds ）
+    // Time unit representing one thousandth of a millisecond   MICROSECONDS   
+    // Time unit representing one thousandth of a second        MILLISECONDS  微秒，符号μs microsecond 
+    //  SECONDS    MINUTES  HOURS  DAYS
+</pre></div>
+
+
+<h3>重启级别</h3>
+<div class="highlight"><pre><span></span>全局重启策略        全局配置文件flink-conf.yaml
+单个job的重启策略   可以通过编程的方式指定 一般情况下，编程方式指定的单个job重启策略会将全局策略覆盖
+api的方式是优先于配置文件的，作用范围仅限于当前任务执行的上下文
+</pre></div>
+
+
+<h3>KeySelector</h3>
+<div class="highlight"><pre><span></span><span class="nx">KeySelector接口继承了Function接口</span><span class="err">，</span><span class="nx">定义了getKey方法</span><span class="err">，</span><span class="nx">用于从IN类型中提取出KEY</span>
+  <span class="nx">The</span> <span class="nx">KeySelector</span> <span class="nx">to</span> <span class="nx">be</span> <span class="nx">used</span> <span class="k">for</span> <span class="nx">extracting</span> <span class="nx">the</span> <span class="nx">key</span> <span class="k">for</span> <span class="nx">partitioning</span>
+<span class="nx">实现KeySelector接口可以自定义key值选取</span>
+  <span class="kr">public</span> <span class="kr">interface</span> <span class="nx">KeySelector</span><span class="o">&lt;</span><span class="nx">IN</span><span class="p">,</span> <span class="nx">KEY</span><span class="o">&gt;</span> <span class="kr">extends</span> <span class="nb">Function</span><span class="p">,</span> <span class="nx">Serializable</span> <span class="p">{</span>
+    <span class="nx">KEY</span> <span class="nx">getKey</span><span class="p">(</span><span class="nx">IN</span> <span class="nx">value</span><span class="p">)</span> <span class="kr">throws</span> <span class="nx">Exception</span><span class="p">;}</span>
+
+<span class="kr">public</span> <span class="kr">class</span> <span class="nx">NullByteKeySelector</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="kr">implements</span> <span class="nx">KeySelector</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">Byte</span><span class="o">&gt;</span> <span class="p">{</span>
+   <span class="kr">private</span> <span class="kr">static</span> <span class="kr">final</span> <span class="kr">long</span> <span class="nx">serialVersionUID</span> <span class="o">=</span> <span class="mi">614256539098549020</span><span class="nx">L</span><span class="p">;</span>
+   <span class="err">@</span><span class="nx">Override</span>
+   <span class="kr">public</span> <span class="nx">Byte</span> <span class="nx">getKey</span><span class="p">(</span><span class="nx">T</span> <span class="nx">value</span><span class="p">)</span> <span class="kr">throws</span> <span class="nx">Exception</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+   <span class="p">}</span>
+   <span class="p">}</span>
+ <span class="nx">源码使用示例</span><span class="err">：</span>
+ <span class="kr">public</span> <span class="kr">class</span> <span class="nx">DataStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+        <span class="kr">public</span> <span class="o">&lt;</span><span class="nx">K</span><span class="o">&gt;</span> <span class="nx">KeyedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">K</span><span class="o">&gt;</span> <span class="nx">keyBy</span><span class="p">(</span><span class="nx">KeySelector</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">K</span><span class="o">&gt;</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">Preconditions</span><span class="p">.</span><span class="nx">checkNotNull</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">KeyedStream</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">clean</span><span class="p">(</span><span class="nx">key</span><span class="p">));</span>
+    <span class="p">}}</span>
+
+ <span class="kr">public</span> <span class="kr">class</span> <span class="nx">AllWindowedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">W</span> <span class="kr">extends</span> <span class="nx">Window</span><span class="o">&gt;</span> <span class="p">{</span>
+     <span class="kr">public</span> <span class="nx">AllWindowedStream</span><span class="p">(</span><span class="nx">DataStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="nx">input</span><span class="p">,</span><span class="nx">WindowAssigner</span><span class="cp">&lt;?</span> <span class="nx">super</span> <span class="nx">T</span><span class="p">,</span> <span class="nx">W</span><span class="o">&gt;</span> <span class="nx">windowAssigner</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="nx">input</span> <span class="o">=</span> <span class="nx">input</span><span class="o">.</span><span class="nx">keyBy</span><span class="p">(</span><span class="k">new</span> <span class="nx">NullByteKeySelector</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">());</span>
+        <span class="k">this</span><span class="o">.</span><span class="nx">windowAssigner</span> <span class="o">=</span> <span class="nx">windowAssigner</span><span class="p">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="nx">trigger</span> <span class="o">=</span> <span class="nx">windowAssigner</span><span class="o">.</span><span class="nx">getDefaultTrigger</span><span class="p">(</span><span class="nx">input</span><span class="o">.</span><span class="nx">getExecutionEnvironment</span><span class="p">());</span>
+      <span class="p">}}</span>
+ <span class="k">public</span> <span class="k">class</span> <span class="nc">KeyedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">KEY</span><span class="o">&gt;</span> <span class="k">extends</span> <span class="nx">DataStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+   <span class="k">public</span> <span class="nx">WindowedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">KEY</span><span class="p">,</span> <span class="nx">TimeWindow</span><span class="o">&gt;</span> <span class="nx">timeWindow</span><span class="p">(</span><span class="nx">Time</span> <span class="nx">size</span><span class="p">)</span> <span class="p">{}</span>
+   <span class="k">public</span> <span class="nx">WindowedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">KEY</span><span class="p">,</span> <span class="nx">TimeWindow</span><span class="o">&gt;</span> <span class="nx">timeWindow</span><span class="p">(</span><span class="nx">Time</span> <span class="nx">size</span><span class="p">,</span> <span class="nx">Time</span> <span class="nx">slide</span><span class="p">)</span> <span class="p">{}</span>
+   <span class="k">public</span> <span class="nx">WindowedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">KEY</span><span class="p">,</span> <span class="nx">GlobalWindow</span><span class="o">&gt;</span> <span class="nx">countWindow</span><span class="p">(</span><span class="nx">long</span> <span class="nx">size</span><span class="p">)</span> <span class="p">{}</span>
+   <span class="k">public</span> <span class="nx">WindowedStream</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">KEY</span><span class="p">,</span> <span class="nx">GlobalWindow</span><span class="o">&gt;</span> <span class="nx">countWindow</span><span class="p">(</span><span class="nx">long</span> <span class="nx">size</span><span class="p">,</span> <span class="nx">long</span> <span class="nx">slide</span><span class="p">)</span> <span class="p">{}</span>  
+ <span class="p">}</span>
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

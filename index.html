@@ -26,7 +26,305 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-58.html">Flink与其他流式计算系统的比较</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-61.html">Flink广播状态和Spark广播变量</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-11-02T20:18:00+08:00">
+                Published: 2019-11-02 20:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info --><h3>基本概念</h3>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.apache.flink.streaming.api.functions.KeyedProcessFunction</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.flink.streaming.api.operators.KeyedProcessOperator</span><span class="p">;</span>
+</pre></div>
+
+
+<h4>Flink Broadcast State</h4>
+<div class="highlight"><pre><span></span>// 设置广播变量和获取广播变量。
+访问 state 前先要定义状态描述符(StateDescriptor). BroadcastState 的状态描述符是 MapStateDescriptor.
+MapStateDescriptor 的 value 类型即是广播流的元素类型，这个例子里是 Map&lt;String,Object&gt;。
+// 01.数据流
+   KeyedStream&lt;Tuple2&lt;String, String&gt;, String&gt; keyedStream  = ……
+// 02.广播流
+//001.定义mapstatdesc 
+    MapStateDescriptor&lt;String, String&gt; testStateDescriptor = new MapStateDescriptor&lt;&gt;(&quot;testStat&quot;, String.class, TestStat.class);
+//002.广播测试数据
+ BroadcastStream&lt;String&gt; testBroadcastStream = testInfoLogSource.map(new TestInfoParseFunction())
+                                                                        .name(&quot;TestInfoParseMap&quot;)
+                                                                        .broadcast(testStateDescriptor);
+//03.连接数据流  数据流.connect(广播流)    
+   DataStream&lt;TestResultBean&gt; matchStream = keyedStream.connect(testBroadcastStream)
+                                                        .process(new TestMatchFunctionNew())
+                                                        .setParallelism(&quot;Test&quot;)
+                                                        .name(&quot;TestMatchFunction&quot;)  ;   
+其中：  
+   public class TestMatchFunctionNew extends KeyedBroadcastProcessFunction&lt;String, Tuple2&lt;String,String&gt;, String, String&gt;{}
+ KeyedStream
+     .connect(BroadcastStream)
+    .process(new KeyedBroadcastProcessFunction&lt;&gt;(…))
+    KeyedStream 连接 BroadcastStream 的，
+  只能使用 KeyedBroadcastProcessFunction 函数处理连接逻辑
+ KeyedBroadcastProcessFunction 比 BroadcastProcessFunction 
+    多了计时器服务和获取当前 key 接口
+
+ noKeyedStream
+   .connect(BroadcastStream)
+   .process(new BroadcastProcessFunction&lt;&gt;(…)) 
+   非 KeyedStream 连接 BroadcastStream 的，
+    只能使用 BroadcastProcessFunction 函数处理连接逻辑
+</pre></div>
+
+
+<h3>Flink源码 KeyedBroadcastProcessFunction</h3>
+<div class="highlight"><pre><span></span>    KS 是 KeyedStream 中 key 的类型；
+    IN1 是数据流(即非广播流)的元素类型；
+    IN2 是广播流的元素类型；
+    OUT 是两个流连接完成后，输出流的元素类型
+   public abstract class KeyedBroadcastProcessFunction &lt;KS, IN1, IN2, OUT&gt; 
+      extends org.apache.flink.streaming.api.functions.co.BaseBroadcastProcessFunction {
+         processElement         // 函数处理数据流的数据
+            value 是数据流中的一个元素；
+            ctx 是上下文，可以提供计时器服务、当前 key和只读的 BroadcastState； ctx.getBroadcastState
+            out 是输出流收集器。
+         processBroadcastElement// 处理广播流的数据
+         onTimer
+          public abstract class Context extends
+          public abstract class ReadOnlyContext extends
+         public abstract class OnTimerContext extends
+      }
+       public abstract class BaseBroadcastProcessFunction extends AbstractRichFunction {
+         getBroadcastState
+        }
+         public abstract class AbstractRichFunction implements RichFunction, Serializable {
+           getRuntimeContext
+           getIterationRuntimeContext
+           open
+           close
+         }
+</pre></div>
+
+
+<h4>Flink源码 BroadcastProcessFunction</h4>
+<div class="highlight"><pre><span></span>   public abstract class BroadcastProcessFunction&lt;IN1, IN2, OUT&gt; extends BaseBroadcastProcessFunction {
+      processElement
+      processBroadcastElement
+      public abstract class Context extends
+      public abstract class ReadOnlyContext  extends      
+    }
+Flink中有两种方式  make data available to all parallel instances of a function
+   Via function parameters/closures or via broadcast sets.
+</pre></div>
+
+
+<h3>Spark Broadcast 广播变量</h3>
+<div class="highlight"><pre><span></span>  //将标签广播
+  List&lt;String&gt; labelColums = Arrays.asList(labels);
+   Broadcast&lt;List&lt;String&gt;&gt; broadcastColumnList = spark.sparkContext().broadcast(labelColums, ClassManifestFactory.classType(List.class));
+ //使用-具名函数的方式
+   JavaRDD&lt;Row&gt; TestRdd = TestSet.javaRDD().flatMap(new TestMatchFuntion(broadcastColumnList))
+
+   其中函数
+     public class TestMatchFuntion implements FlatMapFunction&lt;Row, Row&gt;{
+           public TestMatchFuntion(Broadcast&lt;List&lt;String&gt; broadcastColumnList) {
+           cityList = broadcastColumnList.getValue();
+        }
+         @Override
+          public Iterator&lt;Row&gt; call(Row r) throws Exception {}
+     }
+</pre></div>
+
+
+<h4>Spark源码 broadcast</h4>
+<div class="highlight"><pre><span></span>  org.apache.spark.broadcast
+  Spark&#39;s broadcast variables, used to broadcast immutable datasets to all nodes.
+  作用： BroadCast就是将数据从一个节点发送到其它的节点
+    abstract class Broadcast[T: ClassTag](val id: Long) extends Serializable with Logging
+    private[spark] trait BroadcastFactory
+    private[spark] class BroadcastManager
+    private[spark] class TorrentBroadcastFactory extends BroadcastFactory 
+    private[spark] class TorrentBroadcast[T: ClassTag](obj: T, id: Long) extends Broadcast[T](id) with Logging with Serializable
+其中： BroadcastManager.newBroadcast( ) 
+ 使用getValue时,会执行实例初始化时定义的lazy的函数readBroadcastBlock
+BroadCast的两种广播方式
+   HttpBroadCast方式   HttpBroadCast会出现单点故障，网络IO瓶颈
+   TorrentBroadCast方式
+</pre></div>
+
+
+<h3>Spark广播使用案例</h3>
+<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">com</span><span class="o">.</span><span class="n">letour</span><span class="o">.</span><span class="n">main</span><span class="p">;</span>   
+<span class="kn">import</span> <span class="nn">com.google.common.collect.Lists</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.JavaRDD</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.JavaSparkContext</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.function.FlatMapFunction</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.broadcast.Broadcast</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.DataTypes</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.StructField</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.StructType</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.</span><span class="o">*</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">DimenBroad</span> <span class="p">{</span>
+<span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SparkSession</span> <span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span>
+            <span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">&quot;Invalid&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">enableHiveSupport</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.sql.shuffle.partitions&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">getOrCreate</span><span class="p">();</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="err">待匹配的表</span> <span class="err">年级和年级对应的表</span>
+     <span class="o">*/</span>
+    <span class="n">Dataset</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">gradeDF</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;select grade_nm,grade_cd from tmp_test.tmp_date_ed where grade_cd is  not null &quot;</span><span class="p">);</span>
+    <span class="n">JavaRDD</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">origGradeRDD</span> <span class="o">=</span> <span class="n">gradeDF</span><span class="o">.</span><span class="n">javaRDD</span><span class="p">();</span>
+
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="err">待广播的表</span>
+     <span class="o">*/</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">grades</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;select grade from tmp_test.tmp_data_td&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">collectAsList</span><span class="p">();</span>
+    <span class="o">//</span><span class="err">将年级广播</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">gradeColums</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ArrayList</span><span class="p">(</span><span class="n">grades</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">gradeColums</span> <span class="o">!=</span> <span class="n">null</span> <span class="o">&amp;&amp;</span> <span class="err">!</span><span class="n">gradeColums</span><span class="o">.</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">Row</span> <span class="n">b</span> <span class="p">:</span> <span class="n">grades</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">String</span> <span class="n">grade</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade&quot;</span><span class="p">);</span>
+            <span class="n">gradeColums</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grade</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="o">//</span><span class="err">构造广播的情况</span>
+    <span class="n">JavaSparkContext</span> <span class="n">sparkContext</span> <span class="o">=</span> <span class="n">JavaSparkContext</span><span class="o">.</span><span class="n">fromSparkContext</span><span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">sparkContext</span><span class="p">());</span>
+    <span class="n">final</span> <span class="n">Broadcast</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">dimGradeBroad</span> <span class="o">=</span> <span class="n">sparkContext</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">gradeColums</span><span class="p">);</span>
+    <span class="n">JavaRDD</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">memRDD</span> <span class="o">=</span> <span class="n">origGradeRDD</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="n">new</span> <span class="n">FlatMapFunction</span><span class="o">&lt;</span><span class="n">Row</span><span class="p">,</span> <span class="n">Row</span><span class="o">&gt;</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">call</span><span class="p">(</span><span class="n">Row</span> <span class="n">t</span><span class="p">)</span> <span class="n">throws</span> <span class="ne">Exception</span> <span class="p">{</span>
+            <span class="n">String</span> <span class="n">grade_nm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade_nm&quot;</span><span class="p">);</span>
+            <span class="n">String</span> <span class="n">grade_cd</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade_cd&quot;</span><span class="p">);</span>
+            <span class="n">Row</span> <span class="n">result</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">iList</span> <span class="o">=</span> <span class="n">dimGradeBroad</span><span class="o">.</span><span class="n">value</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">iList</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">grade_nm</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">result</span><span class="o">=</span> <span class="n">RowFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">Grade_nm</span><span class="p">,</span> <span class="n">grade_cd</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span><span class="p">)</span> <span class="n">result</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">})</span><span class="o">.</span><span class="n">repartition</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+   <span class="o">//</span><span class="err">转换为</span><span class="n">Dataset</span><span class="err">数据类型</span>
+    <span class="n">Dataset</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">matchDF</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">memRDD</span><span class="p">,</span> <span class="n">getSchema</span><span class="p">());</span>
+
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="err">写入到表</span>
+     <span class="o">*/</span>
+     <span class="n">matchDF</span><span class="o">.</span><span class="n">write</span><span class="p">()</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="n">SaveMode</span><span class="o">.</span><span class="n">Overwrite</span><span class="p">)</span><span class="o">.</span><span class="n">insertInto</span><span class="p">(</span><span class="s2">&quot;tmp_test.result_date_ed&quot;</span><span class="p">);</span>
+    <span class="o">//</span>  <span class="n">matchDF</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;tmp_chase_d&quot;</span><span class="p">);</span>
+    <span class="o">//</span>  <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;insert overwrite table tmp_test.result_date_d partition(stat=&#39;2019&#39;) select * from tmp_chase_d&quot;</span><span class="p">);</span>
+    <span class="o">//</span><span class="err">执行结束</span>
+    <span class="n">spark</span><span class="o">.</span><span class="n">stop</span><span class="p">();</span>
+<span class="p">}</span>
+ <span class="o">/**</span>
+  <span class="o">*</span> <span class="err">转换为</span><span class="n">Dataset</span><span class="err">数据类型所需要的结构</span>
+  <span class="o">*/</span>
+  <span class="n">private</span> <span class="n">static</span> <span class="n">StructType</span> <span class="n">getSchema</span><span class="p">()</span> <span class="p">{</span>
+      <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">StructField</span><span class="o">&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">StructField</span><span class="o">&gt;</span><span class="p">();</span>
+      <span class="n">StructField</span> <span class="n">Grade_nm</span> <span class="o">=</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">createStructField</span><span class="p">(</span><span class="s2">&quot;grade_nm&quot;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">StringType</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+      <span class="n">StructField</span> <span class="n">Grade_cd</span> <span class="o">=</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">createStructField</span><span class="p">(</span><span class="s2">&quot;grade_cd&quot;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">StringType</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+      <span class="n">fields</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grade_nm</span><span class="p">);</span>
+      <span class="n">fields</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grade_cd</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">createStructType</span><span class="p">(</span><span class="n">fields</span><span class="p">);</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h4>Spark中的Row</h4>
+<div class="highlight"><pre><span></span>To create a new Row, use RowFactory.create() in Java or Row.apply() in Scala
+A Row object can be constructed by providing field values
+01.RowFactory
+  public class RowFactory {
+  public static Row create(Object ... values) {
+    return new GenericRow(values);
+  }
+}
+02.GenericRow
+  class GenericRow(protected[sql] val values: Array[Any]) extends Row{}
+03.Row
+  trait Row extends Serializable {
+  def size: Int = length
+  def length: Int
+  def schema: StructType = null
+  def apply(i: Int): Any = get(i)
+  def get(i: Int): Any
+      getBoolean getByte getShort getInt getLong getFloat getDouble getString getDecimal
+      getDate getTimestamp
+      getSeq getList getMap getJavaMap getStruct getAs getAnyValAs
+      getValuesMap
+   /** Checks whether the value at position i is null. */
+    def isNullAt(i: Int): Boolean = get(i) == null
+   anyNull
+   fieldIndex
+   toSeq  mkString
+   equals  copy toString hashCode
+}
+
+BooleanType -&gt; java.lang.Boolean
+ByteType -&gt; java.lang.Byte
+ShortType -&gt; java.lang.Short
+IntegerType -&gt; java.lang.Integer
+FloatType -&gt; java.lang.Float
+DoubleType -&gt; java.lang.Double
+StringType -&gt; String
+DecimalType -&gt; java.math.BigDecimal
+
+DateType -&gt; java.sql.Date
+TimestampType -&gt; java.sql.Timestamp
+
+BinaryType -&gt; byte array
+ArrayType -&gt; scala.collection.Seq (use getList for java.util.List)
+MapType -&gt; scala.collection.Map (use getJavaMap for java.util.Map)
+StructType -&gt; org.apache.spark.sql.Row
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span> Variables Closures vs. Broadcast Variables
+    https://cwiki.apache.org/confluence/display/FLINK/Variables+Closures+vs.+Broadcast+Variables
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-60.html" rel="bookmark"
+                           title="Permalink to Flink失败恢复重启和KeySelector">Flink失败恢复重启和KeySelector</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-10-26T20:05:00+08:00">
+                Published: 2019-10-26 20:05:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>restart-重启策略  KeySelector</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-60.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-58.html" rel="bookmark"
+                           title="Permalink to Flink与其他流式计算系统的比较">Flink与其他流式计算系统的比较</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-10-20T23:10:00+08:00">
                 Published: 2019-10-20 23:10:00
@@ -37,159 +335,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h4>流计算</h4>
-<div class="highlight"><pre><span></span>Dataflow编程模型： 清晰的定义这些问题，并针对性的在模型框架层面加以解决
-01.概念一
-      bounded data(processing)
-    unbounded data(processing)
-02.概念二 ： Event time和 Process time
-    常见的流式计算框架中的［key，value］两元组tuple形式的信息数据，
-                  变换成了［key,value, event time, window ］这样的四元组模型
-    多数基于Process time定义的固定窗口或滑动窗口模型，并没有特别强调窗口触发这样一个概念
-03.Dataflow提供了可自定义的窗口触发模型
-04.网络流控是为了在上下游速度不匹配的情况下，防止下游出现过载
-</pre></div>
-
-
-<h3>Storm</h3>
-<div class="highlight"><pre><span></span>01.容错方式
-   at least once(实现采用record-level acknowledgments)，可能存在重复发送的情况
-    Trident可以支持storm 提供exactly once语义。
-   ACK机制 ：对每个消息进行全链路跟踪，失败或超时进行重发
- 状态管理
-02. 无状态，需用户自行进行状态管理
-03 
-04
-05.  feedback 机制 
-     Storm 在每一个 Bolt 都会有一个监测反压的线程（Backpressure Thread）
-</pre></div>
-
-
-<h3>Spark</h3>
-<h4>Spark Streaming</h4>
-<div class="highlight"><pre><span></span> 01. 端到端的exactly-once 容错-- failure detector 以及 failover处理
-      Write-Ahead Logs
-      Configuring write-ahead logs 
-        spark.streaming.receiver.writeAheadLog.enable
-        spark.streaming.receiver.writeAheadLog.closeFileAfterWrite    
-02. 状态计算
-        updateStateByKey  reduceByKeyAndWindow 
-03.Event time 以及乱序和迟到数据 
-        水印
-04.窗口和触发模型
-
-05. 网络限速
-  001. Setting the max receiving rate
-        spark.streaming.receiver.maxRate 
-        spark.streaming.kafka.maxRatePerPartition
-  002.backpressure
-            spark.streaming.backpressure.enabled 
-            spark.streaming.backpressure.initialRate
-        Fecher 会实时的从 Buffer、Processing 这样的节点收集一些指标
- 然后通过 Controller 把速度接收的情况再反馈到 Receiver，实现速率的匹配
-06.执行流程
-  Driver - Executor
-  Master -worker
-  任务调度： DAG stage task
-</pre></div>
-
-
-<h4>Spark Structure Streaming</h4>
-<div class="highlight"><pre><span></span>01. end-to-end exactly-once fault-tolerance guarantees 
-       通过 checkpointing and Write-Ahead Logs
-02. Stateful Stream Processing 
-          mapGroupsWithState  和 flatMapGroupsWithState
-03.Event time 以及乱序和迟到数据 
-        水印
-04.窗口和触发模型
-
-05. 网络限速
-</pre></div>
-
-
-<h3>Flink</h3>
-<div class="highlight"><pre><span></span>Flink  checkpointing 和 Two phase commit
-    Phase 1: Pre-commit
-    Phase 2:Commit
-02. 状态计算
-
-03.Event time 以及乱序和迟到数据 
-     水印
-
-04.窗口和触发模型
-
-05. 网络限速  
-   1.5之前 Flink TCP-based 
-     基于 TCP 流控 + bounded buffer 实现反压
-   1.5之后 Credit-based flow control 基于信用度的流量传输控制
-     Credit 可以类比为 TCP 的 Window 机制，实现了自己托管的 credit - based 流控机制，在应用层模拟 TCP 的流控机制
- 默认情况下，jobmanager会每隔50ms采集对每个task采集100个stack trace来决定是否有反压。
-    如果是0.01只表明100个采样中，有1个很慢
-     OK  LOW HIGH
-      配置 
-        jobmanager.web.backpressure.refresh-interval ： web默认是60s采集一次反压值
-        jobmanager.web.backpressure.num-samples ： 采集样本的数量决定反压，默认值是100
-        jobmanager.web.backpressure.num-samples ： 采集样本的数量决定反压，默认值是100
-06.网络通信
-   Apache Flink 在 Dispatcher、JobMaster、ResourceManager、TaskExecutor 几大组件之间采用 akka 进行通信
- Task之间的通信Netty
-   Flink的这个Buffer接口主要是一种flink层面用于传输数据和事件的统一抽象，其实现类是NetworkBuffer，是对MemorySegment的包装
-   为了方便管理NetworkBuffer，Flink提供了BufferPoolFactory，并且提供了唯一实现NetworkBufferPool
- 执行流程
-   Jobmanager TaskManger   dispatcher  resourceManager
-   进程master和worker
-   任务调度： StreamGraph JobGraph ExecutionGraph
-</pre></div>
-
-
-<h4>各个性能</h4>
-<div class="highlight"><pre><span></span>功能：
-   功能完整性
-性能指标：
-   稳定性
-   吞吐量（Throughput）
-   延迟（Latency）
- 其他概念
-   幂等 f(f(x)) = f(x)
-   非幂等
-     幂等：多次重复操作和一次操作产生的影响是一样的。
-   非幂等：多次重复操作和一次操作产生的影响是不一样的。
-      WriteAheadLog()      WAL机制支持非幂等业务请求场景  或者exactly once业务场景
-      HBase的Write Ahead Log (WAL)提供了一种高并发、持久化的日志保存与回放机制。
-          每一个业务数据的写入操作（PUT / DELETE）执行前，都会记账在WAL中。
-   过程 commit  abort 
-附录：
-   当一个特定时间窗口被触发以后，后续晚到的数据如何处理，如何对之前触发结算的结果进行修正
-  三种策略 丢弃  累计  累计并更正
-
-   ProcessFunction函数是低级别的流处理操作，可访问所有（非循环）流应用程序的基本构建块(basic building blocks)，比如：
-      a、Events (stream elements)
-      b、State (fault tolerant, consistent)
-      c、Timers (event time and processing time)
-   ProcessFunction可以看作是一个可访问keyed state和定时器(timers)的FlatMapFunction
- 网络流控
-    网络流控的实现：
-      01.静态限速 传统的做法可以在 Producer 端实现一个类似 Rate Limiter 这样的静态限流
-      02.动态反馈（自动反压）的机制：
-</pre></div>
-
-
-<h4>参考：</h4>
-<div class="highlight"><pre><span></span>谷歌DataFlow编程模型以及Spark/Flink/StreamCQL的相关实现 https://blog.csdn.net/colorant/article/details/74923577
-Apache Flink进阶（七）：网络流控及反压剖析 https://cloud.tencent.com/developer/news/467888
-A Deep-Dive into Flink&#39;s Network Stack https://flink.apache.org/2019/06/05/flink-network-stack.html
-http://www.liaojiayi.com/
-</pre></div>
-
-
-<h4>他山之玉</h4>
-<div class="highlight"><pre><span></span>面对未知概念的时候，我们首先根据已经理解的概念去理解，但是在理解达到了某种程度后，我们必须放弃对旧概念的依赖。进行类比是对相近的事务理解的途径，如果和我们所知道的不一样，怎么去理解，有待重新认识
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>反压Backpressure</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-58.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
