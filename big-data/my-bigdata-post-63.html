@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>SQL解析器 JSqlParser</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-63.html" rel="bookmark"
+           title="Permalink to SQL解析器 JSqlParser">SQL解析器 JSqlParser</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-05-25T21:18:00+08:00">
+                Published: 2019-05-25 21:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->      <h3>语法分析生成器</h3>
+<div class="highlight"><pre><span></span>-- JavaCC    
+   介绍：JavaCC是一个词法分析生成器和语法分析生成器
+   TOP-DOWN：JavaCC产生自顶向下的语法分析器，而YACC等工具则产生的是自底向上的语法分析器。做词法分析
+    输入文件是一个词法和语法的规范文件.jj，文件中词法和语法规则都写在其中
+     在PARSER_BEGIN和PARSER_END之间定义语法解析器的主类，这是整个解析程序的入口，
+       里面主要有一些引用的包和类以及一个main方法（其他的方法由JavaCC生成
+    Apache Calcite是一个动态数据管理框架，它具备很多典型数据库管理系统的功能，比如SQL 解析、SQL校验、SQL查询优化、SQL生成以及数据连接查询等，基于JavaCC。
+-- ANTLR(ANother Tool for Language Recognition)
+   两种遍历树的机制：
+      监听器 Listener extends BaseErrorListener  extends SqlBaseBaseListener
+      访问器 Vistor pattern
+</pre></div>
+
+
+<h3>SQL解析器</h3>
+<div class="highlight"><pre><span></span> 01.JSqlParser  It is built using JavaCC
+    net.sf.jsqlparser.parser.CCJSqlParserUtil   
+ The method CCJSqlParserManager.parse  returns a class implementing Statement 
+  which can be used to navigate the structure representing the SQL statement
+ Jsqlparser对SQL的遍历采用了 VISITOR 模式， 遍历SQL语句比较方便
+ 应用场景： 状态过滤、权限过滤，表和字段血缘管理
+02. Apache Calcite是一个动态数据管理框架，它具备很多典型数据库管理系统的功能，比如SQL 解析、SQL校验、SQL查询优化、SQL生成以及数据连接查询等，基于JavaCC。
+3. fdb-sql-parser
+4. 正则匹配的方法
+</pre></div>
+
+
+<h3>开发</h3>
+<div class="highlight"><pre><span></span>01.Maven依赖
+ <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>com.github.jsqlparser<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>jsqlparser<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>1.2<span class="nt">&lt;/version&gt;</span>
+ <span class="nt">&lt;/dependency&gt;</span>
+ 02.源码
+  文件：  JSqlParserCC.jjt
+     /**
+     * It represents an expression like &quot;(&quot; expression &quot;)&quot;
+     */
+    public class Parenthesis implements Expression {}
+    public interface Expression {void accept(ExpressionVisitor expressionVisitor);}
+
+
+    /**
+     * The core of a &quot;SELECT&quot; statement (no UNION, no ORDER BY)
+     */
+    public class PlainSelect implements SelectBody {
+        public Expression getWhere() {return where;}
+        ……}
+    public interface SelectBody {void accept(SelectVisitor selectVisitor);}
+    public class Select implements Statement {}
+    public interface Statement {void accept(StatementVisitor statementVisitor);}
+03.具体概念
+ Statement  SQL语句
+     Select,Create,Drop,Insert,Delete等，它们作为Statement实现类，均实现accept方法
+ Expression  
+     ExpressionVisitor
+ Visitor有StatementVisitor,SelectVisitor,ExpressionVisitor,SelectItemVisitor,FromItemVisitor
+ CNFConverter ：This class handles the conversion from a normal expression tree into the CNF form.
+ SelectDeParser :
+  A class to de-parse (that is, tranform from JSqlParser hierarchy into a string)
+ // de为英语前缀，前缀de-来自拉丁语，意为&quot;away from&quot;,de-还表示&quot;除去&quot;、&quot;取消&quot;以及&quot;否定&quot;、&quot;非&quot;、&quot;相反&quot;的意思
+</pre></div>
+
+
+<h3>其他</h3>
+<div class="highlight"><pre><span></span>Trie树,又叫做前缀树或者是字典树,是一种有序的树
+ Observer - 观察者模式
+ Listener - 监听模式
+ Visitor  - 访问者
+    访问操作独立出来变成一个新的类，当我们需要增加访问操作的时候，直接增加新的类，原来的代码不需要任何的改变。
+    把结构和数据分开，编写一个访问者，去访问数据结构中的元素，然后把对各元素的处理全部交给访问者类
+     Visitor 声明visit()  ConcreteVisitor 实现visit()
+     Element 声明accept()  ConcreteElement  accept方法的实现 
+     ObjectStructure
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>https://www.programcreek.com/java-api-examples/?class=net.sf.jsqlparser.statement.select.PlainSelect&amp;method=getGroupByColumnReferences
+JSqlParser使用示例   https://zacard.net/2016/05/10/JSqlParser-examples/
+https://www.programcreek.com/java-api-examples/index.php?api=net.sf.jsqlparser.parser.CCJSqlParserUtil
+SQL解析(Jsqlparser) http://itsolife.com/2014/02/02/2014-02-02-JavaJ2EE-SQL_Java--SQL%E8%A7%A3%E6%9E%90Jsqlparser/
+jsqlParse分析SQL https://www.jianshu.com/p/988229bb82b7
+使用Jsqlparser从复杂SQL语句中提取表名 http://www.findsrc.com/java/detail/8640
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

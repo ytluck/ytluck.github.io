@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Flink和Spark高阶函数flatMap</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-62.html" rel="bookmark"
+           title="Permalink to Flink和Spark高阶函数flatMap">Flink和Spark高阶函数flatMap</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-11-23T18:18:00+08:00">
+                Published: 2019-11-23 18:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->      <h3>Java中的数据结构</h3>
+<div class="highlight"><pre><span></span>01.List
+   private static class  ArrayList&lt;E&gt; extends AbstractList&lt;E&gt; implements RandomAccess, java.io.Serializable
+   public abstract class AbstractList&lt;E&gt; extends AbstractCollection&lt;E&gt; implements List&lt;E&gt; {}
+   public abstract class AbstractCollection&lt;E&gt; implements Collection&lt;E&gt; {}
+   public interface List&lt;E&gt; extends Collection&lt;E&gt; {}   
+02.Array 类和 Arrays类
+   数组类 Array 
+       public final class Array extends Object
+           元素的类型必须相同。
+           它无法判断其中实际存有多少元素， length只是告诉我们array的容量
+   静态类 Arrays 
+     public class Arrays extends Object
+           静态类专门用来操作array ，提供搜索、排序、复制等静态方法
+               equals() sort()
+            Arrays.asList(array):将数组array转化为List
+            Arrays.asList()  public static &lt;T&gt; List&lt;T&gt; asList(T... a) {  return new ArrayList&lt;&gt;(a); }
+   共同点//Array和Arrays类都是不能被实例化的，而是提供了很多静态的方法直接用
+ 03.Scala和Java之间
+  scala.collection.Seq         =&gt; java.util.List
+  scala.collection.mutable.Seq =&gt; java.util.List
+</pre></div>
+
+
+<h3>Spark</h3>
+<div class="highlight"><pre><span></span>1.案例
+   JavaRDD&lt;String&gt; words = lines.flatMap(s -&gt; Arrays.asList(SPACE.split(s)).iterator());
+   JavaPairRDD&lt;String, Iterable&lt;String&gt;&gt; links = lines.mapToPair(s -&gt; {
+     String[] parts = SPACES.split(s);
+     return new Tuple2&lt;&gt;(parts[0], parts[1]);
+   }).distinct().groupByKey().cache();    
+ 案例02
+// Generate running word count
+Dataset&lt;Row&gt; wordCounts = lines.flatMap(
+    (FlatMapFunction&lt;String, String&gt;) x -&gt; Arrays.asList(x.split(&quot; &quot;)).iterator(),
+    Encoders.STRING()).groupBy(&quot;value&quot;).count();
+2.具体解释：-源码
+    /**
+  *  Return a new RDD by first applying a function to all elements of this RDD, and then flattening the results.
+  */
+ def flatMap[U: ClassTag](f: T =&gt; TraversableOnce[U]): RDD[U] = withScope {
+   val cleanF = sc.clean(f)
+   new MapPartitionsRDD[U, T](this, (context, pid, iter) =&gt; iter.flatMap(cleanF))
+    }
+ def flatMap[B](f: A =&gt; GenTraversableOnce[B]): Iterator[B] = new AbstractIterator[B] {
+   private var cur: Iterator[B] = empty
+   private def nextCur() { cur = f(self.next()).toIterator }
+   def hasNext: Boolean = {
+     // Equivalent to cur.hasNext || self.hasNext &amp;&amp; { nextCur(); hasNext }
+     // but slightly shorter bytecode (better JVM inlining!)
+     while (!cur.hasNext) {
+       if (!self.hasNext) return false
+       nextCur()
+     }
+     true
+   }
+   def next(): B = (if (hasNext) cur else empty).next()
+ }
+ 其他操作
+  def collect(): JList[T] = rdd.collect().toSeq.asJava
+
+ * @return an iterator over the elements in this list  in proper sequence  */
+   Iterator&lt;E&gt; iterator();  使用方法iterator()要求容器返回一个 Iterator
+ 使用具名函数或者匿名类 -- 源码
+   FlatMapFunction&lt;LineWithTimestamp, Event&gt; linesToEvents =
+  new FlatMapFunction&lt;LineWithTimestamp, Event&gt;() {
+    @Override
+    public Iterator&lt;Event&gt; call(LineWithTimestamp lineWithTimestamp) throws Exception {
+      ArrayList&lt;Event&gt; eventList = new ArrayList&lt;Event&gt;();
+      for (String word : lineWithTimestamp.getLine().split(&quot; &quot;)) {
+        eventList.add(new Event(word, lineWithTimestamp.getTimestamp()));
+      }
+      return eventList.iterator();
+    }
+  };
+
+// Split the lines into words, treat words as sessionId of events
+Dataset&lt;Event&gt; events = lines
+    .withColumnRenamed(&quot;value&quot;, &quot;line&quot;)
+    .as(Encoders.bean(LineWithTimestamp.class))
+    .flatMap(linesToEvents, Encoders.bean(Event.class));
+源函数- 源码
+ public interface FlatMapFunction&lt;T, R&gt; extends Serializable {
+ Iterator&lt;R&gt; call(T t) throws Exception;
+}
+ return result.iterator();
+</pre></div>
+
+
+<h3>Flink</h3>
+<div class="highlight"><pre><span></span>public abstract void flatMap(IN value, Collector&lt;OUT&gt; out) throws Exception;
+案例：
+ 01.   //使用具名类
+ DataSet&lt;Tuple2&lt;Long, Long&gt;&gt; edges = env.readCsvFile(edgesPath).fieldDelimiter(&quot; &quot;).types(Long.class, Long.class).flatMap(new UndirectEdge());
+
+public static final class UndirectEdge implements FlatMapFunction&lt;Tuple2&lt;Long, Long&gt;, Tuple2&lt;Long, Long&gt;&gt; {
+@Override
+public void flatMap(Tuple2&lt;Long, Long&gt; edge, Collector&lt;Tuple2&lt;Long, Long&gt;&gt; out) {
+        invertedEdge.f0 = edge.f1;
+        invertedEdge.f1 = edge.f0;
+        out.collect(edge);
+        out.collect(invertedEdge);
+    }
+}
+02.//使用匿名类
+ .flatMap(new FlatMapFunction&lt;String, WordWithCount&gt;() {
+                @Override
+                public void flatMap(String value, Collector&lt;WordWithCount&gt; out) {
+                    for (String word : value.split(&quot;\\s&quot;)) {
+                        out.collect(new WordWithCount(word, 1L));
+                    }
+                }
+            })
+03.//使用lambda表达式， collector数据类型的必须要声明
+// collector type must be declared
+   input.flatMap((Integer number, Collector&lt;String&gt; out) -&gt; {
+       StringBuilder builder = new StringBuilder();
+       for(int i = 0; i &lt; number; i++) {
+           builder.append(&quot;a&quot;);
+           out.collect(builder.toString());
+       }
+   })
+   // provide type information explicitly
+   .returns(Types.STRING)
+ 其中：
+ /** 源码
+ * Collects a record and forwards it. The collector is the &quot;push&quot; counterpart of the
+ * {@link java.util.Iterator}, which &quot;pulls&quot; data in.
+ */
+@Public
+public interface Collector&lt;T&gt; {
+
+    /**
+     * Emits a record.
+     *
+     * @param record The record to collect.
+     */
+    void collect(T record);
+
+    /**
+     * Closes the collector. If any data was buffered, that data will be flushed.
+     */
+    void close();
+}
+</pre></div>
+
+
+<h3>功能说明：</h3>
+<div class="highlight"><pre><span></span>Java：
+   forEach 循环
+   JAVA 8的 java.util.function 
+    Java8 添加了一个新的特性Function 标注了@FunctionalInterface注解的接口都是函数式接口
+    Function    Function&lt; T, R &gt;    接收T对象，返回R对象 传入一个值经过函数的计算返回另一个值
+Spark
+    /** map    * Return a new RDD by applying a function to all elements of this RDD.
+    /** flatMap  Return a new RDD by first applying a function to all elements of this RDD, and then flattening the results.
+    /** filter   * Return a new RDD containing only the elements that satisfy a predicate.
+   foreach
+Flink
+    /**
+ * The mapping method. Takes an element from the input data set and transforms it into exactly one element.
+ * The flatMap method. Takes an element from the input data set and transforms it into zero, one, or more elements.
+  Each FlatMapFunction call can return any number of elements including none.
+
+ *  filter retains only those element for which the function returns true. Elements for which the function returns false are filtered.
+
+  return transform(&quot;Map&quot;, outType, new StreamMap&lt;&gt;(clean(mapper)));
+  return transform(&quot;Flat Map&quot;, outType, new StreamFlatMap&lt;&gt;(clean(flatMapper)));
+  return transform(&quot;Filter&quot;, getType(), new StreamFilter&lt;&gt;(clean(filter)));
+  return transform(&quot;Process&quot;, outputType, operator);
+</pre></div>
+
+
+<h3>参考：</h3>
+<p>Flink源码1.8与Spark源码2.3</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

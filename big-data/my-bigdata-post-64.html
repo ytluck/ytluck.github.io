@@ -2,7 +2,7 @@
 <html lang="zh_cn">
 <head>
         <meta charset="utf-8" />
-        <title>ytluck—For you - Flink</title>
+        <title>RoaringBitmap概要</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -16,17 +16,22 @@
                 <nav><ul>
                     <li><a href="http://ytluck.github.io/">Home</a></li>
                     <li><a href="/About me.html">About Me</a></li>
-                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
                     <li><a href="/data-mining/index.html">Data Mining</a></li>
                     <li><a href="/items/index.html">Items</a></li>
                     <li><a href="/os/index.html">OS</a></li>
                     <li><a href="/program/index.html">Program</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-64.html" rel="bookmark"
+           title="Permalink to RoaringBitmap概要">RoaringBitmap概要</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-64.html">RoaringBitmap概要</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-12-14T18:18:00+08:00">
                 Published: 2019-12-14 18:18:00
@@ -37,7 +42,7 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h4>1.Bitmap</h4>
+</footer><!-- /.post-info -->      <h4>1.Bitmap</h4>
 <div class="highlight"><pre><span></span>Bitmap索引在数据库和搜索引擎里使用的很广泛，
 BitMap使用bit位，来标记元素对应的Value， 而Key即是该元素
  Bitmap索引一般用来存储整数。整数的范围是0～2^32-1
@@ -150,278 +155,11 @@ Bitmap和布隆过滤器(Bloom Filter)两个算法，对于空间的利用到达
  Filter 过滤 http://muziyuchen.com/spark-ii-14/
  http://dyingbleed.com/ 李震的个人博客
  BitMap与RoaringBitmap、JavaEWAH https://blog.csdn.net/weixin_42142408/article/details/89426499
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</pre></div>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-65.html" rel="bookmark"
-                           title="Permalink to Spark在不同数据层级高阶函数">Spark在不同数据层级高阶函数</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-11-24T19:18:00+08:00">
-                Published: 2019-11-24 19:18:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>JavaRDD  Dataset map filter</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-65.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-62.html" rel="bookmark"
-                           title="Permalink to Flink和Spark高阶函数flatMap">Flink和Spark高阶函数flatMap</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-11-23T18:18:00+08:00">
-                Published: 2019-11-23 18:18:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>flatMap  map</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-62.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-61.html" rel="bookmark"
-                           title="Permalink to Flink广播状态和Spark广播变量">Flink广播状态和Spark广播变量</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-11-02T20:18:00+08:00">
-                Published: 2019-11-02 20:18:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>BroadcastState  broadcast 广播变量 Spark中的 ROW</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-61.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-60.html" rel="bookmark"
-                           title="Permalink to Flink失败恢复重启和KeySelector">Flink失败恢复重启和KeySelector</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-10-26T20:05:00+08:00">
-                Published: 2019-10-26 20:05:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>restart-重启策略  KeySelector</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-60.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-58.html" rel="bookmark"
-                           title="Permalink to Flink与其他流式计算系统的比较">Flink与其他流式计算系统的比较</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-10-20T23:10:00+08:00">
-                Published: 2019-10-20 23:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>反压Backpressure</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-58.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-59.html" rel="bookmark"
-                           title="Permalink to Flink参数传递以及配置读取">Flink参数传递以及配置读取</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-10-20T21:10:00+08:00">
-                Published: 2019-10-20 21:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>ParameterTool Configuration broadcast</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-59.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-55.html" rel="bookmark"
-                           title="Permalink to Flink数据类型之POJO和Table中的Row">Flink数据类型之POJO和Table中的Row</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-09-15T22:10:00+08:00">
-                Published: 2019-09-15 22:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>POJO类型  BinaryRow TypeHint</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-55.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-54.html" rel="bookmark"
-                           title="Permalink to Flink状态计算概述">Flink状态计算概述</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-09-08T21:10:00+08:00">
-                Published: 2019-09-08 21:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>状态一致 状态计算 状态管理</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-54.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-52.html" rel="bookmark"
-                           title="Permalink to Flink和Kafka以及Kafka生产者">Flink和Kafka以及Kafka生产者</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-07-08T22:10:00+08:00">
-                Published: 2019-07-08 22:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>Producer  Flink向kafka发送数据</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-52.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-51.html" rel="bookmark"
-                           title="Permalink to Flink数据类型和Tuple">Flink数据类型和Tuple</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-07-08T21:10:00+08:00">
-                Published: 2019-07-08 21:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>类型推断 Type_Information DataStreaming Table</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-51.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-63.html" rel="bookmark"
-                           title="Permalink to SQL解析器 JSqlParser">SQL解析器 JSqlParser</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-05-25T21:18:00+08:00">
-                Published: 2019-05-25 21:18:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>JSqlParser  JavaCC</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-63.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/big-data/my-bigdata-post-56.html" rel="bookmark"
-                           title="Permalink to Hive字符串和时间处理函数(二）">Hive字符串和时间处理函数(二）</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2017-05-02T22:10:00+08:00">
-                Published: 2017-05-02 22:10:00
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
-        </address>
-<p>In <a href="/big-data/index.html">Big Data</a>.</p>
-<p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info -->                <p>COALESCE  CONCAT_WS  时间格式变换 Hive存储格式</p>
-                <a class="readmore" href="/big-data/my-bigdata-post-56.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>

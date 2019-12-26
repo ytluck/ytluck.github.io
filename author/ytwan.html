@@ -26,7 +26,188 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-61.html">Flink广播状态和Spark广播变量</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-64.html">RoaringBitmap概要</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-12-14T18:18:00+08:00">
+                Published: 2019-12-14 18:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info --><h4>1.Bitmap</h4>
+<div class="highlight"><pre><span></span>Bitmap索引在数据库和搜索引擎里使用的很广泛，
+BitMap使用bit位，来标记元素对应的Value， 而Key即是该元素
+ Bitmap索引一般用来存储整数。整数的范围是0～2^32-1
+ bitmap算法- 精确去重算法主要通过BitMap来实现，它本质上是定义了一个很大的 bit 数组，每个元素对应到 bit 数组的其中一位
+</pre></div>
+
+
+<h4>2.RoaringBitmap</h4>
+<div class="highlight"><pre><span></span>RoaringBitmap中，32位整数被分成了2^16个块。
+      任何一个32位整数的
+         前16位决定放在哪个块里
+         后16位就是放在这个块里的内容
+对于非Integer类型的数据(比如String类型)，可以通过数据字典映射成Integer
+</pre></div>
+
+
+<h4>3.开源的源代码</h4>
+<div class="highlight"><pre><span></span>org.roaringbitmap.RoaringBitmap;
+RoaringArray highLowContainer;  
+//RoaringBitmap中都包含一个 RoaringArray 名字叫 highLowContainer 。 
+//highLowContainer 存储了 RoaringBitmap 中的全部数据
+
+short[] keys;      //高16位会被作为key存储到, //keys数组永远保持有序，方便二分查找，且不会存储重复数值
+Container[] values;//低16位则被看做value
+int size;          //size则标示了当前包含的key-value pair的数量，即keys和values中有效数据的数量
+
+02. Roaring bitmap共有三种不同类型的Container, 分别是Array Container, Bitmap Container, Run Container.
+   ArrayContainer   &lt;= 4096 elements:
+      数组的初始长度为DEFAULT_INIT_SIZE = 4，扩容的规则
+      不会分配超过DEFAULT_MAX_SIZE = 4096大小的capacity
+   BitmapContainer  &gt;= 61140 elements:
+   RunContainer      others
+03.主要的操作
+    主要使用 add remove
+          and or xor 
+         serialize deserialize 等操作
+</pre></div>
+
+
+<h4>4.使用示例</h4>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="n">maven</span><span class="err">依赖</span>
+  <span class="o">&lt;</span><span class="err">!</span><span class="o">--</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mvnrepository</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">artifact</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">roaringbitmap</span><span class="o">/</span><span class="n">RoaringBitmap</span> <span class="o">--&gt;</span>
+ <span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+     <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">roaringbitmap</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+     <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">RoaringBitmap</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+     <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">0.8</span><span class="o">.</span><span class="mi">6</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+ <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+
+<span class="mf">02.</span><span class="err">代码</span>
+<span class="kn">import</span> <span class="nn">org.roaringbitmap.RoaringBitmap</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">ResBitMap</span> <span class="p">{</span>
+<span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">){</span>
+    <span class="o">//</span><span class="err">向</span><span class="n">rr</span><span class="err">中添加</span><span class="mi">1</span><span class="err">、</span><span class="mi">2</span><span class="err">、</span><span class="mi">3</span><span class="err">、</span><span class="mi">1000</span><span class="err">四个数字</span>
+    <span class="n">RoaringBitmap</span> <span class="n">rr</span> <span class="o">=</span> <span class="n">RoaringBitmap</span><span class="o">.</span><span class="n">bitmapOf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+    <span class="o">//</span><span class="err">创建</span><span class="n">RoaringBitmap</span> <span class="n">rr2</span>
+    <span class="n">RoaringBitmap</span> <span class="n">rr2</span> <span class="o">=</span> <span class="n">new</span> <span class="n">RoaringBitmap</span><span class="p">();</span>
+    <span class="o">//</span><span class="err">向</span><span class="n">rr2</span><span class="err">中添加</span><span class="mi">10000</span><span class="o">-</span><span class="mi">12000</span><span class="err">共</span><span class="mi">2000</span><span class="err">个数字</span>
+    <span class="n">rr2</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="il">10000L</span><span class="p">,</span><span class="il">12000L</span><span class="p">);</span>
+    <span class="o">//</span><span class="err">返回第</span><span class="mi">3</span><span class="err">个数字是</span><span class="mi">1000</span><span class="err">，第</span><span class="mi">0</span><span class="err">个数字是</span><span class="mi">1</span><span class="err">，第</span><span class="mi">1</span><span class="err">个数字是</span><span class="mi">2</span><span class="err">，则第</span><span class="mi">3</span><span class="err">个数字是</span><span class="mi">1000</span>
+    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">rr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
+    <span class="o">//</span><span class="err">返回</span><span class="n">value</span> <span class="o">=</span> <span class="mi">2</span> <span class="err">时的索引为</span> <span class="mi">1</span><span class="err">。</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span> <span class="err">时，索引是</span> <span class="mi">0</span> <span class="err">，</span><span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="err">的索引为</span><span class="mi">2</span>
+    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">rr</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+    <span class="o">//</span><span class="err">判断是否包含</span><span class="mi">1000</span>
+    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">rr</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">1000</span><span class="p">));</span>
+    <span class="o">//</span><span class="err">判断是否包含</span><span class="mi">7</span> <span class="o">//</span> <span class="n">will</span> <span class="k">return</span> <span class="n">false</span>
+    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">rr</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">7</span><span class="p">));</span>
+
+    <span class="o">//</span><span class="err">两个</span><span class="n">RoaringBitmap</span><span class="err">进行</span><span class="ow">or</span><span class="err">操作，数值进行合并，合并后产生新的</span><span class="n">RoaringBitmap</span><span class="err">叫</span><span class="n">rror</span>
+    <span class="n">RoaringBitmap</span> <span class="n">rror</span> <span class="o">=</span> <span class="n">RoaringBitmap</span><span class="o">.</span><span class="ow">or</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span> <span class="n">rr2</span><span class="p">);</span>
+    <span class="o">//</span><span class="n">rr</span><span class="err">与</span><span class="n">rr2</span><span class="err">进行位运算，并将值赋值给</span><span class="n">rr</span>
+    <span class="n">rr</span><span class="o">.</span><span class="ow">or</span><span class="p">(</span><span class="n">rr2</span><span class="p">);</span>
+    <span class="o">//</span><span class="err">判断</span><span class="n">rror</span><span class="err">与</span><span class="n">rr</span><span class="err">是否相等，显然是相等的</span>
+    <span class="n">boolean</span> <span class="n">equals</span> <span class="o">=</span> <span class="n">rror</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">rr</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="err">!</span><span class="n">equals</span><span class="p">)</span> <span class="p">{</span><span class="n">throw</span> <span class="n">new</span> <span class="n">RuntimeException</span><span class="p">(</span><span class="s2">&quot;bug&quot;</span><span class="p">);}</span>
+    <span class="o">//</span> <span class="err">查看</span><span class="n">rr</span><span class="err">中存储了多少个值，</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="err">和</span><span class="mi">10000</span><span class="o">-</span><span class="mi">12000</span><span class="err">，共</span><span class="mi">2004</span><span class="err">个数字</span>
+    <span class="nb">long</span> <span class="n">cardinality</span> <span class="o">=</span> <span class="n">rr</span><span class="o">.</span><span class="n">getLongCardinality</span><span class="p">();</span>
+    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">cardinality</span><span class="p">);</span>
+    <span class="o">//</span><span class="err">遍历</span><span class="n">rr</span><span class="err">中的</span><span class="n">value</span>
+    <span class="k">for</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="p">:</span> <span class="n">rr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3>其他</h3>
+<div class="highlight"><pre><span></span>01.BitMap 运营分析-任意两天的重叠活跃用户
+ 对不同日期活跃用户ID进行bitmap编码和计算的
+ 获取过去1天的日活跃用户bitmap和今天的bitmap,对它们做并集(Union)，and等操作
+Bitmap和布隆过滤器(Bloom Filter)两个算法，对于空间的利用到达了一种极致
+02.布隆过滤器就是引入了k(k&gt;1) k(k&gt;1)k(k&gt;1)个相互独立的哈希函数，保证在给定的空间、误判率下，完成元素判重的过程，适合与比Bitmap更多量的数据 .stat()
+ DataFrameStatFunctions
+   bloomFilter    布隆过滤器
+   countMinSketch   算法Count-Min Sketch
+   corr ： 计算the Pearson Correlation Coefficient of two columns of a DataFrame.
+ 03. HyperLogLog算法经常在数据库中被用来统计某一字段的Distinct Value -- 在需要对数据进行去重计数的场景里
+ JavaRDDLike  countApproxDistinct
+  def countApproxDistinct(relativeSD: Double): Long = rdd.countApproxDistinct(relativeSD)。
+ It must be greater than 0.000017.
+ 统计是一个大约的统计，参数relativeSD控制统计的精确度。relativeSD越小，结果越准确
+ APPROX_COUNT_DISTINCT
+</pre></div>
+
+
+<h3>5.参考：</h3>
+<div class="highlight"><pre><span></span> BitMap、RoaringBitmap与JavaEWAH https://www.cnblogs.com/fonxian/p/10937882.html
+ 精确去重和Roaring BitMap https://blog.csdn.net/hfcenter/article/details/95458754
+ Filter 过滤 http://muziyuchen.com/spark-ii-14/
+ http://dyingbleed.com/ 李震的个人博客
+ BitMap与RoaringBitmap、JavaEWAH https://blog.csdn.net/weixin_42142408/article/details/89426499
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-65.html" rel="bookmark"
+                           title="Permalink to Spark在不同数据层级高阶函数">Spark在不同数据层级高阶函数</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-11-24T19:18:00+08:00">
+                Published: 2019-11-24 19:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>JavaRDD  Dataset map filter</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-65.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-62.html" rel="bookmark"
+                           title="Permalink to Flink和Spark高阶函数flatMap">Flink和Spark高阶函数flatMap</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-11-23T18:18:00+08:00">
+                Published: 2019-11-23 18:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>flatMap  map</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-62.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-61.html" rel="bookmark"
+                           title="Permalink to Flink广播状态和Spark广播变量">Flink广播状态和Spark广播变量</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-11-02T20:18:00+08:00">
                 Published: 2019-11-02 20:18:00
@@ -37,264 +218,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h3>基本概念</h3>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.apache.flink.streaming.api.functions.KeyedProcessFunction</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.flink.streaming.api.operators.KeyedProcessOperator</span><span class="p">;</span>
-</pre></div>
-
-
-<h4>Flink Broadcast State</h4>
-<div class="highlight"><pre><span></span>// 设置广播变量和获取广播变量。
-访问 state 前先要定义状态描述符(StateDescriptor). BroadcastState 的状态描述符是 MapStateDescriptor.
-MapStateDescriptor 的 value 类型即是广播流的元素类型，这个例子里是 Map&lt;String,Object&gt;。
-// 01.数据流
-   KeyedStream&lt;Tuple2&lt;String, String&gt;, String&gt; keyedStream  = ……
-// 02.广播流
-//001.定义mapstatdesc 
-    MapStateDescriptor&lt;String, String&gt; testStateDescriptor = new MapStateDescriptor&lt;&gt;(&quot;testStat&quot;, String.class, TestStat.class);
-//002.广播测试数据
- BroadcastStream&lt;String&gt; testBroadcastStream = testInfoLogSource.map(new TestInfoParseFunction())
-                                                                        .name(&quot;TestInfoParseMap&quot;)
-                                                                        .broadcast(testStateDescriptor);
-//03.连接数据流  数据流.connect(广播流)    
-   DataStream&lt;TestResultBean&gt; matchStream = keyedStream.connect(testBroadcastStream)
-                                                        .process(new TestMatchFunctionNew())
-                                                        .setParallelism(&quot;Test&quot;)
-                                                        .name(&quot;TestMatchFunction&quot;)  ;   
-其中：  
-   public class TestMatchFunctionNew extends KeyedBroadcastProcessFunction&lt;String, Tuple2&lt;String,String&gt;, String, String&gt;{}
- KeyedStream
-     .connect(BroadcastStream)
-    .process(new KeyedBroadcastProcessFunction&lt;&gt;(…))
-    KeyedStream 连接 BroadcastStream 的，
-  只能使用 KeyedBroadcastProcessFunction 函数处理连接逻辑
- KeyedBroadcastProcessFunction 比 BroadcastProcessFunction 
-    多了计时器服务和获取当前 key 接口
-
- noKeyedStream
-   .connect(BroadcastStream)
-   .process(new BroadcastProcessFunction&lt;&gt;(…)) 
-   非 KeyedStream 连接 BroadcastStream 的，
-    只能使用 BroadcastProcessFunction 函数处理连接逻辑
-</pre></div>
-
-
-<h3>Flink源码 KeyedBroadcastProcessFunction</h3>
-<div class="highlight"><pre><span></span>    KS 是 KeyedStream 中 key 的类型；
-    IN1 是数据流(即非广播流)的元素类型；
-    IN2 是广播流的元素类型；
-    OUT 是两个流连接完成后，输出流的元素类型
-   public abstract class KeyedBroadcastProcessFunction &lt;KS, IN1, IN2, OUT&gt; 
-      extends org.apache.flink.streaming.api.functions.co.BaseBroadcastProcessFunction {
-         processElement         // 函数处理数据流的数据
-            value 是数据流中的一个元素；
-            ctx 是上下文，可以提供计时器服务、当前 key和只读的 BroadcastState； ctx.getBroadcastState
-            out 是输出流收集器。
-         processBroadcastElement// 处理广播流的数据
-         onTimer
-          public abstract class Context extends
-          public abstract class ReadOnlyContext extends
-         public abstract class OnTimerContext extends
-      }
-       public abstract class BaseBroadcastProcessFunction extends AbstractRichFunction {
-         getBroadcastState
-        }
-         public abstract class AbstractRichFunction implements RichFunction, Serializable {
-           getRuntimeContext
-           getIterationRuntimeContext
-           open
-           close
-         }
-</pre></div>
-
-
-<h4>Flink源码 BroadcastProcessFunction</h4>
-<div class="highlight"><pre><span></span>   public abstract class BroadcastProcessFunction&lt;IN1, IN2, OUT&gt; extends BaseBroadcastProcessFunction {
-      processElement
-      processBroadcastElement
-      public abstract class Context extends
-      public abstract class ReadOnlyContext  extends      
-    }
-Flink中有两种方式  make data available to all parallel instances of a function
-   Via function parameters/closures or via broadcast sets.
-</pre></div>
-
-
-<h3>Spark Broadcast 广播变量</h3>
-<div class="highlight"><pre><span></span>  //将标签广播
-  List&lt;String&gt; labelColums = Arrays.asList(labels);
-   Broadcast&lt;List&lt;String&gt;&gt; broadcastColumnList = spark.sparkContext().broadcast(labelColums, ClassManifestFactory.classType(List.class));
- //使用-具名函数的方式
-   JavaRDD&lt;Row&gt; TestRdd = TestSet.javaRDD().flatMap(new TestMatchFuntion(broadcastColumnList))
-
-   其中函数
-     public class TestMatchFuntion implements FlatMapFunction&lt;Row, Row&gt;{
-           public TestMatchFuntion(Broadcast&lt;List&lt;String&gt; broadcastColumnList) {
-           cityList = broadcastColumnList.getValue();
-        }
-         @Override
-          public Iterator&lt;Row&gt; call(Row r) throws Exception {}
-     }
-</pre></div>
-
-
-<h4>Spark源码 broadcast</h4>
-<div class="highlight"><pre><span></span>  org.apache.spark.broadcast
-  Spark&#39;s broadcast variables, used to broadcast immutable datasets to all nodes.
-  作用： BroadCast就是将数据从一个节点发送到其它的节点
-    abstract class Broadcast[T: ClassTag](val id: Long) extends Serializable with Logging
-    private[spark] trait BroadcastFactory
-    private[spark] class BroadcastManager
-    private[spark] class TorrentBroadcastFactory extends BroadcastFactory 
-    private[spark] class TorrentBroadcast[T: ClassTag](obj: T, id: Long) extends Broadcast[T](id) with Logging with Serializable
-其中： BroadcastManager.newBroadcast( ) 
- 使用getValue时,会执行实例初始化时定义的lazy的函数readBroadcastBlock
-BroadCast的两种广播方式
-   HttpBroadCast方式   HttpBroadCast会出现单点故障，网络IO瓶颈
-   TorrentBroadCast方式
-</pre></div>
-
-
-<h3>Spark广播使用案例</h3>
-<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">com</span><span class="o">.</span><span class="n">letour</span><span class="o">.</span><span class="n">main</span><span class="p">;</span>   
-<span class="kn">import</span> <span class="nn">com.google.common.collect.Lists</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.JavaRDD</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.JavaSparkContext</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.function.FlatMapFunction</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.broadcast.Broadcast</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.sql.</span><span class="o">*</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.DataTypes</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.StructField</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">org.apache.spark.sql.types.StructType</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">java.util.</span><span class="o">*</span><span class="p">;</span>
-
-<span class="n">public</span> <span class="k">class</span> <span class="nc">DimenBroad</span> <span class="p">{</span>
-<span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">SparkSession</span> <span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span>
-            <span class="o">.</span><span class="n">builder</span><span class="p">()</span>
-            <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">&quot;Invalid&quot;</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">enableHiveSupport</span><span class="p">()</span>
-            <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.sql.shuffle.partitions&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">getOrCreate</span><span class="p">();</span>
-    <span class="o">/**</span>
-     <span class="o">*</span> <span class="err">待匹配的表</span> <span class="err">年级和年级对应的表</span>
-     <span class="o">*/</span>
-    <span class="n">Dataset</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">gradeDF</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;select grade_nm,grade_cd from tmp_test.tmp_date_ed where grade_cd is  not null &quot;</span><span class="p">);</span>
-    <span class="n">JavaRDD</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">origGradeRDD</span> <span class="o">=</span> <span class="n">gradeDF</span><span class="o">.</span><span class="n">javaRDD</span><span class="p">();</span>
-
-    <span class="o">/**</span>
-     <span class="o">*</span> <span class="err">待广播的表</span>
-     <span class="o">*/</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">grades</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;select grade from tmp_test.tmp_data_td&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">collectAsList</span><span class="p">();</span>
-    <span class="o">//</span><span class="err">将年级广播</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">gradeColums</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ArrayList</span><span class="p">(</span><span class="n">grades</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">gradeColums</span> <span class="o">!=</span> <span class="n">null</span> <span class="o">&amp;&amp;</span> <span class="err">!</span><span class="n">gradeColums</span><span class="o">.</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">Row</span> <span class="n">b</span> <span class="p">:</span> <span class="n">grades</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">String</span> <span class="n">grade</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade&quot;</span><span class="p">);</span>
-            <span class="n">gradeColums</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grade</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="o">//</span><span class="err">构造广播的情况</span>
-    <span class="n">JavaSparkContext</span> <span class="n">sparkContext</span> <span class="o">=</span> <span class="n">JavaSparkContext</span><span class="o">.</span><span class="n">fromSparkContext</span><span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">sparkContext</span><span class="p">());</span>
-    <span class="n">final</span> <span class="n">Broadcast</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">dimGradeBroad</span> <span class="o">=</span> <span class="n">sparkContext</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">gradeColums</span><span class="p">);</span>
-    <span class="n">JavaRDD</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">memRDD</span> <span class="o">=</span> <span class="n">origGradeRDD</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="n">new</span> <span class="n">FlatMapFunction</span><span class="o">&lt;</span><span class="n">Row</span><span class="p">,</span> <span class="n">Row</span><span class="o">&gt;</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nd">@Override</span>
-        <span class="n">public</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">call</span><span class="p">(</span><span class="n">Row</span> <span class="n">t</span><span class="p">)</span> <span class="n">throws</span> <span class="ne">Exception</span> <span class="p">{</span>
-            <span class="n">String</span> <span class="n">grade_nm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade_nm&quot;</span><span class="p">);</span>
-            <span class="n">String</span> <span class="n">grade_cd</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade_cd&quot;</span><span class="p">);</span>
-            <span class="n">Row</span> <span class="n">result</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
-            <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">iList</span> <span class="o">=</span> <span class="n">dimGradeBroad</span><span class="o">.</span><span class="n">value</span><span class="p">();</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">iList</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">grade_nm</span><span class="p">))</span> <span class="p">{</span>
-                <span class="n">result</span><span class="o">=</span> <span class="n">RowFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">Grade_nm</span><span class="p">,</span> <span class="n">grade_cd</span><span class="p">);</span>
-            <span class="p">}</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span><span class="p">)</span> <span class="n">result</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">})</span><span class="o">.</span><span class="n">repartition</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
-   <span class="o">//</span><span class="err">转换为</span><span class="n">Dataset</span><span class="err">数据类型</span>
-    <span class="n">Dataset</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">matchDF</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">memRDD</span><span class="p">,</span> <span class="n">getSchema</span><span class="p">());</span>
-
-    <span class="o">/**</span>
-     <span class="o">*</span> <span class="err">写入到表</span>
-     <span class="o">*/</span>
-     <span class="n">matchDF</span><span class="o">.</span><span class="n">write</span><span class="p">()</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="n">SaveMode</span><span class="o">.</span><span class="n">Overwrite</span><span class="p">)</span><span class="o">.</span><span class="n">insertInto</span><span class="p">(</span><span class="s2">&quot;tmp_test.result_date_ed&quot;</span><span class="p">);</span>
-    <span class="o">//</span>  <span class="n">matchDF</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;tmp_chase_d&quot;</span><span class="p">);</span>
-    <span class="o">//</span>  <span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;insert overwrite table tmp_test.result_date_d partition(stat=&#39;2019&#39;) select * from tmp_chase_d&quot;</span><span class="p">);</span>
-    <span class="o">//</span><span class="err">执行结束</span>
-    <span class="n">spark</span><span class="o">.</span><span class="n">stop</span><span class="p">();</span>
-<span class="p">}</span>
- <span class="o">/**</span>
-  <span class="o">*</span> <span class="err">转换为</span><span class="n">Dataset</span><span class="err">数据类型所需要的结构</span>
-  <span class="o">*/</span>
-  <span class="n">private</span> <span class="n">static</span> <span class="n">StructType</span> <span class="n">getSchema</span><span class="p">()</span> <span class="p">{</span>
-      <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">StructField</span><span class="o">&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">StructField</span><span class="o">&gt;</span><span class="p">();</span>
-      <span class="n">StructField</span> <span class="n">Grade_nm</span> <span class="o">=</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">createStructField</span><span class="p">(</span><span class="s2">&quot;grade_nm&quot;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">StringType</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
-      <span class="n">StructField</span> <span class="n">Grade_cd</span> <span class="o">=</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">createStructField</span><span class="p">(</span><span class="s2">&quot;grade_cd&quot;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">StringType</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
-      <span class="n">fields</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grade_nm</span><span class="p">);</span>
-      <span class="n">fields</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grade_cd</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">createStructType</span><span class="p">(</span><span class="n">fields</span><span class="p">);</span>
- <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-
-
-<h4>Spark中的Row</h4>
-<div class="highlight"><pre><span></span>To create a new Row, use RowFactory.create() in Java or Row.apply() in Scala
-A Row object can be constructed by providing field values
-01.RowFactory
-  public class RowFactory {
-  public static Row create(Object ... values) {
-    return new GenericRow(values);
-  }
-}
-02.GenericRow
-  class GenericRow(protected[sql] val values: Array[Any]) extends Row{}
-03.Row
-  trait Row extends Serializable {
-  def size: Int = length
-  def length: Int
-  def schema: StructType = null
-  def apply(i: Int): Any = get(i)
-  def get(i: Int): Any
-      getBoolean getByte getShort getInt getLong getFloat getDouble getString getDecimal
-      getDate getTimestamp
-      getSeq getList getMap getJavaMap getStruct getAs getAnyValAs
-      getValuesMap
-   /** Checks whether the value at position i is null. */
-    def isNullAt(i: Int): Boolean = get(i) == null
-   anyNull
-   fieldIndex
-   toSeq  mkString
-   equals  copy toString hashCode
-}
-
-BooleanType -&gt; java.lang.Boolean
-ByteType -&gt; java.lang.Byte
-ShortType -&gt; java.lang.Short
-IntegerType -&gt; java.lang.Integer
-FloatType -&gt; java.lang.Float
-DoubleType -&gt; java.lang.Double
-StringType -&gt; String
-DecimalType -&gt; java.math.BigDecimal
-
-DateType -&gt; java.sql.Date
-TimestampType -&gt; java.sql.Timestamp
-
-BinaryType -&gt; byte array
-ArrayType -&gt; scala.collection.Seq (use getList for java.util.List)
-MapType -&gt; scala.collection.Map (use getJavaMap for java.util.Map)
-StructType -&gt; org.apache.spark.sql.Row
-</pre></div>
-
-
-<h4>参考：</h4>
-<div class="highlight"><pre><span></span> Variables Closures vs. Broadcast Variables
-    https://cwiki.apache.org/confluence/display/FLINK/Variables+Closures+vs.+Broadcast+Variables
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>BroadcastState  broadcast 广播变量 Spark中的 ROW</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-61.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -645,6 +572,28 @@ StructType -&gt; org.apache.spark.sql.Row
 <p>tags: <a href="/tag/things.html">things</a> </p>
 </footer><!-- /.post-info -->                <p>Kafka Pulsar</p>
                 <a class="readmore" href="/big-data/my-bigdata-post-47.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-63.html" rel="bookmark"
+                           title="Permalink to SQL解析器 JSqlParser">SQL解析器 JSqlParser</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-05-25T21:18:00+08:00">
+                Published: 2019-05-25 21:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->                <p>JSqlParser  JavaCC</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-63.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
