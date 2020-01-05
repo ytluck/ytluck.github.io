@@ -26,7 +26,196 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-64.html">RoaringBitmap概要</a></h1>
+                    <h1 class="entry-title"><a href="/big-data/my-bigdata-post-66.html">Flink和Spark类型编码</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2020-01-05T18:18:00+08:00">
+                Published: 2020-01-05 18:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>Spark数据集的行类型编码器(Encoder for Row Type Spark Datasets)
+转换时需要指定一个转换的Encorder，
+在Scala代码中是通过隐式转换进行的，而在Java代码中则需要在代码中指明
+Flink也有类似的系统
+</pre></div>
+
+
+<h3>Spark中Encoders</h3>
+<div class="highlight"><pre><span></span>org.apache.spark.sql.Encoders
+  1. Encoders.STRING()
+     Encoder&lt;String&gt; stringEncoder = Encoders.STRING();
+    def STRING: Encoder[java.lang.String] = ExpressionEncoder()
+
+ 2. Encoders.bean()
+    // Encoders are created for Java beans  自定义的Bean对象类型
+    Encoder&lt;Person&gt; personEncoder = Encoders.bean(Person.class); 
+    def bean[T](beanClass: Class[T]): Encoder[T] = ExpressionEncoder.javaBean(beanClass)
+
+ 3. Encoders.product()
+  * An encoder for Scala&#39;s product type (tuples, case classes, etc).
+   def product[T &lt;: Product : TypeTag]: Encoder[T] = ExpressionEncoder()
+
+ 4. Encoders.tuple()
+  /** An encoder for 5-ary tuples.
+  */
+  def tuple[T1, T2, T3, T4, T5](
+    e1: Encoder[T1],
+    e2: Encoder[T2],
+    e3: Encoder[T3],
+    e4: Encoder[T4],
+    e5: Encoder[T5]): Encoder[(T1, T2, T3, T4, T5)] = {
+    ExpressionEncoder.tuple(
+      encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4), encoderFor(e5))
+  }
+     Encoders.STRING()
+
+5. javaSerialization
+   def javaSerialization[T: ClassTag]: Encoder[T] = genericSerializer(useKryo = false)
+   def kryo             [T: ClassTag]: Encoder[T] = genericSerializer(useKryo = true)
+   def javaSerialization[T](clazz: Class[T]): Encoder[T] = javaSerialization(ClassTag[T](clazz))
+   def kryo             [T](clazz: Class[T]): Encoder[T] = kryo(ClassTag[T](clazz))
+   类型Row为输出的类型
+  // Encoder&lt;Row&gt; rowEncoder = Encoders.kryo(Row.class);
+    Encoder&lt;Row&gt; rowEncoder = Encoders.javaSerialization(Row.class);
+ Eg:
+    Encoder&lt;Row&gt; rowEncoder = Encoders.javaSerialization(Row.class);
+    Dataset&lt;Row&gt; dsString2Row = ds.map(
+            (MapFunction&lt;String, Row&gt;) value -&gt; RowFactory.create(value, value.length()), rowEncoder);
+</pre></div>
+
+
+<h3>Spark 2. ExpressionEncoder</h3>
+<div class="highlight"><pre><span></span>  * A factory for constructing encoders 
+    that convert objects and primitives to and from the internal row format using catalyst expressions and code generation
+</pre></div>
+
+
+<h3>Flink 的 TypeInformation 类</h3>
+<div class="highlight"><pre><span></span> org.apache.flink.api.common.typeinfo.Types
+ org.apache.flink.api.common.typeinfo.TypeInformation; 
+ org.apache.flink.api.common.typeinfo.TypeHint  
+ org.apache.flink.api.common.typeutils.TypeSerializer
+   创建 TypeInformation 或者 TypeSerializer
+  TypeInformation&lt;String&gt; info = TypeInformation.of(String.class);
+
+ This class gives access to the type information of the most common types for which Flink
+  * has built-in serializers and comparators.
+
+ 对于泛型类型，你需要通过 TypeHint 来“捕获”泛型类型信息：
+  TypeInformation&lt;Tuple2&lt;String, Double&gt;&gt; info = TypeInformation.of(new TypeHint&lt;Tuple2&lt;String, Double&gt;&gt;(){});
+ DataSet&lt;SomeType&gt; result = dataSet
+  .map(new MyGenericNonInferrableFunction&lt;Long, SomeType&gt;())
+    .returns(SomeType.class);  // returns(new TypeHint&lt;Tuple2&lt;Integer, SomeType&gt;&gt;(){})
+</pre></div>
+
+
+<h3>Flink的Types</h3>
+<div class="highlight"><pre><span></span>org.apache.flink.table.api.Types
+  Flink 中DataSet和DataStream 都能与Table 互转
+   This class enumerates all supported types of the Table API &amp; SQL
+</pre></div>
+
+
+<h3>Flink中的DataType</h3>
+<div class="highlight"><pre><span></span>1.Data Types in the Table API
+   org.apache.flink.table.types.DataType
+  重构类型系统：在Flink 1.9版本中实现了一套全新的数据类型系统，这套全新的类型系统与SQL标准进行了完全对齐，能够支持更加丰富的类型。这套
+   从 Table API 中移除对 Flink TypeInformation 的依赖，并提高其对 SQL 标准的遵从性
+   The planning for code generation and serialization of runtime operators        
+   Flink Improvement Proposal (FLIP) process     
+   org.apache.flink.table.types.logical.LogicalType
+     org.apache.flink.table.types.logical
+       public abstract class LogicalType implements Serializable {
+   https://cwiki.apache.org/confluence/display/FLINK/Flink+Improvement+Proposals    
+  DataType t = DataTypes.TIMESTAMP(3).bridgedTo(java.sql.Timestamp.class);
+  the difference between data type and type information   
+  org.apache.flink.table.api.types.TypeConverters提供了DataType和Typeinformation之间的相互转化。
+    createExternalTypeInfoFromDataType和createInternalTypeInfoFromDataType
+
+2.SQL standard’s data type and Java Expression
+
+3.Row - org.apache.spark.sql.Row
+          RDD[Row]
+          JavaRDD&lt;Row&gt;
+         Dataset&lt;Row&gt; 
+         List&lt;Row&gt;    createDataFrame(rows: java.util.List[Row], schema: StructType)
+          List&lt;Row&gt; data = Arrays.asList(
+                 RowFactory.create(&quot;L5&quot;, &quot;a1群&quot;),
+                 RowFactory.create(&quot;L9&quot;, &quot;a2群&quot;)
+                )
+             type DataFrame = Dataset[Row]
+       org.apache.flink.types.Row
+          Creates a new Row with projected fields from another row.
+      java.sql.ResultSet
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>  Spark SQL中的Encoder https://www.jianshu.com/p/d3c35e18af44      
+  Data Types  https://ci.apache.org/projects/flink/flink-docs-release-1.9/zh/dev/table/types.html
+   https://ci.apache.org/projects/flink/flink-docs-release-1.9/zh/dev/table/types.html#data-types-in-the-table-api
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-59.html" rel="bookmark"
+                           title="Permalink to Java数据集合应用">Java数据集合应用</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:21:00+08:00">
+                Published: 2019-12-22 22:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>单元测试 异常处理 日志 性能指标系统</p>
+                <a class="readmore" href="/program/my-program-post-59.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-58.html" rel="bookmark"
+                           title="Permalink to Java数据集合应用">Java数据集合应用</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-21T21:22:00+08:00">
+                Published: 2019-12-21 21:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>HashMap HashSet ArrayList LinkedList</p>
+                <a class="readmore" href="/program/my-program-post-58.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/big-data/my-bigdata-post-64.html" rel="bookmark"
+                           title="Permalink to RoaringBitmap概要">RoaringBitmap概要</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-12-14T18:18:00+08:00">
                 Published: 2019-12-14 18:18:00
@@ -37,125 +226,10 @@
         </address>
 <p>In <a href="/big-data/index.html">Big Data</a>.</p>
 <p>tags: <a href="/tag/flink.html">Flink</a> </p>
-</footer><!-- /.post-info --><h4>1.Bitmap</h4>
-<div class="highlight"><pre><span></span>Bitmap索引在数据库和搜索引擎里使用的很广泛，
-BitMap使用bit位，来标记元素对应的Value， 而Key即是该元素
- Bitmap索引一般用来存储整数。整数的范围是0～2^32-1
- bitmap算法- 精确去重算法主要通过BitMap来实现，它本质上是定义了一个很大的 bit 数组，每个元素对应到 bit 数组的其中一位
-</pre></div>
-
-
-<h4>2.RoaringBitmap</h4>
-<div class="highlight"><pre><span></span>RoaringBitmap中，32位整数被分成了2^16个块。
-      任何一个32位整数的
-         前16位决定放在哪个块里
-         后16位就是放在这个块里的内容
-对于非Integer类型的数据(比如String类型)，可以通过数据字典映射成Integer
-</pre></div>
-
-
-<h4>3.开源的源代码</h4>
-<div class="highlight"><pre><span></span>org.roaringbitmap.RoaringBitmap;
-RoaringArray highLowContainer;  
-//RoaringBitmap中都包含一个 RoaringArray 名字叫 highLowContainer 。 
-//highLowContainer 存储了 RoaringBitmap 中的全部数据
-
-short[] keys;      //高16位会被作为key存储到, //keys数组永远保持有序，方便二分查找，且不会存储重复数值
-Container[] values;//低16位则被看做value
-int size;          //size则标示了当前包含的key-value pair的数量，即keys和values中有效数据的数量
-
-02. Roaring bitmap共有三种不同类型的Container, 分别是Array Container, Bitmap Container, Run Container.
-   ArrayContainer   &lt;= 4096 elements:
-      数组的初始长度为DEFAULT_INIT_SIZE = 4，扩容的规则
-      不会分配超过DEFAULT_MAX_SIZE = 4096大小的capacity
-   BitmapContainer  &gt;= 61140 elements:
-   RunContainer      others
-03.主要的操作
-    主要使用 add remove
-          and or xor 
-         serialize deserialize 等操作
-</pre></div>
-
-
-<h4>4.使用示例</h4>
-<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="n">maven</span><span class="err">依赖</span>
-  <span class="o">&lt;</span><span class="err">!</span><span class="o">--</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mvnrepository</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">artifact</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">roaringbitmap</span><span class="o">/</span><span class="n">RoaringBitmap</span> <span class="o">--&gt;</span>
- <span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
-     <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="n">roaringbitmap</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
-     <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">RoaringBitmap</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
-     <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">0.8</span><span class="o">.</span><span class="mi">6</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
- <span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
-
-<span class="mf">02.</span><span class="err">代码</span>
-<span class="kn">import</span> <span class="nn">org.roaringbitmap.RoaringBitmap</span><span class="p">;</span>
-
-<span class="n">public</span> <span class="k">class</span> <span class="nc">ResBitMap</span> <span class="p">{</span>
-<span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">){</span>
-    <span class="o">//</span><span class="err">向</span><span class="n">rr</span><span class="err">中添加</span><span class="mi">1</span><span class="err">、</span><span class="mi">2</span><span class="err">、</span><span class="mi">3</span><span class="err">、</span><span class="mi">1000</span><span class="err">四个数字</span>
-    <span class="n">RoaringBitmap</span> <span class="n">rr</span> <span class="o">=</span> <span class="n">RoaringBitmap</span><span class="o">.</span><span class="n">bitmapOf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
-    <span class="o">//</span><span class="err">创建</span><span class="n">RoaringBitmap</span> <span class="n">rr2</span>
-    <span class="n">RoaringBitmap</span> <span class="n">rr2</span> <span class="o">=</span> <span class="n">new</span> <span class="n">RoaringBitmap</span><span class="p">();</span>
-    <span class="o">//</span><span class="err">向</span><span class="n">rr2</span><span class="err">中添加</span><span class="mi">10000</span><span class="o">-</span><span class="mi">12000</span><span class="err">共</span><span class="mi">2000</span><span class="err">个数字</span>
-    <span class="n">rr2</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="il">10000L</span><span class="p">,</span><span class="il">12000L</span><span class="p">);</span>
-    <span class="o">//</span><span class="err">返回第</span><span class="mi">3</span><span class="err">个数字是</span><span class="mi">1000</span><span class="err">，第</span><span class="mi">0</span><span class="err">个数字是</span><span class="mi">1</span><span class="err">，第</span><span class="mi">1</span><span class="err">个数字是</span><span class="mi">2</span><span class="err">，则第</span><span class="mi">3</span><span class="err">个数字是</span><span class="mi">1000</span>
-    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">rr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
-    <span class="o">//</span><span class="err">返回</span><span class="n">value</span> <span class="o">=</span> <span class="mi">2</span> <span class="err">时的索引为</span> <span class="mi">1</span><span class="err">。</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span> <span class="err">时，索引是</span> <span class="mi">0</span> <span class="err">，</span><span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="err">的索引为</span><span class="mi">2</span>
-    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">rr</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
-    <span class="o">//</span><span class="err">判断是否包含</span><span class="mi">1000</span>
-    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">rr</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">1000</span><span class="p">));</span>
-    <span class="o">//</span><span class="err">判断是否包含</span><span class="mi">7</span> <span class="o">//</span> <span class="n">will</span> <span class="k">return</span> <span class="n">false</span>
-    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span> <span class="n">rr</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">7</span><span class="p">));</span>
-
-    <span class="o">//</span><span class="err">两个</span><span class="n">RoaringBitmap</span><span class="err">进行</span><span class="ow">or</span><span class="err">操作，数值进行合并，合并后产生新的</span><span class="n">RoaringBitmap</span><span class="err">叫</span><span class="n">rror</span>
-    <span class="n">RoaringBitmap</span> <span class="n">rror</span> <span class="o">=</span> <span class="n">RoaringBitmap</span><span class="o">.</span><span class="ow">or</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span> <span class="n">rr2</span><span class="p">);</span>
-    <span class="o">//</span><span class="n">rr</span><span class="err">与</span><span class="n">rr2</span><span class="err">进行位运算，并将值赋值给</span><span class="n">rr</span>
-    <span class="n">rr</span><span class="o">.</span><span class="ow">or</span><span class="p">(</span><span class="n">rr2</span><span class="p">);</span>
-    <span class="o">//</span><span class="err">判断</span><span class="n">rror</span><span class="err">与</span><span class="n">rr</span><span class="err">是否相等，显然是相等的</span>
-    <span class="n">boolean</span> <span class="n">equals</span> <span class="o">=</span> <span class="n">rror</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">rr</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="err">!</span><span class="n">equals</span><span class="p">)</span> <span class="p">{</span><span class="n">throw</span> <span class="n">new</span> <span class="n">RuntimeException</span><span class="p">(</span><span class="s2">&quot;bug&quot;</span><span class="p">);}</span>
-    <span class="o">//</span> <span class="err">查看</span><span class="n">rr</span><span class="err">中存储了多少个值，</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="err">和</span><span class="mi">10000</span><span class="o">-</span><span class="mi">12000</span><span class="err">，共</span><span class="mi">2004</span><span class="err">个数字</span>
-    <span class="nb">long</span> <span class="n">cardinality</span> <span class="o">=</span> <span class="n">rr</span><span class="o">.</span><span class="n">getLongCardinality</span><span class="p">();</span>
-    <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">cardinality</span><span class="p">);</span>
-    <span class="o">//</span><span class="err">遍历</span><span class="n">rr</span><span class="err">中的</span><span class="n">value</span>
-    <span class="k">for</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="p">:</span> <span class="n">rr</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-
-
-<h3>其他</h3>
-<div class="highlight"><pre><span></span>01.BitMap 运营分析-任意两天的重叠活跃用户
- 对不同日期活跃用户ID进行bitmap编码和计算的
- 获取过去1天的日活跃用户bitmap和今天的bitmap,对它们做并集(Union)，and等操作
-Bitmap和布隆过滤器(Bloom Filter)两个算法，对于空间的利用到达了一种极致
-02.布隆过滤器就是引入了k(k&gt;1) k(k&gt;1)k(k&gt;1)个相互独立的哈希函数，保证在给定的空间、误判率下，完成元素判重的过程，适合与比Bitmap更多量的数据 .stat()
- DataFrameStatFunctions
-   bloomFilter    布隆过滤器
-   countMinSketch   算法Count-Min Sketch
-   corr ： 计算the Pearson Correlation Coefficient of two columns of a DataFrame.
- 03. HyperLogLog算法经常在数据库中被用来统计某一字段的Distinct Value -- 在需要对数据进行去重计数的场景里
- JavaRDDLike  countApproxDistinct
-  def countApproxDistinct(relativeSD: Double): Long = rdd.countApproxDistinct(relativeSD)。
- It must be greater than 0.000017.
- 统计是一个大约的统计，参数relativeSD控制统计的精确度。relativeSD越小，结果越准确
- APPROX_COUNT_DISTINCT
-</pre></div>
-
-
-<h3>5.参考：</h3>
-<div class="highlight"><pre><span></span> BitMap、RoaringBitmap与JavaEWAH https://www.cnblogs.com/fonxian/p/10937882.html
- 精确去重和Roaring BitMap https://blog.csdn.net/hfcenter/article/details/95458754
- Filter 过滤 http://muziyuchen.com/spark-ii-14/
- http://dyingbleed.com/ 李震的个人博客
- BitMap与RoaringBitmap、JavaEWAH https://blog.csdn.net/weixin_42142408/article/details/89426499
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Bitmap RoaringBitmap 布隆过滤器(Bloom Filter)</p>
+                <a class="readmore" href="/big-data/my-bigdata-post-64.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

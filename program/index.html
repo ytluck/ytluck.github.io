@@ -26,7 +26,167 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/program/my-program-post-56.html">Java序列化</a></h1>
+                    <h1 class="entry-title"><a href="/program/my-program-post-59.html">Java数据集合应用</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:21:00+08:00">
+                Published: 2019-12-22 22:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>单元测试异常处理
+日志和性能指标
+</pre></div>
+
+
+<h4>防御式编程</h4>
+<div class="highlight"><pre><span></span>防御式编程，就是持怀疑态度审视所有的代码
+契约式编程要求我们在『前提条件』、『后继条件』和『不变量条件』进行契约的检查
+</pre></div>
+
+
+<h4>调试</h4>
+<div class="highlight"><pre><span></span>Debug
+  --使用 IDEA 的断点调试功能，查看程序的运行过程
+  -- 设置断点 .开启调试会话 --单步调试 step over
+   IDEA在Debug时默认阻塞级别是ALL，会阻塞其它线程，只有在当前调试线程走完时才会走其它线程
+  01.采用Debug来追踪代码的运行流程，通常在程序运行过程中出现异常，
+     启用Debug模式可以分析定位异常发生的位置，以及在运行过程中参数的变化。
+  02.可以启用Debug模式来跟踪代码的运行流程去学习三方框架的源码
+</pre></div>
+
+
+<h3>异常处理</h3>
+<div class="highlight"><pre><span></span>1.问题先行？
+  01.什么是异常处理机制？what
+  02.哪些会发生异常？ where
+  03.谁来处理异常？ who
+  04.怎么处理异常？ how
+  05.关于异常的处理理念有哪些？idea
+  06.常见的异常有哪些，请举例，默认的处理机制？
+    默认处理机制：退出
+  07.异常的一些比较以及异常的链化
+2.异常的比较
+throw 抛出异常，触发Java异常处理机制， 代表异常退出，执行代码不确定，由异常处理机制动态处理
+常见的对比 -- return 代表正常退出，返回的位置是确定的，即上一级调用者
+3.怎么处理异常：
+  有2种不同的处理方式：
+   01.使用try…catch…finally语句块处理它。
+   02.或者在函数签名中使用throws 声明交给函数调用者caller去解决
+ 相关的情况
+   通过throw语句手动显式的抛出一个异常。throw语句的后面必须是一个异常对象。
+   throw 语句必须写在函数中，执行throw 语句的地方就是一个异常抛出点
+   eg：   if(user  == null) {throw new IllegalArgumentException(&quot;User对象为空&quot;);}       
+4.Throwable 类源码
+常见的异常有
+     RuntimeException 非检查异常
+       文件未找到异常：   FileNotFoundException
+       空指针异常         NullPointerException
+       数组下标越界异常： ArrayIndexOutOfBoundsException
+       数字格式异常：     NumberFormatException
+     检查异常(CheckedException)
+        输入输出异常：     IOException     
+错误Error
+    java.lang.NoClassDefFoundError
+    java.lang.StackOverflowError
+    java.lang.OutOfMemoryError
+-- itList.getClass() + &quot;:遇到无法解析的对象:&quot; + Thread.currentThread().getStackTrace()[1].getMethodName())
+getStackTrace() 返回一个表示该线程堆栈转储的堆栈跟踪元素数组。
+  如果该线程尚未启动或已经终止，则该方法将返回一个零长度数组。
+  如果返回的数组不是零长度的，则其第一个元素代表堆栈顶，它是该序列中最新的方法调用。最后一个元素代表堆栈底，是该序列中最旧的方法调用。
+   getStackTrace()[0]表示的是 getStackTrace 方法
+  如果有安全管理器，并且该线程不是当前线程，则通过 RuntimePermission(&quot;getStackTrace&quot;) 
+    权限调用安全管理器的 checkPermission 方法，查看是否可以获取堆栈跟踪
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement ele : stackTrace) {
+            System.out.println(ele);
+        }
+产生fail-fast事件，是通过抛出ConcurrentModificationException异常来触发的
+</pre></div>
+
+
+<h3>测试工具</h3>
+<div class="highlight"><pre><span></span>JUnit
+   是一个Java语言的单元测试框架
+Mock
+  模拟对象（英语：mock object，也译作模仿对象）是以可控的方式模拟真实对象行为的假的对象。
+  程序员通常创造模拟对象来测试其他对象的行为
+  Mockito 是GitHub上使用最广泛的Mock框架,并与JUnit结合使用.
+  Mockito框架可以创建和配置mock对象.使用Mockito简化了具有外部依赖的类的测试开发!
+ ​ PowerMock 可以实现完成对private/static/final方法的Mock（模拟），而 Mockito 可以对普通的方法进行Mock
+   PowerMock基于Mockito开发，起语法规则与Mockito一致，
+     主要区别在于使用方面，以实现完成对private/static/final等方法(也支持mock的对象是在方法内部new出来的)的Mock（模拟）      
+  一般使用Mockito的步骤:
+      模拟任何外部依赖并将这些模拟对象插入测试代码中
+      执行测试中的代码
+      验证代码是否按照预期执行
+</pre></div>
+
+
+<h4>日志系统</h4>
+<div class="highlight"><pre><span></span>日志：
+ 日志： 记录操作轨迹，监控系统运行状况，回溯系统故障
+   打日志，日志收集，日志解读，问题定位   
+  日志规范 
+  日志等级
+  日志框架
+</pre></div>
+
+
+<h4>监控指标系统</h4>
+<div class="highlight"><pre><span></span>2.为了更好地了解系统的运行情况，往往我们会有多样的metric性能指标来帮助我们了解这里面的情况
+  Metric框架设计而言，我们需要考虑的问题就要更多一些了，比如以下必须要解决的问题：
+    需要用哪些类型的Metric指标，收集哪些指标数据？
+    应用层如何通过Metric框架来收集我们想要的metric指标？
+    收集好后的Metric指标如何进行指标的expose？JMX，Console?
+例如：
+    Flink exposes a metric system that allows gathering and exposing metrics to external systems
+     Flink supports Counters, Gauges, Histograms and Meters.
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>Linux日志系统以及服务器日志系统 https://ytluck.github.io/os/my-super-os-post-12.html
+论分布式系统中Metric框架的设计  https://blog.csdn.net/Androidlushangderen/article/details/100752425
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-58.html" rel="bookmark"
+                           title="Permalink to Java数据集合应用">Java数据集合应用</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-21T21:22:00+08:00">
+                Published: 2019-12-21 21:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>HashMap HashSet ArrayList LinkedList</p>
+                <a class="readmore" href="/program/my-program-post-58.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-56.html" rel="bookmark"
+                           title="Permalink to Java序列化">Java序列化</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-06-30T21:22:00+08:00">
                 Published: 2019-06-30 21:22:00
@@ -37,88 +197,10 @@
         </address>
 <p>In <a href="/program/index.html">Program</a>.</p>
 <p>tags: <a href="/tag/java.html">Java</a> </p>
-</footer><!-- /.post-info --><h3>序列化：</h3>
-<div class="highlight"><pre><span></span>     序列化：把对象转换 为 字节序列 的过程称为对象的 序列化。
-   反序列化：把字节序列 恢复为 对象 的过程称为对象的 反序列化。
-   以便存储或传输的机制
-场景：把对象的状态信息通过网络进行传输
-</pre></div>
-
-
-<h3>序列化一些概念</h3>
-<div class="highlight"><pre><span></span>api 文档里面关于接口 Serializable 的描述
-01. java.io.Serializable 
- public interface Serializable
-序列化接口 没有方法或字段，仅用于标识可序列化的语义
-是在告诉JVM此类可被序列化，可被默认的序列化机制序列化
-02.implements Serializable
- 类通过实现 java.io.Serializable 接口以启用其序列化功能
- 可序列化类的所有子类型本身都是可序列化的
- 一个类要序列化，它的父类不一定要实现Serializable接口 - Object是每个类的超类，它没有实现 Serializable接口
-   那么 这个子类是可以序列化的，但是在反序列化的过程 中会调用 父类 的无参构造函数，
-   所以在其直接父类（注意是直接父类）中必须有一个无参的构造函数。   
-03.未实现此接口的类将无法使其任何状态序列化或反序列化
- 001.序列化的时候的一个关键字：transient（临时的）。它声明的变量实行序列化操作的时候不会写入到序列化文件中去
- 002.静态static的属性，静态成员变量属于类不属于对象所以不参与序列化的过程
-04.serialVersionUID 
-001.如果可序列化类未显式声明 serialVersionUID，则序列化运行时将基于该类的各个方面计算该类的默认 serialVersionUID 值
- 通过一个类的类名，成员，包名，工程名算出来的一个数字
-002.显式声明：private  静态 (static)、最终 (final) 的 long 型字段
-   private static final long serialVersionUID = 1L;
-该序列号在反序列化过程中用于验证序列化对象的发送者和接收者是否为该对象加载了与序列化兼容的类。
- 如果接收者加载的该对象的类的 serialVersionUID 与对应的发送者的类的版本号不同，
- 则反序列化将会导致 InvalidClassException
-003.数组类不能声明一个明确的 serialVersionUID，因此它们总是具有默认的计算值，
- 但是数组类没有匹配 serialVersionUID 值的要求
-</pre></div>
-
-
-<h3>序列化</h3>
-<div class="highlight"><pre><span></span>01.public class BillBean implements Serializable
-  bean 要实现Serializable接口
-02.Java  RMI
-02.对象的输入输出流 : 主要的作用是用于写入对象信息与读取对象信息
-  ObjectOutputStream , ObjectInputStream
-   writeObject()
-   readObject()
-</pre></div>
-
-
-<h3>常见问题</h3>
-<div class="highlight"><pre><span></span>为什么要实现序列化
- 有利于内存中的对象写入硬盘
- 有利于用套接字在网络上进行对象的传输
- 有利于通过RMI调用对象 即： RMI ：Remote Method Invocation， 远程方法调用-在一个JVM调用另外一个JVM对象）
-</pre></div>
-
-
-<h3>Java中数据类型</h3>
-<div class="highlight"><pre><span></span>01.POJO - JavaBean
-Plain Ordinary Java Object，简单的Java对象，普通的javaBean。除了getter、setter，不能有其他业务方法
-  public class--class必须是public的
-  所有属性必须 private，属性必须 setter getter等 public 方法
-  至少存在一个public无参构造方法
-  运行时类型信息(Run-Time Type Information)
-02.Java 中类与对象
-   类：方法和实例域
-    对象：类的实例
-      某个对象属于某个类，可以利用Java中的的 instanceof   isInstance
-   类之前的关系： is-a  has-a  uses-a
-       is-a : 继承   classa.isAssignableFrom(classb) 可以判断B是否继承于A
-       has-a: 聚合 类A的对象包含类B的对象
-      uses-a: 依赖 一个类的方法操作另外一个类的对象
-</pre></div>
-
-
-<h3>参考：</h3>
-<div class="highlight"><pre><span></span>详解java序列化（二） https://blog.csdn.net/moreevan/article/details/6698529
-Java 之 Serializable 序列化和反序列化的概念,作用的通俗易懂的解释 https://blog.csdn.net/u013870094/article/details/82765907
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>序列化  Serializable</p>
+                <a class="readmore" href="/program/my-program-post-56.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

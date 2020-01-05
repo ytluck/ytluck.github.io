@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java数据集合应用</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-59.html" rel="bookmark"
+           title="Permalink to Java数据集合应用">Java数据集合应用</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:21:00+08:00">
+                Published: 2019-12-22 22:21:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>单元测试异常处理
+日志和性能指标
+</pre></div>
+
+
+<h4>防御式编程</h4>
+<div class="highlight"><pre><span></span>防御式编程，就是持怀疑态度审视所有的代码
+契约式编程要求我们在『前提条件』、『后继条件』和『不变量条件』进行契约的检查
+</pre></div>
+
+
+<h4>调试</h4>
+<div class="highlight"><pre><span></span>Debug
+  --使用 IDEA 的断点调试功能，查看程序的运行过程
+  -- 设置断点 .开启调试会话 --单步调试 step over
+   IDEA在Debug时默认阻塞级别是ALL，会阻塞其它线程，只有在当前调试线程走完时才会走其它线程
+  01.采用Debug来追踪代码的运行流程，通常在程序运行过程中出现异常，
+     启用Debug模式可以分析定位异常发生的位置，以及在运行过程中参数的变化。
+  02.可以启用Debug模式来跟踪代码的运行流程去学习三方框架的源码
+</pre></div>
+
+
+<h3>异常处理</h3>
+<div class="highlight"><pre><span></span>1.问题先行？
+  01.什么是异常处理机制？what
+  02.哪些会发生异常？ where
+  03.谁来处理异常？ who
+  04.怎么处理异常？ how
+  05.关于异常的处理理念有哪些？idea
+  06.常见的异常有哪些，请举例，默认的处理机制？
+    默认处理机制：退出
+  07.异常的一些比较以及异常的链化
+2.异常的比较
+throw 抛出异常，触发Java异常处理机制， 代表异常退出，执行代码不确定，由异常处理机制动态处理
+常见的对比 -- return 代表正常退出，返回的位置是确定的，即上一级调用者
+3.怎么处理异常：
+  有2种不同的处理方式：
+   01.使用try…catch…finally语句块处理它。
+   02.或者在函数签名中使用throws 声明交给函数调用者caller去解决
+ 相关的情况
+   通过throw语句手动显式的抛出一个异常。throw语句的后面必须是一个异常对象。
+   throw 语句必须写在函数中，执行throw 语句的地方就是一个异常抛出点
+   eg：   if(user  == null) {throw new IllegalArgumentException(&quot;User对象为空&quot;);}       
+4.Throwable 类源码
+常见的异常有
+     RuntimeException 非检查异常
+       文件未找到异常：   FileNotFoundException
+       空指针异常         NullPointerException
+       数组下标越界异常： ArrayIndexOutOfBoundsException
+       数字格式异常：     NumberFormatException
+     检查异常(CheckedException)
+        输入输出异常：     IOException     
+错误Error
+    java.lang.NoClassDefFoundError
+    java.lang.StackOverflowError
+    java.lang.OutOfMemoryError
+-- itList.getClass() + &quot;:遇到无法解析的对象:&quot; + Thread.currentThread().getStackTrace()[1].getMethodName())
+getStackTrace() 返回一个表示该线程堆栈转储的堆栈跟踪元素数组。
+  如果该线程尚未启动或已经终止，则该方法将返回一个零长度数组。
+  如果返回的数组不是零长度的，则其第一个元素代表堆栈顶，它是该序列中最新的方法调用。最后一个元素代表堆栈底，是该序列中最旧的方法调用。
+   getStackTrace()[0]表示的是 getStackTrace 方法
+  如果有安全管理器，并且该线程不是当前线程，则通过 RuntimePermission(&quot;getStackTrace&quot;) 
+    权限调用安全管理器的 checkPermission 方法，查看是否可以获取堆栈跟踪
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement ele : stackTrace) {
+            System.out.println(ele);
+        }
+产生fail-fast事件，是通过抛出ConcurrentModificationException异常来触发的
+</pre></div>
+
+
+<h3>测试工具</h3>
+<div class="highlight"><pre><span></span>JUnit
+   是一个Java语言的单元测试框架
+Mock
+  模拟对象（英语：mock object，也译作模仿对象）是以可控的方式模拟真实对象行为的假的对象。
+  程序员通常创造模拟对象来测试其他对象的行为
+  Mockito 是GitHub上使用最广泛的Mock框架,并与JUnit结合使用.
+  Mockito框架可以创建和配置mock对象.使用Mockito简化了具有外部依赖的类的测试开发!
+ ​ PowerMock 可以实现完成对private/static/final方法的Mock（模拟），而 Mockito 可以对普通的方法进行Mock
+   PowerMock基于Mockito开发，起语法规则与Mockito一致，
+     主要区别在于使用方面，以实现完成对private/static/final等方法(也支持mock的对象是在方法内部new出来的)的Mock（模拟）      
+  一般使用Mockito的步骤:
+      模拟任何外部依赖并将这些模拟对象插入测试代码中
+      执行测试中的代码
+      验证代码是否按照预期执行
+</pre></div>
+
+
+<h4>日志系统</h4>
+<div class="highlight"><pre><span></span>日志：
+ 日志： 记录操作轨迹，监控系统运行状况，回溯系统故障
+   打日志，日志收集，日志解读，问题定位   
+  日志规范 
+  日志等级
+  日志框架
+</pre></div>
+
+
+<h4>监控指标系统</h4>
+<div class="highlight"><pre><span></span>2.为了更好地了解系统的运行情况，往往我们会有多样的metric性能指标来帮助我们了解这里面的情况
+  Metric框架设计而言，我们需要考虑的问题就要更多一些了，比如以下必须要解决的问题：
+    需要用哪些类型的Metric指标，收集哪些指标数据？
+    应用层如何通过Metric框架来收集我们想要的metric指标？
+    收集好后的Metric指标如何进行指标的expose？JMX，Console?
+例如：
+    Flink exposes a metric system that allows gathering and exposing metrics to external systems
+     Flink supports Counters, Gauges, Histograms and Meters.
+</pre></div>
+
+
+<h4>参考：</h4>
+<div class="highlight"><pre><span></span>Linux日志系统以及服务器日志系统 https://ytluck.github.io/os/my-super-os-post-12.html
+论分布式系统中Metric框架的设计  https://blog.csdn.net/Androidlushangderen/article/details/100752425
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

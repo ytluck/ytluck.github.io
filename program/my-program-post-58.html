@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Java数据集合应用</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-58.html" rel="bookmark"
+           title="Permalink to Java数据集合应用">Java数据集合应用</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-21T21:22:00+08:00">
+                Published: 2019-12-21 21:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->      <h3>数据类型</h3>
+<div class="highlight"><pre><span></span>数据结构：
+  1.基本构成
+    数组和链表
+  2.具体的数据结构
+    动态数组         ArrayList 
+    队列              Queue接口作为队列数据结构   LinkedList  LinkedList类实现了Queue接口和 Deque
+    双端队列          Deque接口（双端队列） Deque接口所能代表的数据结构：队列，双端队列，栈 ArrayDeque
+                      栈而言，有入栈(push)和出栈(pop)，遵循先进后出原则，将Deque限制为只能从一端入队和出队，则可实现栈的数据结构
+    哈希表           HashMap HashSet  LinkedHashMap (顺序地去存储key-value 保存了记录的插入顺序) LinkedHashSet
+    排序二叉树       TreeMap TreeSet
+    堆-完全二叉树    PriorityQueue   优先级队列，但也是比较通用的实现了堆性质的数据结构
+    位向量           EnumSet 是用位向量实现的
+    B-tree           数据库中的索引常用-- 多路搜索树  带有顺序访问指针的B+Tree
+    bitMap
+</pre></div>
+
+
+<h4>Map数据类型</h4>
+<div class="highlight"><pre><span></span>1.Map填充数据- 一行的是一个value
+  其中 ： List&lt;Row&gt; TestRow
+  //步骤一: 声明变量，生成实例
+      Map&lt;String ,ExpBean&gt; setBean = new HashMap&lt;&gt;();
+   if(TestRow != null &amp;&amp; !TestRow.isEmpty()) {    
+      for (Row row : TestRow) {
+         String testCd= row.getAs(&quot;testCd&quot;).toString().toLowerCase();
+         // 一行数据生成一个testDataBean
+         ExpBean   testDataBean = new ExpBean();
+         setBean.put(testCd,testDataBean);
+         }
+     }
+
+2.Map填充数据- 一类的是一个value
+    其中 ： List&lt;Row&gt; TestRow
+    //步骤一: 声明变量，生成实例
+    Map&lt;String ,ExpBean&gt; setBean = new HashMap&lt;&gt;();
+    if(TestRow != null &amp;&amp; !TestRow.isEmpty()) {    
+        for (Row row : TestRow) {
+            String testCd= row.getAs(&quot;testCd&quot;).toString().toLowerCase();
+        //步骤二:containsKey 作为判断的条件
+         if(setBean.containsKey(testCd)) {
+            //提取ExpBean，并且调用ExpBean的方法
+            ExpBean testDataBean  = setBean.get(testCd);
+            testDataBean.deal(row);
+           }else{
+              //不存在则生成ExpBean, 并且调用ExpBean的方法
+              ExpBean testDataBean = new ExpBean();
+              testDataBean.deal(row);
+              //将对应的ExpBean 实例存放到Map中去
+              setBean.put(testCd,testDataBean);
+            }
+         }
+     }
+
+3.另外一种实现
+    其中 ： List&lt;Row&gt; TestRow
+    //步骤一: 声明变量，生成实例
+    Map&lt;String ,ExpBean&gt; setBean = new HashMap&lt;&gt;();
+    if(TestRow != null &amp;&amp; !TestRow.isEmpty()) {    
+        for (Row row : TestRow) {
+            String testCd= row.getAs(&quot;testCd&quot;).toString().toLowerCase();
+        //步骤二:先使用get来取数据，一类数据生成一个testDataBean
+            ExpBean testDataBean  = setBean.get(testCd);
+        //步骤三: 判断是否为空，不为空，则代表有，是空，则代表没有，新生成相应的对象
+            if(testDataBean == null) {
+                testDataBean = new ExpBean();
+                setBean.put(testCd,testDataBean);
+            }
+        //步骤四： Bean对象的操作
+            testDataBean.deal(row);
+            }
+    }
+</pre></div>
+
+
+<h4>Map遍历的实现</h4>
+<div class="highlight"><pre><span></span><span class="nt">1</span><span class="nc">.Map</span><span class="err">遍历的方式一</span>
+<span class="nt">1</span><span class="o">.</span><span class="err">用</span><span class="nt">Iterator</span><span class="err">来遍历</span> 
+<span class="o">//</span> <span class="err">获取键值对的迭代器</span>  <span class="nt">Iterator</span><span class="o">&lt;</span><span class="nt">Entry</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">,</span> <span class="nt">String</span><span class="o">&gt;&gt;</span> <span class="nt">it</span> <span class="o">=</span> <span class="nt">strMap</span><span class="nc">.entrySet</span><span class="o">()</span><span class="nc">.iterator</span><span class="o">();</span>
+<span class="o">//</span> <span class="err">获取键集合的迭代器</span>  <span class="nt">Iterator</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">&gt;</span>  <span class="nt">it</span> <span class="o">=</span> <span class="nt">strMap</span><span class="nc">.keySet</span><span class="o">()</span><span class="nc">.iterator</span><span class="o">();</span>
+<span class="o">//</span> <span class="err">获取值集合的迭代器</span>  <span class="nt">Iterator</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">&gt;</span>  <span class="nt">it</span> <span class="o">=</span> <span class="nt">strMap</span><span class="nc">.values</span><span class="o">()</span><span class="nc">.iterator</span><span class="o">();</span>
+ <span class="err">遍历</span><span class="nt">HashMap</span><span class="err">的</span><span class="nt">entrySet</span><span class="err">键值对集合</span>
+  <span class="nt">1</span><span class="o">.</span><span class="err">通过</span><span class="nt">HashMap</span><span class="nc">.entrySet</span><span class="o">()</span><span class="err">得到键值对集合；</span>
+  <span class="nt">2</span><span class="o">.</span><span class="err">通过迭代器</span><span class="nt">Iterator</span><span class="err">遍历键值对集合得到</span><span class="nt">key</span><span class="err">值和</span><span class="nt">value</span><span class="err">值；</span>
+  <span class="nt">eg</span><span class="err">：</span>
+   <span class="nt">Map</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">,</span> <span class="nt">String</span><span class="o">&gt;</span> <span class="nt">strMap</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">HashMap</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">,</span> <span class="nt">String</span><span class="o">&gt;();</span>
+ <span class="nt">if</span><span class="o">(!</span><span class="nt">strMap</span><span class="nc">.isEmpty</span><span class="o">())</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="err">获取键值对的迭代器</span>
+   <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">strMap</span><span class="o">.</span><span class="n">entrySet</span><span class="p">()</span><span class="o">.</span><span class="n">iterator</span><span class="p">();</span>
+   <span class="n">while</span> <span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">hasNext</span><span class="p">())</span> <span class="err">{</span>
+                   <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">en</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">();</span>
+                   <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">en</span><span class="o">.</span><span class="n">getKey</span><span class="p">();</span>
+                   <span class="n">String</span> <span class="n">stb</span> <span class="o">=</span> <span class="n">en</span><span class="o">.</span><span class="n">getValue</span><span class="p">();</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;key:&quot;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;---&quot;</span> <span class="o">+</span> <span class="s2">&quot;value:&quot;</span> <span class="o">+</span> <span class="n">value</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="err">}</span>
+<span class="err">遍历方式二</span>
+<span class="nt">2</span><span class="o">.</span><span class="err">用</span><span class="nt">for</span><span class="err">循环遍历</span>
+   <span class="o">//</span>  <span class="nt">strMap</span><span class="nc">.entrySet</span><span class="o">()</span>  <span class="nt">strMap</span><span class="nc">.keySet</span><span class="o">()</span>  <span class="nt">strMap</span><span class="nc">.values</span><span class="o">()</span>
+   <span class="o">//</span>
+ <span class="nt">eg</span><span class="o">:</span>
+   <span class="o">//</span> <span class="nt">Set</span><span class="o">&lt;</span><span class="nt">Map</span><span class="nc">.Entry</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">,</span> <span class="nt">String</span><span class="o">&gt;&gt;</span> <span class="nt">entrySet</span> <span class="o">=</span> <span class="nt">strMap</span><span class="nc">.entrySet</span><span class="o">();//</span><span class="err">把这个</span><span class="nt">set</span><span class="err">取出来</span>
+    <span class="nt">for</span> <span class="o">(</span><span class="nt">Map</span><span class="nc">.Entry</span><span class="o">&lt;</span><span class="nt">String</span><span class="o">,</span> <span class="nt">String</span><span class="o">&gt;</span> <span class="nt">entry</span> <span class="o">:</span> <span class="nt">strMap</span><span class="nc">.entrySet</span><span class="o">())</span> <span class="p">{</span><span class="c">/*---*/</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;key= &quot;</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="n">getKey</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; and value= &quot;</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;; &quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<h4>进一步的方法</h4>
+<div class="highlight"><pre><span></span> /**
+ * @since 1.8
+ */
+  default V getOrDefault(Object key, V defaultValue) {
+    V v;
+    return (((v = get(key)) != null) || containsKey(key))
+        ? v
+        : defaultValue;
+   }
+   forEach
+   putIfAbsent
+   merge
+ 类定义
+    public class HashMap&lt;K,V&gt;       extends AbstractMap&lt;K,V&gt; implements Map&lt;K,V&gt;, Cloneable, Serializable {}
+    public class LinkedHashMap&lt;K,V&gt; extends HashMap&lt;K,V&gt;     implements Map&lt;K,V&gt;{}
+    public class TreeMap&lt;K,V&gt;       extends AbstractMap&lt;K,V&gt; implements NavigableMap&lt;K,V&gt;, Cloneable, java.io.Serializable{}
+    其中 SortedMap 提供排序接口  
+     public interface NavigableMap&lt;K,V&gt; extends SortedMap&lt;K,V&gt; {
+     public interface SortedMap&lt;K,V&gt; extends Map&lt;K,V&gt; {}
+</pre></div>
+
+
+<h4>Set</h4>
+<div class="highlight"><pre><span></span>HashSet: 没有重复，且没有顺序
+    HashSet以及HashMap要求元素重写 hashCode和equals方法，
+      如果两个对象equals相同，则hashCode必须相同，自定义尤其要注意
+    HashSet内部是用HashMap实现的，内部有一个HashMap的实例对象 ，HashSet相当于只有键，而值是相同的
+    这个value值是 private static final Object PRESENT = new Object(); //固定的共享值
+LinkedHashSet 介于HashSet和TreeSet之间。它也是一个hash表 --输出的顺序时确定的，就是插入的顺序。
+TreeSet ：有顺序
+
+Set&lt;String&gt; defineClassSet = new HashSet&lt;&gt;();
+遍历的方法
+    用Iterator来遍历 
+       Iterator&lt;&gt; iterator =  defineClassSet.iterator();
+       While(iterator.hasNext()){
+         System.out.println( iterator.next());
+       }
+    用for循环遍历
+      for( String examp: defineClassSet){
+       System.out.println( examp);
+      }
+public class HashSet&lt;E&gt;        extends AbstractSet&lt;E&gt;  implements Set&lt;E&gt;, Cloneable, java.io.Serializable
+public class LinkedHashSet&lt;E&gt;  extends HashSet&lt;E&gt;      implements Set&lt;E&gt;, Cloneable, java.io.Serializable {
+public class TreeSet&lt;E&gt;        extends AbstractSet&lt;E&gt;  implements NavigableSet&lt;E&gt;, Cloneable, java.io.Serializable
+  SortedSet和SortedMap 这两个接口提供排序操作
+    public interface NavigableSet&lt;E&gt; extends SortedSet&lt;E&gt; {
+    public interface SortedSet&lt;E&gt; extends Set&lt;E&gt; {
+</pre></div>
+
+
+<h4>Queue</h4>
+<div class="highlight"><pre><span></span>  * Java Collections Framework&lt;/a&gt;.
+  *
+  * @see java.util.Collection
+  * @see LinkedList
+  * @see PriorityQueue
+  * @see java.util.concurrent.LinkedBlockingQueue
+  * @see java.util.concurrent.BlockingQueue
+  * @see java.util.concurrent.ArrayBlockingQueue
+  * @see java.util.concurrent.LinkedBlockingQueue
+  * @see java.util.concurrent.PriorityBlockingQueue
+  * @since 1.5
+  * @author Doug Lea
+  * @param &lt;E&gt; the type of elements held in this collection
+  */
+ public interface Queue&lt;E&gt; extends Collection&lt;E&gt; {
+</pre></div>
+
+
+<h4>ArrayList 以及LinkedList</h4>
+<div class="highlight"><pre><span></span>    List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+    //方法1
+    Iterator it1 = list.iterator();
+    while(it1.hasNext()){
+        System.out.println(it1.next());
+    }
+
+    //方法2
+    for(String tmp:list){
+        System.out.println(tmp);
+    }
+
+    //方法3
+    for(Iterator it2 = list.iterator();it2.hasNext();){
+         System.out.println(it2.next());
+    }
+    //方法4
+    for(int i = 0;i &lt; list.size(); i ++){
+        System.out.println(list.get(i));
+    }
+
+public class ArrayList&lt;E&gt;   extends AbstractList&lt;E&gt;           implements List&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable
+public class LinkedList&lt;E&gt;  extends AbstractSequentialList&lt;E&gt; implements List&lt;E&gt;, Deque&lt;E&gt;, Cloneable, java.io.Serializable{}
+2.Fail-fast 机制
+  是java集合(Collection)中的一种错误机制。当多个线程对同一个集合的内容进行操作时，就可能会产生fail-fast事件
+ArrayList中有个成员变量 modCount ，继承于AbstractList。
+这个成员变量记录着集合的修改次数，也就每次add或者remove它的值都会加1
+next和remove操作之前都会先调用checkForComodification来检查expectedModCount和modCount是否相等 
+ ConcurrentModificationException 异常
+</pre></div>
+
+
+<h4>重写hashCode() 以及 equal()</h4>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">.</span><span class="nx">为什么要重写</span>
+<span class="nx">hashCode</span><span class="p">()</span><span class="nx">方法确定元素在数据结构中存放的位置</span><span class="err">。</span>
+<span class="nx">Java的继承体系中</span><span class="err">，</span><span class="nx">Object类是所有类的超类</span><span class="err">，</span>
+  <span class="nx">也就是说实际上自定义的类是继承了Object类的</span><span class="err">，</span>
+  <span class="nx">因此没有重写hashCode</span><span class="p">()</span><span class="nx">方法</span><span class="err">，</span><span class="nx">那么调用的就是Object类的hashCode</span><span class="p">()</span><span class="nx">方法了</span>
+<span class="nx">equals</span><span class="p">()</span>
+   <span class="nx">而使用equals</span><span class="p">()</span><span class="nx">来确认当两个元素存放的位置发生冲突时</span><span class="err">，</span><span class="nx">是应该将两个元素都存入数据结构</span><span class="err">，</span><span class="nx">还是说只需要存放其中一个</span><span class="err">。</span>
+   <span class="nx">如果equals</span><span class="p">()</span><span class="nx">方法判断两个元素是一样的</span><span class="err">，</span><span class="nx">那么当然只需要存放其中一个既可</span><span class="err">；</span>
+   <span class="nx">但如果equals</span><span class="p">()</span><span class="nx">方法判断两个对象是不同的</span><span class="err">，</span><span class="nx">那么当然两个都需要存放到数据结构中</span><span class="err">。</span>
+<span class="mi">2</span><span class="p">.</span><span class="nx">怎样重写</span>
+<span class="nx">equal</span><span class="p">()</span>
+  <span class="nx">首先判断是否是自己和自己比较</span><span class="err">，</span><span class="nx">如果是那么肯定是相同的</span><span class="err">，</span><span class="nx">因为是同一个对象</span><span class="err">。</span>
+   <span class="nx">然后再逐个比较对象的属性</span><span class="err">，</span><span class="nx">如果属性值都相同</span><span class="err">，</span><span class="nx">那么说明就是相同的对象</span><span class="err">。</span>
+<span class="nx">例子Spark源码中Optional</span> <span class="nx">重写</span>
+    <span class="err">@</span><span class="nx">Override</span>
+    <span class="kr">public</span> <span class="kr">int</span> <span class="nx">hashCode</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">value</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="nx">value</span><span class="p">.</span><span class="nx">hashCode</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="err">@</span><span class="nx">Override</span>
+    <span class="kr">public</span> <span class="kr">boolean</span> <span class="nx">equals</span><span class="p">(</span><span class="nb">Object</span> <span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">obj</span> <span class="k">instanceof</span> <span class="nx">Optional</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="nx">Optional</span><span class="cp">&lt;?</span><span class="o">&gt;</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">(</span><span class="nx">Optional</span><span class="o">&lt;</span><span class="cp">?&gt;</span><span class="p">)</span> <span class="nx">obj</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">Objects</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">other</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="err">@</span><span class="nx">Override</span>
+    <span class="kr">public</span> <span class="nb">String</span> <span class="nx">toString</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">value</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="s2">&quot;Optional.empty&quot;</span> <span class="o">:</span> <span class="nb">String</span><span class="p">.</span><span class="nx">format</span><span class="p">(</span><span class="s2">&quot;Optional[%s]&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="nx">Flink中的源码</span>
+     <span class="err">@</span><span class="nx">Override</span>
+    <span class="kr">public</span> <span class="kr">int</span> <span class="nx">hashCode</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">enumClass</span><span class="p">.</span><span class="nx">hashCode</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="err">@</span><span class="nx">Override</span>
+    <span class="kr">public</span> <span class="kr">boolean</span> <span class="nx">equals</span><span class="p">(</span><span class="nb">Object</span> <span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">obj</span> <span class="k">instanceof</span> <span class="nx">EnumSerializer</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">EnumSerializer</span><span class="cp">&lt;?</span><span class="o">&gt;</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">(</span><span class="nx">EnumSerializer</span><span class="o">&lt;</span><span class="cp">?&gt;</span><span class="p">)</span> <span class="nx">obj</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nx">other</span><span class="p">.</span><span class="nx">enumClass</span> <span class="o">==</span> <span class="k">this</span><span class="p">.</span><span class="nx">enumClass</span> <span class="o">&amp;&amp;</span> <span class="nx">Arrays</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">values</span><span class="p">,</span> <span class="nx">other</span><span class="p">.</span><span class="nx">values</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+       <span class="p">}</span>
+    <span class="err">@</span><span class="nx">Override</span>
+    <span class="kr">public</span> <span class="nb">String</span> <span class="nx">toString</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s2">&quot;EnumSerializer{&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;enumClass=&quot;</span> <span class="o">+</span> <span class="nx">enumClass</span> <span class="o">+</span>
+                <span class="s2">&quot;, values=&quot;</span> <span class="o">+</span> <span class="nx">Arrays</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="nx">values</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s1">&#39;}&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="nx">使用场景</span>
+<span class="nx">在重写</span> <span class="nx">equals</span> <span class="nx">方法的时侯</span><span class="err">，</span><span class="nx">一定要重写</span> <span class="nx">hashcode</span> <span class="nx">方法</span>
+</pre></div>
+
+
+<h3>编程中递归</h3>
+<div class="highlight"><pre><span></span>增加IF语句进行初始化
+增加中间变量用于数据变换
+递归函数意味着函数可以调用它本身，在满足条件的时候函数会返回。
+ 递归-- 实现循环
+1.递归的关键点
+ 01.一个递归算法，必须要有这样一个边界条件
+ 02. 分解和组合
+用例
+   01.递归对于列表的一种的处理方式： 即对一个列表的操作，可转化为对第一个元素，及剩余列表的相同操作
+2.过程关键点
+ 整个递归的终止条件。         找整个递归的终止条件：递归应该在什么时候结束？
+ 一级递归需要做什么？         找返回值：应该给上一级返回什么信息？
+ 应该返回给上一级的返回值是什么？本级递归应该做什么：在这一级递归中，应该完成什么任务？
+
+3.递归的形式
+ 01.直接递归 direct recursion -- 互递归 (trivial case).
+         递归算法需要保持调用堆栈，效率较低，如果调用次数较多，会耗尽内存或栈溢出，即
+    如果递归嵌套很深，容易出现栈溢出的问题
+ 02.间接递归 indirect recursion
+ 03.尾递归  tail recursion
+   -- 尾递归函数 Tail Recursive Function 所有递归形式的调用都出现在函数的尾部
+   就是最后一步是递归操作本身(即没有和其它参数参与)，
+   只有到达特定状态的时候, 再去构造返回结果, 而其它时候, 只需要更新一些状态变量即可
+   尾递归可以进行优化，将递归转换成循环实现，避免栈的溢出
+4.具体语言：
+Scala语言特别增加了一个注释@tailrec
+  @tailrec
+Java
+  -- 递归实现字符串的反转
+  用例
+  public String reverse(String str){
+  　　if(str == null || str.length() &lt;= 1){
+        return str;
+    }else
+  　　 {
+       return reverse(str.subString(1)) + str.charAt(0);
+      }   
+  }
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span> 源码
+ Flink和Spark
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

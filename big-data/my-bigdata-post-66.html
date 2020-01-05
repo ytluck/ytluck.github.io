@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>Flink和Spark类型编码</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li class="active"><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/big-data/my-bigdata-post-66.html" rel="bookmark"
+           title="Permalink to Flink和Spark类型编码">Flink和Spark类型编码</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2020-01-05T18:18:00+08:00">
+                Published: 2020-01-05 18:18:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/big-data/index.html">Big Data</a>.</p>
+<p>tags: <a href="/tag/flink.html">Flink</a> </p>
+</footer><!-- /.post-info -->      <div class="highlight"><pre><span></span>Spark数据集的行类型编码器(Encoder for Row Type Spark Datasets)
+转换时需要指定一个转换的Encorder，
+在Scala代码中是通过隐式转换进行的，而在Java代码中则需要在代码中指明
+Flink也有类似的系统
+</pre></div>
+
+
+<h3>Spark中Encoders</h3>
+<div class="highlight"><pre><span></span>org.apache.spark.sql.Encoders
+  1. Encoders.STRING()
+     Encoder&lt;String&gt; stringEncoder = Encoders.STRING();
+    def STRING: Encoder[java.lang.String] = ExpressionEncoder()
+
+ 2. Encoders.bean()
+    // Encoders are created for Java beans  自定义的Bean对象类型
+    Encoder&lt;Person&gt; personEncoder = Encoders.bean(Person.class); 
+    def bean[T](beanClass: Class[T]): Encoder[T] = ExpressionEncoder.javaBean(beanClass)
+
+ 3. Encoders.product()
+  * An encoder for Scala&#39;s product type (tuples, case classes, etc).
+   def product[T &lt;: Product : TypeTag]: Encoder[T] = ExpressionEncoder()
+
+ 4. Encoders.tuple()
+  /** An encoder for 5-ary tuples.
+  */
+  def tuple[T1, T2, T3, T4, T5](
+    e1: Encoder[T1],
+    e2: Encoder[T2],
+    e3: Encoder[T3],
+    e4: Encoder[T4],
+    e5: Encoder[T5]): Encoder[(T1, T2, T3, T4, T5)] = {
+    ExpressionEncoder.tuple(
+      encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4), encoderFor(e5))
+  }
+     Encoders.STRING()
+
+5. javaSerialization
+   def javaSerialization[T: ClassTag]: Encoder[T] = genericSerializer(useKryo = false)
+   def kryo             [T: ClassTag]: Encoder[T] = genericSerializer(useKryo = true)
+   def javaSerialization[T](clazz: Class[T]): Encoder[T] = javaSerialization(ClassTag[T](clazz))
+   def kryo             [T](clazz: Class[T]): Encoder[T] = kryo(ClassTag[T](clazz))
+   类型Row为输出的类型
+  // Encoder&lt;Row&gt; rowEncoder = Encoders.kryo(Row.class);
+    Encoder&lt;Row&gt; rowEncoder = Encoders.javaSerialization(Row.class);
+ Eg:
+    Encoder&lt;Row&gt; rowEncoder = Encoders.javaSerialization(Row.class);
+    Dataset&lt;Row&gt; dsString2Row = ds.map(
+            (MapFunction&lt;String, Row&gt;) value -&gt; RowFactory.create(value, value.length()), rowEncoder);
+</pre></div>
+
+
+<h3>Spark 2. ExpressionEncoder</h3>
+<div class="highlight"><pre><span></span>  * A factory for constructing encoders 
+    that convert objects and primitives to and from the internal row format using catalyst expressions and code generation
+</pre></div>
+
+
+<h3>Flink 的 TypeInformation 类</h3>
+<div class="highlight"><pre><span></span> org.apache.flink.api.common.typeinfo.Types
+ org.apache.flink.api.common.typeinfo.TypeInformation; 
+ org.apache.flink.api.common.typeinfo.TypeHint  
+ org.apache.flink.api.common.typeutils.TypeSerializer
+   创建 TypeInformation 或者 TypeSerializer
+  TypeInformation&lt;String&gt; info = TypeInformation.of(String.class);
+
+ This class gives access to the type information of the most common types for which Flink
+  * has built-in serializers and comparators.
+
+ 对于泛型类型，你需要通过 TypeHint 来“捕获”泛型类型信息：
+  TypeInformation&lt;Tuple2&lt;String, Double&gt;&gt; info = TypeInformation.of(new TypeHint&lt;Tuple2&lt;String, Double&gt;&gt;(){});
+ DataSet&lt;SomeType&gt; result = dataSet
+  .map(new MyGenericNonInferrableFunction&lt;Long, SomeType&gt;())
+    .returns(SomeType.class);  // returns(new TypeHint&lt;Tuple2&lt;Integer, SomeType&gt;&gt;(){})
+</pre></div>
+
+
+<h3>Flink的Types</h3>
+<div class="highlight"><pre><span></span>org.apache.flink.table.api.Types
+  Flink 中DataSet和DataStream 都能与Table 互转
+   This class enumerates all supported types of the Table API &amp; SQL
+</pre></div>
+
+
+<h3>Flink中的DataType</h3>
+<div class="highlight"><pre><span></span>1.Data Types in the Table API
+   org.apache.flink.table.types.DataType
+  重构类型系统：在Flink 1.9版本中实现了一套全新的数据类型系统，这套全新的类型系统与SQL标准进行了完全对齐，能够支持更加丰富的类型。这套
+   从 Table API 中移除对 Flink TypeInformation 的依赖，并提高其对 SQL 标准的遵从性
+   The planning for code generation and serialization of runtime operators        
+   Flink Improvement Proposal (FLIP) process     
+   org.apache.flink.table.types.logical.LogicalType
+     org.apache.flink.table.types.logical
+       public abstract class LogicalType implements Serializable {
+   https://cwiki.apache.org/confluence/display/FLINK/Flink+Improvement+Proposals    
+  DataType t = DataTypes.TIMESTAMP(3).bridgedTo(java.sql.Timestamp.class);
+  the difference between data type and type information   
+  org.apache.flink.table.api.types.TypeConverters提供了DataType和Typeinformation之间的相互转化。
+    createExternalTypeInfoFromDataType和createInternalTypeInfoFromDataType
+
+2.SQL standard’s data type and Java Expression
+
+3.Row - org.apache.spark.sql.Row
+          RDD[Row]
+          JavaRDD&lt;Row&gt;
+         Dataset&lt;Row&gt; 
+         List&lt;Row&gt;    createDataFrame(rows: java.util.List[Row], schema: StructType)
+          List&lt;Row&gt; data = Arrays.asList(
+                 RowFactory.create(&quot;L5&quot;, &quot;a1群&quot;),
+                 RowFactory.create(&quot;L9&quot;, &quot;a2群&quot;)
+                )
+             type DataFrame = Dataset[Row]
+       org.apache.flink.types.Row
+          Creates a new Row with projected fields from another row.
+      java.sql.ResultSet
+</pre></div>
+
+
+<h3>参考</h3>
+<div class="highlight"><pre><span></span>  Spark SQL中的Encoder https://www.jianshu.com/p/d3c35e18af44      
+  Data Types  https://ci.apache.org/projects/flink/flink-docs-release-1.9/zh/dev/table/types.html
+   https://ci.apache.org/projects/flink/flink-docs-release-1.9/zh/dev/table/types.html#data-types-in-the-table-api
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>
