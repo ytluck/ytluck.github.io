@@ -85,6 +85,45 @@ Flink也有类似的系统
     Encoder&lt;Row&gt; rowEncoder = Encoders.javaSerialization(Row.class);
     Dataset&lt;Row&gt; dsString2Row = ds.map(
             (MapFunction&lt;String, Row&gt;) value -&gt; RowFactory.create(value, value.length()), rowEncoder);
+6.   Dataset&lt;Row&gt;
+//创建DataSet的时候指明数据是 RowEncoder 类型
+List&lt;Row&gt; gradeData = Arrays.asList(
+        RowFactory.create(&quot;abc&quot;, &quot;3&quot;, &quot;年级人群&quot;),
+        RowFactory.create(&quot;abc&quot;, &quot;4&quot;, &quot;年级人群&quot;),
+        RowFactory.create(&quot;abc&quot;, &quot;9&quot;, &quot;年级人群&quot;)          
+);
+ StructType grdSchema = new StructType(new StructField[]{
+        new StructField(&quot;class_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+        new StructField(&quot;grade_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+        new StructField(&quot;grade_nm&quot;, DataTypes.StringType, false, Metadata.empty())
+});
+//构造Dataset
+Dataset&lt;Row&gt; dimensionDF = spark.createDataFrame(gradeData, gradeSchema);
+// 构造 Row的 RowEncoder 
+StructType montiorSchema = new StructType(new StructField[]{
+        new StructField(&quot;class_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+         new StructField(&quot;grade_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+        new StructField(&quot;grade_nm&quot;, DataTypes.StringType, false, Metadata.empty())
+});
+ExpressionEncoder&lt;Row&gt; data2Encoder=  RowEncoder.apply(dimensionDF.schema());
+Encoder&lt;Row&gt;  dataEncoder= RowEncoder.apply(montiorSchema);
+//Dataset的 map方法
+Dataset&lt;Row&gt;  montiorDF =   dimensionDF.map(
+        new MapFunction&lt;Row, Row&gt;(){
+            @Override
+            public Row call(Row montiorRow) throws Exception {
+                String class_cd = montiorRow.getAs(&quot;class_cd&quot;).toString().toLowerCase();
+                String grade_cd = montiorRow.getAs(&quot;grade_cd&quot;);
+                String grade_nm = montiorRow.getAs(&quot;grade_nm&quot;);
+                return RowFactory.create(class_cd, grade_cd, grade_nm);
+            } },
+        dataEncoder);
+
+Encoder for Row Type Spark Datasets  https://stackoverflow.com/questions/43238693/encoder-for-row-type-spark-datasets
+ org.apache.spark.sql.catalyst.encoders.RowEncoder
+Dataset的源码
+ new Dataset[Row](sparkSession, qe, RowEncoder(qe.analyzed.schema)
+ def toDF(): DataFrame = new Dataset[Row](sparkSession, queryExecution, RowEncoder(schema))
 </pre></div>
 
 
@@ -167,8 +206,52 @@ Flink也有类似的系统
 
             <li><article class="hentry">
                 <header>
+                    <h1><a href="/program/my-program-post-61.html" rel="bookmark"
+                           title="Permalink to 数据结构-BloomFilter 概要">数据结构-BloomFilter 概要</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:23:00+08:00">
+                Published: 2019-12-22 22:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>BitSet RoaringBitmap  BloomFilter</p>
+                <a class="readmore" href="/program/my-program-post-61.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/program/my-program-post-60.html" rel="bookmark"
+                           title="Permalink to 数据结构-BitSet 概要">数据结构-BitSet 概要</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:22:00+08:00">
+                Published: 2019-12-22 22:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->                <p>BitSet RoaringBitmap  BloomFilter</p>
+                <a class="readmore" href="/program/my-program-post-60.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
                     <h1><a href="/program/my-program-post-59.html" rel="bookmark"
-                           title="Permalink to Java数据集合应用">Java数据集合应用</a></h1>
+                           title="Permalink to Java编程流程">Java编程流程</a></h1>
                 </header>
 
                 <div class="entry-content">
@@ -212,7 +295,7 @@ Flink也有类似的系统
             <li><article class="hentry">
                 <header>
                     <h1><a href="/big-data/my-bigdata-post-64.html" rel="bookmark"
-                           title="Permalink to RoaringBitmap概要">RoaringBitmap概要</a></h1>
+                           title="Permalink to 数据结构-RoaringBitmap概要">数据结构-RoaringBitmap概要</a></h1>
                 </header>
 
                 <div class="entry-content">

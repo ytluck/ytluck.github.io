@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据结构-BloomFilter 概要</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-61.html" rel="bookmark"
+           title="Permalink to 数据结构-BloomFilter 概要">数据结构-BloomFilter 概要</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:23:00+08:00">
+                Published: 2019-12-22 22:23:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->      <h3>过滤器</h3>
+<div class="highlight"><pre><span></span> Burton Bloom 在1970年提出了Bloom Filter 算法，时间复杂度是O(1)
+  可能会把不属于这个集合的元素误认为属于这个集合（false positive）,缺点是有一定的误识别率和删除困难。
+ 适用场景：用于拼写检查和数据库系统
+      在警察系统中，一个嫌疑人的名字是否出现在嫌疑名单上；
+      在网络爬虫里，一个网址是否已经被访问过，等等。
+</pre></div>
+
+
+<h4>Spark中的Bloom Filter</h4>
+<div class="highlight"><pre><span></span>  数据添加到过滤器中，它不存储元素本身，通过K个散列函数将这个元素映射成一个位数组中的K个点，把它们置为1
+  expectedNumItems   布隆过滤器最大缓存的记录数 expectedNumItems 参数对于布隆过滤器的内存消耗影响非常大。
+  增量更新过滤器 bloomFilter.putString(uuid)
+</pre></div>
+
+
+<h4>Spark使用过滤器去重</h4>
+<div class="highlight"><pre><span></span><span class="mf">01.</span><span class="err">代码示例：</span>
+  <span class="o">*</span>  <span class="err">使用布隆过滤器过滤数据</span> <span class="n">spark</span><span class="err">官方封装了基于</span><span class="n">DataFrame</span><span class="err">的布隆过滤器</span>
+   <span class="n">Dataset</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="n">dataTemp1</span> <span class="o">=</span> <span class="n">itemsDF</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s2">&quot;active_date=&#39;20191029&#39;&quot;</span><span class="p">);</span>
+  <span class="o">//</span>  <span class="mf">1.</span><span class="err">创建布隆过滤器</span> <span class="err">第一个参数是使用的数据列</span>
+  <span class="o">//</span><span class="err">第二个参数</span> <span class="n">expectedNumItems</span> <span class="err">为期望的元素数量</span><span class="p">,</span><span class="err">第三个参数</span> <span class="n">fpp</span> <span class="err">为期望的错误概率，数值取</span> <span class="mf">0.0</span> <span class="err">到</span> <span class="mf">1.0</span> <span class="err">之间</span>
+  <span class="n">BloomFilter</span> <span class="n">bf</span> <span class="o">=</span> <span class="n">dataTemp1</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">bloomFilter</span><span class="p">(</span><span class="s2">&quot;grade_cd&quot;</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">JavaSparkContext</span> <span class="n">jsc</span> <span class="o">=</span> <span class="n">new</span> <span class="n">JavaSparkContext</span><span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">sparkContext</span><span class="p">());</span>
+  <span class="n">JavaSparkContext</span> <span class="n">sparkContext</span> <span class="o">=</span> <span class="n">JavaSparkContext</span><span class="o">.</span><span class="n">fromSparkContext</span><span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">sparkContext</span><span class="p">());</span>
+  <span class="o">//</span> <span class="mf">2.</span><span class="err">创建布隆过滤器广播变量</span>
+  <span class="n">Broadcast</span><span class="o">&lt;</span><span class="n">BloomFilter</span><span class="o">&gt;</span> <span class="n">bfBc</span> <span class="o">=</span> <span class="n">sparkContext</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">bf</span><span class="p">);</span>
+  <span class="o">//</span> <span class="mf">3.</span><span class="err">使用布隆过滤器过滤前天访问用户</span>
+  <span class="n">dataTemp2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">new</span> <span class="n">BoolFiltFunction</span><span class="p">(</span><span class="n">bfBc</span><span class="p">))</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+ <span class="err">其中</span> <span class="n">BoolFiltFunction</span> <span class="err">为如下</span>
+     <span class="kn">import</span> <span class="nn">org.apache.spark.api.java.function.FilterFunction</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.apache.spark.broadcast.Broadcast</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.apache.spark.sql.Row</span><span class="p">;</span>
+     <span class="kn">import</span> <span class="nn">org.apache.spark.util.sketch.BloomFilter</span><span class="p">;</span>
+     <span class="n">public</span> <span class="k">class</span> <span class="nc">BoolFiltFunction</span> <span class="n">implements</span> <span class="n">FilterFunction</span><span class="o">&lt;</span><span class="n">Row</span><span class="o">&gt;</span> <span class="p">{</span>
+         <span class="n">Broadcast</span><span class="o">&lt;</span><span class="n">BloomFilter</span><span class="o">&gt;</span> <span class="n">gradeData</span> <span class="o">=</span><span class="n">null</span><span class="p">;</span>
+         <span class="n">public</span> <span class="n">BoolFiltFunction</span><span class="p">(</span><span class="n">Broadcast</span><span class="o">&lt;</span><span class="n">BloomFilter</span><span class="o">&gt;</span> <span class="n">userBroad</span><span class="p">)</span> <span class="p">{</span>
+             <span class="n">gradeData</span>  <span class="o">=</span> <span class="n">userBroad</span><span class="p">;</span>
+         <span class="p">}</span>
+         <span class="nd">@Override</span>
+         <span class="n">public</span> <span class="n">boolean</span> <span class="n">call</span><span class="p">(</span><span class="n">Row</span> <span class="n">va1u</span><span class="p">)</span> <span class="n">throws</span> <span class="ne">Exception</span> <span class="p">{</span>
+           <span class="n">Integer</span>  <span class="n">broadDa</span> <span class="o">=</span> <span class="n">va1u</span><span class="o">.</span><span class="n">getAs</span><span class="p">(</span><span class="s2">&quot;grade_cd&quot;</span><span class="p">);</span>
+           <span class="n">boolean</span> <span class="n">flag</span> <span class="o">=</span>  <span class="n">gradeData</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span><span class="o">.</span><span class="n">mightContain</span><span class="p">(</span><span class="n">broadDa</span><span class="p">);</span>
+           <span class="k">return</span> <span class="n">flag</span><span class="p">;</span>
+         <span class="p">}</span>
+     <span class="p">}</span>
+
+<span class="mf">02.</span><span class="err">方式二</span>  
+    <span class="o">//</span><span class="err">超过</span><span class="mi">10</span><span class="err">万活跃用户时，不要增加此上限值，而是通过</span><span class="n">userId</span><span class="err">分区，用多个微服务并行处理，防止单个布隆过滤器</span><span class="n">OOM</span>
+    <span class="o">//</span><span class="n">expectedNumItems</span> <span class="err">参数对于布隆过滤器的内存消耗影响非常大。</span> 
+    <span class="n">mightContain</span><span class="p">(</span><span class="n">Object</span> <span class="n">var1</span><span class="p">),</span> <span class="n">mightContainString</span><span class="p">(</span><span class="n">String</span> <span class="n">val1</span><span class="p">),</span> <span class="n">mightContainLong</span><span class="p">(</span><span class="nb">long</span> <span class="n">var1</span><span class="p">),</span><span class="n">mightContainBinary</span><span class="p">(</span><span class="n">byte</span><span class="p">[]</span> <span class="n">var1</span><span class="p">)</span>
+      <span class="n">val</span> <span class="n">bf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">bloomFilter</span><span class="p">(</span><span class="s2">&quot;dd&quot;</span><span class="p">,</span><span class="n">dataLen</span><span class="p">,</span><span class="mf">0.01</span><span class="p">)</span>
+      <span class="n">val</span> <span class="n">rightNum</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">x</span><span class="o">=&gt;</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">toInt</span><span class="p">,</span><span class="n">bf</span><span class="o">.</span><span class="n">mightContainString</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="err">或者</span>
+       <span class="n">val</span> <span class="n">bloomFilterInit</span> <span class="o">=</span> <span class="n">BloomFilter</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">expectedNumItems</span><span class="p">,</span> <span class="n">fpp</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Spark源码信息</h3>
+<div class="highlight"><pre><span></span>1.org.apache.spark.util.sketch.BloomFilter
+   public abstract class BloomFilter {}
+   进一步的信息
+   * Combines this bloom filter with another bloom filter by performing a bitwise OR of the underlying data
+    Callers must ensure the  bloom filters are appropriately sized to avoid saturating them.
+      filter1.mergeInPlace(filter2)
+     02. put() putString() putLong() putBinary()
+     参考： test.org.apache.spark.sql.JavaDataFrameSuite
+    Currently supported data types include
+        Byte,Short,Integer,Long,String
+     * The implementation is largely based on the {@code BloomFilter} class from Guava.
+   * @since 2.0.0
+  2.org.apache.spark.sql.DataFrameStatFunctions
+   final class DataFrameStatFunctions private[sql](df: DataFrame) {
+  // Builds a Bloom filter over a specified column.
+   def bloomFilter(colName: String, expectedNumItems: Long, fpp: Double): BloomFilter = {
+     buildBloomFilter(Column(colName), BloomFilter.create(expectedNumItems, fpp))}
+   }
+
+   3.org.apache.spark.sql.Dataset
+     class Dataset[T] private[sql]{
+      def stat: DataFrameStatFunctions = new DataFrameStatFunctions(toDF())
+     }
+</pre></div>
+
+
+<h3>Guava library</h3>
+<div class="highlight"><pre><span></span> com.google.common.hash.BloomFilter
+     BloomFilter 提供了create静态方法来创建BloomFilter实例
+ fpp（ false positive probability）
+ 正确估计预期插入数量是很关键的一个参数。当插入的数量接近或高于预期值的时候，布隆过滤器将会填满，这样的话，它会产生很多无用的误报点。
+ boolean exists = dealIdBloomFilter.mightContain(deal_id);
+    if(!exists){
+        dealIdBloomFilter.put(deal_id);
+    }
+通过BloomFilter mightContain 判断deal_id是否已经存在了，如果不存在则put到BloomFilter中
+2.其他
+Guava的preconditions
+参数检查的工具类--Preconditions, 简化代码中对于参数的预判断和处理
+// checkNotNull会检查参数是否为null, 当为null的时候会抛出NullPointerException, 否则直接返回参数.
+public static &lt;T&gt; T checkNotNull(T reference) {
+  if (reference == null) {
+    throw new NullPointerException();
+  }
+  return reference;
+}
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span> 海量数据去重神器——布隆过滤器  https://blog.csdn.net/xianyuxiaoqiang/article/details/93896428
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <title>数据结构-BitSet 概要</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">ytluck—For you </a></h1>
+                <nav><ul>
+                    <li><a href="http://ytluck.github.io/">Home</a></li>
+                    <li><a href="/About me.html">About Me</a></li>
+                    <li><a href="/big-data/index.html">Big Data</a></li>
+                    <li><a href="/data-mining/index.html">Data Mining</a></li>
+                    <li><a href="/items/index.html">Items</a></li>
+                    <li><a href="/os/index.html">OS</a></li>
+                    <li class="active"><a href="/program/index.html">Program</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/program/my-program-post-60.html" rel="bookmark"
+           title="Permalink to 数据结构-BitSet 概要">数据结构-BitSet 概要</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2019-12-22T22:22:00+08:00">
+                Published: 2019-12-22 22:22:00
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ytwan.html">ytwan</a>
+        </address>
+<p>In <a href="/program/index.html">Program</a>.</p>
+<p>tags: <a href="/tag/java.html">Java</a> </p>
+</footer><!-- /.post-info -->      <h3>数据结构快速查询</h3>
+<div class="highlight"><pre><span></span>BitSet   开源工具类JavaEWAH、 RoaringBitmap, a compressed alternative to the RoaringBitmap 
+BloomFilter 布隆过滤器
+B-Tree Balance Tree  多路搜索树
+Hash  HASH算法  java中的HashMap有个扩容参数默认是0.75
+</pre></div>
+
+
+<h3>BitSet</h3>
+<div class="highlight"><pre><span></span> 用于存储二进制位和对二进制进行操作的数据结构。
+ java.util.BitSet
+    public class BitSet implements Cloneable, java.io.Serializable {}
+ 01.适用场景：整数，无重复
+  布尔运算
+   and or  not  xor
+   &amp;&amp; ||  ! ^
+   左移 N &lt;&lt; 相当于乘以2的N次方，   &lt;&lt;  表示左移，不分正负数，低位补0
+   使用&gt;&gt;来代替除法
+   异或 相当于求余数
+ 02.方法和变量
+    s.size()      返回大小（位数）--位值时实际使用空间的位数 
+    s.cardinality 返回Returns the number of bits set to {@code true}
+    s.length()    BitSet 中最高设置位的索引加 1
+    s.isEmpty()
+    s.any()     返回是否有1
+    s.none()    返回是否没有1
+    s.set()     全部变成1    s.set(p)   将p + 1位变成1（是p+1为，因为bitset从0位开始） s.set(p,x)  将p + 1为变成x
+    s.reset()   全部变成0    s.reset(p) 将p + 1位变成0
+    s.clear()                s.clear(p) 位置pos的字位设置为false，即第 p + 1个
+    s.flip()    全部取反      s.flip(p) 将第p + 1为取反
+    s.to_ulong()    返回它转换为 unsigned long 的结果，超出范围则报
+    toByteArray toLongArray toString
+    bitSet.andNot(bitSet2) 此方法返回在bitSet中不在bitSet2中的值，求的是bitSet相对于bitSet2的补集
+    or  and  xor(相同的置为0，不同的置为1) andNot
+    int nextClearBit(int startIndex) 返回第一个设置为 false 的位的索引，这发生在指定的起始索引或之后的索引上
+    int nextSetBit(int startIndex)   返回第一个设置为 true 的位的索引， 这发生在指定的起始索引或之后的索引上
+      Returns the index of the first bit that is set to true that occurs on or after the specified starting index.
+       If no such bit exists then -1 is returned.
+        for (int i = bs.nextSetBit(0); i &gt;= 0; i = bs.nextSetBit(i+1)) {}
+    previousSetBit  previousClearBit
+   第一个构造方法创建一个默认的对象：  BitSet()
+   第二个方法允许用户指定初始大小。所有位初始化为0。BitSet(int size)
+ 03.原理和实现：
+     一个long[] words数组，把数组总的long数据类型，拆分成bit，也就是每个long可以表达的64个位
+         ADDRESS_BITS_PER_WORD = 6  a long, which consists of 64 bits
+         bitIndex / 64 等价于   bitIndex &gt;&gt; ADDRESS_BITS_PER_WORD;
+           wordIndex函数就能计算出参数bitIndex应该存放在words数组里的哪一个long--word index containing
+         words[wordIndex] |= (1L &lt;&lt; bitIndex)  就是2的次幂
+              1&lt;&lt;0   1
+              1&lt;&lt;1   2
+              1&lt;&lt;2   4
+              1&lt;&lt;7   128
+     默认的初始大小为, 2^6 = 64-1=63 bit.如果指定了bitset的初始化大小，
+       words[wordIndex] |= (1L &lt;&lt; bitIndex)
+     那么会把他规整到一个大于或者等于这个数字的64的整倍数。
+      private long[] words   bitIndex  ensureCapacity
+      byte[]  ByteBuffer  
+      long[]  LongBuffer
+      public boolean isEmpty() { return wordsInUse == 0;}
+      int transderBits = bitIndex % 64;    
+其中
+  1L &lt;&lt; bitIndex就是 2的 bitIndex次方，也就是某一位是1，其余是0的情况
+     words[wordIndex] |= (1L &lt;&lt; bitIndex)
+   其中 a|=b就是 a=a|b,  words[wordsIndex] |= (1L &lt;&lt; transferBits);
+     words[wordIndex]  =   words[wordIndex] | (1L &lt;&lt; bitIndex)
+ 04说明：
+    BitSet是位操作的对象，值只有0或1即false和true，
+    内部维护了一个long数组，初始只有一个long，所以BitSet最小的size是64，
+    当随着存储的元素越来越多，BitSet内部会动态扩充，最终内部是由N个long来存储，这些针对操作都是透明的。
+    一个1G的空间，有 8*1024*1024*1024=8.58*10^9bit，也就是可以表示85亿个不同的数
+     动态扩容： private void ensureCapacity(int wordsRequired){}
+</pre></div>
+
+
+<h3>Roaring BitMap</h3>
+<div class="highlight"><pre><span></span> Roaring bitmap用来表示所有32-bit的unsigned integer的集合(共2 ^ 32 = 42 9496 7296个)
+  42.9亿
+ 用以解决数据稀疏问题，比如三个元素(2,200,10000000)，则需要初始化的长度为 10000000，
+  此时可以使用 Roaring BitMap 算法来解决，
+  也可以使用goolge的  EWAHCompressedBitmap  来解决
+   memory-mapped files, you can use the org.roaringbitmap.buffer package instead.
+  数据结构
+     数据结构为Key-Value的键值
+依赖
+    RoaringBitmap
+        <span class="c">&lt;!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap --&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.roaringbitmap<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>RoaringBitmap<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>0.7.45<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    JavaEWAH
+        <span class="c">&lt;!-- https://mvnrepository.com/artifact/com.googlecode.javaewah/JavaEWAH --&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>com.googlecode.javaewah<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>JavaEWAH<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>1.1.6<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+
+<h3>Bloom Filter</h3>
+<div class="highlight"><pre><span></span>布隆算法（Bloom Filter）是以 BitMap 为基础的排重算法。
+ 二进制向量和一系列随机映射函数。布隆过滤器可以用于检索一个元素是否在一个集合中
+ 利用hash函数把数据映射到bit数组中
+ 应用场景
+    网页爬虫对URL的去重，避免爬取相同的URL地址；
+    反垃圾邮件，从数十亿个垃圾邮件列表中判断某邮箱是否垃圾邮箱（同理，垃圾短信）；
+    缓存击穿，将已存在的缓存放到布隆中，当黑客访问不存在的缓存时迅速返回避免缓存及DB挂掉。
+ BloomFilter的关键在于 hash算法的设定 和 bit数组的大小 确定
+    google的guava包中提供了BloomFilter类
+       private static BloomFilter&lt;Integer&gt; bloomFilter = BloomFilter.create(Funnels.integerFunnel(), size, 0.0001);
+   Hadoop：org.apache.hadoop.util.bloom.BloomFilter（基于BitSet实现）
+ CBF 布隆过滤器的变体CBF(Counting bloomfilter) 。CBF将基本Bloom Filter每一个Bit改  为一个计数器，这样就可以实现删除字符串的功能
+ SBF（Spectral Bloom Filter）:在判断元素是否存在的基础上还可以查询集合元素的出现频率。
+ ACBF（Accurate Counting Bloom Filter）:通过 offset indexing 的方式将 Counter 数组划分成多个层级
+</pre></div>
+
+
+<h4>其他</h4>
+<div class="highlight"><pre><span></span>1.报错类型一
+    Lost task 9.2 in stage 8.0 (TID 3178, slave06-sit.cnsuning.com, executor 5): 
+    java.lang.NoSuchMethodError: org.roaringbitmap.RoaringBitmap.first()
+    2.3.3, 2.4.0, 3.0.0：
+        RoaringBitmap-0.5.11   
+    2.3.4, 2.4.2, 3.0.0
+       Upgrade to  RoaringBitmap-0.7.45        
+    不打进到包里
+        使用  pom.xml添加以下的情况
+          <span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
+
+2.Spark中使用 RoaringBitmap的地方
+    org.apache.spark.serializer.KryoSerializer
+        class KryoSerializer(conf: SparkConf)
+    org.apache.spark.scheduler
+        private[spark] sealed trait MapStatus   
+        Make MapStatus use less memory uage
+3.BitSet 源码
+public void set(int bitIndex) {
+    if (bitIndex <span class="nt">&lt; 0</span><span class="err">)</span> <span class="err">throw</span> <span class="err">new</span> <span class="err">IndexOutOfBoundsException(&quot;bitIndex</span> <span class="err">&lt;</span> <span class="err">0:</span> <span class="err">&quot;</span> <span class="err">+</span> <span class="err">bitIndex);</span>
+    <span class="err">int</span> <span class="na">wordIndex =</span> <span class="s">wordIndex(bitIndex);</span>
+    <span class="err">expandTo(wordIndex);</span>
+    <span class="err">words[wordIndex]</span> <span class="err">|=</span> <span class="err">(1L</span> <span class="err">&lt;&lt;</span> <span class="err">bitIndex);</span> <span class="err">//</span> <span class="err">Restores</span> <span class="err">invariants</span>
+    <span class="err">checkInvariants();</span>
+<span class="err">}</span>
+
+<span class="err">private</span> <span class="err">static</span> <span class="err">int</span> <span class="err">wordIndex(int</span> <span class="err">bitIndex)</span> <span class="err">{</span> <span class="err">return</span> <span class="err">bitIndex</span> <span class="nt">&gt;</span>&gt; ADDRESS_BITS_PER_WORD;}
+
+private void expandTo(int wordIndex) { int wordsRequired = wordIndex+1;
+    if (wordsInUse <span class="nt">&lt; wordsRequired</span><span class="err">)</span> <span class="err">{</span> <span class="err">ensureCapacity(wordsRequired);</span><span class="na">wordsInUse =</span> <span class="s">wordsRequired;</span> <span class="err">}</span>
+<span class="err">}</span>
+
+<span class="err">public</span> <span class="err">boolean</span> <span class="err">get(int</span> <span class="err">bitIndex)</span> <span class="err">{</span>
+   <span class="err">if</span> <span class="err">(bitIndex</span> <span class="err">&lt;</span> <span class="err">0)</span>   <span class="err">throw</span> <span class="err">new</span> <span class="err">IndexOutOfBoundsException(&quot;bitIndex</span> <span class="err">&lt;</span> <span class="err">0:</span> <span class="err">&quot;</span> <span class="err">+</span> <span class="err">bitIndex);</span>
+    <span class="err">checkInvariants();</span>
+    <span class="err">int</span> <span class="na">wordIndex =</span> <span class="s">wordIndex(bitIndex);</span>
+    <span class="err">return</span> <span class="err">(wordIndex</span> <span class="err">&lt;</span> <span class="err">wordsInUse)</span> <span class="err">&amp;&amp;</span> <span class="err">((words[wordIndex]</span> <span class="err">&amp;</span> <span class="err">(1L</span> <span class="err">&lt;&lt;</span> <span class="err">bitIndex))</span> <span class="err">!=</span> <span class="err">0);</span>
+<span class="err">}</span>
+
+<span class="err">4.</span> <span class="err">STL是Standard</span> <span class="err">Template</span> <span class="err">Library-标准模板库,目的是标准化组件</span>
+</pre></div>
+
+
+<h3>参考：</h3>
+<div class="highlight"><pre><span></span> 漫画：什么是Bitmap算法？  https://www.sohu.com/a/300039010_114877
+ https://issues.apache.org/jira/browse/SPARK-27216
+ Upgrade RoaringBitmap to 0.7.45 to fix Kryo unsafe ser/dser issue
+  spark 2.0 MapStatus  https://blog.csdn.net/houzhizhen/article/details/53514330
+ RoaringBitmap https://devhub.io/repos/RoaringBitmap-RoaringBitmap
+ BitMap与RoaringBitmap、JavaEWAH  https://blog.csdn.net/weixin_42142408/article/details/89426499
+ 浅谈bitset  https://cmwqf.github.io/2019/01/30/%E6%B5%85%E8%B0%88bitset/
+ Java的BitSet原理及应用 https://www.jianshu.com/p/4fbad3a6d253
+ BitSet的应用 https://blog.csdn.net/kongmin_123/article/details/82257209
+ RoaringBitmap https://devhub.io/repos/RoaringBitmap-RoaringBitmap
+ 布隆过滤器之Counting Bloom Filter https://my.oschina.net/freelili/blog/3001045
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="https://github.com/ytluck">yt</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://pelican-zh.readthedocs.org/en/latest/zh-cn/settings/">ye</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-76643035-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</body>
+</html>

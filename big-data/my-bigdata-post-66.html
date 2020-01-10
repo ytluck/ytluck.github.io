@@ -90,6 +90,45 @@ Flink也有类似的系统
     Encoder&lt;Row&gt; rowEncoder = Encoders.javaSerialization(Row.class);
     Dataset&lt;Row&gt; dsString2Row = ds.map(
             (MapFunction&lt;String, Row&gt;) value -&gt; RowFactory.create(value, value.length()), rowEncoder);
+6.   Dataset&lt;Row&gt;
+//创建DataSet的时候指明数据是 RowEncoder 类型
+List&lt;Row&gt; gradeData = Arrays.asList(
+        RowFactory.create(&quot;abc&quot;, &quot;3&quot;, &quot;年级人群&quot;),
+        RowFactory.create(&quot;abc&quot;, &quot;4&quot;, &quot;年级人群&quot;),
+        RowFactory.create(&quot;abc&quot;, &quot;9&quot;, &quot;年级人群&quot;)          
+);
+ StructType grdSchema = new StructType(new StructField[]{
+        new StructField(&quot;class_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+        new StructField(&quot;grade_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+        new StructField(&quot;grade_nm&quot;, DataTypes.StringType, false, Metadata.empty())
+});
+//构造Dataset
+Dataset&lt;Row&gt; dimensionDF = spark.createDataFrame(gradeData, gradeSchema);
+// 构造 Row的 RowEncoder 
+StructType montiorSchema = new StructType(new StructField[]{
+        new StructField(&quot;class_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+         new StructField(&quot;grade_cd&quot;, DataTypes.StringType, false, Metadata.empty()),
+        new StructField(&quot;grade_nm&quot;, DataTypes.StringType, false, Metadata.empty())
+});
+ExpressionEncoder&lt;Row&gt; data2Encoder=  RowEncoder.apply(dimensionDF.schema());
+Encoder&lt;Row&gt;  dataEncoder= RowEncoder.apply(montiorSchema);
+//Dataset的 map方法
+Dataset&lt;Row&gt;  montiorDF =   dimensionDF.map(
+        new MapFunction&lt;Row, Row&gt;(){
+            @Override
+            public Row call(Row montiorRow) throws Exception {
+                String class_cd = montiorRow.getAs(&quot;class_cd&quot;).toString().toLowerCase();
+                String grade_cd = montiorRow.getAs(&quot;grade_cd&quot;);
+                String grade_nm = montiorRow.getAs(&quot;grade_nm&quot;);
+                return RowFactory.create(class_cd, grade_cd, grade_nm);
+            } },
+        dataEncoder);
+
+Encoder for Row Type Spark Datasets  https://stackoverflow.com/questions/43238693/encoder-for-row-type-spark-datasets
+ org.apache.spark.sql.catalyst.encoders.RowEncoder
+Dataset的源码
+ new Dataset[Row](sparkSession, qe, RowEncoder(qe.analyzed.schema)
+ def toDF(): DataFrame = new Dataset[Row](sparkSession, queryExecution, RowEncoder(schema))
 </pre></div>
 
 
